@@ -1,6 +1,6 @@
 package com.golfing8.kcommon.command.argument;
 
-import com.golfing8.kcommon.command.PKCommand;
+import com.golfing8.kcommon.command.KCommand;
 import lombok.Data;
 import org.bukkit.command.CommandSender;
 
@@ -16,7 +16,7 @@ public class ArgumentContext {
     /**
      * The PKCommand the argument belongs to.
      */
-    private final PKCommand command;
+    private final KCommand command;
     /**
      * The label that was used.
      */

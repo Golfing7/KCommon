@@ -1,5 +1,6 @@
 package com.golfing8.kcommon;
 
+import com.golfing8.kcommon.command.impl.KModuleCommand;
 import com.golfing8.kcommon.util.NMSVersion;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -37,5 +38,6 @@ public class KCommon extends KPlugin{
         this.debug = getConfig().getBoolean("debug", false);
         this.serverVersion = NMSVersion.fromBukkitPackageName(Bukkit.getServer().getClass().getName().split("\\.")[3]);
         NMS.initialize();
+        new KModuleCommand().register();
     }
 }

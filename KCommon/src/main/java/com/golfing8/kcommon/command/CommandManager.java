@@ -29,12 +29,12 @@ public class CommandManager {
     }
 
     /**
-     * Registers a {@link PKCommand} to the bukkit command map.
+     * Registers a {@link KCommand} to the bukkit command map.
      *
      * @param command the command.
      * @return the registered plugin command.
      */
-    public PluginCommand registerNewCommand(PKCommand command){
+    public PluginCommand registerNewCommand(KCommand command){
         PluginCommand pluginCommand = getCommand(command.getCommandName(), command.getCommandAliases());
 
         getCommandMap().register(plugin.getName(), pluginCommand);
@@ -51,7 +51,7 @@ public class CommandManager {
      *
      * @param command the command to use.
      */
-    public void unregisterCommand(PKCommand command){
+    public void unregisterCommand(KCommand command){
         deregisterCommand(command.getCommandName(), command.getCommandAliases());
     }
 

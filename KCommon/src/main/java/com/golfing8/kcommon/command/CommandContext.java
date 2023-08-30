@@ -35,7 +35,7 @@ public class CommandContext {
      * The command this context is running on.
      */
     @Getter
-    private final PKCommand command;
+    private final KCommand command;
 
     /**
      * The next available index of an argument.

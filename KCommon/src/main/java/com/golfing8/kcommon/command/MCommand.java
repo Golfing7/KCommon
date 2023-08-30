@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * An abstract module command, used in modules that need to register commands for themselves.
  */
-public abstract class MCommand<T extends Module> extends PKCommand implements LangConfigContainer {
+public abstract class MCommand<T extends Module> extends KCommand implements LangConfigContainer {
     /**
      * The module this command is tied to.
      */
@@ -50,7 +50,7 @@ public abstract class MCommand<T extends Module> extends PKCommand implements La
         StringBuilder builder = new StringBuilder();
 
         //Generate the command prefix.
-        PKCommand parent = getParent();
+        KCommand parent = getParent();
         while(parent != null) {
             builder.append(parent.getCommandName()).append("-");
             parent = parent.getParent();

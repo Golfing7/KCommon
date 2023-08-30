@@ -331,6 +331,6 @@ public final class MS {
     }
 
     private static String[] split(String message){
-        return message.split(SPLIT_STRING_SEQUENCE);
+        return message == null ? new String[0] : message.split(SPLIT_STRING_SEQUENCE);
     }
 }

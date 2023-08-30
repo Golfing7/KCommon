@@ -95,7 +95,7 @@ public final class CommandArguments {
     /**
      * A command argument for all modules.
      */
-    public static final CommandArgument<Module> MODULE_ARGUMENT = new CommandArgument<>("A module", (context) -> {
+    public static final CommandArgument<Module> MODULE = new CommandArgument<>("A module", (context) -> {
         return Modules.getAll().stream().map(Module::getModuleName).collect(Collectors.toList());
     }, (context) -> {
         return Modules.getModule(context.getArgument()) != null;

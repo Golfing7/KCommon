@@ -26,7 +26,7 @@ public @interface Cmd {
     /**
      * The visibility of this command.
      */
-    CommandVisibility visibility() default CommandVisibility.PUBLIC;
+    CommandVisibility visibility() default CommandVisibility.PROTECTED;
 
     String description() default "No provided description";
 
