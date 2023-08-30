@@ -1,0 +1,43 @@
+package com.golfing8.kcommon.menu.action;
+
+import org.bukkit.event.inventory.InventoryClickEvent;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class ClickAction {
+    private long cooldownLength;
+    private ClickRunnable clickRunnable;
+
+    private Map<UUID, Long> clickTimes;
+
+    public ClickAction(ClickRunnable clickRunnable) {
+        this(0, clickRunnable);
+    }
+
+    public ClickAction(long cooldownLength, ClickRunnable clickRunnable) {
+        this.cooldownLength = cooldownLength;
+        this.clickRunnable = clickRunnable;
+
+        this.clickTimes = new HashMap<>();
+    }
+
+    public void attemptClick(InventoryClickEvent event) {
+        if (!clickTimes.containsKey(event.getWhoClicked().getUniqueId())) {
+            clickRunnable.click(event);
+
+            if (cooldownLength > 0) {
+                clickTimes.put(event.getWhoClicked().getUniqueId(), System.currentTimeMillis());
+            }
+        } else {
+            if (System.currentTimeMillis() - clickTimes.get(event.getWhoClicked().getUniqueId()) < cooldownLength) {
+                clickRunnable.clickCooldown(event);
+            } else {
+                clickRunnable.click(event);
+
+                clickTimes.put(event.getWhoClicked().getUniqueId(), System.currentTimeMillis());
+            }
+        }
+    }
+}

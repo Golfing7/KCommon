@@ -1,0 +1,51 @@
+package com.golfing8.kcommon.struct.placeholder;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+
+/**
+ * Used specifically in cases where multiple lines are replaced.
+ * <p/>
+ * An item with text "something %PLACEHOLDER%" in its lore will do the following
+ * <p/>
+ * - "Some text"<p />
+ * - "Something Something" <p />
+ * - "something %PLACEHOLDER%" <p />
+ * and the replacement of lines counting 1-3 would be:
+ * <p />
+ * - "Some text"<p />
+ * - "Something Something" <p />
+ * - "1" <p />
+ * - "2" <p />
+ * - "3" <p />
+ * Note that the line with the placeholder is deleted and replaced with the first line of the placeholder. This is true with messages as well.
+ *
+ */
+@AllArgsConstructor
+public class MultiLinePlaceholder {
+    /**
+     * The label of the placeholder, typically in %FORMAT%.
+     */
+    @Getter
+    private final String label;
+    /**
+     * The replacement list to replace the label with.
+     */
+    @Getter
+    private final List<String> replacement;
+
+    /**
+     * Generates a placeholder with the default naming convention and a list of string values.
+     *
+     * @param label the label, will be converted to uppercase and surrounded in '%'s
+     * @param values the values to replace the label with.
+     * @return the created placeholder.
+     */
+    public static MultiLinePlaceholder percent(@Nonnull String label, @Nonnull List<String> values) {
+        String trueLabel = "%" + label.toUpperCase() + "%";
+        return new MultiLinePlaceholder(trueLabel, values);
+    }
+}
