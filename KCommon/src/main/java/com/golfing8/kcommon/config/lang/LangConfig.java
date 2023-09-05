@@ -109,7 +109,7 @@ public class LangConfig {
      * @return true if the item was added to the config.
      */
     public boolean addLanguageConstant(String key, List<String> value) {
-        return addLanguageConstant(key, new Message(value, null, null));
+        return addLanguageConstant(key, new Message(value, null, null, null));
     }
 
     /**
@@ -134,6 +134,8 @@ public class LangConfig {
         }
         return false;
     }
+
+
 
     /**
      * Gets the message with the given key.

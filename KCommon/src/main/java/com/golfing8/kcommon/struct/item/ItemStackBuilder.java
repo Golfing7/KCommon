@@ -319,6 +319,8 @@ public final class ItemStackBuilder {
             ((Map) value).forEach((k, v) -> {
                 setValueInNBT(nbtItem, k.toString(), v);
             });
+        } else if (value instanceof Boolean) {
+            nbtItem.setBoolean(key, (Boolean) value);
         }
     }
 

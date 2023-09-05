@@ -159,6 +159,15 @@ public interface LangConfigContainer {
     }
 
     /**
+     * If the LangConfig managing this container should reflectively load language enums for the implementor of this interface.
+     *
+     * @return true if this supports lang enums.
+     */
+    default boolean supportsLangEnums() {
+        return true;
+    }
+
+    /**
      * Gets the lang config backing this container.
      *
      * @return the language config.

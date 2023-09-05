@@ -106,8 +106,6 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
 
         Reflection.discoverModules((PluginClassLoader) getClassLoader()).forEach(mClass -> {
             //We only want to work on our own modules, not other plugins
-            Bukkit.getLogger().info(mClass.getPackage().getName());
-            Bukkit.getLogger().info(this.getClass().getPackage().getName());
             if (!mClass.getPackage().getName().startsWith(this.getClass().getPackage().getName()))
                 return;
 

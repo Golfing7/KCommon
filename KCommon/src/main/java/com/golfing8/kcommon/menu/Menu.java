@@ -9,6 +9,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.golfing8.kcommon.menu.MenuUtils.getSlotFromCartCoords;
 
@@ -95,6 +96,9 @@ public interface Menu extends Listener {
     void addClickAction(int slot, ClickAction clickAction);
 
     void clearClickActions(int slot);
+    void clearAllClickActions();
+    Map<Integer, List<ClickAction>> getClickActions();
+    void setClickActions(Map<Integer, List<ClickAction>> newActions);
 
     void onClose(CloseRunnable runnable);
 

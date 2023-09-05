@@ -27,6 +27,6 @@ public class KModuleReloadCommand extends KCommand {
         module.reloadWithDependencies();
         long timeEnd = System.currentTimeMillis();
 
-        KCommon.getInstance().sendConfigMessage(context.getSender(), "reload-command-message", "MODULE", module.getModuleName(), timeEnd - timeBegin);
+        KCommon.getInstance().sendConfigMessage(context.getSender(), "reload-command-message", "MODULE", module.getModuleName(), "TIME", timeEnd - timeBegin);
     }
 }

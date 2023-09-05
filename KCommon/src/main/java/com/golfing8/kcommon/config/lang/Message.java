@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.lang;
 
+import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.FieldType;
@@ -9,6 +10,7 @@ import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.title.Title;
 import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
+import lombok.Builder;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -24,6 +26,7 @@ import java.util.List;
 /**
  * A message which can represent a string or a list of strings.
  */
+@Builder
 public class Message {
     /**
      * The message to send to the player, can be a string or list.
@@ -37,6 +40,9 @@ public class Message {
      */
     @Getter @Nullable
     private Title title;
+    /** The message for the player's action bar */
+    @Getter @Nullable
+    private String actionBar;
 
     /**
      * Constructs a message depending on the type given.
@@ -60,6 +66,9 @@ public class Message {
             this.title = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "title"),
                     new FieldType(Title.class));
             Object oMsg = section.get("message");
+
+            // Read the action bar.
+            this.actionBar = section.getString("actionbar");
 
             //Get the actual message.
             if(oMsg instanceof String) {
@@ -86,10 +95,11 @@ public class Message {
         }
     }
 
-    public Message(@Nullable List<String> messages, @Nullable List<SoundWrapper> sounds, @Nullable Title title) {
+    public Message(@Nullable List<String> messages, @Nullable List<SoundWrapper> sounds, @Nullable Title title, @Nullable String actionBar) {
         this.messages = messages == null ? Collections.emptyList() : messages;
         this.sounds = sounds == null ? Collections.emptyList() : sounds;
         this.title = title;
+        this.actionBar = actionBar;
     }
 
     /**
@@ -117,6 +127,10 @@ public class Message {
             MS.sendTitle((Player) sender, getTitle());
         }
 
+        if (getActionBar() != null && sender instanceof Player) {
+            NMS.getTheNMS().sendActionBar((Player) sender, MS.parseSingle(actionBar, placeholders));
+        }
+
         if (getSounds() != null && sender instanceof Player) {
             getSounds().forEach(sound -> {
                 sound.send((Player) sender);
@@ -138,6 +152,10 @@ public class Message {
 
         if (getTitle() != null && sender instanceof Player) {
             MS.sendTitle((Player) sender, getTitle());
+        }
+
+        if (getActionBar() != null && sender instanceof Player) {
+            NMS.getTheNMS().sendActionBar((Player) sender, MS.parseSingle(actionBar, placeholders));
         }
 
         if (getSounds() != null && sender instanceof Player) {
@@ -164,6 +182,10 @@ public class Message {
 
         if (getTitle() != null && sender instanceof Player) {
             MS.sendTitle((Player) sender, getTitle(), placeholders);
+        }
+
+        if (getActionBar() != null && sender instanceof Player) {
+            NMS.getTheNMS().sendActionBar((Player) sender, MS.parseSingle(actionBar, placeholders));
         }
 
         if (getSounds() != null && sender instanceof Player) {

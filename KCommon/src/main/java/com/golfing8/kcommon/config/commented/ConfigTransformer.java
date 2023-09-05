@@ -128,7 +128,7 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
             return false;
 
         String strippedLine = StringUtils.strip(line);
-        return Character.isAlphabetic(strippedLine.charAt(0)) || strippedLine.charAt(0) == '\'';
+        return strippedLine.contains(":") && (Character.isAlphabetic(strippedLine.charAt(0)) || strippedLine.charAt(0) == '\'');
     }
 
     @NotNull

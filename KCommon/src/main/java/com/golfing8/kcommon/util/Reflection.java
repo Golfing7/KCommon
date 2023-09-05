@@ -123,4 +123,19 @@ public final class Reflection {
         }
         return map;
     }
+
+    /**
+     * Gets all static nested classes inside the given class.
+     *
+     * @param main the main class.
+     * @return the nested classes
+     */
+    public static Set<Class<?>> getAllNestedClasses(Class<?> main) {
+        Set<Class<?>> classes = new HashSet<>();
+        for (Class<?> clazz : main.getDeclaredClasses()) {
+            classes.add(clazz);
+            classes.addAll(getAllNestedClasses(clazz));
+        }
+        return classes;
+    }
 }

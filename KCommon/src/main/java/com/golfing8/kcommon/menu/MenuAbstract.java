@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -95,6 +96,22 @@ public abstract class MenuAbstract implements Menu {
     @Override
     public void clearClickActions(int slot) {
         actionMap.remove(slot);
+    }
+
+    @Override
+    public void clearAllClickActions() {
+        actionMap.clear();
+    }
+
+    @Override
+    public Map<Integer, List<ClickAction>> getClickActions() {
+        return Collections.unmodifiableMap(this.actionMap);
+    }
+
+    @Override
+    public void setClickActions(Map<Integer, List<ClickAction>> newActions) {
+        actionMap.clear();
+        actionMap.putAll(newActions);
     }
 
     @Override

@@ -22,8 +22,7 @@ public class CAMessage implements ConfigAdapter<Message> {
         if (entry.getSource() != null)
             return new Message(entry.getSource());
 
-        Bukkit.getLogger().info("Source was null.");
-        return new Message((List<String>) entry.getPrimitive(), null, null);
+        return new Message((List<String>) entry.getPrimitive(), null, null, null);
     }
 
     @Override
@@ -47,6 +46,9 @@ public class CAMessage implements ConfigAdapter<Message> {
                 sounds.put(String.valueOf(count++), adapter.toPrimitive(wrapper).getPrimitive());
             }
             items.put("sounds", sounds);
+        }
+        if (object.getActionBar() != null) {
+            items.put("actionbar", object.getActionBar());
         }
         if (object.getTitle() != null) {
             ConfigAdapter<Title> adapter = (ConfigAdapter<Title>) ConfigTypeRegistry.findAdapter(Title.class);
