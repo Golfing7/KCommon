@@ -269,7 +269,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
                 FileOutputStream writer = new FileOutputStream(configPath.toFile())) {
 
                 //Check that the resource exists
-                if(resource == null) {
+                if(resource == null && Files.notExists(configPath)) {
                     Files.createFile(configPath);
                 } else {
                     //Read from the input stream and write the output stream

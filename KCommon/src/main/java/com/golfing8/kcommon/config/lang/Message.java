@@ -109,7 +109,7 @@ public class Message {
      * @return if this message only has simple text messages.
      */
     public boolean isSimple() {
-        return (this.sounds == null || this.sounds.isEmpty()) && (this.title == null);
+        return (this.sounds == null || this.sounds.isEmpty()) && (this.title == null) && (this.actionBar == null);
     }
 
     /**
