@@ -280,7 +280,7 @@ public abstract class MenuAbstract implements Menu {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event){
-        if(onClose != null && this.backingInventory == event.getInventory()){
+        if(onClose != null && this.backingInventory.getViewers().contains(event.getPlayer())){
             onClose.run(event);
         }
     }
