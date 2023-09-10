@@ -169,7 +169,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
         this.objectCache.remove(key);
         try{
-            Files.delete(directoryPrefix.resolve(key));
+            Files.delete(directoryPrefix.resolve(String.format("%s.json", key)));
         }catch(IOException exc) {
             throw new RuntimeException(String.format("Failed to delete object with type %s with key %s!", this.getTypeClass().getName(), key));
         }

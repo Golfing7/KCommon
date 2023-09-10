@@ -131,6 +131,30 @@ public class ConfigTypeRegistry {
      * Gets a value from the config by using the CONFIG_ADAPTER_MAP. If the type is unrecognized, the section's {@link ConfigurationSection#get(String, Object) get} method is used.
      *
      * @param entry the config entry.
+     * @param clazz the class type.
+     * @return the value
+     * @param <T> the type of value
+     */
+    public static <T> T getFromType(ConfigEntry entry, Class<T> clazz) {
+        return getFromType(entry, new FieldType(clazz));
+    }
+
+    /**
+     * Gets a value from the config by using the CONFIG_ADAPTER_MAP. If the type is unrecognized, the section's {@link ConfigurationSection#get(String, Object) get} method is used.
+     *
+     * @param entry the config entry.
+     * @param field the field type.
+     * @return the value
+     * @param <T> the type of value
+     */
+    public static <T> T getFromType(ConfigEntry entry, Field field) {
+        return getFromType(entry, new FieldType(field));
+    }
+
+    /**
+     * Gets a value from the config by using the CONFIG_ADAPTER_MAP. If the type is unrecognized, the section's {@link ConfigurationSection#get(String, Object) get} method is used.
+     *
+     * @param entry the config entry.
      * @param field the field type.
      * @return the value
      * @param <T> the type of value
@@ -143,24 +167,6 @@ public class ConfigTypeRegistry {
         }
 
         return (T) adapter.toPOJO(entry.getPrimitive(), field);
-    }
-
-    /**
-     * Gets a value from the config by using the CONFIG_ADAPTER_MAP. If the type is unrecognized, the section's {@link ConfigurationSection#get(String, Object) get} method is used.
-     *
-     * @param entry the config entry.
-     * @param field the field type.
-     * @return the value
-     * @param <T> the type of value
-     */
-    @SuppressWarnings({"unchecked"})
-    public static <T> T getFromType(ConfigEntry entry, Field field) {
-        ConfigAdapter<? super T> adapter = (ConfigAdapter<? super T>) findAdapter(field.getType());
-        if (adapter == null) {
-            return (T) entry.get();
-        }
-
-        return (T) adapter.toPOJO(entry.getPrimitive(), new FieldType(field));
     }
 
     /**

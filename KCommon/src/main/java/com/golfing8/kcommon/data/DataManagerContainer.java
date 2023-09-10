@@ -47,12 +47,12 @@ public interface DataManagerContainer {
     /**
      * Gets, or creates, the object of the given type linked to the given key.
      *
-     * @param type the type.
      * @param key the key.
+     * @param type the type.
      * @return the data.
      * @param <T> the type of the data.
      */
-    default <T extends DataSerializable> T getOrCreate(Class<T> type, String key) {
+    default <T extends DataSerializable> T getOrCreate(String key, Class<T> type) {
         DataManager<T> dataManager = getDataManager(type);
         if(dataManager == null)
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", type.getName()));
@@ -71,8 +71,8 @@ public interface DataManagerContainer {
      * @return the data.
      * @param <T> the type of the data.
      */
-    default <T extends DataSerializable> T getOrCreate(Class<T> type, UUID key) {
-        return getOrCreate(type, key.toString());
+    default <T extends DataSerializable> T getOrCreate(UUID key, Class<T> type) {
+        return getOrCreate(key.toString(), type);
     }
 
     /**
@@ -122,6 +122,21 @@ public interface DataManagerContainer {
 
         DataManager<T> dataManager = getDataManager(dataClass);
         dataManager.delete(key);
+    }
+
+    /**
+     * Deletes the given object.
+     *
+     * @param data the data.
+     * @param <T> the type of the data.
+     */
+    @SuppressWarnings("unchecked")
+    default <T extends DataSerializable> void deleteData(T data) {
+        if(!this.getDataManagerMap().containsKey(data.getClass()))
+            throw new UnsupportedOperationException(String.format("Data class %s not supported!", data.getClass().getName()));
+
+        DataManager<T> dataManager = (DataManager<T>) getDataManager(data.getClass());
+        dataManager.delete(data.getKey());
     }
 
     //Shorthand for the below method.
