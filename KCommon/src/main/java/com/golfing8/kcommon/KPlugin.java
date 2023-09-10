@@ -66,6 +66,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         onDisableInner();
 
         for (Module module : Modules.getAll()) {
+            if (module.getPlugin() != this)
+                continue;
+
             try {
                 module.shutdown();
             } catch (Throwable thr) {
