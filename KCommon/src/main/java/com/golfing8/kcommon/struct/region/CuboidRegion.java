@@ -17,15 +17,12 @@ public class CuboidRegion implements Region {
 
     //Creates a cuboid region with all the given bounds.
     public CuboidRegion(double minX, double maxX, double minY, double maxY, double minZ, double maxZ) {
-        if(minX > maxX || minY > maxY || minZ > maxZ)
-            throw new IllegalArgumentException("Minimum values must be smaller than maximum values!");
-
-        this.minX = minX;
-        this.maxX = maxX;
-        this.minY = minY;
-        this.maxY = maxY;
-        this.minZ = minZ;
-        this.maxZ = maxZ;
+        this.minX = Math.min(minX, maxX);
+        this.maxX = Math.max(minX, maxX);
+        this.minY = Math.min(minY, maxY);
+        this.maxY = Math.max(minY, maxY);
+        this.minZ = Math.min(minZ, maxZ);
+        this.maxZ = Math.max(minZ, maxZ);
 
         //Resolve the middle of the location.
         double middleX = (this.maxX + this.minX) / 2D;

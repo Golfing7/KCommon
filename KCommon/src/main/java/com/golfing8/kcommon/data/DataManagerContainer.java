@@ -195,4 +195,20 @@ public interface DataManagerContainer {
 
         return Collections.unmodifiableCollection(dataManager.getAll().values());
     }
+
+    /**
+     * Gets all the cached data instances for the given data type.
+     *
+     * @param type the type.
+     * @return a collection of all the data.
+     * @param <T> the type of data.
+     */
+    default  <T extends DataSerializable> Collection<T> getAllCachedDataOfType(Class<T> type) {
+        if(!this.getDataManagerMap().containsKey(type))
+            throw new UnsupportedOperationException(String.format("Data class %s not supported!", type.getName()));
+
+        DataManager<T> dataManager = getDataManager(type);
+
+        return Collections.unmodifiableCollection(dataManager.getAllCached().values());
+    }
 }

@@ -5,3 +5,7 @@ name: KCommon
 api-version: 1.17
 depend:
   - PlaceholderAPI
+  - Vault
+softdepend:
+  - HolographicDisplays
+  - DecentHolograms

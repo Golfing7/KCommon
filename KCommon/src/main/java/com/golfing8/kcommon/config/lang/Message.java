@@ -86,7 +86,6 @@ public class Message {
                 for(String soundKey : section.getConfigurationSection("sounds").getKeys(false)) {
                     SoundWrapper fromType = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "sounds." + soundKey),
                             new FieldType(SoundWrapper.class));
-                    System.out.println(fromType);
                     this.sounds.add(fromType);
                 }
             }

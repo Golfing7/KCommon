@@ -269,8 +269,8 @@ public abstract class MenuAbstract implements Menu {
             //Run the bottom runnable.
             if(this.bottomClickEvent != null) {
                 this.bottomClickEvent.attemptClick(event);
-                return;
             }
+            return;
         }
 
         if(actionMap.containsKey(event.getSlot())){

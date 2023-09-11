@@ -81,6 +81,13 @@ public interface DataManager<T extends DataSerializable> {
     Map<String, T> getAll();
 
     /**
+     * Gets all cached objects stored in the data manager
+     *
+     * @return a map of all cached objects mapped from their keys
+     */
+    Map<String, T> getAllCached();
+
+    /**
      * Deletes an object from the data manager
      *
      * @param obj the object to delete

@@ -80,14 +80,18 @@ public final class Placeholders {
         public String get(){
             String toSend = message;
             for (int i = 0; i < keys.size() && i < values.size(); i++) {
-                toSend = toSend.replace("{" + keys.get(i) + "}", values.get(i).get().toString());
+                Object o = values.get(i).get();
+                String value = o == null ? "null" : o.toString();
+                toSend = toSend.replace("{" + keys.get(i) + "}", value);
             }
             return toSend;
         }
         public StringPlaceholders send(Player player){
             String toSend = message;
             for (int i = 0; i < keys.size() && i < values.size(); i++) {
-                toSend = toSend.replace("{" + keys.get(i) + "}", values.get(i).get().toString());
+                Object o = values.get(i).get();
+                String value = o == null ? "null" : o.toString();
+                toSend = toSend.replace("{" + keys.get(i) + "}", value);
             }
             player.sendMessage(toSend);
             return this;

@@ -1,7 +1,10 @@
 package com.golfing8.kcommon.data.serializer;
 
 import com.golfing8.kcommon.struct.Pair;
+import com.golfing8.kcommon.struct.region.CuboidRegion;
+import com.golfing8.kcommon.struct.region.Region;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -56,6 +59,27 @@ public final class DataSerializer {
             float pitch = json.get("pitch").getAsFloat();
 
             return new Location(world, x, y, z, yaw, pitch);
+        });
+
+        registerTransformer(CuboidRegion.class, (loc) -> {
+            JsonObject object = new JsonObject();
+            object.addProperty("min-x", loc.getMinimumXValue());
+            object.addProperty("min-y", loc.getMinimumYValue());
+            object.addProperty("min-z", loc.getMinimumZValue());
+
+            object.addProperty("max-x", loc.getMaximumXValue());
+            object.addProperty("max-y", loc.getMaximumYValue());
+            object.addProperty("max-z", loc.getMaximumZValue());
+            return object;
+        }, (json) -> {
+            double minX = json.get("min-x").getAsDouble();
+            double minY = json.get("min-y").getAsDouble();
+            double minZ = json.get("min-z").getAsDouble();
+
+            double maxX = json.get("max-x").getAsDouble();
+            double maxY = json.get("max-y").getAsDouble();
+            double maxZ = json.get("max-z").getAsDouble();
+            return new CuboidRegion(minX, maxX, minY, maxY, minZ, maxZ);
         });
     }
 

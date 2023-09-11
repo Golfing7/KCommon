@@ -150,6 +150,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
                 try {
                     T t = this.loadObject(path);
                     toReturn.put(t.getKey(), t);
+                    objectCache.put(t.getKey(), t);
                 } catch (IOException e) {
                     throw new RuntimeException(String.format("Failed to load object with type %s under path %s!", getTypeClass().getName(), path), e);
                 }
@@ -160,6 +161,11 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
         toReturn.putAll(this.objectCache);
         return toReturn;
+    }
+
+    @Override
+    public Map<String, T> getAllCached() {
+        return new HashMap<>(this.objectCache);
     }
 
     @Override
