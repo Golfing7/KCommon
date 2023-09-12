@@ -1,9 +1,11 @@
 package com.golfing8.kcommon.nms.v1_19.access;
 
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
+import com.golfing8.kcommon.nms.item.NMSItemStack;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
@@ -56,5 +58,10 @@ public class MagicItems implements NMSMagicItems {
     @Override
     public void setCustomModelData(ItemMeta meta, int modelData) {
         meta.setCustomModelData(modelData);
+    }
+
+    @Override
+    public NMSItemStack wrapItemStack(ItemStack itemStack) {
+        return new com.golfing8.kcommon.nms.v1_19.item.ItemStack(CraftItemStack.asNMSCopy(itemStack));
     }
 }

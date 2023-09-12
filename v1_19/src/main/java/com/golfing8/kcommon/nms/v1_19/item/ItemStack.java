@@ -10,6 +10,11 @@ public class ItemStack implements NMSItemStack {
     }
 
     @Override
+    public String getI18DisplayName() {
+        return stack.p();
+    }
+
+    @Override
     public Object getHandle() {
         return stack;
     }

@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.nms.access;
 
+import com.golfing8.kcommon.nms.item.NMSItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,6 +21,14 @@ public interface NMSMagicItems {
      * @param modelData the custom model data.
      */
     void setCustomModelData(ItemMeta meta, int modelData);
+
+    /**
+     * Wraps the given item stack.
+     *
+     * @param itemStack the item stack.
+     * @return the wrapped item stack.
+     */
+    NMSItemStack wrapItemStack(ItemStack itemStack);
 
     default void setUnbreakable(ItemStack itemStack, boolean value){
         if(itemStack == null || !itemStack.hasItemMeta())

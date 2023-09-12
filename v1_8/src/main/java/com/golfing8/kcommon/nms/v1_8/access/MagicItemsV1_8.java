@@ -1,9 +1,12 @@
 package com.golfing8.kcommon.nms.v1_8.access;
 
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
+import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.nms.v1_8.item.ItemStackV1_8;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -57,6 +60,11 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
     public void setCustomModelData(ItemMeta meta, int modelData) {
 
+    }
+
+    @Override
+    public NMSItemStack wrapItemStack(ItemStack itemStack) {
+        return new ItemStackV1_8(CraftItemStack.asNMSCopy(itemStack));
     }
 
     public static EntityType translateNMSTypes(String nmsType){
