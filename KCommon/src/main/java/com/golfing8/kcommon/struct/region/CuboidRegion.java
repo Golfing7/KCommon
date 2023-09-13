@@ -12,7 +12,7 @@ public class CuboidRegion implements Region {
     /**
      * The absolute center of this region.
      */
-    private final BlockVector center;
+    private final transient BlockVector center;
     private final double minX, maxX, minY, maxY, minZ, maxZ;
 
     //Creates a cuboid region with all the given bounds.

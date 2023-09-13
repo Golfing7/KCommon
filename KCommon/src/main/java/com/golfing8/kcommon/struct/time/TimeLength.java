@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.struct.time;
 
-import com.golfing8.kcommon.data.JsonSerializable;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  * Represents some positive duration of time. This was created for the sake of regularizing string to time input.
  */
 @NoArgsConstructor
-public class TimeLength implements JsonSerializable {
+public class TimeLength {
     /**
      * The time length in ticks.
      */
@@ -144,18 +143,5 @@ public class TimeLength implements JsonSerializable {
             accumulation = 0;
         }
         return new TimeLength(totalTime);
-    }
-
-    @Nullable
-    @Override
-    public JsonObject serialize() {
-        JsonObject object = new JsonObject();
-        object.addProperty("duration", durationTicks);
-        return object;
-    }
-
-    @Override
-    public void deserialize(JsonObject object) {
-        this.durationTicks = object.get("duration").getAsLong();
     }
 }

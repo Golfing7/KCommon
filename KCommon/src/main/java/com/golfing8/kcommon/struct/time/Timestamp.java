@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.struct.time;
 
 import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.data.JsonSerializable;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import lombok.*;
@@ -17,7 +16,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Timestamp implements JsonSerializable {
+public final class Timestamp {
     /** This value is used when a field isn't being used by this timestamp. */
     public static final int UNUSED = -1;
     /** The year that takes place, or {@link #UNUSED} if not in use. */
@@ -68,56 +67,6 @@ public final class Timestamp implements JsonSerializable {
             return this.minute > timestamp.minute;
 
         return this.second > timestamp.second;
-    }
-
-    @Override
-    public JsonObject serialize() {
-        JsonObject object = new JsonObject();
-        if (this.year != UNUSED) {
-            object.addProperty("year", this.year);
-        }
-        if (this.month != UNUSED) {
-            object.addProperty("month", this.month);
-        }
-        if (this.dayOfYear != UNUSED) {
-            object.addProperty("dayOfYear", this.dayOfYear);
-        }
-        if (this.dayOfMonth != UNUSED) {
-            object.addProperty("dayOfMonth", this.dayOfMonth);
-        }
-        if (this.dayOfWeek != UNUSED) {
-            object.addProperty("dayOfWeek", this.dayOfWeek);
-        }
-        if (this.hour != UNUSED) {
-            object.addProperty("hour", this.hour);
-        }
-        if (this.minute != UNUSED) {
-            object.addProperty("minute", this.minute);
-        }
-        if (this.second != UNUSED) {
-            object.addProperty("second", this.second);
-        }
-        return object;
-    }
-
-    @Override
-    public void deserialize(JsonObject object) {
-        if (object.has("year"))
-            year = object.get("year").getAsInt();
-        if (object.has("month"))
-            month = object.get("month").getAsInt();
-        if (object.has("dayOfYear"))
-            dayOfYear = object.get("dayOfYear").getAsInt();
-        if (object.has("dayOfMonth"))
-            dayOfMonth = object.get("dayOfMonth").getAsInt();
-        if (object.has("dayOfWeek"))
-            dayOfWeek = object.get("dayOfWeek").getAsInt();
-        if (object.has("hour"))
-            hour = object.get("hour").getAsInt();
-        if (object.has("minute"))
-            minute = object.get("minute").getAsInt();
-        if (object.has("second"))
-            second = object.get("second").getAsInt();
     }
 
     @Override

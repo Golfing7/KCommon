@@ -1,23 +1,16 @@
 package com.golfing8.kcommon.data.serializer;
 
-import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.data.serializer.type.AdapterWorld;
-import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import com.golfing8.kcommon.data.serializer.type.WorldAdapterFactory;
 import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
-import com.golfing8.kcommon.struct.region.Region;
-import com.golfing8.kcommon.util.Reflection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import lombok.experimental.UtilityClass;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import java.io.NotSerializableException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,14 +93,17 @@ public final class DataSerializer {
      * @return the gson.
      */
     public static Gson getGSONBase() {
+        if (LOADED_GSON != null)
+            return LOADED_GSON;
         GsonBuilder builder = new GsonBuilder();
         builder.setPrettyPrinting();
+        builder.enableComplexMapKeySerialization();
         builder.disableHtmlEscaping();
         builder.excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC);
 
-        builder.registerTypeAdapter(World.class, AdapterWorld.INSTANCE);
+        builder.registerTypeAdapterFactory(WorldAdapterFactory.INSTANCE);
 
-        return builder.create();
+        return LOADED_GSON = builder.create();
     }
 
     /**

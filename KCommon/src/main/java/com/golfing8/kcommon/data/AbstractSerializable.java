@@ -9,19 +9,19 @@ import javax.annotation.Nullable;
 public abstract class AbstractSerializable implements DataSerializable {
     /** The ID of this  object */
     @Getter
-    private String objectId;
+    private String _objectId;
     /** If this object has changed */
     @Getter
     private transient boolean changed;
 
     @Override
     public String getKey() {
-        return objectId;
+        return _objectId;
     }
 
     @Override
     public void setKey(String key) {
-        this.objectId = key;
+        this._objectId = key;
     }
 
     @Override

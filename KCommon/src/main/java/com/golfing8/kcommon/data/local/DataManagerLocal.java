@@ -4,8 +4,11 @@ import com.golfing8.kcommon.data.DataManager;
 import com.golfing8.kcommon.data.DataManagerAbstract;
 import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.key.FieldIndexer;
+import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.Getter;
@@ -61,10 +64,11 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
      */
     private void saveAllChanged() {
         Map<String, JsonObject> objectMap = new HashMap<>();
+        Gson base = DataSerializer.getGSONBase();
         for (T obj : objectCache.values()) {
             if (obj.hasChanged()) {
                 obj.markSaved();
-                objectMap.put(obj.getKey(), obj.serialize());
+                objectMap.put(obj.getKey(), base.toJsonTree(obj).getAsJsonObject());
             }
         }
 
@@ -114,6 +118,9 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         }catch(IOException exc) {
             throw new RuntimeException(String.format("Failed load object with type %s with key %s!", getTypeClass().getName(), key));
         }
+        if (loaded == null)
+            return null;
+
         this.objectCache.put(key, loaded);
         return loaded;
     }
@@ -149,6 +156,9 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
                 try {
                     T t = this.loadObject(path);
+                    if (t == null)
+                        return;
+
                     toReturn.put(t.getKey(), t);
                     objectCache.put(t.getKey(), t);
                 } catch (IOException e) {
@@ -221,12 +231,15 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         JsonParser parser = new JsonParser();
 
         //Read the object in
-        JsonObject object = (JsonObject) parser.parse(reader);
+        JsonElement object = parser.parse(reader);
 
         //Create an empty instance
-        T newObject = createEmpty();
+        T newObject = DataSerializer.getGSONBase().fromJson(object, getTypeClass());
+        if (newObject == null) {
+            Files.delete(objPath);
+            return null;
+        }
         newObject.setKey(objPath.getFileName().toString().replace(".json", ""));
-        newObject.deserialize(object);
         return newObject;
     }
 
@@ -242,11 +255,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
             Files.createFile(objPath);
 
         try(Writer writer = Files.newBufferedWriter(objPath)) {
-            JsonObject jsonObject = obj.serialize();
-            if(jsonObject == null)
-                return;
-
-            writer.write(GSON.toJson(jsonObject));
+            writer.write(DataSerializer.getGSONBase().toJson(obj));
             writer.flush();
         }
     }
@@ -267,7 +276,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
             Files.createFile(objPath);
 
         try(Writer writer = Files.newBufferedWriter(objPath)) {
-            writer.write(GSON.toJson(object));
+            writer.write(DataSerializer.getGSONBase().toJson(object));
             writer.flush();
         }
     }

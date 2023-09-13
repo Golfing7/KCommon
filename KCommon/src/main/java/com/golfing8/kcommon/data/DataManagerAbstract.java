@@ -10,8 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public abstract class DataManagerAbstract<T extends DataSerializable> implements DataManager<T>{
-    protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
     @Getter
     private final String key;
     @Getter
@@ -31,15 +29,6 @@ public abstract class DataManagerAbstract<T extends DataSerializable> implements
         }catch (NoSuchMethodException e) {
             throw new RuntimeException(String.format("Failed to find default constructor for %s class!", typeClass.getName()), e);
         }
-    }
-
-    /**
-     * Gets the GSON instance this data manager uses.
-     *
-     * @return the gson instance.
-     */
-    public Gson getGSON() {
-        return GSON;
     }
 
     @Override

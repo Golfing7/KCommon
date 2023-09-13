@@ -14,12 +14,14 @@ import java.util.UUID;
 public abstract class SenderSerializable extends AbstractSerializable {
     /** The player's UUID. */
     @Getter
-    private UUID playerUUID;
+    private transient UUID playerUUID;
     /** The cached player object */
     private transient Player player;
 
     @Override
     public String getKey() {
+        if (playerUUID == null)
+            playerUUID = UUID.fromString(super.getKey());
         return playerUUID.toString();
     }
 
@@ -36,6 +38,9 @@ public abstract class SenderSerializable extends AbstractSerializable {
      */
     @Nullable
     public Player getPlayer() {
+        if (playerUUID == null)
+            playerUUID = UUID.fromString(super.getKey());
+
         if (player != null) {
             if (!player.isOnline())
                 return null;

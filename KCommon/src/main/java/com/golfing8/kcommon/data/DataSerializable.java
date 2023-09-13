@@ -3,7 +3,7 @@ package com.golfing8.kcommon.data;
 /**
  * Represents something that can be serialized by a {@link DataManager}.
  */
-public interface DataSerializable extends JsonSerializable {
+public interface DataSerializable {
     /**
      * Gets the key to use for this serializable
      *

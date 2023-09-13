@@ -33,7 +33,6 @@ dependencies {
     implementation("de.tr7zw:item-nbt-api:2.11.3") //For items.
     implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
     implementation("com.github.cryptomorin:XSeries:9.2.0") { isTransitive = false } //For XSeries
-    implementation("dev.morphia.morphia:morphia-core:2.0.0")
 
     compileOnly(project(":NMS"))
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0")
