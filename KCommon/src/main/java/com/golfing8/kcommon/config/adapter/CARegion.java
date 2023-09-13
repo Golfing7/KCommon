@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.adapter;
 
+import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
 import com.golfing8.kcommon.struct.region.Region;
 

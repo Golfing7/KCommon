@@ -2,11 +2,10 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.cryptomorin.xseries.XSound;
 import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
-import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.struct.SoundWrapper;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 

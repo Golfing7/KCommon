@@ -1,13 +1,10 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.cryptomorin.xseries.XSound;
-import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
-import com.golfing8.kcommon.struct.SoundWrapper;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.title.Title;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class CATitle implements ConfigAdapter<Title> {
     @Override

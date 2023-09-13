@@ -3,7 +3,7 @@ package com.golfing8.kcommon.config.commented;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.config.adapter.FieldType;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;

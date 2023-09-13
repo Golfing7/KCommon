@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
+import com.golfing8.kcommon.struct.reflection.FieldType;
+
 /**
  * A config adapter implementation for enums.
  */

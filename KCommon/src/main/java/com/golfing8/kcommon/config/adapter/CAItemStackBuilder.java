@@ -3,8 +3,8 @@ package com.golfing8.kcommon.config.adapter;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;

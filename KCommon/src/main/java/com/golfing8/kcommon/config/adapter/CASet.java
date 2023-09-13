@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 
 import java.util.*;
 

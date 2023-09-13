@@ -1,4 +1,4 @@
-package com.golfing8.kcommon.config.adapter;
+package com.golfing8.kcommon.struct.reflection;
 
 import com.golfing8.kcommon.util.Reflection;
 import lombok.AllArgsConstructor;

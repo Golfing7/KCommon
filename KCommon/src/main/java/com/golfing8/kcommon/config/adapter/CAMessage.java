@@ -3,8 +3,8 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.struct.SoundWrapper;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.title.Title;
-import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.List;

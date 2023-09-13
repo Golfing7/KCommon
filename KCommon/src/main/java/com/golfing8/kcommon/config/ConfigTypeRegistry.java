@@ -1,13 +1,10 @@
 package com.golfing8.kcommon.config;
 
 import com.cryptomorin.xseries.XPotion;
-import com.cryptomorin.xseries.XSound;
 import com.golfing8.kcommon.config.adapter.*;
-import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.menu.MenuUtils;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
-import com.golfing8.kcommon.struct.SoundWrapper;
-import com.golfing8.kcommon.struct.title.Title;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.potion.PotionEffect;

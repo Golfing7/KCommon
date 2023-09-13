@@ -1,15 +1,24 @@
 package com.golfing8.kcommon.data.serializer;
 
+import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.data.serializer.type.AdapterWorld;
+import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
 import com.golfing8.kcommon.struct.region.Region;
+import com.golfing8.kcommon.util.Reflection;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import lombok.experimental.UtilityClass;
+import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.io.NotSerializableException;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,6 +28,8 @@ import java.util.function.Function;
  */
 @UtilityClass
 public final class DataSerializer {
+    /** The GSON this serializer uses */
+    private static Gson LOADED_GSON;
     /**
      * Transformers for serialization.
      */
@@ -84,6 +95,22 @@ public final class DataSerializer {
     }
 
     /**
+     * Gets the base gson.
+     *
+     * @return the gson.
+     */
+    public static Gson getGSONBase() {
+        GsonBuilder builder = new GsonBuilder();
+        builder.setPrettyPrinting();
+        builder.disableHtmlEscaping();
+        builder.excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC);
+
+        builder.registerTypeAdapter(World.class, AdapterWorld.INSTANCE);
+
+        return builder.create();
+    }
+
+    /**
      * Attempts to serialize the given object as json. If
      *
      * @param obj the object to serialize.
@@ -91,8 +118,9 @@ public final class DataSerializer {
      * @throws IllegalArgumentException if the object does not have support for serialization.
      */
     public static JsonObject serialize(Object obj) throws IllegalArgumentException {
-        if(!TRANSFORMERS.containsKey(obj.getClass()))
-            throw new IllegalArgumentException(String.format("Unregistered class type %s!", obj.getClass().getName()));
+        if(!TRANSFORMERS.containsKey(obj.getClass())) {
+            return getGSONBase().toJsonTree(obj).getAsJsonObject();
+        }
 
         return TRANSFORMERS.get(obj.getClass()).getA().apply(obj);
     }
@@ -107,8 +135,9 @@ public final class DataSerializer {
      */
     @SuppressWarnings("unchecked")
     public static <T> T deserialize(Class<T> clazz, JsonObject object) {
-        if(!TRANSFORMERS.containsKey(clazz))
-            throw new IllegalArgumentException(String.format("Unregistered class type %s!", clazz.getName()));
+        if(!TRANSFORMERS.containsKey(clazz)) {
+            return getGSONBase().fromJson(object, clazz);
+        }
 
         return (T) TRANSFORMERS.get(clazz).getB().apply(object);
     }
