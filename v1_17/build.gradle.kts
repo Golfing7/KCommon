@@ -7,6 +7,10 @@ version = "0.1"
 
 repositories {
     mavenCentral()
+
+    maven {
+        url = uri("https://maven.enginehub.org/repo/")
+    }
 }
 
 dependencies {
@@ -15,7 +19,7 @@ dependencies {
 
     compileOnly(project(":NMS"))
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4")
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.0.0-SNAPSHOT")
+    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.15")
     compileOnly("io.papermc.paper:paper-api:1.17-R0.1-SNAPSHOT")
     compileOnly("org.spigotmc:spigot:1.17.2")
     compileOnly("com.mojang:authlib:1.0")

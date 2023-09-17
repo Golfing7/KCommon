@@ -19,7 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * The 1.19 implementation for the worldedit hook.
+ * The 1.17 implementation for the worldedit hook.
  */
 public class WorldEdit implements WorldEditHook {
     private final com.sk89q.worldedit.WorldEdit worldEdit;
