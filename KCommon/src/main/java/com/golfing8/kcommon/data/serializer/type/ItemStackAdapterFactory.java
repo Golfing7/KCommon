@@ -1,40 +1,45 @@
 package com.golfing8.kcommon.data.serializer.type;
 
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.*;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.*;
 
 /**
  * A type adapter for bukkit {@link ItemStack} instances.
  */
-public enum ItemStackAdapterFactory implements TypeAdapterFactory {
+public enum ItemStackAdapterFactory implements JsonSerializer<ConfigurationSerializable>, JsonDeserializer<ConfigurationSerializable> {
     INSTANCE;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-        if (!ItemStack.class.isAssignableFrom(typeToken.getRawType()))
-            return null;
+    final Type objectStringMapType = new TypeToken<Map<String, Object>>() {}.getType();
 
-        return (TypeAdapter<T>) new TypeAdapterItemStack();
+    @Override
+    public ConfigurationSerializable deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
+        final Map<String, Object> map = new LinkedHashMap<>();
+
+        for (Map.Entry<String, JsonElement> entry : jsonElement.getAsJsonObject().entrySet()) {
+            final JsonElement value = entry.getValue();
+            final String name = entry.getKey();
+
+            if (value.isJsonObject() && value.getAsJsonObject().has(ConfigurationSerialization.SERIALIZED_TYPE_KEY)) {
+                map.put(name, this.deserialize(value, value.getClass(), context));
+            } else {
+                map.put(name, context.deserialize(value, Object.class));
+            }
+        }
+
+        return ConfigurationSerialization.deserializeObject(map);
     }
 
-    public static class TypeAdapterItemStack extends TypeAdapter<ItemStack> {
-
-        @Override
-        public void write(JsonWriter jsonWriter, ItemStack itemStack) throws IOException {
-
-        }
-
-        @Override
-        public ItemStack read(JsonReader jsonReader) throws IOException {
-            return null;
-        }
+    @Override
+    public JsonElement serialize(ConfigurationSerializable itemStack, Type type, JsonSerializationContext context) {
+        final Map<String, Object> map = new LinkedHashMap<>();
+        map.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(ItemStack.class));
+        map.putAll(itemStack.serialize());
+        return context.serialize(map, objectStringMapType);
     }
 }

@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.data.serializer;
 
+import com.golfing8.kcommon.data.serializer.type.ItemStackAdapterFactory;
 import com.golfing8.kcommon.data.serializer.type.WorldAdapterFactory;
 import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
@@ -10,6 +11,8 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -101,6 +104,8 @@ public final class DataSerializer {
         builder.disableHtmlEscaping();
         builder.excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC);
 
+        builder.registerTypeHierarchyAdapter(ItemMeta.class, ItemStackAdapterFactory.INSTANCE);
+        builder.registerTypeHierarchyAdapter(ItemStack.class, ItemStackAdapterFactory.INSTANCE);
         builder.registerTypeAdapterFactory(WorldAdapterFactory.INSTANCE);
 
         return LOADED_GSON = builder.create();
