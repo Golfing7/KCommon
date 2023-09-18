@@ -50,10 +50,10 @@ public final class MenuBuilder {
     private Map<String, Supplier<Collection<MultiLinePlaceholder>>> specialMPlaceholders = new HashMap<>();
     /** The global placeholders to apply to EVERY string in this menu. */
     @Getter
-    private List<Placeholder> globalPlaceholders;
+    private List<Placeholder> globalPlaceholders = new ArrayList<>();
     /** The global multiline placeholders for this menu */
     @Getter
-    private List<MultiLinePlaceholder> globalMultiLinePlaceholders;
+    private List<MultiLinePlaceholder> globalMultiLinePlaceholders = new ArrayList<>();
     /**
      * The other GUI items to apply in this menu.
      */

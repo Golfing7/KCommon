@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.struct.placeholder;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import javax.annotation.Nonnull;
@@ -12,6 +13,7 @@ import java.util.List;
  * convention for placeholders is {BRACKETS_UPPER_CASE}.
  */
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Placeholder {
     /**
      * The label to replace, typically in {BRACKETS_UPPER_CASE} format.
@@ -23,6 +25,14 @@ public class Placeholder {
      */
     @Getter
     private final String value;
+
+    @Override
+    public String toString() {
+        return "Placeholder{" +
+                "label='" + label + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 
     /**
      * Generates a placeholder from a list with the default convention for naming.

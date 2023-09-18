@@ -131,8 +131,8 @@ public abstract class MenuAbstract implements Menu {
     @Override
     public ItemStack setItemAt(int slot, ItemStack set) {
         ItemStack there = getItemAt(slot);
-        ItemUtil.applyPlaceholders(there, placeholders);
-        ItemUtil.applyMPlaceholders(there, multiLinePlaceholders);
+        ItemUtil.applyPlaceholders(set, placeholders);
+        ItemUtil.applyMPlaceholders(set, multiLinePlaceholders);
         backingInventory.setItem(slot, set);
         return there;
     }
@@ -199,18 +199,17 @@ public abstract class MenuAbstract implements Menu {
 
     @Override
     public void setContents(ItemStack[] contents) {
+        for (ItemStack itemStack : contents) {
+            if (itemStack == null)
+                continue;
+
+            ItemUtil.applyPlaceholders(itemStack, placeholders);
+            ItemUtil.applyMPlaceholders(itemStack, multiLinePlaceholders);
+        }
+
         if(contents.length != backingInventory.getSize()){
             ItemStack[] padded = new ItemStack[backingInventory.getSize()];
-
             System.arraycopy(contents, 0, padded, 0, padded.length);
-
-            for (ItemStack itemStack : padded) {
-                if (itemStack == null)
-                    continue;
-
-                ItemUtil.applyPlaceholders(itemStack, placeholders);
-                ItemUtil.applyMPlaceholders(itemStack, multiLinePlaceholders);
-            }
             backingInventory.setContents(padded);
         }else{
             backingInventory.setContents(contents);
@@ -255,7 +254,7 @@ public abstract class MenuAbstract implements Menu {
 
             ItemStack[] contents = getContents();
 
-            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, size, MS.parseSingle(title));
+            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, size, MS.parseSingle(title, placeholders));
 
             this.backingInventory.setContents(contents);
 
