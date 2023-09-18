@@ -2,12 +2,12 @@ package com.golfing8.kcommon.struct.time;
 
 import com.golfing8.kcommon.KCommon;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonObject;
 import lombok.*;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A time stamp used for marking a certain time.
@@ -69,18 +69,51 @@ public final class Timestamp {
         return this.second > timestamp.second;
     }
 
-    @Override
-    public String toString() {
-        return "Timestamp{" +
-                "year=" + year +
-                ", month=" + month +
-                ", dayOfWeek=" + dayOfWeek +
-                ", dayOfMonth=" + dayOfMonth +
-                ", dayOfYear=" + dayOfYear +
-                ", hour=" + hour +
-                ", minute=" + minute +
-                ", second=" + second +
-                '}';
+    /**
+     * Gets the milliseconds of difference between this time and the given time.
+     *
+     * @param timeInPast the time in the past.
+     * @return the milliseconds of difference.
+     */
+    public long getMillisDifference(Timestamp timeInPast) {
+        long totalTime = 0;
+
+        // Does not count leap years.
+        if (this.year != UNUSED && timeInPast.getYear() != UNUSED) {
+            totalTime += (this.year - timeInPast.getYear()) * TimeUnit.DAYS.toMillis(365);
+        }
+
+        // Assumes uniform 30 days
+        if (this.month != UNUSED && timeInPast.getMonth() != UNUSED) {
+            totalTime += Math.floorMod(this.month - timeInPast.getMonth(), 12) * TimeUnit.DAYS.toMillis(30);
+        }
+
+        // Assumes uniform 30 days
+        if (this.dayOfMonth != UNUSED && timeInPast.getDayOfMonth() != UNUSED) {
+            totalTime += TimeUnit.DAYS.toMillis(Math.floorMod(this.dayOfMonth - timeInPast.getDayOfMonth(), 30));
+        }
+
+        if (this.hour != UNUSED && timeInPast.getHour() != UNUSED) {
+            totalTime += TimeUnit.HOURS.toMillis(Math.floorMod(this.hour - timeInPast.getHour(), 60));
+        }
+
+        if (this.minute != UNUSED && timeInPast.getMinute() != UNUSED) {
+            totalTime += TimeUnit.MINUTES.toMillis(Math.floorMod(this.minute - timeInPast.getMinute(), 60));
+        }
+
+        if (this.second != UNUSED && timeInPast.getSecond() != UNUSED) {
+            totalTime += TimeUnit.SECONDS.toMillis(Math.floorMod(this.second - timeInPast.getSecond(), 60));
+        }
+        return totalTime;
+    }
+
+    /**
+     * Creates a timestamp representing the current time of call.
+     *
+     * @return the time.
+     */
+    public static Timestamp now() {
+        return now(KCommon.getInstance().getTimeZone());
     }
 
     /**
@@ -108,7 +141,7 @@ public final class Timestamp {
             String[] dataSplit = toParse.split("-");
             if (dataSplit.length != 4)
                 throw new DateTimeException(String.format("Timestamp format does not follow: MM-DD-YYYY(-hh:mm(:ss)). Was %s", timestamp));
-            
+
             months = Integer.parseInt(dataSplit[0]);
             days = Integer.parseInt(dataSplit[1]);
             years = Integer.parseInt(dataSplit[2]);
@@ -126,15 +159,6 @@ public final class Timestamp {
         int seconds = timeSplit.length > 2 ? Integer.parseInt(timeSplit[2]) : UNUSED;
 
         return new Timestamp(years, months, UNUSED, days, UNUSED, hours, minutes, seconds);
-    }
-
-    /**
-     * Creates a timestamp representing the current time of call. Uses {@link KCommon#getTimeZone()} as the time zone.
-     *
-     * @return the time.
-     */
-    public static Timestamp now() {
-        return now(KCommon.getInstance().getTimeZone());
     }
 
     /**
@@ -164,5 +188,19 @@ public final class Timestamp {
      */
     public static Timestamp ofIntraDay(int hour, int minute, int second) {
         return new Timestamp(UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, hour, minute, second);
+    }
+
+    @Override
+    public String toString() {
+        return "Timestamp{" +
+                "year=" + year +
+                ", month=" + month +
+                ", dayOfWeek=" + dayOfWeek +
+                ", dayOfMonth=" + dayOfMonth +
+                ", dayOfYear=" + dayOfYear +
+                ", hour=" + hour +
+                ", minute=" + minute +
+                ", second=" + second +
+                '}';
     }
 }

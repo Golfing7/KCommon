@@ -3,6 +3,8 @@ package com.golfing8.kcommon.menu;
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.movement.MorphingItem;
 import com.golfing8.kcommon.menu.movement.MovingItem;
+import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
+import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -15,8 +17,9 @@ public class MenuDynamic extends MenuAbstract {
     private final List<MorphingItem> morphingItems;
     private final List<MovingItem> movingItems;
 
-    public MenuDynamic(String title, int size, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap) {
-        super(title, size, clickable, canExpire, actionMap);
+    public MenuDynamic(String title, int size, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
+                       List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders) {
+        super(title, size, clickable, canExpire, actionMap, placeholders, multiLinePlaceholders);
 
         this.morphingItems = new ArrayList<>();
         this.movingItems = new ArrayList<>();

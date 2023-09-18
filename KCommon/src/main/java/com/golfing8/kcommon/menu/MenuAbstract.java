@@ -7,8 +7,10 @@ import com.golfing8.kcommon.menu.marker.NoClickHolder;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.util.ItemUtil;
 import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,6 +32,10 @@ public abstract class MenuAbstract implements Menu {
      * The gui items to apply when the menu is 'updated'
      */
     private List<SimpleGUIItem> guiItems;
+    @Getter
+    private List<Placeholder> placeholders;
+    @Getter
+    private List<MultiLinePlaceholder> multiLinePlaceholders;
 
     private Inventory backingInventory;
     private String title;
@@ -44,12 +50,15 @@ public abstract class MenuAbstract implements Menu {
 
     private ClickAction bottomClickEvent;
 
-    public MenuAbstract(String title, int size, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap){
-        this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, size, MS.parseSingle(title));
+    public MenuAbstract(String title, int size, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
+                        List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders){
+        this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, size, MS.parseSingle(title, placeholders));
         this.guiItems = new ArrayList<>();
         this.canExpire = canExpire;
         this.size = size;
         this.clickable = clickable;
+        this.placeholders = placeholders;
+        this.multiLinePlaceholders = multiLinePlaceholders;
 
         this.actionMap = actionMap;
 
@@ -122,6 +131,8 @@ public abstract class MenuAbstract implements Menu {
     @Override
     public ItemStack setItemAt(int slot, ItemStack set) {
         ItemStack there = getItemAt(slot);
+        ItemUtil.applyPlaceholders(there, placeholders);
+        ItemUtil.applyMPlaceholders(there, multiLinePlaceholders);
         backingInventory.setItem(slot, set);
         return there;
     }
@@ -156,7 +167,7 @@ public abstract class MenuAbstract implements Menu {
 
     @Override
     public void setTitle(String title) {
-        this.title = title;
+        this.title = MS.parseSingle(title, this.placeholders);
         recreate = true;
     }
 
@@ -193,6 +204,13 @@ public abstract class MenuAbstract implements Menu {
 
             System.arraycopy(contents, 0, padded, 0, padded.length);
 
+            for (ItemStack itemStack : padded) {
+                if (itemStack == null)
+                    continue;
+
+                ItemUtil.applyPlaceholders(itemStack, placeholders);
+                ItemUtil.applyMPlaceholders(itemStack, multiLinePlaceholders);
+            }
             backingInventory.setContents(padded);
         }else{
             backingInventory.setContents(contents);

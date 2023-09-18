@@ -32,6 +32,26 @@ public class Schedule {
     }
 
     /**
+     * Gets the next available time stamp from this schedule.
+     *
+     * @return the timestamp.
+     */
+    public Timestamp getNextAvailableTimestamp() {
+        Timestamp now = Timestamp.now();
+        long minimumTime = Long.MAX_VALUE;
+        Timestamp found = null;
+
+        for (ScheduleEntry entry : scheduleEntries) {
+            long difference = entry.timestamp.getMillisDifference(now);
+            if (difference < minimumTime) {
+                minimumTime = difference;
+                found = entry.timestamp;
+            }
+        }
+        return found;
+    }
+
+    /**
      * Polls all available schedule entries and checks if one of them is ready to execute.
      * If one is found to be ready, the timestamp is returned.
      *

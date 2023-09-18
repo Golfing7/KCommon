@@ -74,7 +74,8 @@ public class PKorePAPIHook extends PlaceholderExpansion implements Relational {
         String[] newParams = new String[parameterSplit.length - 1];
         System.arraycopy(parameterSplit, 1, newParams, 0, newParams.length);
         PlaceholderProvider provider = this.providerMap.get(parameterSplit[0]);
-        return provider.onPlaceholderRequest(player, newParams);
+        String result = provider.onPlaceholderRequest(player, newParams);
+        return result == null ? String.format("%s not found", params) : result;
     }
 
     @Override
@@ -91,6 +92,7 @@ public class PKorePAPIHook extends PlaceholderExpansion implements Relational {
         String[] newParams = new String[parameterSplit.length - 1];
         System.arraycopy(parameterSplit, 1, newParams, 0, newParams.length);
         PlaceholderProvider provider = this.providerMap.get(parameterSplit[0]);
-        return provider.onRelationalPlaceholderRequest(player, player1, newParams);
+        String result = provider.onRelationalPlaceholderRequest(player, player1, newParams);
+        return result == null ? String.format("%s not found", s) : result;
     }
 }

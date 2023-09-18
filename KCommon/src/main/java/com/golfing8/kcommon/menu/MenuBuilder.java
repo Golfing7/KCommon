@@ -48,7 +48,12 @@ public final class MenuBuilder {
      * A map containing multiline placeholders for each special item.
      */
     private Map<String, Supplier<Collection<MultiLinePlaceholder>>> specialMPlaceholders = new HashMap<>();
-
+    /** The global placeholders to apply to EVERY string in this menu. */
+    @Getter
+    private List<Placeholder> globalPlaceholders;
+    /** The global multiline placeholders for this menu */
+    @Getter
+    private List<MultiLinePlaceholder> globalMultiLinePlaceholders;
     /**
      * The other GUI items to apply in this menu.
      */
@@ -93,6 +98,16 @@ public final class MenuBuilder {
 
     public SimpleGUIItem getSpecialItem(String key) {
         return specialGUIItems.get(key);
+    }
+
+    public MenuBuilder globalMultiLinePlaceholders(MultiLinePlaceholder... placeholders) {
+        this.globalMultiLinePlaceholders = Arrays.asList(placeholders);
+        return this;
+    }
+
+    public MenuBuilder globalPlaceholders(Placeholder... placeholders) {
+        this.globalPlaceholders = Arrays.asList(placeholders);
+        return this;
     }
 
     public MenuBuilder specialMPlaceholders(String special, Supplier<Collection<MultiLinePlaceholder>> placeholders) {
@@ -227,7 +242,7 @@ public final class MenuBuilder {
             }
         }
 
-        MenuSimple menuSimple = new MenuSimple(this.title, size, clickable, canExpire, clickActions);
+        MenuSimple menuSimple = new MenuSimple(this.title, size, clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuSimple.setContents(contents);
         menuSimple.setBottomClickAction(bottomClickEvent);
 
@@ -286,7 +301,7 @@ public final class MenuBuilder {
             }
         }
 
-        MenuDynamic menuDynamic = new MenuDynamic(this.title, size, clickable, canExpire, clickActions);
+        MenuDynamic menuDynamic = new MenuDynamic(this.title, size, clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuDynamic.setContents(contents);
         menuDynamic.setBottomClickAction(bottomClickEvent);
 

@@ -3,6 +3,7 @@ package com.golfing8.kcommon.hook.placeholderapi;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Represents functionality for requesting a placeholder throughout the KCommon plugin.
@@ -22,9 +23,9 @@ public interface PlaceholderProvider {
      *
      * @param player the player the placeholder is parsing on.
      * @param parameters the parameters for the placeholder.
-     * @return the parsed placeholder.
+     * @return the parsed placeholder, or null if the default unimplemented placeholder should be returned.
      */
-    @Nonnull
+    @Nullable
     default String onPlaceholderRequest(Player player, String[] parameters) {
         return "Unimplemented";
     }
@@ -36,9 +37,9 @@ public interface PlaceholderProvider {
      * @param p1 the first player.
      * @param p2 the second player.
      * @param parameters the parameters for the placeholder.
-     * @return the parsed placeholder.
+     * @return the parsed placeholder, or null if the default unimplemented placeholder should be returned.
      */
-    @Nonnull
+    @Nullable
     default String onRelationalPlaceholderRequest(Player p1, Player p2, String[] parameters) {
         return "Unimplemented";
     }

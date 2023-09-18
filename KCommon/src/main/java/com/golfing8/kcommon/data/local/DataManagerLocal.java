@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.data.local;
 
+import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.data.DataManager;
 import com.golfing8.kcommon.data.DataManagerAbstract;
 import com.golfing8.kcommon.data.DataSerializable;
@@ -7,13 +8,11 @@ import com.golfing8.kcommon.data.key.FieldIndexer;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import lombok.Getter;
 import lombok.val;
 import lombok.var;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -233,13 +232,23 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         //Read the object in
         JsonElement object = parser.parse(reader);
 
+        String key = objPath.getFileName().toString().replace(".json", "");
         //Create an empty instance
-        T newObject = DataSerializer.getGSONBase().fromJson(object, getTypeClass());
+        T newObject;
+        try {
+            newObject = DataSerializer.getGSONBase().fromJson(object, getTypeClass());
+        } catch (JsonParseException exc) {
+            getPlugin().getLogger().warning(String.format("Cache %s failed to load object %s!", getTypeClass().getName(), key));
+            if (KCommon.getInstance().isDebug()) {
+                exc.printStackTrace();
+            }
+            newObject = null;
+        }
         if (newObject == null) {
             Files.delete(objPath);
             return null;
         }
-        newObject.setKey(objPath.getFileName().toString().replace(".json", ""));
+        newObject.setKey(key);
         return newObject;
     }
 
