@@ -34,8 +34,8 @@ public class CAPotionEffect implements ConfigAdapter<PotionEffect> {
         int duration = (int) map.getOrDefault("duration", 600);
         int amplifier = (int) map.getOrDefault("amplifier", 0);
 
-        boolean ambient = (boolean) map.getOrDefault("ambient", false);
-        boolean particles = (boolean) map.getOrDefault("particles", false);
+        boolean ambient = (boolean) map.getOrDefault("ambient", true);
+        boolean particles = (boolean) map.getOrDefault("particles", true);
         return new PotionEffect(effectType, duration, amplifier, ambient, particles);
     }
 
