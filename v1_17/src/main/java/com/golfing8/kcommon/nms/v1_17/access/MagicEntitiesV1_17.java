@@ -101,7 +101,7 @@ public class MagicEntitiesV1_17 implements NMSMagicEntities {
         return (Slime) entitySlime.getBukkitEntity();
     }
 
-    public Skeleton spawnWitherSkeleton(Location location){
+    public Monster spawnWitherSkeleton(Location location){
         EntitySkeletonWither entitySkeleton = new EntitySkeletonWither(EntityTypes.ba, ((CraftWorld) location.getWorld()).getHandle());
 
         entitySkeleton.setPosition(location.getX(), location.getY(), location.getZ());

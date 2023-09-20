@@ -16,7 +16,7 @@ public interface NMSMagicEntities {
     //Initial health is required as slimes seem to override their health given if not done via NMS.
     Slime spawnSlimeWithSize(Location location, int size, double initialHealth);
 
-    Skeleton spawnWitherSkeleton(Location location);
+    Monster spawnWitherSkeleton(Location location);
 
     Guardian spawnElderGuardian(Location location);
 

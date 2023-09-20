@@ -36,7 +36,15 @@ public final class NMS {
 
             theNMS = (NMSAccess) cons.newInstance(KCommon.getInstance());
         } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException ignored) {
+            try {
+                Class<?> mainClass = Class.forName("com.golfing8.kcommon.nms.unknown.NMS");
 
+                Constructor<?> cons = mainClass.getConstructor(Plugin.class);
+
+                theNMS = (NMSAccess) cons.newInstance(KCommon.getInstance());
+            } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException exc) {
+                throw new IllegalStateException("NMS failed to initialize!");
+            }
         }
     }
 
