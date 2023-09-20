@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XPotion;
 import com.golfing8.kcommon.config.adapter.*;
 import com.golfing8.kcommon.menu.MenuUtils;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
+import com.golfing8.kcommon.struct.filter.ItemFilter;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
@@ -167,6 +168,24 @@ public class ConfigTypeRegistry {
     }
 
     /**
+     * Gets a value from the config by using the CONFIG_ADAPTER_MAP. If the type is unrecognized, the section's {@link ConfigurationSection#get(String, Object) get} method is used.
+     *
+     * @param entry the config entry.
+     * @param field the field type.
+     * @return the value
+     * @param <T> the type of value
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <T> T getFromType(ConfigPrimitive entry, FieldType field) {
+        ConfigAdapter<? super T> adapter = (ConfigAdapter<? super T>) findAdapter(field.getType());
+        if (adapter == null) {
+            return (T) entry.getPrimitive();
+        }
+
+        return (T) adapter.toPOJO(entry, field);
+    }
+
+    /**
      * Sets the value at the given configuration section.
      *
      * @param section the section.
@@ -201,6 +220,8 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAMessage());
         registerAdapter(new CASoundWrapper());
         registerAdapter(new CATitle());
+        registerAdapter(new CAItemFilter());
+        registerAdapter(new CAStringFilter());
 
         registerAdapter(MenuCoordinate.class, (section) -> {
             if(section.contains("slot")) {
@@ -215,9 +236,11 @@ public class ConfigTypeRegistry {
                     if(yCoordinate < 1 || yCoordinate > 9)
                         throw new ImproperlyConfiguredValueException(section.getConfigurationSection("slot"), "y", "A value 1-9");
 
-                    return new MenuCoordinate(xCoordinate, yCoordinate);
+                    return new MenuCoordinate(xCoordinate, yCoordinate, section.getInt("page"));
                 }else {
-                    return MenuUtils.getCartCoordsFromSlot(section.getInt("slot"));
+                    MenuCoordinate slot = MenuUtils.getCartCoordsFromSlot(section.getInt("slot"));
+                    slot.setPage(section.getInt("page"));
+                    return slot;
                 }
             }else {
                 throw new ImproperlyConfiguredValueException(section, "slot", "a 'slot' key");
