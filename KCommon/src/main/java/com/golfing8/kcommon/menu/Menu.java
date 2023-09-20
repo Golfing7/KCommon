@@ -57,6 +57,13 @@ public interface Menu extends Listener {
         return setItemAt(getSlotFromCartCoords(x, y), set);
     }
 
+    /**
+     * Sets the top click action of the menu.
+     *
+     * @param action the click action.
+     */
+    void setTopClickAction(ClickAction action);
+
     void setBottomClickAction(ClickAction action);
 
     String getTitle();

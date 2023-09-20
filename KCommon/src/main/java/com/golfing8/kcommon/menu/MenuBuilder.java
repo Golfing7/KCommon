@@ -31,6 +31,8 @@ public final class MenuBuilder {
      * The bottom click action, run when any slot in the bottom inventory is clicked.
      */
     private ClickAction bottomClickEvent = null;
+    /** The top click event is called when a player clicks the top menu. Regardless if there is a click action on the slot clicked */
+    private ClickAction topClickEvent = null;
     /**
      * A map containing all special GUI items, mapped from their keys.
      */
@@ -102,6 +104,11 @@ public final class MenuBuilder {
 
     public MenuBuilder globalMultiLinePlaceholders(MultiLinePlaceholder... placeholders) {
         this.globalMultiLinePlaceholders = Arrays.asList(placeholders);
+        return this;
+    }
+
+    public MenuBuilder topClickAction(ClickRunnable runnable) {
+        this.topClickEvent = new ClickAction(runnable);
         return this;
     }
 
@@ -244,6 +251,7 @@ public final class MenuBuilder {
 
         MenuSimple menuSimple = new MenuSimple(this.title, size, clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuSimple.setContents(contents);
+        menuSimple.setTopClickAction(topClickEvent);
         menuSimple.setBottomClickAction(bottomClickEvent);
 
         otherGUIItems.forEach(item -> {
@@ -303,6 +311,7 @@ public final class MenuBuilder {
 
         MenuDynamic menuDynamic = new MenuDynamic(this.title, size, clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuDynamic.setContents(contents);
+        menuDynamic.setTopClickAction(topClickEvent);
         menuDynamic.setBottomClickAction(bottomClickEvent);
 
         otherGUIItems.forEach(item -> {

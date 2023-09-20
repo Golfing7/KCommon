@@ -48,7 +48,7 @@ public abstract class MenuAbstract implements Menu {
 
     private CloseRunnable onClose;
 
-    private ClickAction bottomClickEvent;
+    private ClickAction bottomClickEvent, topClickEvent;
 
     public MenuAbstract(String title, int size, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
                         List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders){
@@ -177,6 +177,11 @@ public abstract class MenuAbstract implements Menu {
     }
 
     @Override
+    public void setTopClickAction(ClickAction action) {
+        this.topClickEvent = action;
+    }
+
+    @Override
     public String getTitle() {
         return title;
     }
@@ -290,6 +295,9 @@ public abstract class MenuAbstract implements Menu {
             return;
         }
 
+        if (this.topClickEvent != null) {
+            this.topClickEvent.attemptClick(event);
+        }
         if(actionMap.containsKey(event.getSlot())){
             actionMap.get(event.getSlot()).forEach(z -> z.attemptClick(event));
         }
