@@ -5,6 +5,7 @@ import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.struct.time.TimeLength;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
@@ -22,6 +23,14 @@ public final class CommandArguments {
      * A pattern used to match alphanumeric strings.
      */
     private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("\\w+");
+
+    /** A command argument for all offline players */
+    public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER = new CommandArgument<>("An offline player", (context) -> {
+        return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());
+    }, (context) -> {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(context.getArgument());
+        return player != null && player.getName().equalsIgnoreCase(context.getArgument());
+    }, Bukkit::getOfflinePlayer);
 
     /**
      * A command argument to auto-complete online players.
