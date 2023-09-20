@@ -3,12 +3,36 @@ package com.golfing8.kcommon.util;
 import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 /**
  * Stores utility classes pertaining to players.
  */
 @UtilityClass
 public final class PlayerUtil {
+
+    /**
+     * Removes the given potion effect IF it's the most 'dominant' on the player.
+     * <p>
+     * e.g. Player has Strength 2 for 30 seconds. If the passed in potion effect
+     * is Strength 1, the potion effect will not be removed.
+     * </p>
+     *
+     * @param player the player to remove the effect from.
+     * @param potionEffect the potion effect.
+     * @return if the potion effect was removed.
+     */
+    public static boolean removePotionEffectNoOverride(Player player, PotionEffect potionEffect) {
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            if (effect.getType().equals(potionEffect.getType())) {
+                if (effect.getAmplifier() > potionEffect.getAmplifier())
+                    return false;
+            }
+        }
+
+        player.removePotionEffect(potionEffect.getType());
+        return true;
+    }
 
     /**
      * Gives the player the given item or drops it at their feet.

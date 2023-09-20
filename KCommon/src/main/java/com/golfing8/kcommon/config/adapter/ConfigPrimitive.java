@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigEntry;
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +48,9 @@ public final class ConfigPrimitive {
      * @return the unwrapped value.
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public @Nullable Object unwrap() {
+    public Object unwrap() {
+        Preconditions.checkNotNull(primitive, "Value cannot be null");
+
         if (primitive instanceof Map) {
             Map items = new HashMap();
             Map m = (Map) primitive;
@@ -72,6 +75,18 @@ public final class ConfigPrimitive {
             return l;
         }
         return primitive;
+    }
+
+    public static ConfigPrimitive of(Object value) {
+        if (value instanceof Number ||
+                value instanceof String ||
+                value instanceof Map ||
+                value instanceof List ||
+                value instanceof Boolean) {
+            return new ConfigPrimitive(value);
+        } else {
+            throw new IllegalArgumentException(String.format("Value was not a primitive! Was %s", value.getClass()));
+        }
     }
 
     public static ConfigPrimitive ofNull() {

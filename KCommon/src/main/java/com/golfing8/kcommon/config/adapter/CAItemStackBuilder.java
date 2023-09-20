@@ -2,6 +2,8 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.inventory.ItemFlag;
@@ -46,6 +48,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             builder.lore((List<String>) primitiveValue.get("lore"));
         if (primitiveValue.containsKey("nbt-data"))
             builder.extraData((Map<String, Object>) ((ConfigPrimitive) primitiveValue.get("nbt-data")).getPrimitive());
+        if (primitiveValue.containsKey("potion-data"))
+            builder.potionData(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue.get("potion-data")), new FieldType(PotionData.class)));
         if (primitiveValue.containsKey("enchantments")) {
             Map<String, Object> enchantments = (Map<String, Object>) ((ConfigPrimitive) primitiveValue.get("enchantments")).getPrimitive();
             for (Map.Entry<String, Object> enchant : enchantments.entrySet()) {
@@ -80,6 +84,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("lore", builder.getItemLore());
         if (builder.getExtraData() != null && builder.getExtraData().size() > 0)
             objects.put("nbt-data", builder.getExtraData());
+        if (builder.getPotionData() != null)
+            objects.put("potion-data", ConfigTypeRegistry.toPrimitive(builder.getPotionData()).unwrap());
         if (builder.getEnchantments() != null && !builder.getEnchantments().isEmpty()) {
             Map<String, Integer> enchantments = new HashMap<>();
             builder.getEnchantments().forEach((k, v) -> {

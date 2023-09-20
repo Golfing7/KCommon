@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.struct.reflection;
 
 import com.golfing8.kcommon.util.Reflection;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,7 +24,7 @@ public class FieldType {
     /** The field's type. */
     private final Class<?> type;
     /** All generic types of the field */
-    private final List<Class<?>> genericTypes;
+    private final List<Type> genericTypes;
 
     public FieldType(Class<?> type) {
         this.type = type;
@@ -33,9 +36,21 @@ public class FieldType {
         this.genericTypes = Reflection.getParameterizedTypes(field);
     }
 
+    public FieldType(Type type) {
+        Preconditions.checkArgument(type instanceof Class<?> || type instanceof ParameterizedType);
+        if (type instanceof Class<?>) {
+            this.type = (Class<?>) type;
+            this.genericTypes = Collections.emptyList();
+        } else {
+            this.type = (Class<?>) ((ParameterizedType) type).getRawType();
+            this.genericTypes = Arrays.asList(((ParameterizedType) type).getActualTypeArguments());
+        }
+
+    }
+
     public static FieldType extractFrom(TypeToken<?> token) {
         ParameterizedType foundType = (ParameterizedType) token.getType();
         return new FieldType((Class<?>) foundType.getRawType(),
-                Lists.newArrayList((Class<?>) foundType.getActualTypeArguments()[0]));
+                Lists.newArrayList(foundType.getActualTypeArguments()[0]));
     }
 }

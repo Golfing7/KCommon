@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -20,7 +21,7 @@ public class CASet implements ConfigAdapter<Set> {
         if (entry.getPrimitive() == null)
             return Collections.emptySet();
 
-        Class<?> actualType = type.getGenericTypes().get(0);
+        Type actualType = type.getGenericTypes().get(0);
         ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(actualType);
         Set toReturn = new HashSet();
         if (adapter != null) {

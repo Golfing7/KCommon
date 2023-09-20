@@ -11,6 +11,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -40,29 +42,41 @@ public class ConfigTypeRegistry {
      */
     @SuppressWarnings("unchecked")
     public static <T> ConfigAdapter<? super T> findAdapter(Class<T> actualType) {
+        return (ConfigAdapter<? super T>) findAdapter((Type) actualType);
+    }
+
+    /**
+     * Tries to find an adapter for the given type.
+     *
+     * @param actualType the actual type.
+     * @return the adapter.
+     */
+    @SuppressWarnings({"rawtypes"})
+    public static ConfigAdapter<?> findAdapter(Type actualType) {
+        Class<?> clazzType = (actualType instanceof ParameterizedType) ? (Class<?>) ((ParameterizedType) actualType).getRawType() : (Class<?>) actualType;
         // Base case for recursive section.
-        if (actualType == Object.class || actualType == null)
+        if (clazzType == Object.class || clazzType == null)
             return null;
 
-        if (ADAPTER_LOOKUP.containsKey(actualType))
-            return (ConfigAdapter<T>) ADAPTER_LOOKUP.get(actualType);
+        if (ADAPTER_LOOKUP.containsKey(clazzType))
+            return ADAPTER_LOOKUP.get(clazzType);
 
         // Direct registration?
-        if (CONFIG_ADAPTERS.containsKey(actualType))
-            return (ConfigAdapter<T>) CONFIG_ADAPTERS.get(actualType);
+        if (CONFIG_ADAPTERS.containsKey(clazzType))
+            return CONFIG_ADAPTERS.get(clazzType);
 
         // If not, check parents.
-        ConfigAdapter<T> parent = (ConfigAdapter<T>) findAdapter(actualType.getSuperclass());
+        ConfigAdapter parent = findAdapter(clazzType.getSuperclass());
         if (parent != null) {
-            ADAPTER_LOOKUP.put(actualType, parent);
+            ADAPTER_LOOKUP.put(clazzType, parent);
             return parent;
         }
 
         // And if it's still not found, check interfaces.
-        for (Class<?> iface : actualType.getInterfaces()) {
-            ConfigAdapter<T> adapter = (ConfigAdapter<T>) findAdapter(iface);
+        for (Class<?> iface : clazzType.getInterfaces()) {
+            ConfigAdapter adapter = findAdapter(iface);
             if (adapter != null) {
-                ADAPTER_LOOKUP.put(actualType, adapter);
+                ADAPTER_LOOKUP.put(clazzType, adapter);
                 return adapter;
             }
         }
@@ -186,6 +200,22 @@ public class ConfigTypeRegistry {
     }
 
     /**
+     * Converts the value to a primitive object.
+     *
+     * @param value the value.
+     * @return the primitive object.
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static ConfigPrimitive toPrimitive(Object value) {
+        ConfigAdapter adapter = findAdapter(value.getClass());
+        if (adapter == null) {
+            return ConfigPrimitive.of(value);
+        }
+
+        return adapter.toPrimitive(value);
+    }
+
+    /**
      * Sets the value at the given configuration section.
      *
      * @param section the section.
@@ -222,6 +252,9 @@ public class ConfigTypeRegistry {
         registerAdapter(new CATitle());
         registerAdapter(new CAItemFilter());
         registerAdapter(new CAStringFilter());
+        registerAdapter(new CAPotionEffectType());
+        registerAdapter(new CAPotionData());
+        registerAdapter(new CAPotionEffect());
 
         registerAdapter(MenuCoordinate.class, (section) -> {
             if(section.contains("slot")) {

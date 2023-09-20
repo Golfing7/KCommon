@@ -2,14 +2,20 @@ package com.golfing8.kcommon.nms.v1_8.access;
 
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.nms.v1_8.item.ItemStackV1_8;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import net.minecraft.server.v1_8_R3.Items;
+import net.minecraft.server.v1_8_R3.MobEffect;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+
+import java.util.List;
 
 public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
@@ -58,8 +64,18 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     }
 
     @Override
-    public void setCustomModelData(ItemMeta meta, int modelData) {
+    public void setBaseEffect(PotionMeta meta, PotionData data) {
+        throw new UnsupportedOperationException("1.8 does not support potion data types."); // TODO Maybe try to find a way?
+    }
 
+    @Override
+    public PotionData getBaseEffect(PotionMeta meta) {
+        throw new UnsupportedOperationException("1.8 does not support potion data types."); // TODO Maybe try to find a way?
+    }
+
+    @Override
+    public void setCustomModelData(ItemMeta meta, int modelData) {
+        throw new UnsupportedOperationException("1.8 does not support custom model data.");
     }
 
     @Override

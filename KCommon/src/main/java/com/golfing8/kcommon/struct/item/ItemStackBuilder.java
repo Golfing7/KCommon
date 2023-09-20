@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
+import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
@@ -16,6 +17,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 
 import java.util.*;
 
@@ -60,6 +62,8 @@ public final class ItemStackBuilder {
      * The item flags to apply to the item.
      */
     private Set<ItemFlag> itemFlags = new HashSet<>();
+    /** The potion data for this item */
+    private PotionData potionData;
     /**
      * The placeholders for the item, applied to all parts.
      */
@@ -176,6 +180,11 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder potionData(PotionData data) {
+        this.potionData = data;
+        return this;
+    }
+
     public ItemStackBuilder lore(String... lore) {
         this.itemLore = lore == null ? Collections.emptyList() : Arrays.asList(lore);
         return this;
@@ -263,6 +272,11 @@ public final class ItemStackBuilder {
             List<String> firstRun = MS.parseAll(this.itemLore, placeholderArr);
             List<String> secondRun = MS.parseAllMulti(firstRun, multiLinePlaceholders.toArray(new MultiLinePlaceholder[0]));
             meta.setLore(secondRun);
+        }
+
+        if (meta instanceof PotionMeta) {
+            PotionMeta potionMeta = (PotionMeta) meta;
+            NMS.getTheNMS().getMagicItems().setBaseEffect(potionMeta, potionData);
         }
 
         //Next, apply item flags

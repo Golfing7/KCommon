@@ -59,17 +59,12 @@ public final class Reflection {
      * @param field the field.
      * @return the parameterized types.
      */
-    public static List<Class<?>> getParameterizedTypes(Field field) {
-        List<Class<?>> classes = new ArrayList<>();
+    public static List<Type> getParameterizedTypes(Field field) {
+        List<Type> classes = new ArrayList<>();
         Type fieldType = field.getGenericType();
         if (fieldType instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) fieldType;
-            for (Type t : parameterizedType.getActualTypeArguments()) {
-                if (!(t instanceof Class))
-                    continue;
-
-                classes.add((Class<?>) t);
-            }
+            classes.addAll(Arrays.asList(parameterizedType.getActualTypeArguments()));
         }
         return classes;
     }

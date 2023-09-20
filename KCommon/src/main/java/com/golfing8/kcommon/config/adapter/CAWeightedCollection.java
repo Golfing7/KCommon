@@ -4,6 +4,7 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.blocks.WeightedCollection;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class CAWeightedCollection implements ConfigAdapter<WeightedCollection> {
 
         Map<?, Double> primitiveObject = (Map<?, Double>) entry.getPrimitive();
         WeightedCollection collection = new WeightedCollection();
-        Class<?> genericType = type.getGenericTypes().get(0);
+        Type genericType = type.getGenericTypes().get(0);
         ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(genericType);
         primitiveObject.forEach((k, v) -> {
             if (adapter != null) {

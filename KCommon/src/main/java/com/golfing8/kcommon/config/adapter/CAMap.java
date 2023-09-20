@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,21 +27,19 @@ public class CAMap implements ConfigAdapter<Map> {
 
         // The keys are assumed to be strings.
         Map values = new LinkedHashMap();
-        Class<?> keyType = type.getGenericTypes().get(0);
-        Class<?> valueType = type.getGenericTypes().get(1);
+        Type keyType = type.getGenericTypes().get(0);
+        Type valueType = type.getGenericTypes().get(1);
         FieldType keyFieldType = new FieldType(keyType);
         FieldType valueFieldType = new FieldType(valueType);
         ConfigAdapter<?> adapter = ConfigTypeRegistry.findAdapter(valueType);
         ConfigAdapter<?> keyAdapter = ConfigTypeRegistry.findAdapter(keyType);
 
-        Map<String, Object> primitive = (Map<String, Object>) entry.getPrimitive();
+        Map<String, Object> primitive = (Map<String, Object>) entry.unwrap();
         for (Map.Entry<String, Object> mapEntry : primitive.entrySet()) {
             Object adaptedKey = keyAdapter != null ? keyAdapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getKey()), keyFieldType) : mapEntry.getKey();
 
             if (adapter == null) {
                 values.put(adaptedKey, mapEntry.getValue());
-            } else if (mapEntry.getValue() instanceof ConfigPrimitive) {
-                values.put(adaptedKey, adapter.toPOJO((ConfigPrimitive) mapEntry.getValue(), valueFieldType));
             } else {
                 values.put(adaptedKey, adapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getValue()), valueFieldType));
             }
@@ -58,7 +57,7 @@ public class CAMap implements ConfigAdapter<Map> {
             if (adapter == null) {
                 primitive.put(entry.getKey().toString(), entry.getValue());
             } else {
-                primitive.put(entry.getKey().toString(), adapter.toPrimitive(entry.getValue()).getPrimitive());
+                primitive.put(entry.getKey().toString(), adapter.toPrimitive(entry.getValue()).unwrap());
             }
         }
         return ConfigPrimitive.ofMap(primitive);
