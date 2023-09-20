@@ -30,27 +30,27 @@ public class CAItemFilter implements ConfigAdapter<ItemFilter> {
         TypeToken<?> token = new TypeToken<Set<StringFilter>>() {};
         FieldType ftype = FieldType.extractFrom(token);
 
-        Map<String, Object> objectMap = (Map<String, Object>) entry.getPrimitive();
+        Map<String, Object> objectMap = (Map<String, Object>) entry.unwrap();
         Set<StringFilter> materialFilters = Collections.emptySet();
         Set<StringFilter> nameFilters = Collections.emptySet();
         Set<StringFilter> loreFilters = Collections.emptySet();
         if (objectMap.containsKey("material-filters")) {
             materialFilters = ConfigTypeRegistry.getFromType(
-                    (ConfigEntry) objectMap.get("material-filters"),
+                    ConfigPrimitive.ofTrusted(objectMap.get("material-filters")),
                     ftype
             );
         }
 
         if (objectMap.containsKey("name-filters")) {
             nameFilters = ConfigTypeRegistry.getFromType(
-                    (ConfigEntry) objectMap.get("name-filters"),
+                    ConfigPrimitive.ofTrusted(objectMap.get("name-filters")),
                     ftype
             );
         }
 
         if (objectMap.containsKey("lore-filters")) {
             loreFilters = ConfigTypeRegistry.getFromType(
-                    (ConfigEntry) objectMap.get("lore-filters"),
+                    ConfigPrimitive.ofTrusted(objectMap.get("lore-filters")),
                     ftype
             );
         }

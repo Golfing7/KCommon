@@ -35,7 +35,7 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
         if (primitiveValue.containsKey("amount"))
             builder.amount((int) primitiveValue.get("amount"));
         if (primitiveValue.containsKey("durability"))
-            builder.durability((short) primitiveValue.get("durability"));
+            builder.durability(((Integer) primitiveValue.get("durability")).shortValue());
         if (primitiveValue.containsKey("unbreakable"))
             builder.unbreakable((boolean) primitiveValue.get("unbreakable"));
         if (primitiveValue.containsKey("custom-model-data"))

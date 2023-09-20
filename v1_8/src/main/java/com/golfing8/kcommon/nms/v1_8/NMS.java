@@ -3,6 +3,7 @@ package com.golfing8.kcommon.nms.v1_8;
 import com.golfing8.kcommon.nms.access.*;
 import com.golfing8.kcommon.nms.v1_8.access.*;
 import com.golfing8.kcommon.nms.v1_8.block.BlockDispenserV1_8;
+import com.golfing8.kcommon.nms.v1_8.event.ArmorEquipHandler;
 import com.golfing8.kcommon.nms.v1_8.packets.*;
 import com.golfing8.kcommon.nms.v1_8.server.ServerV1_8;
 import com.golfing8.kcommon.nms.v1_8.worldedit.WorldEditV1_8;
@@ -27,6 +28,8 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Collections;
 
 public class NMS implements NMSAccess {
     private final MagicNumbersV1_8 magicNumbersV1_8;
@@ -55,6 +58,7 @@ public class NMS implements NMSAccess {
         this.server = new ServerV1_8();
 
         Bukkit.getServer().getPluginManager().registerEvents(new PreSpawnSpawnerAdapter(), plugin);
+        new ArmorEquipHandler(plugin, Collections.emptyList());
     }
 
     public WorldEditHook getWorldEditHook() {

@@ -54,6 +54,8 @@ public final class ConfigPrimitive {
             m.forEach((k, v) -> {
                 if (v instanceof ConfigPrimitive) {
                     items.put(k, ((ConfigPrimitive) v).unwrap());
+                } else {
+                    items.put(k, v);
                 }
             });
             return items;
@@ -63,6 +65,8 @@ public final class ConfigPrimitive {
                 Object thing = l.get(i);
                 if (thing instanceof ConfigPrimitive) {
                     l.set(i, ((ConfigPrimitive) thing).unwrap());
+                } else {
+                    l.set(i, thing);
                 }
             }
             return l;
