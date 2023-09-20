@@ -257,10 +257,11 @@ public final class ItemStackBuilder {
      * @return the item stack built from the template.
      */
     public ItemStack buildFromTemplate() {
-        ItemStack newCopy = new ItemStack(itemType.parseMaterial(), amount, itemDurability);
-        if (itemType.getData() != 0) {
-            newCopy.setDurability(itemType.getData());
+        ItemStack newCopy = itemType.parseItem();
+        if (itemDurability > 0) {
+            newCopy.setDurability(itemDurability);
         }
+        newCopy.setAmount(amount);
 
         ItemMeta meta = newCopy.getItemMeta();
 
