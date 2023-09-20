@@ -36,23 +36,28 @@ public class ItemFilter implements Filter<ItemStack> {
         if (itemStack == null)
             return 0;
 
+        int maxFilter = 0;
         if (materialFilters != null && !materialFilters.isEmpty()) {
             String name = XMaterial.matchXMaterial(itemStack).name();
             for (StringFilter filter : materialFilters) {
-                if (filter.filter(name) != 0)
-                    return 1;
+                if (filter.filter(name) != 0) {
+                    maxFilter = 1;
+                    break;
+                }
             }
         }
 
         if (!itemStack.hasItemMeta())
-            return 0;
+            return maxFilter;
 
         ItemMeta meta = itemStack.getItemMeta();
         if (itemNameFilters != null && !itemNameFilters.isEmpty() && meta.hasDisplayName()) {
             String displayName = stripColors ? ChatColor.stripColor(meta.getDisplayName()) : meta.getDisplayName();
             for (StringFilter filter : itemNameFilters) {
-                if (filter.filter(displayName) != 0)
-                    return 2;
+                if (filter.filter(displayName) != 0) {
+                    maxFilter = 2;
+                    break;
+                }
             }
         }
 
@@ -63,11 +68,13 @@ public class ItemFilter implements Filter<ItemStack> {
 
             for (String loreLine : itemLore) {
                 for (StringFilter filter : itemLoreFilters) {
-                    if (filter.filter(loreLine) != 0)
-                        return 2;
+                    if (filter.filter(loreLine) != 0) {
+                        maxFilter = 2;
+                        break;
+                    }
                 }
             }
         }
-        return 0;
+        return maxFilter;
     }
 }
