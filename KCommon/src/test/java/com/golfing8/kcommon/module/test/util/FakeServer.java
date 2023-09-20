@@ -92,7 +92,7 @@ public final class FakeServer implements Server {
 
     @Override
     public String getVersion() {
-        return "1.0";
+        return "MC: 1.20";
     }
 
     @Override

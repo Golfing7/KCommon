@@ -36,7 +36,7 @@ public class ItemFilter implements Filter<ItemStack> {
         if (itemStack == null)
             return 0;
 
-        if (!materialFilters.isEmpty()) {
+        if (materialFilters != null && !materialFilters.isEmpty()) {
             String name = XMaterial.matchXMaterial(itemStack).name();
             for (StringFilter filter : materialFilters) {
                 if (filter.filter(name) != 0)
@@ -48,7 +48,7 @@ public class ItemFilter implements Filter<ItemStack> {
             return 0;
 
         ItemMeta meta = itemStack.getItemMeta();
-        if (!itemNameFilters.isEmpty() && meta.hasDisplayName()) {
+        if (itemNameFilters != null && !itemNameFilters.isEmpty() && meta.hasDisplayName()) {
             String displayName = stripColors ? ChatColor.stripColor(meta.getDisplayName()) : meta.getDisplayName();
             for (StringFilter filter : itemNameFilters) {
                 if (filter.filter(displayName) != 0)
@@ -56,7 +56,7 @@ public class ItemFilter implements Filter<ItemStack> {
             }
         }
 
-        if (!itemLoreFilters.isEmpty() && meta.hasLore()) {
+        if (itemLoreFilters != null && !itemLoreFilters.isEmpty() && meta.hasLore()) {
             List<String> itemLore = stripColors ?
                     meta.getLore().stream().map(ChatColor::stripColor).collect(Collectors.toList()) :
                     meta.getLore();
