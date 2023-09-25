@@ -46,7 +46,7 @@ public abstract class MenuAbstract implements Menu {
 
     private boolean recreate;
 
-    private CloseRunnable onClose;
+    private CloseRunnable onClose, postClose;
 
     private ClickAction bottomClickEvent, topClickEvent;
 
@@ -70,6 +70,11 @@ public abstract class MenuAbstract implements Menu {
     @Override
     public void onClose(CloseRunnable runnable) {
         this.onClose = runnable;
+    }
+
+    @Override
+    public void onPostClose(CloseRunnable runnable) {
+        this.postClose = runnable;
     }
 
     @Override
@@ -305,8 +310,12 @@ public abstract class MenuAbstract implements Menu {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event){
-        if(onClose != null && this.backingInventory.getViewers().contains(event.getPlayer())){
+        if(onClose != null && event.getInventory() == getGUI()){
             onClose.run(event);
+        }
+
+        if(postClose != null && event.getInventory() == getGUI()){
+            Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> postClose.run(event));
         }
     }
 }

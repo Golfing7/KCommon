@@ -108,6 +108,7 @@ public interface Menu extends Listener {
     void setClickActions(Map<Integer, List<ClickAction>> newActions);
 
     void onClose(CloseRunnable runnable);
+    void onPostClose(CloseRunnable runnable);
 
     Inventory getGUI();
 

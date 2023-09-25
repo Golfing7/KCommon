@@ -2,6 +2,7 @@ package com.golfing8.kcommon.menu;
 
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.ClickRunnable;
+import com.golfing8.kcommon.menu.action.CloseRunnable;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.menu.shape.MenuShape;
 import com.golfing8.kcommon.menu.shape.ShapeRectangle;
@@ -60,6 +61,12 @@ public final class MenuBuilder {
      * The other GUI items to apply in this menu.
      */
     private List<SimpleGUIItem> otherGUIItems = new ArrayList<>();
+    /** This will be run in the same tick the inventory has been closed */
+    @Getter
+    private CloseRunnable closeRunnable;
+    /** This will be run at the end of the tick the inventory has been closed. Useful for opening another menu */
+    @Getter
+    private CloseRunnable postCloseRunnable;
 
     private MenuBuilder() {
     }
@@ -100,6 +107,16 @@ public final class MenuBuilder {
 
     public SimpleGUIItem getSpecialItem(String key) {
         return specialGUIItems.get(key);
+    }
+
+    public MenuBuilder closeRunnable(CloseRunnable closeRunnable) {
+        this.closeRunnable = closeRunnable;
+        return this;
+    }
+
+    public MenuBuilder postCloseRunnable(CloseRunnable postCloseRunnable) {
+        this.postCloseRunnable = postCloseRunnable;
+        return this;
     }
 
     public MenuBuilder globalMultiLinePlaceholders(MultiLinePlaceholder... placeholders) {
@@ -252,6 +269,8 @@ public final class MenuBuilder {
         MenuSimple menuSimple = new MenuSimple(this.title, size, clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuSimple.setContents(contents);
         menuSimple.setTopClickAction(topClickEvent);
+        menuSimple.onClose(this.closeRunnable);
+        menuSimple.onPostClose(this.postCloseRunnable);
         menuSimple.setBottomClickAction(bottomClickEvent);
 
         otherGUIItems.forEach(item -> {
