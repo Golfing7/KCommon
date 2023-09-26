@@ -318,12 +318,25 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
     }
 
     /**
+     * Adds the given runnable as a task. The returned runnable will have not started.
+     *
+     * @param runnable the runnable.
+     * @return the task.
+     */
+    protected synchronized ModuleTask addTask(Runnable runnable) {
+        ModuleTask mTask = new ModuleTask(this, runnable);
+        this.moduleTasks.add(mTask);
+        return mTask;
+    }
+
+    /**
      * Removes a task from this module's task list.
      *
      * @param task the task to remove.
      */
-    protected synchronized void removeTask(BukkitRunnable task) {
+    protected synchronized BukkitRunnable removeTask(BukkitRunnable task) {
         this.moduleTasks.remove(task);
+        return task;
     }
 
     /**
@@ -332,8 +345,9 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      *
      * @param task the task.
      */
-    protected synchronized void addTask(BukkitRunnable task) {
+    protected synchronized BukkitRunnable addTask(BukkitRunnable task) {
         this.moduleTasks.add(task);
+        return task;
     }
 
     /**

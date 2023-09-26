@@ -32,7 +32,7 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             return null;
 
         ItemStackBuilder builder = new ItemStackBuilder();
-        Map<String, Object> primitiveValue = (Map<String, Object>) entry.getPrimitive();
+        Map<String, Object> primitiveValue = (Map<String, Object>) entry.unwrap();
         builder.material(XMaterial.matchXMaterial(primitiveValue.get("type").toString()).orElse(null));
         if (primitiveValue.containsKey("amount"))
             builder.amount((int) primitiveValue.get("amount"));
@@ -47,11 +47,11 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
         if (primitiveValue.containsKey("lore"))
             builder.lore((List<String>) primitiveValue.get("lore"));
         if (primitiveValue.containsKey("nbt-data"))
-            builder.extraData((Map<String, Object>) ((ConfigPrimitive) primitiveValue.get("nbt-data")).getPrimitive());
+            builder.extraData((Map<String, Object>) primitiveValue.get("nbt-data"));
         if (primitiveValue.containsKey("potion-data"))
             builder.potionData(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue.get("potion-data")), new FieldType(PotionData.class)));
         if (primitiveValue.containsKey("enchantments")) {
-            Map<String, Object> enchantments = (Map<String, Object>) ((ConfigPrimitive) primitiveValue.get("enchantments")).getPrimitive();
+            Map<String, Object> enchantments = (Map<String, Object>) primitiveValue.get("enchantments");
             for (Map.Entry<String, Object> enchant : enchantments.entrySet()) {
                 XEnchantment enchantment = XEnchantment.valueOf(enchant.getKey());
                 int level = (int) enchant.getValue();
