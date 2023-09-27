@@ -330,6 +330,8 @@ public final class MenuBuilder {
 
         MenuDynamic menuDynamic = new MenuDynamic(this.title, size, clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuDynamic.setContents(contents);
+        menuDynamic.onClose(this.closeRunnable);
+        menuDynamic.onPostClose(this.postCloseRunnable);
         menuDynamic.setTopClickAction(topClickEvent);
         menuDynamic.setBottomClickAction(bottomClickEvent);
 

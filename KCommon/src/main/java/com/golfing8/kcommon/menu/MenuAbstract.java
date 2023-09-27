@@ -310,11 +310,13 @@ public abstract class MenuAbstract implements Menu {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event){
-        if(onClose != null && event.getInventory() == getGUI()){
+        // Both checks are necessary as different Bukkit versions change how you can detect the inventory being closed.
+        boolean wasInventory = event.getInventory() == getGUI() || getGUI().getViewers().contains(event.getPlayer());
+        if(onClose != null && wasInventory){
             onClose.run(event);
         }
 
-        if(postClose != null && event.getInventory() == getGUI()){
+        if(postClose != null && wasInventory){
             Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> postClose.run(event));
         }
     }
