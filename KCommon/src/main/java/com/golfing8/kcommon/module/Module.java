@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.module;
 
+import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.MCommand;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.config.generator.ConfigClass;
@@ -69,7 +70,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      * The owning plugin of this module.
      */
     @Getter
-    private final Plugin plugin;
+    private final KPlugin plugin;
     /**
      * The name of this module.
      */
@@ -83,10 +84,11 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
     private final Set<Class<? extends Module>> dependencies;
 
     /**
-     * If this module is enabled or not.
+     * If this module is enabled or not. This is simply the module's current state.
+     * This has no indication of the plugin's enabled state for this module in its manifest.
      */
     @Getter
-    private boolean enabled;
+    private transient boolean enabled;
 
     /**
      * The list of tasks this module is currently running.
@@ -129,7 +131,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      */
     private final List<MCommand<?>> moduleCommands;
 
-    public Module(Plugin plugin, String moduleName, List<Class<? extends Module>> dependencies) {
+    public Module(KPlugin plugin, String moduleName, List<Class<? extends Module>> dependencies) {
         this.plugin = plugin;
         this.moduleName = moduleName;
         this.moduleCommands = new ArrayList<>();
@@ -141,7 +143,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.subListeners = new HashSet<>();
     }
 
-    public Module(Plugin plugin, String moduleName) {
+    public Module(KPlugin plugin, String moduleName) {
         this(plugin, moduleName, Collections.emptyList());
     }
 
@@ -150,7 +152,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         if (info == null)
             throw new IllegalArgumentException("Module info missing!");
 
-        this.plugin = JavaPlugin.getProvidingPlugin(this.getClass());;
+        this.plugin = (KPlugin) JavaPlugin.getProvidingPlugin(this.getClass());
         this.moduleName = info.name();
         this.moduleCommands = new ArrayList<>();
         this.permissionLevels = new HashMap<>();
@@ -190,6 +192,22 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
             return;
         }
         Modules.registerModule(this);
+        if (getPlugin().getManifest().loadModule(this)) {
+            enable();
+            plugin.getLogger().info(String.format("Loaded and enabled module: %s", this.getModuleName()));
+        } else {
+            plugin.getLogger().info(String.format("Loaded and disabled module: %s", this.getModuleName()));
+        }
+    }
+
+    /**
+     * Transitively enables this module. Note that this will not change the module's
+     * state as according to its plugin's manifest.
+     */
+    public void enable() {
+        // Don't enable twice
+        if (enabled)
+            return;
 
         loadConfigs();
 
@@ -209,13 +227,25 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      * Should be called when this module needs to shut down.
      */
     public void shutdown() {
+        this.disable();
+        Modules.unregisterModule(this);
+    }
+
+    /**
+     * Transitively disables this module. Note that this will not change the module's
+     * state as according to its plugin's manifest.
+     */
+    public void disable() {
+        // Don't disable self twice.
+        if (!enabled)
+            return;
+
         //Save the lang config.
         this.langConfig.save();
 
         this.onDisable();
         this.dataManagers.values().forEach(DataManager::shutdown);
         HandlerList.unregisterAll(this);
-        Modules.unregisterModule(this);
 
         //Unregister all commands associated with this module.
         this.moduleCommands.forEach(MCommand::unregister);

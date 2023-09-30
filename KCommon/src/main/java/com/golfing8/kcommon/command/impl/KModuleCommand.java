@@ -15,5 +15,7 @@ public class KModuleCommand extends KCommand {
     @Override
     protected void onRegister() {
         addSubCommand(new KModuleReloadCommand());
+        addSubCommand(new KModuleDisableCommand());
+        addSubCommand(new KModuleEnableCommand());
     }
 }

@@ -1,22 +1,29 @@
 package com.golfing8.kcommon;
 
 import com.golfing8.kcommon.command.CommandManager;
+import com.golfing8.kcommon.command.KCommand;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
+import com.golfing8.kcommon.data.DataSerializable;
+import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.golfing8.kcommon.hook.placeholderapi.PKorePAPIHook;
 import com.golfing8.kcommon.menu.Menu;
 import com.golfing8.kcommon.menu.MenuManager;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.ModuleInfo;
+import com.golfing8.kcommon.module.ModuleManifest;
 import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.util.Reflection;
+import com.google.gson.Gson;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.PluginClassLoader;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -36,6 +43,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
      */
     @Getter
     private PKorePAPIHook placeholderAPIHook;
+    /** The module manifest */
+    @Getter
+    private ModuleManifest manifest;
 
     public final void onEnable() {
         this.commandManager = new CommandManager(this);
@@ -50,6 +60,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.langConfig.load();
         this.loadLangConstants();
         this.langConfig.save();
+        this.loadModuleManifest();
 
         this.onEnableInner();
         try {
@@ -86,6 +97,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
 
         //Once more save the lang config.
         this.langConfig.save();
+        saveModuleManifest();
     }
 
     /**
@@ -94,6 +106,36 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
     protected void loadLangConstants() {
         this.langConfig.addLanguageConstant("kore-reload-command-reloaded", "&aReloaded the &e{MODULE} &amodule in &e{TIME}ms&a.");
         this.langConfig.addLanguageConstant("generic-command-not-player", "&cOnly players can do that!");
+    }
+
+    private void saveModuleManifest() {
+        try {
+            DataSerializer.getGSONBase().toJson(this.manifest, Files.newBufferedWriter(Paths.get("module-manifest.json")));
+        } catch (IOException e) {
+            getLogger().warning("Failed to save module-manifest.json!");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Tries to load the module manifest.
+     */
+    private void loadModuleManifest() {
+        Path path = Paths.get("module-manifest.json");
+        if (Files.notExists(path)) {
+            // Load default manifest.
+            this.manifest = new ModuleManifest();
+            return;
+        }
+
+        Gson gsonBase = DataSerializer.getGSONBase();
+        try {
+            this.manifest = gsonBase.fromJson(Files.newBufferedReader(path), ModuleManifest.class);
+        } catch (IOException exc) {
+            getLogger().warning("Failed to read module-manifest.json! Loading default manifest...");
+            exc.printStackTrace();
+            this.manifest = new ModuleManifest();
+        }
     }
 
     /**
