@@ -11,6 +11,7 @@ import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -79,6 +80,7 @@ public final class ItemStackBuilder {
     /**
      * The last built itemstack for this builder.
      */
+    @Getter(AccessLevel.PRIVATE)
     private ItemStack cachedBuild;
 
     /**
