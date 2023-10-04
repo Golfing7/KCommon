@@ -108,6 +108,29 @@ public final class Timestamp {
     }
 
     /**
+     * Converts this timestamp to a config string.
+     *
+     * @return the config string.
+     */
+    public String toConfigString() {
+        String timeString = formatInt(this.hour) + ":" + formatInt(this.minute);
+        if (this.second != UNUSED) {
+            timeString += ":" + formatInt(this.second);
+        }
+
+        if (this.month != UNUSED || this.dayOfMonth != UNUSED || this.year != UNUSED) {
+            return formatInt(this.month) + "-" + formatInt(this.dayOfMonth) + "-" + formatInt(this.year) + "-" + timeString;
+        }
+        return timeString;
+    }
+
+    private static String formatInt(int num) {
+        if (num >= 0 && num < 10)
+            return "0" + num;
+        return String.valueOf(num);
+    }
+
+    /**
      * Creates a timestamp representing the current time of call.
      *
      * @return the time.

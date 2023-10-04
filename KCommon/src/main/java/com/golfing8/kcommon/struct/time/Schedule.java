@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.time;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,10 +14,20 @@ import java.util.stream.Collectors;
  */
 public class Schedule {
     /** Time stamps for actions to take place at. Mapped to a boolean for if they've been used during a given time period. */
+    @Getter
     private final List<ScheduleEntry> scheduleEntries = new ArrayList<>();
 
     public Schedule(Collection<Timestamp> entries) {
         this.scheduleEntries.addAll(entries.stream().map(ScheduleEntry::new).collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets all timestamps in this schedule.
+     *
+     * @return the timestamps.
+     */
+    public List<Timestamp> getAllTimestamps() {
+        return scheduleEntries.stream().map(entry -> entry.timestamp).collect(Collectors.toList());
     }
 
     /**

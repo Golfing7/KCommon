@@ -255,6 +255,8 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAPotionEffectType());
         registerAdapter(new CAPotionData());
         registerAdapter(new CAPotionEffect());
+        registerAdapter(new CARange());
+        registerAdapter(new CASchedule());
 
         registerAdapter(MenuCoordinate.class, (section) -> {
             if(section.contains("slot")) {

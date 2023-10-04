@@ -1,9 +1,11 @@
 package com.golfing8.kcommon.struct.region;
 
 import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A cuboid region occupying a rectangular prism area in three-dimensional space.
@@ -39,6 +41,19 @@ public class CuboidRegion implements Region {
      */
     public CuboidRegion(BlockVector minimum, BlockVector maximum) {
         this(minimum.getX(), maximum.getX(), minimum.getY(), maximum.getY(), minimum.getZ(), maximum.getZ());
+    }
+
+    /**
+     * Gets a random position within this region.
+     *
+     * @return the random position.
+     */
+    public Vector getRandomPosition() {
+        double x = ThreadLocalRandom.current().nextDouble(this.minX, this.maxX);
+        double y = ThreadLocalRandom.current().nextDouble(this.minY, this.maxY);
+        double z = ThreadLocalRandom.current().nextDouble(this.minZ, this.maxZ);
+
+        return new Vector(x, y, z);
     }
 
     /**
