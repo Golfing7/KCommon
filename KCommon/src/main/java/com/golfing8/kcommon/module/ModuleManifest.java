@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.module;
 
 import com.golfing8.kcommon.KPlugin;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
  */
 public class ModuleManifest {
     /** The states of all modules controlled by the plugin */
+    @Getter
     private Map<String, Boolean> moduleStates = new HashMap<>();
 
     /**

@@ -3,13 +3,16 @@ package com.golfing8.kcommon.util;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -29,7 +32,7 @@ public final class Reflection {
     public static Collection<Class<? extends Module>> discoverModules(URLClassLoader loader) {
         List<Class<? extends Module>> classes = new ArrayList<>();
         for (URL url : loader.getURLs()) {
-            try (JarFile file = new JarFile(url.getFile())){
+            try (JarFile file = new JarFile(url.toURI().getPath())){
                 Enumeration<JarEntry> entries = file.entries();
                 while (entries.hasMoreElements()) {
                     JarEntry entry = entries.nextElement();
@@ -48,7 +51,9 @@ public final class Reflection {
                         // Class file version error ? Either way, wasn't supposed to be loaded so let it pass.
                     }
                 }
-            } catch (IOException ignored) {}
+            } catch (IOException | URISyntaxException exc) {
+                exc.printStackTrace();
+            }
         }
         return classes;
     }

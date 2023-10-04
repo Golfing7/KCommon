@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -204,7 +205,9 @@ public abstract class ConfigClass {
                 continue;
 
             try {
-                ConfigClass instance = (ConfigClass) clazz.getDeclaredConstructor().newInstance();
+                Constructor<?> constructor = clazz.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                ConfigClass instance = (ConfigClass) constructor.newInstance();
                 instance.parent = this;
                 this.children.put((Class<? extends ConfigClass>) clazz, instance);
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {

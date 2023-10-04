@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.PluginClassLoader;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -69,7 +70,6 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             this.getLogger().warning("Failed to reflectively initialize modules! Shutting down...");
             e.printStackTrace();
             this.getServer().getPluginManager().disablePlugin(this);
-            return;
         }
     }
 
@@ -110,7 +110,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
 
     private void saveModuleManifest() {
         try {
-            DataSerializer.getGSONBase().toJson(this.manifest, Files.newBufferedWriter(Paths.get("module-manifest.json")));
+            BufferedWriter writer = Files.newBufferedWriter(getDataFolder().toPath().resolve("module-manifest.json"));
+            DataSerializer.getGSONBase().toJson(this.manifest, writer);
+            writer.close();
         } catch (IOException e) {
             getLogger().warning("Failed to save module-manifest.json!");
             e.printStackTrace();
@@ -121,16 +123,23 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
      * Tries to load the module manifest.
      */
     private void loadModuleManifest() {
-        Path path = Paths.get("module-manifest.json");
+        Path path = getDataFolder().toPath().resolve("module-manifest.json");
         if (Files.notExists(path)) {
             // Load default manifest.
             this.manifest = new ModuleManifest();
+            try {
+                Files.createFile(path);
+            } catch (IOException exc) {
+                getLogger().warning("Failed to save default module-manifest.json!");
+                exc.printStackTrace();
+            }
             return;
         }
 
         Gson gsonBase = DataSerializer.getGSONBase();
         try {
-            this.manifest = gsonBase.fromJson(Files.newBufferedReader(path), ModuleManifest.class);
+            ModuleManifest loadedManifest = gsonBase.fromJson(Files.newBufferedReader(path), ModuleManifest.class);
+            this.manifest = loadedManifest == null || loadedManifest.getModuleStates() == null ? new ModuleManifest() : loadedManifest;
         } catch (IOException exc) {
             getLogger().warning("Failed to read module-manifest.json! Loading default manifest...");
             exc.printStackTrace();
@@ -139,12 +148,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
     }
 
     /**
-     * Uses reflection to detect all present module classes in the <code>com.golfing8.kore.module.all</code> package
-     * and instantiates them.
+     * Uses reflection to detect all present module classes and instantiate them.
      */
     private void reflectivelySetupModules() {
-        Class<Module> moduleClass = Module.class;
-
         //A map storing module classes to their dependencies in graph like formation
         Map<Class<?>, List<Class<?>>> classToClassDependencyGraph = new HashMap<>();
         Map<Class<?>, Module> instances = new HashMap<>();

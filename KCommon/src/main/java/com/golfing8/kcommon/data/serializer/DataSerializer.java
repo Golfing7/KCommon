@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.data.serializer;
 
 import com.golfing8.kcommon.data.serializer.type.ItemStackAdapterFactory;
+import com.golfing8.kcommon.data.serializer.type.LocationAdapterFactory;
 import com.golfing8.kcommon.data.serializer.type.WorldAdapterFactory;
 import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
@@ -107,6 +108,7 @@ public final class DataSerializer {
         builder.registerTypeHierarchyAdapter(ItemMeta.class, ItemStackAdapterFactory.INSTANCE);
         builder.registerTypeHierarchyAdapter(ItemStack.class, ItemStackAdapterFactory.INSTANCE);
         builder.registerTypeAdapterFactory(WorldAdapterFactory.INSTANCE);
+        builder.registerTypeAdapterFactory(LocationAdapterFactory.INSTANCE);
 
         return LOADED_GSON = builder.create();
     }
