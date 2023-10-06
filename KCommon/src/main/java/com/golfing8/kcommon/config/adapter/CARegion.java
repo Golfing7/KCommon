@@ -23,10 +23,10 @@ public class CARegion implements ConfigAdapter<Region> {
         if (map.containsKey("region-type")) {
             return new CuboidRegion(
                     (double) map.get("min-x"),
-                    (double) map.get("min-y"),
-                    (double) map.get("min-z"),
                     (double) map.get("max-x"),
+                    (double) map.get("min-y"),
                     (double) map.get("max-y"),
+                    (double) map.get("min-z"),
                     (double) map.get("max-z")
             );
         }

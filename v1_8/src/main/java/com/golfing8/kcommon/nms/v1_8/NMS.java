@@ -181,8 +181,12 @@ public class NMS implements NMSAccess {
                 IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + subtitle + "\"}"), fadeInTime, showTime, fadeOutTime);
         PacketPlayOutTitle packetOutTimes = new PacketPlayOutTitle(fadeInTime, showTime, fadeOutTime);
 
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetOutTitle);
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetOutSubtitle);
+        if (title != null) {
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetOutTitle);
+        }
+        if (subtitle != null) {
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetOutSubtitle);
+        }
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetOutTimes);
     }
 

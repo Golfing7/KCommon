@@ -49,9 +49,9 @@ public class CuboidRegion implements Region {
      * @return the random position.
      */
     public Vector getRandomPosition() {
-        double x = ThreadLocalRandom.current().nextDouble(this.minX, this.maxX);
-        double y = ThreadLocalRandom.current().nextDouble(this.minY, this.maxY);
-        double z = ThreadLocalRandom.current().nextDouble(this.minZ, this.maxZ);
+        double x = ThreadLocalRandom.current().nextDouble(this.minX, this.maxX + 1e-6);
+        double y = ThreadLocalRandom.current().nextDouble(this.minY, this.maxY + 1e-6);
+        double z = ThreadLocalRandom.current().nextDouble(this.minZ, this.maxZ + 1e-6);
 
         return new Vector(x, y, z);
     }
