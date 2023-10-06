@@ -49,7 +49,7 @@ public abstract class ConfigClass {
      */
     @SuppressWarnings("unchecked")
     public static <T extends ConfigClass> T get(@NotNull Class<T> type) {
-        return (T) CONFIG_CLASS_MAP.get(type.getClass().getComponentType());
+        return (T) CONFIG_CLASS_MAP.get(type);
     }
 
     /**
