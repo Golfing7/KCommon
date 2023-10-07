@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.particle;
 
+import com.golfing8.kcommon.util.VectorUtil;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
@@ -27,9 +28,9 @@ public class ParticleCircle extends Particle{
             offset.setX(Math.cos(Math.toRadians(angle)) * radius);
             offset.setZ(Math.sin(Math.toRadians(angle)) * radius);
 
-            rotateAroundX(offset, Math.toRadians(getPitch()));
-            rotateAroundY(offset, Math.toRadians(getYaw()));
-            rotateAroundZ(offset, Math.toRadians(getRoll()));
+            VectorUtil.rotateAroundX(offset, Math.toRadians(getPitch()));
+            VectorUtil.rotateAroundY(offset, Math.toRadians(getYaw()));
+            VectorUtil.rotateAroundZ(offset, Math.toRadians(getRoll()));
 
             Location particleLocation = location.clone().add(offset);
 

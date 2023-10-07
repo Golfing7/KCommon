@@ -29,7 +29,9 @@ public class CAMessage implements ConfigAdapter<Message> {
     @SuppressWarnings("unchecked")
     public ConfigPrimitive toPrimitive(Message object) {
         if (object.isSimple()) {
-            return ConfigPrimitive.ofList(object.getMessages());
+            return object.getMessages().size() == 1 ?
+                    ConfigPrimitive.ofString(object.getMessages().get(0)) :
+                    ConfigPrimitive.ofList(object.getMessages());
         }
         Map<String, Object> items = new HashMap<>();
         if (object.getMessages() != null) {

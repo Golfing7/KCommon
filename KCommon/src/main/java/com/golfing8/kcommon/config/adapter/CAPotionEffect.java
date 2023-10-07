@@ -44,6 +44,16 @@ public class CAPotionEffect implements ConfigAdapter<PotionEffect> {
         if (object == null)
             return ConfigPrimitive.ofNull();
 
+        // Ambient with particles is default. Serialize as a string.
+        if (object.isAmbient() && object.hasParticles()) {
+            return ConfigPrimitive.ofString(
+                    String.join(":",
+                            object.getType().getName(),
+                            String.valueOf(object.getAmplifier()),
+                            String.valueOf(object.getDuration()))
+            );
+        }
+
         Map<String, Object> map = new HashMap<>();
         map.put("effect-type", object.getType().getName());
 
