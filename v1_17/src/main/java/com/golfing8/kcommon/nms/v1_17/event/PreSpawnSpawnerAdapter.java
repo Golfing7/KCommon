@@ -11,6 +11,7 @@ public class PreSpawnSpawnerAdapter implements Listener {
     @EventHandler
     public void onSpawn(PreSpawnerSpawnEvent event){
         PreSpawnSpawnerEvent preEvent = new PreSpawnSpawnerEvent(event.getSpawnerLocation().getBlock(), event.getType());
+        preEvent.setCancelled(event.isCancelled());
 
         Bukkit.getServer().getPluginManager().callEvent(preEvent);
 
