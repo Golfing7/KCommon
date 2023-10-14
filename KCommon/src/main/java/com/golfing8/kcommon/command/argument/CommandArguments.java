@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.command.argument;
 
+import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.struct.time.TimeLength;
@@ -8,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -109,4 +111,22 @@ public final class CommandArguments {
     }, (context) -> {
         return Modules.getModule(context.getArgument()) != null;
     }, Modules::getModule);
+
+    /**
+     * A command argument for plugins.
+     */
+    public static final CommandArgument<Plugin> PLUGIN = new CommandArgument<>("plugin", (context) -> {
+        return Arrays.stream(Bukkit.getServer().getPluginManager().getPlugins()).map(Plugin::getName).collect(Collectors.toList());
+    }, (context) -> {
+        return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
+    }, Bukkit.getServer().getPluginManager()::getPlugin);
+
+    /**
+     * A command argument for plugins that use this library.
+     */
+    public static final CommandArgument<KPlugin> KPLUGIN = new CommandArgument<>("kcommon plugin", (context) -> {
+        return Arrays.stream(Bukkit.getServer().getPluginManager().getPlugins()).filter(pl -> pl instanceof KPlugin).map(Plugin::getName).collect(Collectors.toList());
+    }, (context) -> {
+        return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
+    }, str -> (KPlugin) Bukkit.getServer().getPluginManager().getPlugin(str));
 }
