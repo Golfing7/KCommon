@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.generator;
 
+import com.golfing8.kcommon.config.commented.Config;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import lombok.Getter;
@@ -70,9 +71,11 @@ public abstract class ConfigClass {
     /**
      * The parent class of this config.
      */
-    @Nullable
-    @Getter
+    @Nullable @Getter
     private ConfigClass parent;
+    /** The optional conf annotation for this class */
+    @Nullable @Getter
+    private Conf confAnnotation;
     /** If this config class requires the {@link Conf} annotation on fields. */
     @Getter @Setter
     private boolean requireAnnotation = false;
@@ -141,6 +144,10 @@ public abstract class ConfigClass {
     public final boolean loadValues(ConfigurationSection source) {
         String path = buildPath();
         boolean modified = false;
+        if (source instanceof Config && this.confAnnotation != null) {
+            ((Config) source).setComments(path, this.confAnnotation.value());
+        }
+
         for (ConfigValueHandle handle : this.fieldHandleMap.values()) {
             String fieldPath = handle.getFormattedPath(path);
             modified |= handle.load(source, fieldPath, readOnly);
@@ -162,8 +169,10 @@ public abstract class ConfigClass {
             return "";
 
         // If we have a parent, we need to somehow distinguish our path.
+        String name = this.confAnnotation != null && !this.confAnnotation.label().isEmpty() ?
+                this.confAnnotation.label() : this.self.getSimpleName();
         String parentPath = parent.buildPath();
-        return !parentPath.isEmpty() ? parentPath + "." + this.self.getSimpleName() : this.self.getSimpleName();
+        return !parentPath.isEmpty() ? parentPath + "." + name : name;
     }
 
     /**
@@ -209,6 +218,9 @@ public abstract class ConfigClass {
                 constructor.setAccessible(true);
                 ConfigClass instance = (ConfigClass) constructor.newInstance();
                 instance.parent = this;
+                if (clazz.isAnnotationPresent(Conf.class))
+                    instance.confAnnotation = clazz.getAnnotation(Conf.class);
+
                 this.children.put((Class<? extends ConfigClass>) clazz, instance);
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(String.format("Failed to load child config class %s.", clazz.getName()), e);

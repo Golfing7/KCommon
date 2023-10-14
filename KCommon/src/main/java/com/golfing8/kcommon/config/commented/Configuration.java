@@ -114,10 +114,19 @@ public class Configuration extends YamlConfiguration implements Config {
 
     @Override
     public void set(String path, Object value, String... comments) {
-        this.comments.put(path, Arrays.stream(comments).map(str -> "# " + str).toArray(String[]::new));
+        setComments(path, comments);
         set(path, value);
     }
-    
+
+    @Override
+    public void setComments(String path, String... comments) {
+        if (comments == null || comments.length == 0) {
+            this.comments.remove(path);
+        } else {
+            this.comments.put(path, Arrays.stream(comments).map(str -> "# " + str).toArray(String[]::new));
+        }
+    }
+
     // BOILERPLATE
 
     @Override

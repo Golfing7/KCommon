@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config.commented;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 
 /**
  * A bukkit {@link Configuration} that supports comments.
@@ -18,6 +19,14 @@ public interface Config extends org.bukkit.configuration.Configuration {
      * @param comments the comments.
      */
     void set(String path, Object value, String... comments);
+
+    /**
+     * Sets the comments of the given path.
+     *
+     * @param path the path to set.
+     * @param comments the comments to set, or null if they should be cleared.
+     */
+    void setComments(String path, String... comments);
 
     /**
      * Gets the value at the path with the given type.
