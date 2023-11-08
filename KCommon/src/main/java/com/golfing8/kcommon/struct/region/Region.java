@@ -57,6 +57,13 @@ public interface Region extends Iterable<BlockVector> {
     double getMinimumZValue();
 
     /**
+     * Gets the volume of this region.
+     *
+     * @return the total volume.
+     */
+    double getVolume();
+
+    /**
      * Checks if the given vector is within this region.
      *
      * @param vector the vector position.

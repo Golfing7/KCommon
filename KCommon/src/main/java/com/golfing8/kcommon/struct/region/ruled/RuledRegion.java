@@ -92,6 +92,11 @@ public class RuledRegion implements Region {
     }
 
     @Override
+    public double getVolume() {
+        return backingRegion.getVolume();
+    }
+
+    @Override
     public boolean isPositionWithin(Vector vector) {
         return backingRegion.isPositionWithin(vector);
     }

@@ -131,6 +131,11 @@ public class CuboidRegion implements Region {
     }
 
     @Override
+    public double getVolume() {
+        return (maxX - minX) * (maxY - minY) * (maxZ - minZ);
+    }
+
+    @Override
     public boolean isPositionWithin(Vector vector) {
         return vector.getX() >= this.minX && vector.getX() <= this.maxX &&
                 vector.getY() >= this.minY && vector.getY() <= this.maxY &&

@@ -24,6 +24,8 @@ import java.util.Map;
  * </p>
  */
 public final class ConfigPrimitive {
+    /** The name of the parent section when using {@link #ofSection(ConfigurationSection)} */
+    public static final String PARENT_KEY = "$parent_name";
     private static final ConfigPrimitive NULL = new ConfigPrimitive(null);
 
     /** The primitive object */
@@ -134,6 +136,9 @@ public final class ConfigPrimitive {
                 values.put(key, section.get(key));
             }
         }
+
+        // Insert a special key for the parent key.
+        values.put(PARENT_KEY, section.getName());
 
         return ConfigPrimitive.ofMap(values);
     }
