@@ -12,6 +12,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -105,10 +106,9 @@ public final class DataSerializer {
         builder.disableHtmlEscaping();
         builder.excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC);
 
-        builder.registerTypeHierarchyAdapter(ItemMeta.class, ItemStackAdapterFactory.INSTANCE);
-        builder.registerTypeHierarchyAdapter(ItemStack.class, ItemStackAdapterFactory.INSTANCE);
-        builder.registerTypeAdapterFactory(WorldAdapterFactory.INSTANCE);
         builder.registerTypeAdapterFactory(LocationAdapterFactory.INSTANCE);
+        builder.registerTypeAdapterFactory(WorldAdapterFactory.INSTANCE);
+        builder.registerTypeHierarchyAdapter(ItemStack.class, ItemStackAdapterFactory.INSTANCE);
 
         return LOADED_GSON = builder.create();
     }
