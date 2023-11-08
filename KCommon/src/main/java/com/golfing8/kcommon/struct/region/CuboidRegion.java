@@ -1,5 +1,8 @@
 package com.golfing8.kcommon.struct.region;
 
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
@@ -15,10 +18,16 @@ public class CuboidRegion implements Region {
      * The absolute center of this region.
      */
     private final transient BlockVector center;
+    /** The world that this region belongs to, can be null */
+    private final World world;
     private final double minX, maxX, minY, maxY, minZ, maxZ;
 
     //Creates a cuboid region with all the given bounds.
     public CuboidRegion(double minX, double maxX, double minY, double maxY, double minZ, double maxZ) {
+        this(minX, maxX, minY, maxY, minZ, maxZ, null);
+    }
+
+    public CuboidRegion(double minX, double maxX, double minY, double maxY, double minZ, double maxZ, World world) {
         this.minX = Math.min(minX, maxX);
         this.maxX = Math.max(minX, maxX);
         this.minY = Math.min(minY, maxY);
@@ -31,6 +40,7 @@ public class CuboidRegion implements Region {
         double middleY = (this.maxY + this.minY) / 2D;
         double middleZ = (this.maxZ + this.minZ) / 2D;
         this.center = new BlockVector(middleX, middleY, middleZ);
+        this.world = world;
     }
 
     /**
@@ -41,6 +51,17 @@ public class CuboidRegion implements Region {
      */
     public CuboidRegion(BlockVector minimum, BlockVector maximum) {
         this(minimum.getX(), maximum.getX(), minimum.getY(), maximum.getY(), minimum.getZ(), maximum.getZ());
+    }
+
+    /**
+     * Creates the cuboid region with the minimum and maximum locations
+     * Assumes both locations use the same world.
+     *
+     * @param minimum the minimum location
+     * @param maximum the maximum location
+     */
+    public CuboidRegion(Location minimum, Location maximum) {
+        this(minimum.getX(), maximum.getX(), minimum.getY(), maximum.getY(), minimum.getZ(), maximum.getZ(), minimum.getWorld());
     }
 
     /**
@@ -110,10 +131,15 @@ public class CuboidRegion implements Region {
     }
 
     @Override
-    public boolean isPositionWithin(BlockVector vector) {
+    public boolean isPositionWithin(Vector vector) {
         return vector.getX() >= this.minX && vector.getX() <= this.maxX &&
                 vector.getY() >= this.minY && vector.getY() <= this.maxY &&
                 vector.getZ() >= this.minZ && vector.getZ() <= this.maxZ;
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 
     @Override

@@ -185,6 +185,19 @@ public class ConfigTypeRegistry {
      * Gets a value from the config by using the CONFIG_ADAPTER_MAP. If the type is unrecognized, the section's {@link ConfigurationSection#get(String, Object) get} method is used.
      *
      * @param entry the config entry.
+     * @param clazz the field type.
+     * @return the value
+     * @param <T> the type of value
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <T> T getFromType(ConfigPrimitive entry, Class<T> clazz) {
+        return getFromType(entry, new FieldType(clazz));
+    }
+
+    /**
+     * Gets a value from the config by using the CONFIG_ADAPTER_MAP. If the type is unrecognized, the section's {@link ConfigurationSection#get(String, Object) get} method is used.
+     *
+     * @param entry the config entry.
      * @param field the field type.
      * @return the value
      * @param <T> the type of value
@@ -257,6 +270,7 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAPotionEffect());
         registerAdapter(new CARange());
         registerAdapter(new CASchedule());
+        registerAdapter(new CAWorld());
 
         registerAdapter(MenuCoordinate.class, (section) -> {
             if(section.contains("slot")) {

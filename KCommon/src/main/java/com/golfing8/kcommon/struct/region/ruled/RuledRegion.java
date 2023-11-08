@@ -7,6 +7,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ public class RuledRegion implements Region {
     }
 
     @Override
-    public boolean isPositionWithin(BlockVector vector) {
+    public boolean isPositionWithin(Vector vector) {
         return backingRegion.isPositionWithin(vector);
     }
 

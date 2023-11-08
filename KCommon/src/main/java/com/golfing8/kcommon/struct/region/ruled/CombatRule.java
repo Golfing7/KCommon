@@ -19,6 +19,9 @@ public class CombatRule extends RegionRule {
         if (!(event.getDamager() instanceof Player) || !(event.getEntity() instanceof Player))
             return;
 
+        if (!getRegion().isWithin(event.getEntity()) && !getRegion().isWithin(event.getDamager()))
+            return;
+
         if (allowCombatBetweenFriendlies)
             event.setCancelled(true);
         else
@@ -28,6 +31,9 @@ public class CombatRule extends RegionRule {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPostDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player) || !(event.getEntity() instanceof Player))
+            return;
+
+        if (!getRegion().isWithin(event.getEntity()) && !getRegion().isWithin(event.getDamager()))
             return;
 
         if (allowCombatBetweenFriendlies) {

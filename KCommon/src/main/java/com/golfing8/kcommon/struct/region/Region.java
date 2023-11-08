@@ -1,7 +1,10 @@
 package com.golfing8.kcommon.struct.region;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 
 /**
  * An abstract region in three-dimensional space.
@@ -59,7 +62,26 @@ public interface Region extends Iterable<BlockVector> {
      * @param vector the vector position.
      * @return true if it's within the region, false if not.
      */
-    boolean isPositionWithin(BlockVector vector);
+    boolean isPositionWithin(Vector vector);
+
+    /**
+     * Checks if the given location is within this region.
+     *
+     * @param location the vector position.
+     * @return true if it's within the region, false if not.
+     */
+    default boolean isPositionWithin(Location location) {
+        return (getWorld() == null || getWorld() == location.getWorld()) && isPositionWithin(location.toVector());
+    }
+
+    /**
+     * Gets the world associated with this region.
+     *
+     * @return the world.
+     */
+    default World getWorld() {
+        return null;
+    }
 
     /**
      * Checks if this entity's position is within this region.
@@ -68,6 +90,6 @@ public interface Region extends Iterable<BlockVector> {
      * @return true if they are within this region.
      */
     default boolean isWithin(Entity entity) {
-        return isPositionWithin(entity.getLocation().toVector().toBlockVector());
+        return (getWorld() == null || getWorld() == entity.getWorld()) && isPositionWithin(entity.getLocation().toVector().toBlockVector());
     }
 }
