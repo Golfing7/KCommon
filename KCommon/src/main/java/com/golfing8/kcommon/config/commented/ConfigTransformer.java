@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.commented;
 
+import com.golfing8.kcommon.KCommon;
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -55,49 +56,54 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
 
     @Override
     public String next() {
-        lastKeyIndex = index;
-
-        junk.clear();
-        List<String> temp = junk;
-        junk = junk2;
-        junk2 = temp;
-
         String line = null;
-        while (index < lines.length && !isKeyLine(line = lines[index++])) {
-            junk2.add(line);
-            this.transformedLines.add(line);
-        }
+        try {
+            lastKeyIndex = index;
 
-        // Failed to find anything, return null
-        if (!isKeyLine(line) && index == lines.length) {
-            if (nextKey != null) {
-                String toReturn = nextKey;
-                nextKey = null;
-                return toReturn;
+            junk.clear();
+            List<String> temp = junk;
+            junk = junk2;
+            junk2 = temp;
+
+            while (index < lines.length && !isKeyLine(line = lines[index++])) {
+                junk2.add(line);
+                this.transformedLines.add(line);
             }
-            // Check if we should throw an exception.
-            if (lastKeyIndex > 0)
-                throw new NoSuchElementException();
-            return null;
+
+            // Failed to find anything, return null
+            if (!isKeyLine(line) && index == lines.length) {
+                if (nextKey != null) {
+                    String toReturn = nextKey;
+                    nextKey = null;
+                    return toReturn;
+                }
+                // Check if we should throw an exception.
+                if (lastKeyIndex > 0)
+                    throw new NoSuchElementException();
+                return null;
+            }
+
+            // Update indent and key path
+            int nextIndent = getIndent(line);
+            keys = keys.subList(0, nextIndent);
+            String strippedLine = StringUtils.strip(line);
+            if (strippedLine.charAt(0) == '\'')
+                strippedLine = strippedLine.replace("'", "");
+            keys.add(strippedLine.substring(0, strippedLine.indexOf(":")));
+
+            // Build key, update next
+            transformedLines.add(line);
+            String previous = nextKey;
+            String fullKey = String.join(".", keys);
+            lastIndent = indent;
+            indent = nextIndent;
+            nextKey = fullKey;
+            return previous;
+        } catch (Exception exc) {
+            KCommon.getInstance().getLogger().severe("Failed to read config! Current Line: " + line + " " + this);
+            throw exc;
         }
 
-        // Update indent and key path
-        int nextIndent = getIndent(line);
-        keys = keys.subList(0, nextIndent);
-        String strippedLine = StringUtils.strip(line);
-        if (strippedLine.charAt(0) == '\'')
-            strippedLine = strippedLine.replace("'", "");
-        keys.add(strippedLine.substring(0, strippedLine.indexOf(":")));
-
-        // Build key, update next
-        transformedLines.add(line);
-        String previous = nextKey;
-        String fullKey = String.join(".", keys);
-        lastIndent = indent;
-        indent = nextIndent;
-        nextKey = fullKey;
-
-        return previous;
     }
 
     /**
@@ -128,12 +134,27 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
             return false;
 
         String strippedLine = StringUtils.strip(line);
-        return strippedLine.contains(":") && (Character.isAlphabetic(strippedLine.charAt(0)) || strippedLine.charAt(0) == '\'');
+        return strippedLine.contains(":") && (Character.isLetterOrDigit(strippedLine.charAt(0)) || strippedLine.charAt(0) == '\'');
     }
 
     @NotNull
     @Override
     public Iterator<String> iterator() {
         return this; // :)
+    }
+
+    @Override
+    public String toString() {
+        return "ConfigTransformer{" +
+                "lastKeyIndex=" + lastKeyIndex +
+                ", linesInserted=" + linesInserted +
+                ", junk=" + junk +
+                ", junk2=" + junk2 +
+                ", index=" + index +
+                ", indent=" + indent +
+                ", lastIndent=" + lastIndent +
+                ", keys=" + keys +
+                ", nextKey='" + nextKey + '\'' +
+                '}';
     }
 }
