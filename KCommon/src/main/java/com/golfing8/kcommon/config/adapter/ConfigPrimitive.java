@@ -48,9 +48,7 @@ public final class ConfigPrimitive {
      * @return the unwrapped value.
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public Object unwrap() {
-        Preconditions.checkNotNull(primitive, "Value cannot be null");
-
+    public <T> T unwrap() {
         if (primitive instanceof Map) {
             Map items = new HashMap();
             Map m = (Map) primitive;
@@ -61,7 +59,7 @@ public final class ConfigPrimitive {
                     items.put(k, v);
                 }
             });
-            return items;
+            return (T) items;
         } else if (primitive instanceof List) {
             List l = (List) primitive;
             for (int i = 0; i < l.size(); i++) {
@@ -72,9 +70,9 @@ public final class ConfigPrimitive {
                     l.set(i, thing);
                 }
             }
-            return l;
+            return (T) l;
         }
-        return primitive;
+        return (T) primitive;
     }
 
     public static ConfigPrimitive of(Object value) {

@@ -271,6 +271,7 @@ public class ConfigTypeRegistry {
         registerAdapter(new CARange());
         registerAdapter(new CASchedule());
         registerAdapter(new CAWorld());
+        registerAdapter(new CAReflective());
 
         registerAdapter(MenuCoordinate.class, (section) -> {
             if(section.contains("slot")) {

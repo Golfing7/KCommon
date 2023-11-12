@@ -135,8 +135,8 @@ public class Configuration extends YamlConfiguration implements Config {
     }
 
     @Override
-    public Object getWithType(String path, Field type) {
-        return ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), new FieldType(type));
+    public Object getWithType(String path, FieldType type) {
+        return ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), type);
     }
 
     @Override

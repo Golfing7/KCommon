@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.config.commented;
 
+import com.golfing8.kcommon.struct.reflection.FieldType;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 
@@ -35,5 +37,27 @@ public interface Config extends org.bukkit.configuration.Configuration {
      * @param type the type.
      * @return the value.
      */
-    Object getWithType(String path, Field type);
+    default Object getWithType(String path, Field type) {
+        return getWithType(path, new FieldType(type));
+    }
+
+    /**
+     * Gets the value at the path with the given type.
+     *
+     * @param path the path.
+     * @param type the type.
+     * @return the value.
+     */
+    default Object getWithType(String path, Class<?> type) {
+        return getWithType(path, new FieldType(type));
+    }
+
+    /**
+     * Gets the value at the path with the given type.
+     *
+     * @param path the path.
+     * @param type the type.
+     * @return the value.
+     */
+    Object getWithType(String path, FieldType type);
 }
