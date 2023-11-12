@@ -133,6 +133,6 @@ public final class ConfigPrimitive {
             }
         }
 
-        return ConfigPrimitive.ofMap(values);
+        return new ConfigPrimitive(values, section);
     }
 }
