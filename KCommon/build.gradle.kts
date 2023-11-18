@@ -30,7 +30,7 @@ dependencies {
     testImplementation("io.papermc:paper-api:1.12.2")
     testImplementation(project(":NMS"))
 
-    implementation("de.tr7zw:item-nbt-api:2.11.3") //For items.
+    implementation("de.tr7zw:item-nbt-api:2.12.1") //For items.
     implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
     implementation("com.github.cryptomorin:XSeries:9.2.0") { isTransitive = false } //For XSeries
 

@@ -68,7 +68,7 @@ subprojects {
     dependencies {
         annotationProcessor("org.projectlombok:lombok:1.18.24")
         compileOnly("org.projectlombok:lombok:1.18.24")
-        compileOnly("de.tr7zw:item-nbt-api:2.11.3") //For items.
+        compileOnly("de.tr7zw:item-nbt-api:2.12.1") //For items.
     }
 
     repositories {

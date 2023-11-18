@@ -136,6 +136,25 @@ public class CuboidRegion implements Region {
     }
 
     @Override
+    public double getDistance(Vector vector) {
+        if (isPositionWithin(vector))
+            return 0;
+
+        double distX = vector.getX() < this.minX ? this.minX - vector.getX() : vector.getX() > this.maxX ? vector.getX() - this.maxX : 0;
+        double distY = vector.getY() < this.minY ? this.minY - vector.getY() : vector.getY() > this.maxY ? vector.getY() - this.maxY : 0;
+        double distZ = vector.getZ() < this.minZ ? this.minZ - vector.getZ() : vector.getZ() > this.maxZ ? vector.getZ() - this.maxZ : 0;
+        return Math.sqrt(distX * distX + distY * distY + distZ * distZ);
+    }
+
+    @Override
+    public double getDistance(Location location) {
+        if (getWorld() != null && location.getWorld() != getWorld())
+            throw new IllegalArgumentException("Location world does not match.");
+
+        return getDistance(location.toVector());
+    }
+
+    @Override
     public boolean isPositionWithin(Vector vector) {
         return vector.getX() >= this.minX && vector.getX() <= this.maxX &&
                 vector.getY() >= this.minY && vector.getY() <= this.maxY &&

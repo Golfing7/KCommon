@@ -3,6 +3,7 @@ package com.golfing8.kcommon.struct.region.ruled;
 import com.golfing8.kcommon.struct.region.Region;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Location;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -94,6 +95,16 @@ public class RuledRegion implements Region {
     @Override
     public double getVolume() {
         return backingRegion.getVolume();
+    }
+
+    @Override
+    public double getDistance(Vector vector) {
+        return backingRegion.getDistance(vector);
+    }
+
+    @Override
+    public double getDistance(Location location) {
+        return backingRegion.getDistance(location);
     }
 
     @Override

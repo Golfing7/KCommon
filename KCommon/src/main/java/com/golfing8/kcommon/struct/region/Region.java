@@ -64,6 +64,22 @@ public interface Region extends Iterable<BlockVector> {
     double getVolume();
 
     /**
+     * Gets the closest distance to the region.
+     *
+     * @param vector the vector.
+     * @return the distance.
+     */
+    double getDistance(Vector vector);
+
+    /**
+     * Gets the closest distance to the region.
+     *
+     * @param location the location.
+     * @return the distance.
+     */
+    double getDistance(Location location);
+
+    /**
      * Checks if the given vector is within this region.
      *
      * @param vector the vector position.
