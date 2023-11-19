@@ -256,9 +256,10 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         new ArrayList<>(moduleTasks).forEach(BukkitRunnable::cancel);
 
         //Unregister sub listeners.
-        subListeners.forEach(HandlerList::unregisterAll);
+        this.subListeners.forEach(HandlerList::unregisterAll);
 
         //Clear some data structures.
+        this.subListeners.clear();
         this.moduleTasks.clear();
         this.dataManagers.clear();
         this.moduleCommands.clear();
