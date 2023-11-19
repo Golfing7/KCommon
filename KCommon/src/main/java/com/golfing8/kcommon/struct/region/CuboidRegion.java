@@ -162,6 +162,11 @@ public class CuboidRegion implements Region {
     }
 
     @Override
+    public Region grow(double toGrow) {
+        return new CuboidRegion(minX - toGrow, maxX + toGrow, minY - toGrow, maxY + toGrow, minZ - toGrow, maxZ + toGrow);
+    }
+
+    @Override
     public World getWorld() {
         return world;
     }

@@ -80,6 +80,13 @@ public interface Region extends Iterable<BlockVector> {
     double getDistance(Location location);
 
     /**
+     * Grows this region by the given amount on all axes.
+     *
+     * @return the cloned grown region.
+     */
+    Region grow(double toGrow);
+
+    /**
      * Checks if the given vector is within this region.
      *
      * @param vector the vector position.

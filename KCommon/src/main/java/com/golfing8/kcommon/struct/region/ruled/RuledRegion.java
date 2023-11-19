@@ -107,6 +107,18 @@ public class RuledRegion implements Region {
         return backingRegion.getDistance(location);
     }
 
+    /**
+     * Clones the backing region and grows it.
+     * Note that region rules do NOT get cloned.
+     *
+     * @param toGrow the grown region.
+     * @return the grown region.
+     */
+    @Override
+    public Region grow(double toGrow) {
+        return new RuledRegion(this.enforcer, this.backingRegion.grow(toGrow));
+    }
+
     @Override
     public boolean isPositionWithin(Vector vector) {
         return backingRegion.isPositionWithin(vector);
