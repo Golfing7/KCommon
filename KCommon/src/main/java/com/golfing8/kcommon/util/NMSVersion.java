@@ -15,6 +15,7 @@ public enum NMSVersion {
     v1_17(17),
     v1_18(18),
     v1_19(19),
+    v1_20(20),
     ;
 
     private final int value;

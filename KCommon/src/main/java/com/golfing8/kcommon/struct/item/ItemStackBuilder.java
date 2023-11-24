@@ -47,6 +47,8 @@ public final class ItemStackBuilder {
      * If this item is unbreakable or not.
      */
     private boolean unbreakable;
+    /** If the item can be made shiny */
+    private boolean glowing;
     /**
      * The name of the item.
      */
@@ -122,6 +124,7 @@ public final class ItemStackBuilder {
         this.itemType = optionalType.get();
         this.placeholders = new ArrayList<>();
         this.multiLinePlaceholders = new ArrayList<>();
+        this.glowing = section.getBoolean("glowing");
         this.itemDurability = section.contains("durability") ? (short) section.getInt("durability") : this.itemType.getData();
         this.unbreakable = section.getBoolean("unbreakable", false);
         this.customModelData = section.getInt("custom-model-data", 0);
@@ -174,6 +177,11 @@ public final class ItemStackBuilder {
 
     public ItemStackBuilder unbreakable(boolean unbreakable) {
         this.unbreakable = unbreakable;
+        return this;
+    }
+
+    public ItemStackBuilder glowing(boolean glowing) {
+        this.glowing = glowing;
         return this;
     }
 
@@ -303,6 +311,11 @@ public final class ItemStackBuilder {
         //Set the item as unbreakable or not.
         if (this.unbreakable) {
             NMS.getTheNMS().getMagicItems().setUnbreakable(meta, this.unbreakable);
+        }
+
+        if (this.glowing) {
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addEnchant(XEnchantment.DURABILITY.getEnchant(), 0, true);
         }
 
         newCopy.setItemMeta(meta);
