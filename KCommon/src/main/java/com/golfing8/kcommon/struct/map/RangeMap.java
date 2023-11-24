@@ -131,4 +131,33 @@ public class RangeMap<V> implements Map<Range, V> {
     public Set<Entry<Range, V>> entrySet() {
         return originalMap.entrySet();
     }
+
+    /**
+     * Creates a builder for this class.
+     *
+     * @return the builder.
+     */
+    public static <T> Builder<T> builder() {
+        return new Builder<>();
+    }
+
+    /**
+     * A simple builder for range maps.
+     */
+    public static class Builder<T> {
+        private List<Pair<Range, T>> values = new ArrayList<>();
+        public Builder<T> put(Range range, T object) {
+            this.values.add(new Pair<>(range, object));
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public <V> RangeMap<V> build() {
+            RangeMap<T> map = new RangeMap<T>();
+            for (Pair<Range, T> pair : values) {
+                map.put(pair.getA(), pair.getB());
+            }
+            return (RangeMap<V>) map;
+        }
+    }
 }
