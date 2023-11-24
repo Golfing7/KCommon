@@ -71,6 +71,8 @@ public final class ConfigPrimitive {
                 }
             }
             return (T) l;
+        } else if (primitive instanceof ConfigPrimitive) {
+            return ((ConfigPrimitive) primitive).unwrap();
         }
         return (T) primitive;
     }

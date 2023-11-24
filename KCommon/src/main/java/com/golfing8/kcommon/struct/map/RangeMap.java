@@ -24,6 +24,24 @@ public class RangeMap<V> implements Map<Range, V> {
         this.originalMap = new HashMap<>();
     }
 
+    /**
+     * Gets the minimum key from the ranges stored in this map.
+     *
+     * @return the minimum key.
+     */
+    public double getMinimumKey() {
+        return this.rangeMap.firstKey();
+    }
+
+    /**
+     * Gets the maximum key from the ranges stored in this map.
+     *
+     * @return the maximum key.
+     */
+    public double getMaximumKey() {
+        return this.rangeMap.lastKey();
+    }
+
     @Override
     public int size() {
         return this.rangeMap.size();

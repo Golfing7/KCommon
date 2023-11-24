@@ -244,7 +244,7 @@ public class ConfigTypeRegistry {
             return;
         }
 
-        section.set(path, adapter.toPrimitive(value).getPrimitive());
+        section.set(path, adapter.toPrimitive(value).unwrap());
     }
 
     // Register some common types.

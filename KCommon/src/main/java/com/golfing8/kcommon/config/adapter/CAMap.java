@@ -4,6 +4,7 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,8 +27,18 @@ public class CAMap implements ConfigAdapter<Map> {
         if (entry.getPrimitive() == null)
             return Collections.emptyMap();
 
+        // Check if we can reflectively find the type of map that was being used.
+        Map values;
+        if (!type.getType().isInterface() && (type.getType().getModifiers() & Modifier.ABSTRACT) == 0) {
+            try {
+                values = (Map) type.getType().newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(String.format("Failed to instantiate map with type %s", type.getType().getName()), e);
+            }
+        } else {
+            values = new LinkedHashMap();
+        }
         // The keys are assumed to be strings.
-        Map values = new LinkedHashMap();
         Type keyType = type.getGenericTypes().get(0);
         Type valueType = type.getGenericTypes().get(1);
         FieldType keyFieldType = new FieldType(keyType);
@@ -54,12 +65,14 @@ public class CAMap implements ConfigAdapter<Map> {
         Map<String, Object> primitive = new HashMap<>();
         for (Object oentry : object.entrySet()) {
             Map.Entry entry = (Map.Entry) oentry;
-            ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(entry.getValue().getClass());
-            if (adapter == null) {
-                primitive.put(entry.getKey().toString(), entry.getValue());
-            } else {
-                primitive.put(entry.getKey().toString(), adapter.toPrimitive(entry.getValue()).unwrap());
-            }
+            ConfigAdapter valueAdapter = ConfigTypeRegistry.findAdapter(entry.getValue().getClass());
+            ConfigAdapter keyAdapter = ConfigTypeRegistry.findAdapter(entry.getKey().getClass());
+            Object adaptedKey = keyAdapter == null ? entry.getKey() : keyAdapter.toPrimitive(entry.getKey()).unwrap();
+            Object adaptedValue = valueAdapter == null ? entry.getValue() : valueAdapter.toPrimitive(entry.getValue()).unwrap();
+            if (!(adaptedKey instanceof String))
+                throw new IllegalStateException(String.format("Cannot serialize map with non string-like key %s", adaptedKey));
+
+            primitive.put((String) adaptedKey, adaptedValue);
         }
         return ConfigPrimitive.ofMap(primitive);
     }
