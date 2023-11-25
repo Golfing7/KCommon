@@ -82,7 +82,11 @@ public class ScheduleTask extends BukkitRunnable {
             return;
 
         Timestamp now = Timestamp.now();
-        Timestamp nextAvailable = this.schedule.getNextAvailableTimestamp();
+        Timestamp nextAvailable = this.schedule.getNextAvailableTimestamp().clone();
+        // Support time lengths of seconds.
+        if (nextAvailable.getSecond() == Timestamp.UNUSED)
+            nextAvailable.setSecond(0);
+
         long difference = nextAvailable.getMillisDifference(now);
         if (difference < 0)
             return;

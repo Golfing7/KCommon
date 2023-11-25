@@ -13,10 +13,11 @@ import java.util.concurrent.TimeUnit;
  * A time stamp used for marking a certain time.
  */
 @Getter
+@Setter
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Timestamp {
+public final class Timestamp implements Cloneable {
     /** This value is used when a field isn't being used by this timestamp. */
     public static final int UNUSED = -1;
     /** The year that takes place, or {@link #UNUSED} if not in use. */
@@ -223,6 +224,12 @@ public final class Timestamp {
      */
     public static Timestamp ofIntraDay(int hour, int minute, int second) {
         return new Timestamp(UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, hour, minute, second);
+    }
+
+    @Override
+    @SneakyThrows
+    public Timestamp clone() {
+        return (Timestamp) super.clone();
     }
 
     @Override
