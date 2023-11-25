@@ -16,5 +16,9 @@ public class TimestampTest {
         Timestamp past = Timestamp.parse("12:00:00");
         Timestamp future = Timestamp.parse("19:00:00");
         assertEquals(future.getMillisDifference(past), TimeUnit.HOURS.toMillis(7));
+
+        past = Timestamp.parse("01:59:59");
+        future = Timestamp.parse("2:00:00");
+        assertEquals(future.getMillisDifference(past), TimeUnit.SECONDS.toMillis(1));
     }
 }

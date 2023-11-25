@@ -94,14 +94,26 @@ public final class Timestamp {
         }
 
         if (this.hour != UNUSED && timeInPast.getHour() != UNUSED) {
+            if (timeInPast.getHour() > this.hour) {
+                totalTime -= TimeUnit.DAYS.toMillis(1);
+            }
+
             totalTime += TimeUnit.HOURS.toMillis(Math.floorMod(this.hour - timeInPast.getHour(), 60));
         }
 
         if (this.minute != UNUSED && timeInPast.getMinute() != UNUSED) {
+            if (timeInPast.getMinute() > this.minute) {
+                totalTime -= TimeUnit.HOURS.toMillis(1);
+            }
+
             totalTime += TimeUnit.MINUTES.toMillis(Math.floorMod(this.minute - timeInPast.getMinute(), 60));
         }
 
         if (this.second != UNUSED && timeInPast.getSecond() != UNUSED) {
+            if (timeInPast.getSecond() > this.second) {
+                totalTime -= TimeUnit.MINUTES.toMillis(1);
+            }
+
             totalTime += TimeUnit.SECONDS.toMillis(Math.floorMod(this.second - timeInPast.getSecond(), 60));
         }
         return totalTime;

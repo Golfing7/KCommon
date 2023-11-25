@@ -13,9 +13,21 @@ import java.util.stream.Collectors;
  * A class that contains timestamps for things to run at during the day.
  */
 public class Schedule {
-    /** Time stamps for actions to take place at. Mapped to a boolean for if they've been used during a given time period. */
+    /** Time stamps for actions to take place at. */
     @Getter
     private final List<ScheduleEntry> scheduleEntries = new ArrayList<>();
+    /**
+     * A list of durations that should handle an event when it is the duration's length from the next entry.
+     * Note that these lengths aren't used in this class. They're primarily used in the {@link ScheduleTask} class,
+     * but it's easy to store them in here when creating one.
+     */
+    @Getter
+    private final List<TimeLength> anticipationTimes = new ArrayList<>();
+
+    public Schedule(Collection<Timestamp> entries, Collection<TimeLength> timeLengths) {
+        this.scheduleEntries.addAll(entries.stream().map(ScheduleEntry::new).collect(Collectors.toList()));
+        this.anticipationTimes.addAll(timeLengths);
+    }
 
     public Schedule(Collection<Timestamp> entries) {
         this.scheduleEntries.addAll(entries.stream().map(ScheduleEntry::new).collect(Collectors.toList()));

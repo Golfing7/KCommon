@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * Represents some positive duration of time. This was created for the sake of regularizing string to time input.
  */
 @NoArgsConstructor
-public class TimeLength {
+public class TimeLength implements Comparable<TimeLength> {
     /**
      * The time length in ticks.
      */
@@ -143,5 +144,10 @@ public class TimeLength {
             accumulation = 0;
         }
         return new TimeLength(totalTime);
+    }
+
+    @Override
+    public int compareTo(@NotNull TimeLength o) {
+        return Long.compare(this.durationTicks, o.durationTicks);
     }
 }

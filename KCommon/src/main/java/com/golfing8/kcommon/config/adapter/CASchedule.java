@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.time.Schedule;
+import com.golfing8.kcommon.struct.time.TimeLength;
 import com.golfing8.kcommon.struct.time.Timestamp;
 
 import java.util.ArrayList;
@@ -17,15 +18,22 @@ public class CASchedule implements ConfigAdapter<Schedule> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Schedule toPOJO(ConfigPrimitive entry, FieldType type) {
         if (entry.getPrimitive() == null)
             return null;
 
-        List<String> timestampsString = (List<String>) entry.unwrap();
+        List<String> timestampsString = entry.unwrap();
         List<Timestamp> allTimestamps = new ArrayList<>();
-        timestampsString.forEach(str -> allTimestamps.add(Timestamp.parse(str)));
-        return new Schedule(allTimestamps);
+        List<TimeLength> anticipatedTimes = new ArrayList<>();
+        timestampsString.forEach(str -> {
+            if (str.startsWith("@")) {
+                str = str.replace("@", "");
+                anticipatedTimes.add(TimeLength.parseTime(str));
+            } else {
+                allTimestamps.add(Timestamp.parse(str));
+            }
+        });
+        return new Schedule(allTimestamps, anticipatedTimes);
     }
 
     @Override
@@ -36,6 +44,9 @@ public class CASchedule implements ConfigAdapter<Schedule> {
         List<String> strings = new ArrayList<>();
         for (Timestamp timestamp : object.getAllTimestamps()) {
             strings.add(timestamp.toConfigString());
+        }
+        for (TimeLength length : object.getAnticipationTimes()) {
+            strings.add("@" + length.getAsString(true));
         }
         return ConfigPrimitive.ofList(strings);
     }
