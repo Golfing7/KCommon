@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.ItemStack;
 
 @AllArgsConstructor
 public class MagicEntities implements NMSMagicEntities {

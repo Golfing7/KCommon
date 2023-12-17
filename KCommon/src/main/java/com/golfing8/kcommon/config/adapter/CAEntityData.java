@@ -1,6 +1,6 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.golfing8.kcommon.struct.EntityData;
+import com.golfing8.kcommon.struct.entity.EntityData;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 
 public class CAEntityData implements ConfigAdapter<EntityData> {

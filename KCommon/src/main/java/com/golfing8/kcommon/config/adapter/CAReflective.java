@@ -5,9 +5,11 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;
+import com.golfing8.kcommon.util.StringUtil;
 import lombok.var;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ import java.util.Map;
  */
 public class CAReflective implements ConfigAdapter<CASerializable> {
     private final Map<Class<?>, Map<String, FieldHandle<?>>> typeFieldCache = new HashMap<>();
+    private final Map<Class<?>, Constructor<?>> constructorCache = new HashMap<>();
 
     @Override
     public Class<CASerializable> getAdaptType() {
@@ -35,14 +38,21 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
         CASerializable instance;
         try {
-            instance = (CASerializable) type.getType().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            Constructor<?> constructor = null;
+            if (constructorCache.containsKey(type.getType())) {
+                constructor = constructorCache.get(type.getType());
+            } else {
+                constructor = type.getType().getDeclaredConstructor();
+                constructor.setAccessible(true);
+            }
+            instance = (CASerializable) constructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             KCommon.getInstance().getLogger().severe(String.format("Failed to deserialize type %s!", type.getType().getName()));
             throw new RuntimeException(e);
         }
         for (var fieldEntry : fieldHandles.entrySet()) {
             var handle = fieldEntry.getValue();
-            Object primitiveValue = primitives.get(fieldEntry.getKey());
+            Object primitiveValue = primitives.get(StringUtil.camelToYaml(fieldEntry.getKey()));
             if (primitiveValue == null) {
                 handle.set(instance, null);
                 continue;
@@ -71,7 +81,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             var handle = fieldEntry.getValue();
 
             ConfigPrimitive primitiveValue = ConfigTypeRegistry.toPrimitive(handle.get(object));
-            primitives.put(fieldEntry.getKey(), primitiveValue.unwrap());
+            primitives.put(StringUtil.camelToYaml(fieldEntry.getKey()), primitiveValue.unwrap());
         }
         return ConfigPrimitive.ofMap(primitives);
     }

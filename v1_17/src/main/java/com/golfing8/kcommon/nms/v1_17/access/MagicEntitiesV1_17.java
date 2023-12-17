@@ -37,6 +37,7 @@ import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;

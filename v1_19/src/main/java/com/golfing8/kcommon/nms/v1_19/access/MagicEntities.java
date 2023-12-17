@@ -27,6 +27,7 @@ import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.ItemStack;
 
 @AllArgsConstructor
 public class MagicEntities implements NMSMagicEntities {

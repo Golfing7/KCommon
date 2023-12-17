@@ -34,6 +34,10 @@ public class FieldHandle<T> {
     }
 
     public void set(Object object, Object value){
+        // Cannot set primitive fields to null.
+        if (field.getType().isPrimitive() && value == null)
+            return;
+
         try{
             field.set(object, value);
             return;

@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.ItemStack;
 
 public interface NMSMagicEntities {
 
@@ -21,6 +22,21 @@ public interface NMSMagicEntities {
     Guardian spawnElderGuardian(Location location);
 
     boolean canEntitySpawn(LivingEntity entity);
+
+    default void setItemInOffHand(LivingEntity entity, ItemStack stack) {
+        entity.getEquipment().setItemInOffHand(stack);
+    }
+    default void setItemInOffHandDropChance(LivingEntity entity, float chance) {
+        entity.getEquipment().setItemInOffHandDropChance(chance);
+    }
+
+    default ItemStack getItemInOffHand(LivingEntity entity) {
+        return entity.getEquipment().getItemInOffHand();
+    }
+
+    default float getItemInOffHandDropChance(LivingEntity entity) {
+        return entity.getEquipment().getItemInOffHandDropChance();
+    }
 
     void setAttribute(LivingEntity entity, EntityAttribute attribute, double value);
 

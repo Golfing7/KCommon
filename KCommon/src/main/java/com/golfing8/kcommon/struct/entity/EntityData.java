@@ -1,11 +1,10 @@
-package com.golfing8.kcommon.struct;
+package com.golfing8.kcommon.struct.entity;
 
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.util.NMSVersion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.*;
 
 /**

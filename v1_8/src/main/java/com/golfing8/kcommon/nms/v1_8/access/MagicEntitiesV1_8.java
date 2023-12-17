@@ -20,6 +20,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.ItemStack;
 
 @AllArgsConstructor
 public class MagicEntitiesV1_8 implements NMSMagicEntities {
@@ -145,6 +146,26 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
             return true;
 
         return ((EntityInsentient) living).canSpawn();
+    }
+
+    @Override
+    public void setItemInOffHand(LivingEntity entity, ItemStack stack) {
+
+    }
+
+    @Override
+    public void setItemInOffHandDropChance(LivingEntity entity, float chance) {
+
+    }
+
+    @Override
+    public ItemStack getItemInOffHand(LivingEntity entity) {
+        return null;
+    }
+
+    @Override
+    public float getItemInOffHandDropChance(LivingEntity entity) {
+        return 0.0F;
     }
 
     @Override
