@@ -2,6 +2,7 @@ package com.golfing8.kcommon.struct.item;
 
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import com.deanveloper.skullcreator.SkullCreator;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
 import com.golfing8.kcommon.nms.struct.PotionData;
@@ -80,6 +81,10 @@ public final class ItemStackBuilder {
      */
     private Map<String, Object> extraData = new HashMap<>();
     /**
+     * The skull's base 64 texture. Only applied if this item builder builds a player head.
+     */
+    private String skullB64;
+    /**
      * The last built itemstack for this builder.
      */
     @Getter(AccessLevel.PRIVATE)
@@ -125,6 +130,7 @@ public final class ItemStackBuilder {
         this.placeholders = new ArrayList<>();
         this.multiLinePlaceholders = new ArrayList<>();
         this.glowing = section.getBoolean("glowing");
+        this.skullB64 = section.getString("skull-texture");
         this.itemDurability = section.contains("durability") ? (short) section.getInt("durability") : this.itemType.getData();
         this.unbreakable = section.getBoolean("unbreakable", false);
         this.customModelData = section.getInt("custom-model-data", 0);
@@ -164,6 +170,11 @@ public final class ItemStackBuilder {
     /*
     Builder methods for the above fields.
      */
+
+    public ItemStackBuilder skullB64(String b64) {
+        this.skullB64 = b64;
+        return this;
+    }
 
     public ItemStackBuilder material(XMaterial material) {
         this.itemType = material;
@@ -267,11 +278,16 @@ public final class ItemStackBuilder {
      * @return the item stack built from the template.
      */
     public ItemStack buildFromTemplate() {
-        ItemStack newCopy = itemType.parseItem();
-        if (itemDurability > 0) {
-            newCopy.setDurability(itemDurability);
+        ItemStack newCopy;
+        if (itemType == XMaterial.PLAYER_HEAD && skullB64 != null) {
+            newCopy = SkullCreator.itemFromBase64(skullB64);
+        } else {
+            newCopy = itemType.parseItem();
+            if (itemDurability > 0) {
+                newCopy.setDurability(itemDurability);
+            }
+            newCopy.setAmount(amount);
         }
-        newCopy.setAmount(amount);
 
         ItemMeta meta = newCopy.getItemMeta();
 

@@ -1,9 +1,11 @@
 package com.golfing8.kcommon.nms.v1_8;
 
+import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.access.*;
 import com.golfing8.kcommon.nms.v1_8.access.*;
 import com.golfing8.kcommon.nms.v1_8.block.BlockDispenserV1_8;
 import com.golfing8.kcommon.nms.v1_8.event.ArmorEquipHandler;
+import com.golfing8.kcommon.nms.v1_8.event.WineSpigotArmorEquipListener;
 import com.golfing8.kcommon.nms.v1_8.packets.*;
 import com.golfing8.kcommon.nms.v1_8.server.ServerV1_8;
 import com.golfing8.kcommon.nms.v1_8.worldedit.WorldEditV1_8;
@@ -58,7 +60,11 @@ public class NMS implements NMSAccess {
         this.server = new ServerV1_8();
 
         Bukkit.getServer().getPluginManager().registerEvents(new PreSpawnSpawnerAdapter(), plugin);
-        new ArmorEquipHandler(plugin, Collections.emptyList());
+        if (WineSpigot.isWineSpigot()) {
+            Bukkit.getServer().getPluginManager().registerEvents(new WineSpigotArmorEquipListener(), plugin);
+        } else {
+            new ArmorEquipHandler(plugin, Collections.emptyList());
+        }
     }
 
     public WorldEditHook getWorldEditHook() {

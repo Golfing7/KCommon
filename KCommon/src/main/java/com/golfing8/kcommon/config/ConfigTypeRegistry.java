@@ -7,6 +7,7 @@ import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.struct.filter.ItemFilter;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.potion.PotionEffect;
 
@@ -272,6 +273,8 @@ public class ConfigTypeRegistry {
         registerAdapter(new CASchedule());
         registerAdapter(new CAWorld());
         registerAdapter(new CAReflective());
+        registerAdapter(new CAEntityData());
+        registerAdapter(new CARangeMap());
 
         registerAdapter(MenuCoordinate.class, (section) -> {
             if(section.contains("slot")) {

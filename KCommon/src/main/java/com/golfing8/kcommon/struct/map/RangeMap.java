@@ -97,6 +97,7 @@ public class RangeMap<V> implements Map<Range, V> {
     @Override
     public V put(Range key, V value) {
         double minimum = key.getMin();
+        originalMap.put(key, value);
         Pair<Range, V> valuePair = new Pair<>(key, value);
         Pair<Range, V> old = this.rangeMap.put(minimum, valuePair);
         return old != null ? old.getB() : null;

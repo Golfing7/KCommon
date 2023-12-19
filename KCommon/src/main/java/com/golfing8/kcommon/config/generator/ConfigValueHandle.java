@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.generator;
 
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.config.commented.Config;
 import com.golfing8.kcommon.util.StringUtil;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
@@ -11,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Acts as a handle to a configuration value.
@@ -47,7 +49,8 @@ public class ConfigValueHandle {
             if (annotation != null && sourceSection instanceof Config) {
                 ((Config) sourceSection).set(path, handle.get(instance), this.annotation.value());
             } else {
-                sourceSection.set(path, handle.get(instance));
+                ConfigPrimitive adapted = ConfigTypeRegistry.toPrimitive(handle.get(instance));
+                sourceSection.set(path, adapted.unwrap());
             }
             return true;
         } else {

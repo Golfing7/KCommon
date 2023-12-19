@@ -7,6 +7,7 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
 import lombok.var;
+import org.bukkit.Bukkit;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -52,6 +53,9 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
         }
         for (var fieldEntry : fieldHandles.entrySet()) {
             var handle = fieldEntry.getValue();
+            if (!handle.shouldSerialize())
+                continue;
+
             Object primitiveValue = primitives.get(StringUtil.camelToYaml(fieldEntry.getKey()));
             if (primitiveValue == null) {
                 handle.set(instance, null);
@@ -79,6 +83,8 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
         for (var fieldEntry : fieldHandles.entrySet()) {
             var handle = fieldEntry.getValue();
+            if (!handle.shouldSerialize())
+                continue;
 
             ConfigPrimitive primitiveValue = ConfigTypeRegistry.toPrimitive(handle.get(object));
             primitives.put(StringUtil.camelToYaml(fieldEntry.getKey()), primitiveValue.unwrap());

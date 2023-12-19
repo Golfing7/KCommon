@@ -52,6 +52,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             builder.potionData(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue.get("potion-data")), new FieldType(PotionData.class)));
         if (primitiveValue.containsKey("glowing"))
             builder.glowing((Boolean) primitiveValue.get("glowing"));
+        if (primitiveValue.containsKey("skull-texture"))
+            builder.skullB64((String) primitiveValue.get("skull-texture"));
         if (primitiveValue.containsKey("enchantments")) {
             Map<String, Object> enchantments = (Map<String, Object>) primitiveValue.get("enchantments");
             for (Map.Entry<String, Object> enchant : enchantments.entrySet()) {
@@ -90,6 +92,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("potion-data", ConfigTypeRegistry.toPrimitive(builder.getPotionData()).unwrap());
         if (builder.isGlowing())
             objects.put("glowing", true);
+        if (builder.getSkullB64() != null)
+            objects.put("skull-texture", builder.getSkullB64());
         if (builder.getEnchantments() != null && !builder.getEnchantments().isEmpty()) {
             Map<String, Integer> enchantments = new HashMap<>();
             builder.getEnchantments().forEach((k, v) -> {

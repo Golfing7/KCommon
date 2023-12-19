@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import lombok.var;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,8 +122,14 @@ public final class ConfigPrimitive {
         return new ConfigPrimitive(list);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static ConfigPrimitive ofMap(Map<String, ?> map) {
-        return new ConfigPrimitive(map);
+        Map safeValues = new HashMap();
+        for (var entry : map.entrySet()) {
+            String realKey = stringToSafeKeyString(entry.getKey());
+            safeValues.put(realKey, entry.getValue());
+        }
+        return new ConfigPrimitive(safeValues);
     }
 
     public static ConfigPrimitive ofSection(ConfigurationSection section) {
@@ -136,5 +143,51 @@ public final class ConfigPrimitive {
         }
 
         return new ConfigPrimitive(values, section);
+    }
+
+    public static String stringToSafeKeyString(String original) {
+        return original.replace(".", ",");
+    }
+
+    public static String safeKeyStringToString(String original) {
+        return original.replace(",", ".");
+    }
+
+    /**
+     * Tries to coerce java-like objects to strings such as Integer or Double.
+     *
+     * @param value the value.
+     * @return the string representation.
+     */
+    public static String coerceBoxedToString(Object value) {
+        return value.toString();
+    }
+
+    /**
+     * Tries to coerce a string back into its java box object.
+     *
+     * @param str the string.
+     * @param boxedType the boxed type of object
+     * @return the boxed object.
+     */
+    public static Object coerceStringToBoxed(String str, Class<?> boxedType) {
+        if (boxedType == Integer.class) {
+            return Integer.parseInt(str);
+        } else if (boxedType == Short.class) {
+            return Short.parseShort(str);
+        } else if (boxedType == Byte.class) {
+            return Byte.parseByte(str);
+        } else if (boxedType == Long.class) {
+            return Long.parseLong(str);
+        } else if (boxedType == Double.class) {
+            return Double.parseDouble(str);
+        } else if (boxedType == Float.class) {
+            return Float.parseFloat(str);
+        } else if (boxedType == Boolean.class) {
+            return Boolean.parseBoolean(str);
+        } else if (boxedType == String.class) {
+            return str;
+        }
+        throw new IllegalArgumentException(String.format("Class type %s not recognized", boxedType.getName()));
     }
 }

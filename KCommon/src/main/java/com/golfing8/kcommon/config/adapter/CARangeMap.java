@@ -1,9 +1,9 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.map.RangeMap;
 import com.golfing8.kcommon.struct.reflection.FieldType;
-import org.bukkit.Bukkit;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -17,54 +17,45 @@ import java.util.Map;
  * A config adapter for maps.
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class CAMap implements ConfigAdapter<Map> {
+public class CARangeMap implements ConfigAdapter<RangeMap> {
     @Override
-    public Class<Map> getAdaptType() {
-        return Map.class;
+    public Class<RangeMap> getAdaptType() {
+        return RangeMap.class;
     }
 
     @Override
-    public Map toPOJO(ConfigPrimitive entry, FieldType type) {
+    public RangeMap toPOJO(ConfigPrimitive entry, FieldType type) {
         if (entry.getPrimitive() == null)
-            return Collections.emptyMap();
+            return new RangeMap();
 
-        // Check if we can reflectively find the type of map that was being used.
-        Map values;
-        if (!type.getType().isInterface() && (type.getType().getModifiers() & Modifier.ABSTRACT) == 0) {
-            try {
-                values = (Map) type.getType().newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(String.format("Failed to instantiate map with type %s", type.getType().getName()), e);
-            }
-        } else {
-            values = new LinkedHashMap();
-        }
+        RangeMap rangeMap = new RangeMap();
+
         // The keys are assumed to be strings.
-        Type keyType = type.getGenericTypes().get(0);
-        Type valueType = type.getGenericTypes().get(1);
+        Type keyType = Range.class;
+        Type valueType = type.getGenericTypes().get(0);
         FieldType keyFieldType = new FieldType(keyType);
         FieldType valueFieldType = new FieldType(valueType);
         ConfigAdapter<?> adapter = ConfigTypeRegistry.findAdapter(valueType);
         ConfigAdapter<?> keyAdapter = ConfigTypeRegistry.findAdapter(keyType);
+        if (keyAdapter == null)
+            throw new IllegalStateException("Range config adapter does not exist!");
 
         Map<String, Object> primitive = entry.unwrap();
         for (Map.Entry<String, Object> mapEntry : primitive.entrySet()) {
-            Object adaptedKey = keyAdapter != null ?
-                    keyAdapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getKey()), keyFieldType) :
-                    ConfigPrimitive.coerceStringToBoxed(mapEntry.getKey(), keyFieldType.getType());
+            Range adaptedKey = (Range) keyAdapter.toPOJO(ConfigPrimitive.ofTrusted(ConfigPrimitive.safeKeyStringToString(mapEntry.getKey())), keyFieldType);
 
             if (adapter == null) {
-                values.put(adaptedKey, mapEntry.getValue());
+                rangeMap.put(adaptedKey, mapEntry.getValue());
             } else {
-                values.put(adaptedKey, adapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getValue()), valueFieldType));
+                rangeMap.put(adaptedKey, adapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getValue()), valueFieldType));
             }
         }
 
-        return values;
+        return rangeMap;
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Map object) {
+    public ConfigPrimitive toPrimitive(RangeMap object) {
         Map<String, Object> primitive = new HashMap<>();
         for (Object oentry : object.entrySet()) {
             Map.Entry entry = (Map.Entry) oentry;

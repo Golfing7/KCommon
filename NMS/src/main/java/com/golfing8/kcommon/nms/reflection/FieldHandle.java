@@ -3,6 +3,7 @@ package com.golfing8.kcommon.nms.reflection;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -31,6 +32,11 @@ public class FieldHandle<T> {
         }catch(NoSuchFieldException exc){
             throw new RuntimeException(exc);
         }
+    }
+
+    public boolean shouldSerialize() {
+        int modifiers = field.getModifiers();
+        return (modifiers & Modifier.TRANSIENT) == 0 && (modifiers & Modifier.STATIC) == 0;
     }
 
     public void set(Object object, Object value){
