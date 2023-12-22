@@ -4,13 +4,14 @@ import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.ClickRunnable;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
-import com.golfing8.kcommon.menu.shape.MenuShape;
-import com.golfing8.kcommon.menu.shape.ShapeRectangle;
+import com.golfing8.kcommon.menu.shape.MenuLayoutShape;
+import com.golfing8.kcommon.menu.shape.LayoutShapeRectangle;
 import com.golfing8.kcommon.struct.ChancedReference;
 import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,7 +27,7 @@ public final class MenuBuilder {
     @Getter
     private String title = "&cAspect GUI";
     private Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
-    private List<Pair<MenuShape, List<ChancedReference<ItemStack>>>> shapeCreation = new ArrayList<>();
+    private List<Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>>> shapeCreation = new ArrayList<>();
     private Map<Integer, ItemStack> specificItems = new HashMap<>();
     /**
      * The bottom click action, run when any slot in the bottom inventory is clicked.
@@ -61,6 +62,8 @@ public final class MenuBuilder {
      * The other GUI items to apply in this menu.
      */
     private List<SimpleGUIItem> otherGUIItems = new ArrayList<>();
+    /** The type of menu being built */
+    private MenuShapeType menuShapeType;
     /** This will be run in the same tick the inventory has been closed */
     @Getter
     private CloseRunnable closeRunnable;
@@ -75,7 +78,17 @@ public final class MenuBuilder {
      * Creates a menu builder from the given configuration section.
      */
     public MenuBuilder(ConfigurationSection section) {
-        this.size = section.getInt("size");
+        if (section.contains("type")) {
+            this.menuShapeType = MenuShapeType.valueOf(section.getString("type").toUpperCase());
+            if (section.contains("size"))
+                this.size = 27;
+            else
+                this.size = this.menuShapeType.getType().getDefaultSize();
+        } else {
+            this.menuShapeType = MenuShapeType.CHEST;
+            this.size = 27;
+        }
+
         this.title = section.getString("title");
 
         if(section.getBoolean("use-filler-item")) {
@@ -164,6 +177,12 @@ public final class MenuBuilder {
         return this;
     }
 
+    public MenuBuilder shapeType(MenuShapeType type) {
+        Preconditions.checkNotNull(type, "Type cannot be null");
+        this.menuShapeType = type;
+        return this;
+    }
+
     public MenuBuilder size(int size) {
         this.size = size;
         return this;
@@ -190,7 +209,7 @@ public final class MenuBuilder {
     }
 
     public MenuBuilder setAt(int x, int y, ItemStack itemStack) {
-        this.specificItems.put(MenuUtils.getSlotFromCartCoords(x, y), itemStack);
+        this.specificItems.put(MenuUtils.getSlotFromCartCoords(menuShapeType, x, y), itemStack);
         return this;
     }
 
@@ -203,30 +222,30 @@ public final class MenuBuilder {
     }
 
     public MenuBuilder filler(List<ChancedReference<ItemStack>> filler) {
-        MenuCoordinate cartCoordsFromSlot = MenuUtils.getCartCoordsFromSlot(size - 1);
-        ShapeRectangle key = new ShapeRectangle(new MenuCoordinate(1, 1), cartCoordsFromSlot);
+        MenuCoordinate cartCoordsFromSlot = MenuUtils.getCartCoordsFromSlot(menuShapeType, size - 1);
+        LayoutShapeRectangle key = new LayoutShapeRectangle(new MenuCoordinate(1, 1), cartCoordsFromSlot);
         return this.drawShape(key, filler);
     }
 
-    public MenuBuilder drawShape(MenuShape shape, ItemStack stack) {
+    public MenuBuilder drawShape(MenuLayoutShape shape, ItemStack stack) {
         return this.drawShape(shape, new ChancedReference<>(stack));
     }
 
-    public MenuBuilder drawShape(MenuShape shape, ChancedReference<ItemStack> reference) {
+    public MenuBuilder drawShape(MenuLayoutShape shape, ChancedReference<ItemStack> reference) {
         return this.drawShape(shape, Lists.newArrayList(reference));
     }
 
-    public MenuBuilder drawShape(MenuShape shape, List<ChancedReference<ItemStack>> reference) {
+    public MenuBuilder drawShape(MenuLayoutShape shape, List<ChancedReference<ItemStack>> reference) {
         this.shapeCreation.add(new Pair<>(shape, reference));
         return this;
     }
 
     public MenuBuilder addAction(int x, int y, ClickAction action) {
-        return this.addAction(MenuUtils.getSlotFromCartCoords(x, y), action);
+        return this.addAction(MenuUtils.getSlotFromCartCoords(menuShapeType, x, y), action);
     }
 
     public MenuBuilder addAction(int x, int y, ClickRunnable runnable) {
-        return this.addAction(MenuUtils.getSlotFromCartCoords(x, y), runnable);
+        return this.addAction(MenuUtils.getSlotFromCartCoords(menuShapeType, x, y), runnable);
     }
 
     public MenuBuilder addAction(int slot, ClickRunnable runnable) {
@@ -250,9 +269,9 @@ public final class MenuBuilder {
     public MenuSimple buildSimple() {
         ItemStack[] contents = new ItemStack[size];
 
-        for (Pair<MenuShape, List<ChancedReference<ItemStack>>> shapeListPair : shapeCreation) {
+        for (Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>> shapeListPair : shapeCreation) {
             for (MenuCoordinate coordinate : shapeListPair.getA().getInRange()) {
-                int slot = MenuUtils.getSlotFromCartCoords(coordinate.getX(), coordinate.getY());
+                int slot = MenuUtils.getSlotFromCartCoords(this.menuShapeType, coordinate.getX(), coordinate.getY());
 
                 ItemStack found = null;
                 while (found == null) {
@@ -266,7 +285,7 @@ public final class MenuBuilder {
             }
         }
 
-        MenuSimple menuSimple = new MenuSimple(this.title, size, clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
+        MenuSimple menuSimple = new MenuSimple(this.title, new MenuShape(menuShapeType, size), clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuSimple.setContents(contents);
         menuSimple.setTopClickAction(topClickEvent);
         menuSimple.onClose(this.closeRunnable);
@@ -295,7 +314,7 @@ public final class MenuBuilder {
             guiItem.getItem().multiLinePlaceholders(mPlaceholders.get().toArray(new MultiLinePlaceholder[0]));
 
             //Add the item to the GUI.
-            int slot = MenuUtils.getSlotFromCartCoords(guiItem.getSlot().getX(), guiItem.getSlot().getY());
+            int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, guiItem.getSlot().getX(), guiItem.getSlot().getY());
             this.addAction(slot, specialBinding.getValue());
             this.setAt(slot,
                     guiItem.getItem().buildFromTemplate());
@@ -312,9 +331,9 @@ public final class MenuBuilder {
     public MenuDynamic buildDynamic() {
         ItemStack[] contents = new ItemStack[size];
 
-        for (Pair<MenuShape, List<ChancedReference<ItemStack>>> shapeListPair : shapeCreation) {
+        for (Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>> shapeListPair : shapeCreation) {
             for (MenuCoordinate coordinate : shapeListPair.getA().getInRange()) {
-                int slot = MenuUtils.getSlotFromCartCoords(coordinate.getX(), coordinate.getY());
+                int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, coordinate.getX(), coordinate.getY());
 
                 ItemStack found = null;
                 while (found == null) {
@@ -328,7 +347,7 @@ public final class MenuBuilder {
             }
         }
 
-        MenuDynamic menuDynamic = new MenuDynamic(this.title, size, clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
+        MenuDynamic menuDynamic = new MenuDynamic(this.title, new MenuShape(menuShapeType, size), clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuDynamic.setContents(contents);
         menuDynamic.onClose(this.closeRunnable);
         menuDynamic.onPostClose(this.postCloseRunnable);
@@ -357,7 +376,7 @@ public final class MenuBuilder {
             guiItem.getItem().multiLinePlaceholders(mPlaceholders.get().toArray(new MultiLinePlaceholder[0]));
 
             //Add the item to the GUI.
-            int slot = MenuUtils.getSlotFromCartCoords(guiItem.getSlot().getX(), guiItem.getSlot().getY());
+            int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, guiItem.getSlot().getX(), guiItem.getSlot().getY());
             this.addAction(slot, specialBinding.getValue());
             this.setAt(slot,
                     guiItem.getItem().buildFromTemplate());

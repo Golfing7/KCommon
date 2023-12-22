@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.lang;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
@@ -12,15 +13,13 @@ import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.var;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * A message which can represent a string or a list of strings.
@@ -88,6 +87,33 @@ public class Message {
                     this.sounds.add(fromType);
                 }
             }
+        }else if(message instanceof Map) { //In this case the player might be defining a title too.
+            Map section = (Map) message;
+            //Check for the title
+            this.title = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofNullable(section.get("title")), Title.class);
+            Object oMsg = section.get("message");
+
+            // Read the action bar.
+            this.actionBar = (String) section.get("actionbar");
+
+            //Get the actual message.
+            if(oMsg instanceof String) {
+                this.messages = Lists.newArrayList(oMsg.toString());
+            }else if(oMsg instanceof List) {
+                this.messages = new ArrayList<>();
+                ((List<?>) oMsg).forEach(object -> this.messages.add(object.toString()));
+            }else {
+                throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", oMsg));
+            }
+
+            //Load the sounds.
+            this.sounds = new ArrayList<>();
+            if(section.containsKey("sounds")) {
+                var soundSection = (Map<String, Object>) section.get("sounds");
+                for (var entry : soundSection.entrySet()) {
+                    this.sounds.add(ConfigTypeRegistry.getFromType(ConfigPrimitive.of(entry.getValue()), SoundWrapper.class));
+                }
+            }
         }else {
             throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", message.toString()));
         }
@@ -122,7 +148,7 @@ public class Message {
         }
 
         if (getTitle() != null && sender instanceof Player) {
-            MS.sendTitle((Player) sender, getTitle());
+            MS.sendTitle((Player) sender, getTitle(), placeholders);
         }
 
         if (getActionBar() != null && sender instanceof Player) {
@@ -149,7 +175,7 @@ public class Message {
         }
 
         if (getTitle() != null && sender instanceof Player) {
-            MS.sendTitle((Player) sender, getTitle());
+            MS.sendTitle((Player) sender, getTitle(), placeholders);
         }
 
         if (getActionBar() != null && sender instanceof Player) {

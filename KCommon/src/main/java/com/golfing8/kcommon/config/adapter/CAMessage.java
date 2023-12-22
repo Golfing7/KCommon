@@ -17,12 +17,11 @@ public class CAMessage implements ConfigAdapter<Message> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Message toPOJO(ConfigPrimitive entry, FieldType type) {
-        if (entry.getSource() != null && entry.getPrimitive() != null)
-            return new Message(entry.getSource());
+        if (entry.getPrimitive() == null)
+            return Message.builder().build();
 
-        return new Message((List<String>) entry.getPrimitive(), null, null, null);
+        return new Message(entry.unwrap());
     }
 
     @Override

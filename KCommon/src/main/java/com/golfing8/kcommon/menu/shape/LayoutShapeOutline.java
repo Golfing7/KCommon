@@ -5,10 +5,10 @@ import com.golfing8.kcommon.menu.MenuUtils;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ShapeOutline implements MenuShape {
+public class LayoutShapeOutline implements MenuLayoutShape {
     private List<MenuCoordinate> inRange;
 
-    public ShapeOutline(MenuCoordinate low, MenuCoordinate high) {
+    public LayoutShapeOutline(MenuCoordinate low, MenuCoordinate high) {
         inRange = new LinkedList<>();
 
         for (int x = low.getX(); x <= high.getX(); x++) {
@@ -20,7 +20,7 @@ public class ShapeOutline implements MenuShape {
         }
     }
 
-    public ShapeOutline(int lowSlot, int highSlot) {
+    public LayoutShapeOutline(int lowSlot, int highSlot) {
         this(MenuUtils.getCartCoordsFromSlot(lowSlot), MenuUtils.getCartCoordsFromSlot(highSlot));
     }
 

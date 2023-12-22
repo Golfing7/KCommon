@@ -221,6 +221,9 @@ public class ConfigTypeRegistry {
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static ConfigPrimitive toPrimitive(Object value) {
+        if (value == null)
+            return ConfigPrimitive.ofNull();
+
         ConfigAdapter adapter = findAdapter(value.getClass());
         if (adapter == null) {
             return ConfigPrimitive.of(value);

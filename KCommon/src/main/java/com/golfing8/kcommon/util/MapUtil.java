@@ -25,4 +25,11 @@ public class MapUtil {
         }
         return newMap;
     }
+
+    public static <K, V, T extends Map<K, V>> T fill(T map, Object... values) {
+        for (int i = 0; i < values.length; i += 2) {
+            map.put((K) values[i], (V) values[i + 1]);
+        }
+        return map;
+    }
 }

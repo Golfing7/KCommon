@@ -90,6 +90,21 @@ public final class ConfigPrimitive {
         }
     }
 
+    public static ConfigPrimitive ofNullable(Object value) {
+        if (value == null)
+            return NULL;
+
+        if (value instanceof Number ||
+                value instanceof String ||
+                value instanceof Map ||
+                value instanceof List ||
+                value instanceof Boolean) {
+            return new ConfigPrimitive(value);
+        } else {
+            throw new IllegalArgumentException(String.format("Value was not a primitive! Was %s", value.getClass()));
+        }
+    }
+
     public static ConfigPrimitive ofNull() {
         return NULL;
     }

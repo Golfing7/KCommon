@@ -49,13 +49,19 @@ public abstract class MenuAbstract implements Menu {
     private CloseRunnable onClose, postClose;
 
     private ClickAction bottomClickEvent, topClickEvent;
+    private MenuShape menuShape;
 
-    public MenuAbstract(String title, int size, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
+    public MenuAbstract(String title, MenuShape shape, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
                         List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders){
-        this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, size, MS.parseSingle(title, placeholders));
+        this.menuShape = shape;
+        if (shape.getType().isSizeMutable()) {
+            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, size, MS.parseSingle(title, placeholders));
+        } else {
+            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, shape.getType().getType(), MS.parseSingle(title, placeholders));
+        }
         this.guiItems = new ArrayList<>();
         this.canExpire = canExpire;
-        this.size = size;
+        this.size = shape.getSize();
         this.clickable = clickable;
         this.placeholders = placeholders;
         this.multiLinePlaceholders = multiLinePlaceholders;
@@ -65,6 +71,11 @@ public abstract class MenuAbstract implements Menu {
         Bukkit.getServer().getPluginManager().registerEvents(this, KCommon.getInstance());
 
         MenuManager.getInstance().addMenu(this);
+    }
+
+    @Override
+    public MenuShape getMenuShape() {
+        return menuShape;
     }
 
     @Override
@@ -163,7 +174,7 @@ public abstract class MenuAbstract implements Menu {
             if(item.getSpecialPlaceholders() != null)
                 builder.placeholders(item.getSpecialPlaceholders().get().toArray(new Placeholder[0]));
 
-            int slot = MenuUtils.getSlotFromCartCoords(item.getSlot().getX(), item.getSlot().getY());
+            int slot = MenuUtils.getSlotFromCartCoords(getMenuShape().getType(), item.getSlot().getX(), item.getSlot().getY());
             this.setItemAt(slot, item.getItem().buildFromTemplate());
         }
 

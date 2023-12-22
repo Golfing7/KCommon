@@ -5,10 +5,10 @@ import com.golfing8.kcommon.menu.MenuUtils;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ShapeRectangle implements MenuShape {
+public class LayoutShapeRectangle implements MenuLayoutShape {
     private List<MenuCoordinate> inRange;
 
-    public ShapeRectangle(MenuCoordinate low, MenuCoordinate high) {
+    public LayoutShapeRectangle(MenuCoordinate low, MenuCoordinate high) {
         inRange = new LinkedList<>();
 
         for (int x = low.getX(); x <= high.getX(); x++) {
@@ -18,7 +18,7 @@ public class ShapeRectangle implements MenuShape {
         }
     }
 
-    public ShapeRectangle(int lowSlot, int highSlot) {
+    public LayoutShapeRectangle(int lowSlot, int highSlot) {
         this(MenuUtils.getCartCoordsFromSlot(lowSlot), MenuUtils.getCartCoordsFromSlot(highSlot));
     }
 

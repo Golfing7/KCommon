@@ -314,6 +314,22 @@ public final class MS {
      * @param title the title to send.
      * @param placeholders the placeholders.
      */
+    public static void sendTitle(Player player, Title title, Placeholder... placeholders) {
+        NMS.getTheNMS().sendTitle(player,
+                MS.parseSingle(title.getTitle(), placeholders),
+                MS.parseSingle(title.getSubtitle(), placeholders),
+                title.getIn(),
+                title.getStay(),
+                title.getOut());
+    }
+
+    /**
+     * Sends a title to a player.
+     *
+     * @param player the player.
+     * @param title the title to send.
+     * @param placeholders the placeholders.
+     */
     public static void sendTitle(Player player, Title title, Collection<Object> placeholders) {
         Object[] objects = placeholders == null ? null : placeholders.toArray(new Object[0]);
         NMS.getTheNMS().sendTitle(player,

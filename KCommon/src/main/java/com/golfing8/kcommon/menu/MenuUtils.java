@@ -7,6 +7,10 @@ import com.golfing8.kcommon.menu.shape.MenuCoordinate;
  * Util class used for some methods in the Menu classes
  */
 public final class MenuUtils {
+    public static int getSlotFromCartCoords(int x, int y) {
+        return getSlotFromCartCoords(MenuShapeType.CHEST, x, y);
+    }
+
     /**
      * Returns the slot number of two coordinates in a cartesian coordinate system
      *
@@ -14,14 +18,22 @@ public final class MenuUtils {
      * @param y the y coordinate
      * @return the slot number of two given coordinates
      */
-    public static int getSlotFromCartCoords(int x, int y) {
-        return (y - 1) * 9 + (x - 1);
+    public static int getSlotFromCartCoords(MenuShapeType type, int x, int y) {
+        return (y - 1) * type.getWidth() + (x - 1);
     }
 
     public static MenuCoordinate getCartCoordsFromSlot(int slot) {
-        int x = slot % 9 + 1;
-        int y = slot / 9 + 1;
+        return getCartCoordsFromSlot(MenuShapeType.CHEST, slot);
+    }
+
+    public static MenuCoordinate getCartCoordsFromSlot(MenuShapeType type, int slot) {
+        int x = slot % type.getWidth() + 1;
+        int y = slot / type.getWidth() + 1;
         return new MenuCoordinate(x, y);
+    }
+
+    public static MoveLength calculateMovement(int slotStart, int slotTarget, boolean allowDiagonal) {
+        return calculateMovement(MenuShapeType.CHEST, slotStart, slotTarget, allowDiagonal);
     }
 
     /**
@@ -32,8 +44,8 @@ public final class MenuUtils {
      * @param allowDiagonal If we can move diagonally
      * @return The coordinate set between point a and point b
      */
-    public static MoveLength calculateMovement(int slotStart, int slotTarget, boolean allowDiagonal) {
-        MenuCoordinate start = getCartCoordsFromSlot(slotStart), target = getCartCoordsFromSlot(slotTarget);
+    public static MoveLength calculateMovement(MenuShapeType type, int slotStart, int slotTarget, boolean allowDiagonal) {
+        MenuCoordinate start = getCartCoordsFromSlot(type, slotStart), target = getCartCoordsFromSlot(type, slotTarget);
         int xStart = start.getX(), yStart = start.getY(), xEnd = target.getX(), yEnd = target.getY();
 
         int xDist = Math.abs(xStart - xEnd);

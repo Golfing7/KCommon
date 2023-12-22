@@ -115,6 +115,23 @@ public final class ItemStackBuilder {
         this.itemFlags = itemMeta.getItemFlags();
     }
 
+    public ItemStackBuilder(ItemStackBuilder toCopy) {
+        this.itemType = toCopy.itemType;
+        this.amount = toCopy.amount;
+        this.itemDurability = toCopy.itemDurability;
+        this.unbreakable = toCopy.unbreakable;
+        this.itemName = toCopy.itemName;
+        this.itemLore = new ArrayList<>(toCopy.itemLore);
+        this.enchantments = new HashMap<>(toCopy.enchantments);
+        this.itemFlags = new HashSet<>(toCopy.itemFlags);
+        this.placeholders = new ArrayList<>(toCopy.placeholders);
+        this.multiLinePlaceholders = new ArrayList<>(toCopy.multiLinePlaceholders);
+        this.skullB64 = toCopy.skullB64;
+        this.extraData = new HashMap<>(toCopy.extraData);
+        this.potionData = toCopy.potionData;
+        this.glowing = toCopy.glowing;
+    }
+
     /**
      * Loads this item stack builder from the given config section.
      *
@@ -254,6 +271,15 @@ public final class ItemStackBuilder {
 
     public ItemStackBuilder placeholders(Placeholder... placeholders) {
         this.placeholders = Lists.newArrayList(placeholders);
+        return this;
+    }
+
+    public ItemStackBuilder addPlaceholders(Placeholder... placeholders) {
+        if (this.placeholders == null) {
+            this.placeholders = Lists.newArrayList(placeholders);
+        } else {
+            this.placeholders.addAll(Arrays.asList(placeholders));
+        }
         return this;
     }
 

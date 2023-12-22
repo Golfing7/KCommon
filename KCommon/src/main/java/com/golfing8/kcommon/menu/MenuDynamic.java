@@ -17,9 +17,9 @@ public class MenuDynamic extends MenuAbstract {
     private final List<MorphingItem> morphingItems;
     private final List<MovingItem> movingItems;
 
-    public MenuDynamic(String title, int size, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
+    public MenuDynamic(String title, MenuShape shape, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
                        List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders) {
-        super(title, size, clickable, canExpire, actionMap, placeholders, multiLinePlaceholders);
+        super(title, shape, clickable, canExpire, actionMap, placeholders, multiLinePlaceholders);
 
         this.morphingItems = new ArrayList<>();
         this.movingItems = new ArrayList<>();

@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
  */
 public class LangConfig {
     private static final Pattern KEY_PATTERN = Pattern.compile(
-            "[a-z\\-.]+"
+            "[a-z\\-.]+",
+            Pattern.CASE_INSENSITIVE
     );
 
     /**

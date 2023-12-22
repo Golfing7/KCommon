@@ -15,6 +15,12 @@ import static com.golfing8.kcommon.menu.MenuUtils.getSlotFromCartCoords;
 
 public interface Menu extends Listener {
     /**
+     * Gets the shape of this menu.
+     * @return the actual shape.
+     */
+    MenuShape getMenuShape();
+
+    /**
      * Gets the item occupying the slot specified
      *
      * @param slot the slot requested
@@ -31,7 +37,7 @@ public interface Menu extends Listener {
      * @return The item at the given coordinates
      */
     default ItemStack getItemAt(int x, int y) {
-        return getItemAt(getSlotFromCartCoords(x, y));
+        return getItemAt(getSlotFromCartCoords(getMenuShape().getType(), x, y));
     }
 
     /**
@@ -54,7 +60,7 @@ public interface Menu extends Listener {
      * @return The item that was in the slot
      */
     default ItemStack setItemAt(int x, int y, ItemStack set) {
-        return setItemAt(getSlotFromCartCoords(x, y), set);
+        return setItemAt(getSlotFromCartCoords(getMenuShape().getType(), x, y), set);
     }
 
     /**
@@ -97,7 +103,7 @@ public interface Menu extends Listener {
     List<ClickAction> getActionsAt(int slot);
 
     default List<ClickAction> getActionAt(int x, int y) {
-        return getActionsAt(getSlotFromCartCoords(x, y));
+        return getActionsAt(getSlotFromCartCoords(getMenuShape().getType(), x, y));
     }
 
     void addClickAction(int slot, ClickAction clickAction);

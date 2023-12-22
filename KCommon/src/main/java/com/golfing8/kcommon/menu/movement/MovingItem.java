@@ -45,7 +45,7 @@ public class MovingItem {
         this.rolloverSpeed = new ResettableNumber(rolloverSpeed);
         this.finalStep = slotProgression.length;
         this.currentStep = 0;
-        this.morphingItem = new MorphingItem(menu, stacks, MenuUtils.getSlotFromCartCoords(moveLengths[0].getCoordinates()[0].getX(), moveLengths[0].getCoordinates()[0].getY()), 0, 0, false, null);
+        this.morphingItem = new MorphingItem(menu, stacks, MenuUtils.getSlotFromCartCoords(menu.getMenuShape().getType(), moveLengths[0].getCoordinates()[0].getX(), moveLengths[0].getCoordinates()[0].getY()), 0, 0, false, null);
         this.menu = menu;
         this.nonDestructive = nonDestructive;
         this.copySelf = copySelf;
@@ -74,7 +74,7 @@ public class MovingItem {
     }
 
     public int getCurrentSlot() {
-        return MenuUtils.getSlotFromCartCoords(slotProgression[currentStep].getX(), slotProgression[currentStep].getY());
+        return MenuUtils.getSlotFromCartCoords(menu.getMenuShape().getType(), slotProgression[currentStep].getX(), slotProgression[currentStep].getY());
     }
 
     public void reset() {
@@ -93,7 +93,7 @@ public class MovingItem {
             }
             if (rolloverSpeed.getCurrentValue() == -1) {
                 if (removeOnFinish) {
-                    menu.setItemAt(MenuUtils.getSlotFromCartCoords(slotProgression[currentStep].getX(), slotProgression[currentStep].getY()), null);
+                    menu.setItemAt(MenuUtils.getSlotFromCartCoords(menu.getMenuShape().getType(), slotProgression[currentStep].getX(), slotProgression[currentStep].getY()), null);
 
                     removeOnFinish = false;
                 }

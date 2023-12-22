@@ -24,7 +24,7 @@ public final class CommandArguments {
     /**
      * A pattern used to match alphanumeric strings.
      */
-    private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("\\w+");
+    private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("[\\w-]+");
 
     /** A command argument for all offline players */
     public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER = new CommandArgument<>("An offline player", (context) -> {
