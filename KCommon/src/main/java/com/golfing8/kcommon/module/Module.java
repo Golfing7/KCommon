@@ -21,12 +21,10 @@ import lombok.Setter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,11 +75,13 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
     @Getter
     private final String moduleName;
     /**
-     * The dependencies for this module. Note that we store the classes and not the instances
-     * as when this is set, not all modules have been created.
+     * The module dependencies for this module.
      */
     @Getter
-    private final Set<Class<? extends Module>> dependencies;
+    private final Set<String> moduleDependencies;
+    /** The plugin dependencies for this module */
+    @Getter
+    private final Set<String> pluginDependencies;
 
     /**
      * If this module is enabled or not. This is simply the module's current state.
@@ -131,7 +131,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      */
     private final List<MCommand<?>> moduleCommands;
 
-    public Module(KPlugin plugin, String moduleName, List<Class<? extends Module>> dependencies) {
+    public Module(KPlugin plugin, String moduleName, Set<String> moduleDependencies, Set<String> pluginDependencies) {
         this.plugin = plugin;
         this.moduleName = moduleName;
         this.moduleCommands = new ArrayList<>();
@@ -139,12 +139,13 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.dataManagers = new HashMap<>();
         this.c2DataManager = new HashMap<>();
         this.moduleTasks = new HashSet<>();
-        this.dependencies = new HashSet<>(dependencies);
+        this.moduleDependencies = new HashSet<>(moduleDependencies);
+        this.pluginDependencies = new HashSet<>(pluginDependencies);
         this.subListeners = new HashSet<>();
     }
 
     public Module(KPlugin plugin, String moduleName) {
-        this(plugin, moduleName, Collections.emptyList());
+        this(plugin, moduleName, Collections.emptySet(), Collections.emptySet());
     }
 
     protected Module() {
@@ -159,7 +160,8 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.dataManagers = new HashMap<>();
         this.c2DataManager = new HashMap<>();
         this.moduleTasks = new HashSet<>();
-        this.dependencies = new HashSet<>(Arrays.asList(info.moduleDependencies()));
+        this.moduleDependencies = new HashSet<>(Arrays.asList(info.moduleDependencies()));
+        this.pluginDependencies = new HashSet<>(Arrays.asList(info.pluginDependencies()));
         this.subListeners = new HashSet<>();
     }
 
@@ -178,7 +180,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.reload();
 
         for(Module module : Modules.getAll()) {
-            if(module.getDependencies().contains(this.getClass()))
+            if(module.getModuleDependencies().contains(this.getClass()))
                 module.reloadWithDependencies();
         }
     }

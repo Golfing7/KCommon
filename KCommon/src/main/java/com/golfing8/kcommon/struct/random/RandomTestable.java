@@ -25,6 +25,6 @@ public interface RandomTestable {
     }
 
     default boolean testRandom() {
-        return getChance() < getRandomInstance().nextDouble();
+        return getChance() > getRandomInstance().nextDouble();
     }
 }

@@ -14,8 +14,11 @@ import com.golfing8.kcommon.module.ModuleInfo;
 import com.golfing8.kcommon.module.ModuleManifest;
 import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.util.Reflection;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import lombok.Getter;
+import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.PluginClassLoader;
@@ -154,6 +157,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         //A map storing module classes to their dependencies in graph like formation
         Map<Class<?>, List<Class<?>>> classToClassDependencyGraph = new HashMap<>();
         Map<Class<?>, Module> instances = new HashMap<>();
+        BiMap<String, Class<?>> nameModuleMap = HashBiMap.create();
 
         Reflection.discoverModules((PluginClassLoader) getClassLoader()).forEach(mClass -> {
             //We only want to work on our own modules, not other plugins
@@ -168,6 +172,14 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
 
             //Instantiate the module with the given information
             ModuleInfo info = mClass.getAnnotation(ModuleInfo.class);
+
+            // We can filter modules that are missing plugin dependencies at this point.
+            for (String depend : info.pluginDependencies()) {
+                if (!Bukkit.getPluginManager().isPluginEnabled(depend)) {
+                    return;
+                }
+            }
+
             Module instance;
             try {
                 Constructor<? extends Module> constructor = mClass.getConstructor();
@@ -176,8 +188,24 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
                      InvocationTargetException e) {
                 throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), e);
             }
+
             instances.put(mClass, instance);
-            classToClassDependencyGraph.put(mClass, Arrays.asList(info.moduleDependencies()));
+            nameModuleMap.put(info.name(), mClass);
+        });
+
+        // Build the dependency graph and filter classes that are missing module dependencies
+        instances.entrySet().removeIf(entry -> {
+            List<Class<?>> classDepends = new ArrayList<>();
+            for (String mdepend : entry.getValue().getModuleDependencies()) {
+                if (!nameModuleMap.containsKey(mdepend) && !Modules.moduleExists(mdepend)) {
+                    nameModuleMap.remove(entry.getValue().getModuleName());
+                    return true;
+                }
+
+                classDepends.add(nameModuleMap.containsKey(mdepend) ? nameModuleMap.get(mdepend) : Modules.getModule(mdepend).getClass());
+            }
+            classToClassDependencyGraph.put(entry.getKey(), classDepends);
+            return false;
         });
 
         //Loop through to detect cycles.

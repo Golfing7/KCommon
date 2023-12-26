@@ -20,5 +20,13 @@ public @interface ModuleInfo {
      *
      * @return the dependencies of this module.
      */
-    Class<? extends Module>[] moduleDependencies() default {};
+    String[] moduleDependencies() default {};
+
+    /**
+     * A list of dependencies that this module depends on. If a module lacks one of these plugins, it will not
+     * be registered as a module.
+     *
+     * @return the module's plugin dependencies.
+     */
+    String[] pluginDependencies() default {};
 }
