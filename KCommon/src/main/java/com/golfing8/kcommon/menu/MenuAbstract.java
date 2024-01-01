@@ -55,7 +55,7 @@ public abstract class MenuAbstract implements Menu {
                         List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders){
         this.menuShape = shape;
         if (shape.getType().isSizeMutable()) {
-            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, size, MS.parseSingle(title, placeholders));
+            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, shape.getSize(), MS.parseSingle(title, placeholders));
         } else {
             this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, shape.getType().getType(), MS.parseSingle(title, placeholders));
         }

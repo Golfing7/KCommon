@@ -81,9 +81,12 @@ public final class MenuBuilder {
         if (section.contains("type")) {
             this.menuShapeType = MenuShapeType.valueOf(section.getString("type").toUpperCase());
             if (section.contains("size"))
-                this.size = 27;
+                this.size = section.getInt("size");
             else
                 this.size = this.menuShapeType.getType().getDefaultSize();
+        } else if (section.contains("size")) {
+            this.menuShapeType = MenuShapeType.CHEST;
+            this.size = section.getInt("size");
         } else {
             this.menuShapeType = MenuShapeType.CHEST;
             this.size = 27;
