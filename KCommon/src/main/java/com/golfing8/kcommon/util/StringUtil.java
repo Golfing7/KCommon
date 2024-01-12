@@ -613,6 +613,24 @@ public class StringUtil {
         return toReturn.reverse().toString();
     }
 
+    public static String parseCommas(long integer){
+        String string = String.valueOf(integer);
+
+        String backwards = new StringBuilder(string).reverse().toString();
+
+        StringBuilder toReturn = new StringBuilder();
+
+        if(string.length() < 4)return string;
+
+        for(int z = 0; z < string.length(); z++){
+            if(z % 3 == 0 && z != 0){
+                toReturn.append(",");
+            }
+            toReturn.append(backwards.charAt(z));
+        }
+        return toReturn.reverse().toString();
+    }
+
     public static String parseCommas(double d){
         String string = String.valueOf(d);
 

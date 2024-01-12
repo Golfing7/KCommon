@@ -68,6 +68,20 @@ public final class CommandArguments {
     }, Double::parseDouble);
 
     /**
+     * A command argument to auto-complete doubles.
+     */
+    public static final CommandArgument<Double> DOUBLE = new CommandArgument<>("A non negative number", (context) -> {
+        return Collections.emptyList();
+    }, (context) -> {
+        try{
+            double number = Double.parseDouble(context.getArgument());
+            return true;
+        }catch(NumberFormatException exc) {
+            return false;
+        }
+    }, Double::parseDouble);
+
+    /**
      * A command argument to auto-complete non-negative integers.
      */
     public static final CommandArgument<Integer> NON_NEGATIVE_INTEGER = new CommandArgument<>("A non negative integer", (context) -> {

@@ -13,7 +13,6 @@ import java.util.UUID;
  */
 public abstract class SenderSerializable extends AbstractSerializable {
     /** The player's UUID. */
-    @Getter
     private transient UUID playerUUID;
     /** The cached player object */
     private transient Player player;
@@ -29,6 +28,12 @@ public abstract class SenderSerializable extends AbstractSerializable {
     public void setKey(String objectId) {
         super.setKey(objectId);
         playerUUID = UUID.fromString(objectId);
+    }
+
+    public UUID getPlayerUUID() {
+        if (playerUUID == null)
+            playerUUID = UUID.fromString(super.getKey());
+        return playerUUID;
     }
 
     /**
