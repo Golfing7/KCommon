@@ -72,11 +72,16 @@ public final class Timestamp implements Cloneable {
 
     /**
      * Gets the milliseconds of difference between this time and the given time.
+     * <p>
+     * If the given timestamp isn't taken from the past, it'll be looped around so it is.
+     * </p>
      *
      * @param timeInPast the time in the past.
      * @return the milliseconds of difference.
      */
     public long getMillisDifference(Timestamp timeInPast) {
+        boolean timeInFuture = timeInPast.isAfter(this);
+
         long totalTime = 0;
 
         // Does not count leap years.
@@ -99,7 +104,10 @@ public final class Timestamp implements Cloneable {
                 totalTime -= TimeUnit.DAYS.toMillis(1);
             }
 
-            totalTime += TimeUnit.HOURS.toMillis(Math.floorMod(this.hour - timeInPast.getHour(), 60));
+            totalTime += TimeUnit.HOURS.toMillis(Math.floorMod(this.hour - timeInPast.getHour(), 24));
+            if (timeInFuture) {
+                totalTime += TimeUnit.DAYS.toMillis(1);
+            }
         }
 
         if (this.minute != UNUSED && timeInPast.getMinute() != UNUSED) {
@@ -108,6 +116,9 @@ public final class Timestamp implements Cloneable {
             }
 
             totalTime += TimeUnit.MINUTES.toMillis(Math.floorMod(this.minute - timeInPast.getMinute(), 60));
+            if (timeInFuture) {
+                totalTime += TimeUnit.HOURS.toMillis(1);
+            }
         }
 
         if (this.second != UNUSED && timeInPast.getSecond() != UNUSED) {
@@ -116,6 +127,9 @@ public final class Timestamp implements Cloneable {
             }
 
             totalTime += TimeUnit.SECONDS.toMillis(Math.floorMod(this.second - timeInPast.getSecond(), 60));
+            if (timeInFuture) {
+                totalTime += TimeUnit.MINUTES.toMillis(1);
+            }
         }
         return totalTime;
     }
