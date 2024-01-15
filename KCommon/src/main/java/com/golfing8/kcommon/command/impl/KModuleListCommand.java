@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 @Cmd(
         name = "list",
         aliases = "l",
-        permission = "kcommon.command.kmodules.list",
         description = "List all modules globally, or for a plugin"
 )
 public class KModuleListCommand extends KCommand {

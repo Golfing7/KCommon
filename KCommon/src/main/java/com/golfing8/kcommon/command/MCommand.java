@@ -46,6 +46,11 @@ public abstract class MCommand<T extends Module> extends KCommand implements Lan
     }
 
     @Override
+    protected String buildCommandPermissionSuffix() {
+        return this.module.getModuleName() + "." + super.buildCommandPermissionSuffix();
+    }
+
+    @Override
     public String getPrefix() {
         StringBuilder builder = new StringBuilder();
 

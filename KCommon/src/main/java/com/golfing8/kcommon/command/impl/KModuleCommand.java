@@ -8,7 +8,6 @@ import com.golfing8.kcommon.command.KCommand;
 @Cmd(
         name = "kmodules",
         aliases = "km",
-        permission = "kcommon.command.kmodules",
         description = "Work with modules"
 )
 public class KModuleCommand extends KCommand {

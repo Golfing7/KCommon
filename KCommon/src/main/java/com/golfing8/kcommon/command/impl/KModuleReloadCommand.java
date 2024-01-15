@@ -10,7 +10,6 @@ import com.golfing8.kcommon.module.Module;
 @Cmd(
         name = "reload",
         aliases = "r",
-        permission = "kcommon.command.kmodules.reload",
         description = "Reload a module"
 )
 public class KModuleReloadCommand extends KCommand {

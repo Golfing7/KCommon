@@ -9,7 +9,6 @@ import com.golfing8.kcommon.module.Module;
 
 @Cmd(
         name = "disable",
-        permission = "kcommon.command.kmodules.disable",
         description = "Disables a module"
 )
 public class KModuleDisableCommand extends KCommand {

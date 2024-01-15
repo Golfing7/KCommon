@@ -9,7 +9,6 @@ import com.golfing8.kcommon.module.Module;
 
 @Cmd(
         name = "enable",
-        permission = "kcommon.command.kmodules.enable",
         description = "Enables a module"
 )
 public class KModuleEnableCommand extends KCommand {

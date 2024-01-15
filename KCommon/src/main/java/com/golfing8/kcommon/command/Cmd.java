@@ -8,6 +8,8 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Cmd {
+    String GENERATE_PERMISSION = "@generate";
+
     /**
      * The name of the command.
      */
@@ -20,8 +22,15 @@ public @interface Cmd {
 
     /**
      * The permission to use for this command.
+     * <p>
+     * If set to the sentinel {@link #GENERATE_PERMISSION}, this will generate a permission with the following format:
+     * <br>
+     * <code>PLUGIN_NAME.command[.{MODULE_NAME}].{COMMAND_NAME}[.{SUB_COMMAND}...]</code>
+     * <br>
+     * As an example, the command <code>/kmodules enable (some-module)</code> would have the permission 'kcommon.command.kmodules.enable'.
+     * </p>
      */
-    String permission() default "";
+    String permission() default GENERATE_PERMISSION;
 
     /**
      * The visibility of this command.

@@ -5,6 +5,7 @@ import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.exc.CommandInstantiationException;
 import com.golfing8.kcommon.util.MS;
+import com.google.common.collect.Lists;
 import lombok.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -71,11 +72,19 @@ public abstract class KCommand implements TabExecutor {
      */
     @Getter
     private final List<KCommand> subcommands = new ArrayList<>();
+    /**
+     * The annotation defining the structure of this command.
+     */
+    @Getter
+    private Cmd annotation;
     /** The visibility of the command */
     @Getter
     private CommandVisibility visibility = CommandVisibility.PUBLIC;
     /**
      * The permission required to execute this command.
+     * <p>
+     * This is set after {@link #onRegister()} is called as it can be dynamically built.
+     * </p>
      */
     @Getter @Setter
     private String commandPermission = "";
@@ -100,11 +109,12 @@ public abstract class KCommand implements TabExecutor {
         if(cmd == null)
             throw new CommandInstantiationException(String.format("Cannot instantiate command '%s' with default constructor without Cmd annotation!", this.getClass().getName()));
 
+        this.annotation = cmd;
+        this.commandPermission = cmd.permission();
         this.commandName = cmd.name();
         this.commandAliases = Arrays.asList(cmd.aliases());
         this.onlyForPlayers = cmd.forPlayers();
         this.description = cmd.description();
-        this.commandPermission = cmd.permission();
         this.visibility = cmd.visibility();
     }
 
@@ -132,6 +142,38 @@ public abstract class KCommand implements TabExecutor {
     }
 
     /**
+     * Builds the suffix of the command permission.
+     * The suffix is the part that comes after the <code>{PLUGIN_NAME}.command</code> prefix.
+     */
+    protected String buildCommandPermissionSuffix() {
+        List<String> parentNames = Lists.newArrayList(this.commandName);
+        KCommand parent = this.parent;
+        while (parent != null) {
+            parentNames.add(parent.commandName);
+            parent = parent.getParent();
+        }
+        Collections.reverse(parentNames);
+
+        return String.join(".", parentNames);
+    }
+
+    /**
+     * Sets up the permission for using this command.
+     */
+    private void setupPermission() {
+        // If the annotation is null, we have no business in setting this back up.
+        if (this.annotation == null)
+            return;
+
+        // Is it not dynamic? Then there's no reason to change it.
+        if (!this.annotation.permission().equals(Cmd.GENERATE_PERMISSION))
+            return;
+
+        String prefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + ".command.";
+        this.commandPermission = prefix + buildCommandPermissionSuffix();
+    }
+
+    /**
      * Recursive method for calling sub commands' onRegister methods.
      */
     protected final void subRegister() {
@@ -139,6 +181,8 @@ public abstract class KCommand implements TabExecutor {
             sub.onRegister();
             sub.subRegister();
         }
+
+        this.setupPermission();
     }
 
     /**
