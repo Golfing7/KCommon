@@ -18,6 +18,7 @@ import com.golfing8.kcommon.nms.v1_19.event.PreSpawnSpawnerAdapter;
 import com.golfing8.kcommon.nms.v1_19.worldedit.WorldEdit;
 import com.golfing8.kcommon.nms.v1_19.worldguard.Worldguard;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.EntityPlayer;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.block.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
@@ -61,6 +63,11 @@ public class NMS implements NMSAccess {
     @Override
     public WorldEditHook getWorldEditHook() {
         return worldEditHook;
+    }
+
+    @Override
+    public void sendMiniMessage(CommandSender player, String string) {
+        player.sendMessage(ComponentUtils.toComponent(string));
     }
 
     @Override

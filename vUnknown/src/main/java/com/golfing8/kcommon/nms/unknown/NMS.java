@@ -16,9 +16,11 @@ import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -51,6 +53,11 @@ public class NMS implements NMSAccess {
     @Override
     public WorldEditHook getWorldEditHook() {
         return worldEditHook;
+    }
+
+    @Override
+    public void sendMiniMessage(CommandSender player, String string) {
+        player.sendMessage(ComponentUtils.toComponent(string));
     }
 
     @Override

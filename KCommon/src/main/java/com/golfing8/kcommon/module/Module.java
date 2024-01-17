@@ -255,7 +255,11 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.enabled = false;
 
         //Unregister tasks, clone for concurrency.
-        new ArrayList<>(moduleTasks).forEach(BukkitRunnable::cancel);
+        new ArrayList<>(moduleTasks).forEach(runnable -> {
+            try {
+                runnable.cancel();
+            } catch (IllegalStateException ignored) {} // Can be thrown if the runnable wasn't scheduled yet
+        });
 
         //Unregister sub listeners.
         this.subListeners.forEach(HandlerList::unregisterAll);

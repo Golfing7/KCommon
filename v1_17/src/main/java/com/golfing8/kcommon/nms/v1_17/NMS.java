@@ -29,6 +29,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
@@ -61,6 +62,11 @@ public class NMS implements NMSAccess {
     @Override
     public WorldEditHook getWorldEditHook() {
         return (location, path) -> {};
+    }
+
+    @Override
+    public void sendMiniMessage(CommandSender player, String string) {
+        player.sendMessage(string);
     }
 
     @Override

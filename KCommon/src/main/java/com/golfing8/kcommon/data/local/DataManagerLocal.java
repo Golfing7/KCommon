@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -43,7 +44,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
     public DataManagerLocal(String key, Plugin plugin, Class<T> typeClass) {
         super(key, plugin, typeClass);
-        this.objectCache = new HashMap<>();
+        this.objectCache = new ConcurrentHashMap<>();
         this.directoryPrefix = Paths.get(getPlugin().getDataFolder().getPath(), "data", getKey());
 
         try{

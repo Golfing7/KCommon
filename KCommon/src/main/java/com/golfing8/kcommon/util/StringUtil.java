@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 
 public class StringUtil {
 
-    private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("###.##");
+    private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###.##");
 
     public enum DefaultFontInfo {
 
@@ -478,9 +478,6 @@ public class StringUtil {
 
     /**
      * Converts a camelCasedString to a yaml-cased-string.
-     * <p>
-     * If the string isn't considered
-     * </p>
      *
      * @param camelCase the camel case string.
      */
@@ -660,7 +657,7 @@ public class StringUtil {
     }
 
     public static String parseMoney(double d){
-        return parseCommas(MONEY_FORMAT.format(d));
+        return MONEY_FORMAT.format(d);
     }
 
     public static String timeFormatted(int duration, boolean dayFirst){

@@ -9,6 +9,7 @@ import com.golfing8.kcommon.nms.world.NMSWorld;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public interface NMSAccess {
@@ -38,6 +39,14 @@ public interface NMSAccess {
      * @return the world edit hook.
      */
     WorldEditHook getWorldEditHook();
+
+    /**
+     * Sends a minimessage formatted message to the player.
+     *
+     * @param sender the sender.
+     * @param string the formatted message.
+     */
+    void sendMiniMessage(CommandSender sender, String string);
 
     void teleportPlayerNoEvent(Player player, Location location);
 

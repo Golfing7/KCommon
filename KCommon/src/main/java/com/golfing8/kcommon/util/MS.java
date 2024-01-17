@@ -343,7 +343,7 @@ public final class MS {
     public static void pass(CommandSender sender, String message, Object... placeholders){
         List<String> messages = p(message, placeholders);
 
-        messages.forEach(sender::sendMessage);
+        messages.forEach(m -> NMS.getTheNMS().sendMiniMessage(sender, m));
     }
 
     private static String[] split(String message){

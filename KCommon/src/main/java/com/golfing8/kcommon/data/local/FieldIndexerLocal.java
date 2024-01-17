@@ -7,6 +7,7 @@ import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A local implementation of the {@link FieldIndexer} interface.
@@ -23,7 +24,7 @@ public class FieldIndexerLocal<T extends DataSerializable> implements FieldIndex
 
     public FieldIndexerLocal(DataManagerLocal<T> local) {
         this.dataManager = local;
-        this.fieldHandleMap = Reflection.getAllFields(getIndexClass());
+        this.fieldHandleMap = new ConcurrentHashMap<>(Reflection.getAllFields(getIndexClass()));
     }
 
     @Override

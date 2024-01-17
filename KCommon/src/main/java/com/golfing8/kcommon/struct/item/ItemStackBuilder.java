@@ -305,8 +305,9 @@ public final class ItemStackBuilder {
      */
     public ItemStack buildFromTemplate() {
         ItemStack newCopy;
+        Placeholder[] placeholderArr = placeholders.toArray(new Placeholder[0]);
         if (itemType == XMaterial.PLAYER_HEAD && skullB64 != null) {
-            newCopy = SkullCreator.itemFromBase64(skullB64);
+            newCopy = SkullCreator.itemFromBase64(MS.parseSingle(skullB64, placeholderArr));
         } else {
             newCopy = itemType.parseItem();
             if (itemDurability > 0) {
@@ -317,7 +318,6 @@ public final class ItemStackBuilder {
 
         ItemMeta meta = newCopy.getItemMeta();
 
-        Placeholder[] placeholderArr = placeholders.toArray(new Placeholder[0]);
         if(this.itemName != null)
             meta.setDisplayName(MS.parseSingle(this.itemName, placeholderArr));
         if(this.itemLore != null && !this.itemLore.isEmpty()) {
