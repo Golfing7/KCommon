@@ -1,9 +1,12 @@
 package com.golfing8.kcommon.command.argument;
 
 import com.golfing8.kcommon.KPlugin;
+import com.golfing8.kcommon.command.argument.type.BooleanCommandArgument;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.struct.time.TimeLength;
+import com.golfing8.kcommon.util.MapUtil;
+import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -33,6 +36,14 @@ public final class CommandArguments {
         OfflinePlayer player = Bukkit.getOfflinePlayer(context.getArgument());
         return player != null && player.getName().equalsIgnoreCase(context.getArgument());
     }, Bukkit::getOfflinePlayer);
+
+    /** Used for parsing raw booleans. The formatting of the inputs will be true/false */
+    public static final BooleanCommandArgument BOOLEAN = new BooleanCommandArgument(MapUtil.of("true", true, "false", false));
+
+    /** Used for parsing booleans in a nicer format such as yes/no */
+    public static final BooleanCommandArgument BOOLEAN_FRIENDLY = new BooleanCommandArgument(MapUtil.of("yes", true, "no", false));
+    /** A boolean argument corresponding to the state of something (on/off) */
+    public static final BooleanCommandArgument BOOLEAN_STATE = new BooleanCommandArgument(MapUtil.of("on", true, "off", false));
 
     /**
      * A command argument to auto-complete online players.
