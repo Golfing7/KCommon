@@ -1,11 +1,13 @@
 package com.golfing8.kcommon;
 
 import com.golfing8.kcommon.command.impl.KModuleCommand;
+import com.golfing8.kcommon.db.MongoConnector;
 import com.golfing8.kcommon.util.NMSVersion;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
@@ -31,6 +33,10 @@ public class KCommon extends KPlugin{
      */
     @Getter
     private NMSVersion serverVersion;
+
+    /** The mongo database connector, can be null if not enabled */
+    @Getter
+    private @Nullable MongoConnector connector;
     @Override
     public void onEnableInner() {
         instance = this;
@@ -38,6 +44,17 @@ public class KCommon extends KPlugin{
         if ((economy = setupEconomy()) == null) {
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+
+        if (getConfig().contains("mongo")) {
+            String username = getConfig().getString("mongo.username");
+            String password = getConfig().getString("mongo.password");
+            String address = getConfig().getString("mongo.address");
+            int port = getConfig().getInt("mongo.port");
+            String database = getConfig().getString("mongo.database");
+            this.connector = new MongoConnector(username, password, address, port, database);
+            this.connector.connect();
+            getLogger().info("Connected to MongoDB");
         }
 
         try {

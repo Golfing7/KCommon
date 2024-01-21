@@ -29,6 +29,8 @@ public final class CommandArguments {
      */
     private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("[\\w-]+");
 
+    public static final CommandArgument<String> ANYTHING = new CommandArgument<>("Anything", (ctx) -> Collections.emptyList(), (context) -> true, (s) -> s);
+
     /** A command argument for all offline players */
     public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER = new CommandArgument<>("An offline player", (context) -> {
         return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());

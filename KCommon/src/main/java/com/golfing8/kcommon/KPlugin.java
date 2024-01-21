@@ -1,12 +1,10 @@
 package com.golfing8.kcommon;
 
 import com.golfing8.kcommon.command.CommandManager;
-import com.golfing8.kcommon.command.KCommand;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
-import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
-import com.golfing8.kcommon.hook.placeholderapi.PKorePAPIHook;
+import com.golfing8.kcommon.hook.placeholderapi.KPAPIHook;
 import com.golfing8.kcommon.menu.Menu;
 import com.golfing8.kcommon.menu.MenuManager;
 import com.golfing8.kcommon.module.Module;
@@ -18,7 +16,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import lombok.Getter;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.PluginClassLoader;
@@ -46,7 +43,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
      * The placeholderAPI hook for the entire plugin.
      */
     @Getter
-    private PKorePAPIHook placeholderAPIHook;
+    private KPAPIHook placeholderAPIHook;
     /** The module manifest */
     @Getter
     private ModuleManifest manifest;
@@ -55,7 +52,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.commandManager = new CommandManager(this);
         this.menuManager = new MenuManager(this);
         //Setup PAPI.
-        this.placeholderAPIHook = new PKorePAPIHook(this);
+        this.placeholderAPIHook = new KPAPIHook(this);
         this.placeholderAPIHook.register();
 
         //Set up the lang config.

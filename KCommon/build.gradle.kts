@@ -32,7 +32,8 @@ dependencies {
 
     implementation("de.tr7zw:item-nbt-api:2.12.1") //For items.
     implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
-    implementation("com.github.cryptomorin:XSeries:9.2.0") { isTransitive = false } //For XSeries
+    implementation("com.github.cryptomorin:XSeries:9.8.1") { isTransitive = false } //For XSeries
+    implementation("org.mongodb:mongodb-driver-sync:4.11.1")
 
     compileOnly(project(":NMS"))
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0")

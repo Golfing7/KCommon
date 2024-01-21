@@ -16,11 +16,11 @@ import java.util.Map;
  * This class controls the hook into PlaceholderAPI for KCommon.
  */
 @RequiredArgsConstructor
-public class PKorePAPIHook extends PlaceholderExpansion implements Relational {
+public class KPAPIHook extends PlaceholderExpansion implements Relational {
     /**
-     * The kcommon plugin.
+     * The plugin.
      */
-    private final Plugin common;
+    private final Plugin plugin;
     /**
      * The provider map, used to map parameters to their given provider.
      */
@@ -47,7 +47,7 @@ public class PKorePAPIHook extends PlaceholderExpansion implements Relational {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "pkore";
+        return plugin.getName().toLowerCase();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class PKorePAPIHook extends PlaceholderExpansion implements Relational {
 
     @Override
     public @NotNull String getVersion() {
-        return common.getDescription().getVersion();
+        return plugin.getDescription().getVersion();
     }
 
     @Override
@@ -66,14 +66,18 @@ public class PKorePAPIHook extends PlaceholderExpansion implements Relational {
             return "Placeholder is empty";
 
         //Try looking for the provider.
-        String[] parameterSplit = params.split(" +");
+        String[] parameterSplit = params.split("_");
         if(parameterSplit.length == 0)
             return "Placeholder is empty";
 
         //Create the new params array.
+        PlaceholderProvider provider = this.providerMap.get(parameterSplit[0]);
+        if (provider == null) {
+            return String.format("%s not found", params);
+        }
+
         String[] newParams = new String[parameterSplit.length - 1];
         System.arraycopy(parameterSplit, 1, newParams, 0, newParams.length);
-        PlaceholderProvider provider = this.providerMap.get(parameterSplit[0]);
         String result = provider.onPlaceholderRequest(player, newParams);
         return result == null ? String.format("%s not found", params) : result;
     }
