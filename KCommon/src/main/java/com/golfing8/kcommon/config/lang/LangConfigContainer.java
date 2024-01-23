@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,12 +57,28 @@ public interface LangConfigContainer {
      * @param placeholders the placeholders to apply to the message.
      */
     default void sendDefaultMessage(CommandSender sender, String key, String defaultMsg, Placeholder... placeholders) {
+        this.sendDefaultMessage(sender, key, new Message(defaultMsg), placeholders);
+    }
+
+    /**
+     * Sends a config message to the player, if it doesn't exist in the config it is added.
+     * <p />
+     * This method should be avoided in favor of using {@link LangConfig#addLanguageConstant(String, List)}.
+     * It is provided for the sake of convenience.
+     *
+     * @param sender the receiver of the message.
+     * @param key the key of the message.
+     * @param defaultMsg the default message.
+     * @param placeholders the placeholders to apply to the message.
+     */
+    default void sendDefaultMessage(CommandSender sender, String key, Message defaultMsg, Placeholder... placeholders) {
         String formatted = getFormattedPrefix(key);
         Message message = getLangConfig().getMessage(formatted);
         if(message == null) {
             //Define the message.
             getLangConfig().addLanguageConstant(formatted, defaultMsg);
             message = getLangConfig().getMessage(formatted);
+            getLangConfig().save();
         }
         MS.parseAll(message.getMessages(), placeholders)
                 .forEach(string -> MS.pass(sender, string));
@@ -132,8 +149,7 @@ public interface LangConfigContainer {
      * @param value the actual value.
      */
     default void addLanguageConstant(String key, String... value) {
-        String formatted = getFormattedPrefix(key);
-        getLangConfig().addLanguageConstant(formatted, value);
+        addLanguageConstant(key, Arrays.asList(value));
     }
 
     /**
@@ -143,8 +159,7 @@ public interface LangConfigContainer {
      * @param value the actual value.
      */
     default void addLanguageConstant(String key, List<String> value) {
-        String formatted = getFormattedPrefix(key);
-        getLangConfig().addLanguageConstant(formatted, value);
+        addLanguageConstant(key, Message.builder().messages(value).build());
     }
 
     /**

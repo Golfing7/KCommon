@@ -13,6 +13,7 @@ import com.golfing8.kcommon.data.DataManagerContainer;
 import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.local.DataManagerLocal;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
+import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.PermissionLevel;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
@@ -75,6 +76,11 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
     @Getter
     private final String moduleName;
     /**
+     * The namespace key of this module
+     */
+    @Getter
+    private final KNamespacedKey namespacedKey;
+    /**
      * The module dependencies for this module.
      */
     @Getter
@@ -133,6 +139,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
 
     public Module(KPlugin plugin, String moduleName, Set<String> moduleDependencies, Set<String> pluginDependencies) {
         this.plugin = plugin;
+        this.namespacedKey = new KNamespacedKey(plugin, moduleName);
         this.moduleName = moduleName;
         this.moduleCommands = new ArrayList<>();
         this.permissionLevels = new HashMap<>();
@@ -155,6 +162,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
 
         this.plugin = (KPlugin) JavaPlugin.getProvidingPlugin(this.getClass());
         this.moduleName = info.name();
+        this.namespacedKey = new KNamespacedKey(this.plugin, this.moduleName);
         this.moduleCommands = new ArrayList<>();
         this.permissionLevels = new HashMap<>();
         this.dataManagers = new HashMap<>();
@@ -334,7 +342,6 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.langConfig = new LangConfig(langPath);
         this.langConfig.load();
         this.loadLangConstants(this.langConfig);
-        this.langConfig.save();
 
         // Finally, load the config wrapper.
         this.configWrapper = new ConfigClassWrapper(null, this.getClass(), this);
@@ -479,7 +486,9 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      * these values will not override existing settings in the config.
      *
      * @param config the language config to add the constants to.
+     * @deprecated register constants in {@link #onEnable()}
      */
+    @Deprecated
     protected void loadLangConstants(LangConfig config) {/*Intentionally empty*/}
 
     /**

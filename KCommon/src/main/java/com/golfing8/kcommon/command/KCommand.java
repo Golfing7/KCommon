@@ -5,6 +5,7 @@ import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.exc.CommandInstantiationException;
 import com.golfing8.kcommon.util.MS;
+import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
 import lombok.*;
 import org.bukkit.command.Command;
@@ -158,6 +159,28 @@ public abstract class KCommand implements TabExecutor {
     }
 
     /**
+     * Gets the prefix to this command's permission.
+     * <p>
+     * This is the part of the permission that's inserted BEFORE 'command'.
+     * If null/empty, nothing is inserted.
+     * </p>
+     * <p>
+     * e.g. If this method returns {@code "lifesteal"}, then the permission's prefix transforms from
+     * <br>
+     * {@code PLUGIN.command.COMMAND_NAME}
+     * <br>
+     * to
+     * <br>
+     * {@code PLUGIN.lifesteal.command.COMMAND_NAME}
+     * </p>
+     *
+     * @return the prefix.
+     */
+    protected String getCommandPermissionPrefix() {
+        return null;
+    }
+
+    /**
      * Sets up the permission for using this command.
      */
     private void setupPermission() {
@@ -169,8 +192,14 @@ public abstract class KCommand implements TabExecutor {
         if (!this.annotation.permission().equals(Cmd.GENERATE_PERMISSION))
             return;
 
-        String prefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + ".command.";
-        this.commandPermission = prefix + buildCommandPermissionSuffix();
+        String prefixInsertion = getCommandPermissionPrefix();
+        String builtPrefix;
+        if (StringUtil.isNotEmpty(prefixInsertion)) {
+            builtPrefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + "." + prefixInsertion + ".command.";
+        } else {
+            builtPrefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + ".command.";
+        }
+        this.commandPermission = builtPrefix + buildCommandPermissionSuffix();
     }
 
     /**
@@ -345,8 +374,22 @@ public abstract class KCommand implements TabExecutor {
      * @param sender the sender.
      * @return if they have permission.
      */
-    private boolean checkPermission(CommandSender sender) {
+    public boolean checkPermission(CommandSender sender) {
         return this.commandPermission.isEmpty() || sender.hasPermission(this.commandPermission);
+    }
+
+    /**
+     * Checks if the given sender has the given extension of the command's permission.
+     *
+     * @param sender the sender.
+     * @param extension the extension.
+     * @return if they have the permission extension.
+     */
+    public boolean checkPermissionExtension(CommandSender sender, String extension) {
+        if (this.commandPermission.isEmpty()) // If the command has no permission, there's nothing we can do here.
+            return true; // TODO Make *every* command have a permission
+
+        return sender.hasPermission(this.commandPermission + "." + extension);
     }
 
     /**

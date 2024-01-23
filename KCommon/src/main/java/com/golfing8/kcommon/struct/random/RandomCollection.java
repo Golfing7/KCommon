@@ -1,4 +1,4 @@
-package com.golfing8.kcommon.struct;
+package com.golfing8.kcommon.struct.random;
 
 import com.google.gson.annotations.Expose;
 

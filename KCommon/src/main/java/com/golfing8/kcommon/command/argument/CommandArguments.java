@@ -4,6 +4,7 @@ import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.argument.type.BooleanCommandArgument;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.Modules;
+import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.time.TimeLength;
 import com.golfing8.kcommon.util.MapUtil;
 import com.google.common.collect.Lists;
@@ -136,8 +137,29 @@ public final class CommandArguments {
     public static final CommandArgument<Module> MODULE = new CommandArgument<>("A module", (context) -> {
         return Modules.getAll().stream().map(Module::getModuleName).collect(Collectors.toList());
     }, (context) -> {
+        String argument = context.getArgument().toLowerCase();
+        if (argument.contains(":")) {
+            String[] split = argument.split(":");
+            Plugin plugin = Bukkit.getPluginManager().getPlugin(split[0]);
+            if (plugin != null) {
+                return Modules.getModule(new KNamespacedKey(plugin, split[1])) != null;
+            } else {
+                return Modules.getModule(new KNamespacedKey(split[0], split[1])) != null;
+            }
+        }
         return Modules.getModule(context.getArgument()) != null;
-    }, Modules::getModule);
+    }, (argument) -> {
+        if (argument.contains(":")) {
+            String[] split = argument.split(":");
+            Plugin plugin = Bukkit.getPluginManager().getPlugin(split[0]);
+            if (plugin != null) {
+                return Modules.getModule(new KNamespacedKey(plugin, split[1]));
+            } else {
+                return Modules.getModule(new KNamespacedKey(split[0], split[1]));
+            }
+        }
+        return Modules.getModule(argument);
+    });
 
     /**
      * A command argument for plugins.

@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.module;
 
 import com.golfing8.kcommon.KPlugin;
+import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.google.common.base.Preconditions;
 import lombok.experimental.UtilityClass;
 
@@ -9,6 +10,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +26,9 @@ public final class Modules {
      * Note that module names are stored as lowercase strings to ensure that no two modules can share
      * similar names.
      */
-    private static final Map<String, Module> MODULE_MAP = new HashMap<>();
+    private static final Map<KNamespacedKey, Module> MODULE_MAP = new HashMap<>();
+    /** A clone of the above map, but uses ONLY the name of the module. (Can cause problems if two plugins register the same module) */
+    private static final Map<String, List<Module>> SMODULE_MAP = new HashMap<>();
     /**
      * Stores the module's class to its instance.
      */
@@ -47,7 +51,7 @@ public final class Modules {
      */
     public static boolean moduleExists(@Nonnull String moduleName) {
         Preconditions.checkNotNull(moduleName);
-        return MODULE_MAP.containsKey(moduleName.toLowerCase());
+        return SMODULE_MAP.containsKey(moduleName.toLowerCase());
     }
 
     /**
@@ -59,7 +63,19 @@ public final class Modules {
     @Nullable
     public static Module getModule(@Nonnull String moduleName) {
         Preconditions.checkNotNull(moduleName);
-        return MODULE_MAP.get(moduleName.toLowerCase());
+        return SMODULE_MAP.get(moduleName.toLowerCase()).get(0);
+    }
+
+    /**
+     * Gets the module with the given namespaced key, or null if the module does not exist.
+     *
+     * @param namespacedKey the module's name.
+     * @return the module, or null if no such module exists.
+     */
+    @Nullable
+    public static Module getModule(@Nonnull KNamespacedKey namespacedKey) {
+        Preconditions.checkNotNull(namespacedKey);
+        return MODULE_MAP.get(namespacedKey);
     }
 
     /**
@@ -83,10 +99,12 @@ public final class Modules {
      */
     static boolean registerModule(@Nonnull Module module) {
         Preconditions.checkNotNull(module);
-        if(MODULE_MAP.containsKey(module.getModuleName().toLowerCase()))
+        KNamespacedKey namespacedKey = module.getNamespacedKey();
+        if(MODULE_MAP.containsKey(namespacedKey))
             return false;
 
-        MODULE_MAP.put(module.getModuleName().toLowerCase(), module);
+        MODULE_MAP.put(namespacedKey, module);
+        SMODULE_MAP.computeIfAbsent(module.getModuleName(), (k) -> new ArrayList<>()).add(module);
         CLASS_MODULE_MAP.put(module.getClass(), module);
         return true;
     }
@@ -99,7 +117,14 @@ public final class Modules {
      */
     static void unregisterModule(@Nonnull Module module) {
         Preconditions.checkNotNull(module);
-        MODULE_MAP.remove(module.getModuleName());
+        MODULE_MAP.remove(module.getNamespacedKey());
+        if (SMODULE_MAP.containsKey(module.getModuleName())) {
+            List<Module> modules = SMODULE_MAP.get(module.getModuleName());
+            modules.remove(module);
+            if (modules.isEmpty())
+                SMODULE_MAP.remove(module.getModuleName());
+        }
+        SMODULE_MAP.remove(module.getModuleName());
         CLASS_MODULE_MAP.remove(module.getClass());
     }
 }

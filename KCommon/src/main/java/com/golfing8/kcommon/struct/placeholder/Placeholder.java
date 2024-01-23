@@ -78,4 +78,16 @@ public class Placeholder {
         String trueLabel = "{" + label.toUpperCase() + "}";
         return new Placeholder(trueLabel, value);
     }
+
+    /**
+     * Generates a placeholder with the default convention for naming.
+     *
+     * @param label the label, which is surrounded with {} and uppercased.
+     * @param value the value to replace it with.
+     * @return the placeholder generated.
+     */
+    public static Placeholder curly(@Nonnull String label, @Nonnull Object value) {
+        String trueLabel = "{" + label.toUpperCase() + "}";
+        return new Placeholder(trueLabel, value.toString());
+    }
 }

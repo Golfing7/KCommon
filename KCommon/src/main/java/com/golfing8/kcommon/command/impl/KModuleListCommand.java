@@ -49,7 +49,7 @@ public class KModuleListCommand extends KCommand {
 
         for (Module module : modules) {
             KCommon.getInstance().sendConfigMessage(context.getSender(), "list-command-format",
-                    "MODULE", (module.isEnabled() ? "&a" : "&c") + module.getModuleName());
+                    "MODULE", (module.isEnabled() ? "&a" : "&c") + (forPlugin == null ? module.getNamespacedKey().toString() : module.getModuleName()));
         }
     }
 }
