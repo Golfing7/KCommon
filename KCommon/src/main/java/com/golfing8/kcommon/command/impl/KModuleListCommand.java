@@ -25,7 +25,7 @@ public class KModuleListCommand extends KCommand {
         KCommon.getInstance().getLangConfig().addLanguageConstant("list-command-none",
                 "&c{PLUGIN} doesn't have any modules.");
         KCommon.getInstance().getLangConfig().addLanguageConstant("list-command-header",
-                "&7&m----- &a{PLUGIN} modules &7&m-----");
+                "&7&m-----&r &a{PLUGIN} modules &7&m-----");
         KCommon.getInstance().getLangConfig().addLanguageConstant("list-command-format",
                 "&7- {MODULE}");
     }

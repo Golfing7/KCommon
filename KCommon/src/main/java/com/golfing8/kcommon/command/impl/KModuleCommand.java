@@ -17,5 +17,6 @@ public class KModuleCommand extends KCommand {
         addSubCommand(new KModuleDisableCommand());
         addSubCommand(new KModuleEnableCommand());
         addSubCommand(new KModuleListCommand());
+        addSubCommand(new KModulePlaceholders());
     }
 }

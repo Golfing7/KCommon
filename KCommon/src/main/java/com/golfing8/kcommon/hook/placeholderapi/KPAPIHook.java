@@ -83,20 +83,24 @@ public class KPAPIHook extends PlaceholderExpansion implements Relational {
     }
 
     @Override
-    public String onPlaceholderRequest(Player player, Player player1, String s) {
-        if(s == null || s.isEmpty())
+    public String onPlaceholderRequest(Player player, Player player1, String params) {
+        if(params == null || params.isEmpty())
             return "Placeholder is empty";
 
         //Try looking for the provider.
-        String[] parameterSplit = s.split(" +");
+        String[] parameterSplit = params.split("_");
         if(parameterSplit.length == 0)
             return "Placeholder is empty";
 
         //Create the new params array.
+        PlaceholderProvider provider = this.providerMap.get(parameterSplit[0]);
+        if (provider == null) {
+            return String.format("%s not found", params);
+        }
+
         String[] newParams = new String[parameterSplit.length - 1];
         System.arraycopy(parameterSplit, 1, newParams, 0, newParams.length);
-        PlaceholderProvider provider = this.providerMap.get(parameterSplit[0]);
         String result = provider.onRelationalPlaceholderRequest(player, player1, newParams);
-        return result == null ? String.format("%s not found", s) : result;
+        return result == null ? String.format("%s not found", params) : result;
     }
 }

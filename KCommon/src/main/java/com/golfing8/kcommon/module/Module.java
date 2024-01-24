@@ -12,6 +12,7 @@ import com.golfing8.kcommon.data.DataManager;
 import com.golfing8.kcommon.data.DataManagerContainer;
 import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.local.DataManagerLocal;
+import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.PermissionLevel;
@@ -136,6 +137,16 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      * every time {@link #onEnable()} is called.
      */
     private final List<MCommand<?>> moduleCommands;
+    /**
+     * Stores simple placeholders registered to this module.
+     */
+    @Getter
+    private final TreeMap<KPlaceholderDefinition, PlaceholderFunction> placeholders;
+    /**
+     * Stores relational placeholders registered to this module.
+     */
+    @Getter
+    private final TreeMap<KPlaceholderDefinition, RelPlaceholderFunction> relationalPlaceholders;
 
     public Module(KPlugin plugin, String moduleName, Set<String> moduleDependencies, Set<String> pluginDependencies) {
         this.plugin = plugin;
@@ -148,6 +159,8 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.moduleTasks = new HashSet<>();
         this.moduleDependencies = new HashSet<>(moduleDependencies);
         this.pluginDependencies = new HashSet<>(pluginDependencies);
+        this.placeholders = new TreeMap<>();
+        this.relationalPlaceholders = new TreeMap<>();
         this.subListeners = new HashSet<>();
     }
 
@@ -168,6 +181,8 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.dataManagers = new HashMap<>();
         this.c2DataManager = new HashMap<>();
         this.moduleTasks = new HashSet<>();
+        this.placeholders = new TreeMap<>();
+        this.relationalPlaceholders = new TreeMap<>();
         this.moduleDependencies = new HashSet<>(Arrays.asList(info.moduleDependencies()));
         this.pluginDependencies = new HashSet<>(Arrays.asList(info.pluginDependencies()));
         this.subListeners = new HashSet<>();
@@ -280,6 +295,8 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.c2DataManager.clear();
         this.permissionLevels.clear();
         this.configWrapper.unregister();
+        this.relationalPlaceholders.clear();
+        this.placeholders.clear();
     }
 
     /**
@@ -490,6 +507,16 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      */
     @Deprecated
     protected void loadLangConstants(LangConfig config) {/*Intentionally empty*/}
+
+    @Override
+    public void addPlaceholder(KPlaceholderDefinition definition, PlaceholderFunction function) {
+        this.placeholders.put(definition, function);
+    }
+
+    @Override
+    public void addRelPlaceholder(KPlaceholderDefinition definition, RelPlaceholderFunction function) {
+        this.relationalPlaceholders.put(definition, function);
+    }
 
     /**
      * Run when this module is called to enable itself

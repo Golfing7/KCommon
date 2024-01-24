@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 /**
  * An abstract KCommon command. Can be registered without a module and should be used for plugin-wide commands.
  */
-@RequiredArgsConstructor
 public abstract class KCommand implements TabExecutor {
     private static final Pattern HELP_PATTERN = Pattern.compile(
             "(help|\\?)",
@@ -131,6 +130,16 @@ public abstract class KCommand implements TabExecutor {
         this.onlyForPlayers = cmd.forPlayers();
         this.description = cmd.description();
         this.visibility = cmd.visibility();
+        if (this.onlyForPlayers) {
+            this.commandRequirements.add(RequirementPlayer.getInstance());
+        }
+    }
+
+    public KCommand(String commandName, List<String> commandAliases, boolean forPlayers) {
+        this.commandName = commandName;
+        this.commandAliases = commandAliases;
+        this.onlyForPlayers = forPlayers;
+        this.plugin = (KPlugin) KPlugin.getProvidingPlugin(this.getClass());
         if (this.onlyForPlayers) {
             this.commandRequirements.add(RequirementPlayer.getInstance());
         }
