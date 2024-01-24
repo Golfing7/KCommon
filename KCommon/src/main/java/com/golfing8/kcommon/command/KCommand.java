@@ -4,8 +4,11 @@ import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.exc.CommandInstantiationException;
+import com.golfing8.kcommon.command.requirement.Requirement;
+import com.golfing8.kcommon.command.requirement.RequirementPlayer;
 import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.StringUtil;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import lombok.*;
 import org.bukkit.command.Command;
@@ -30,9 +33,9 @@ public abstract class KCommand implements TabExecutor {
             Pattern.CASE_INSENSITIVE
     );
 
-    @RequiredArgsConstructor
-    @AllArgsConstructor
     @Data
+    @AllArgsConstructor
+    @RequiredArgsConstructor
     public static final class BuiltCommandArgument {
         /**
          * The name of the argument.
@@ -74,6 +77,16 @@ public abstract class KCommand implements TabExecutor {
     @Getter
     private final List<KCommand> subcommands = new ArrayList<>();
     /**
+     * The plugin that registered this command.
+     */
+    @Getter
+    private final KPlugin plugin;
+    /**
+     * The requirements for executing this command.
+     */
+    @Getter
+    private final List<Requirement> commandRequirements = new ArrayList<>();
+    /**
      * The annotation defining the structure of this command.
      */
     @Getter
@@ -111,12 +124,16 @@ public abstract class KCommand implements TabExecutor {
             throw new CommandInstantiationException(String.format("Cannot instantiate command '%s' with default constructor without Cmd annotation!", this.getClass().getName()));
 
         this.annotation = cmd;
+        this.plugin = (KPlugin) KPlugin.getProvidingPlugin(this.getClass());
         this.commandPermission = cmd.permission();
         this.commandName = cmd.name();
         this.commandAliases = Arrays.asList(cmd.aliases());
         this.onlyForPlayers = cmd.forPlayers();
         this.description = cmd.description();
         this.visibility = cmd.visibility();
+        if (this.onlyForPlayers) {
+            this.commandRequirements.add(RequirementPlayer.getInstance());
+        }
     }
 
     /**
@@ -228,7 +245,7 @@ public abstract class KCommand implements TabExecutor {
      * Registers this command to the bukkit command map.
      */
     public final void register() {
-        ((KPlugin) KPlugin.getProvidingPlugin(this.getClass())).getCommandManager().registerNewCommand(this);
+        this.plugin.getCommandManager().registerNewCommand(this);
         this.onRegister();
         this.subRegister();
     }
@@ -237,7 +254,7 @@ public abstract class KCommand implements TabExecutor {
      * Unregisters this command from the bukkit command map.
      */
     public final void unregister() {
-        ((KPlugin) KPlugin.getProvidingPlugin(this.getClass())).getCommandManager().unregisterCommand(this);
+        this.plugin.getCommandManager().unregisterCommand(this);
         this.onUnregister();
         this.subUnregister();
     }
@@ -277,6 +294,15 @@ public abstract class KCommand implements TabExecutor {
      */
     protected final void addArgument(String name, CommandArgument<?> argument, Function<CommandSender, Object> autofill) {
         this.commandArguments.add(new BuiltCommandArgument(name, argument, autofill));
+    }
+
+    /**
+     * Adds the given command requirement to this command.
+     *
+     * @param requirement the requirement.
+     */
+    protected final void addRequirement(Requirement requirement) {
+        this.commandRequirements.add(requirement);
     }
 
     /**
@@ -369,13 +395,29 @@ public abstract class KCommand implements TabExecutor {
     }
 
     /**
+     * Checks that the context meets all requirements.
+     *
+     * @param context the context.
+     * @return if they meet the requirements.
+     */
+    private boolean checkRequirements(CommandContext context) {
+        for (Requirement requirement : this.commandRequirements) {
+            if (!requirement.meetsRequirement(context)) {
+                requirement.getErrorMessage(context).send(context.getSender());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Checks if the sender has permission to execute this command.
      *
      * @param sender the sender.
      * @return if they have permission.
      */
     public boolean checkPermission(CommandSender sender) {
-        return this.commandPermission.isEmpty() || sender.hasPermission(this.commandPermission);
+        return StringUtil.isEmpty(this.commandPermission) || sender.hasPermission(this.commandPermission);
     }
 
     /**
@@ -386,8 +428,8 @@ public abstract class KCommand implements TabExecutor {
      * @return if they have the permission extension.
      */
     public boolean checkPermissionExtension(CommandSender sender, String extension) {
-        if (this.commandPermission.isEmpty()) // If the command has no permission, there's nothing we can do here.
-            return true; // TODO Make *every* command have a permission
+        if (StringUtil.isEmpty(this.commandPermission)) // If the command has no permission, there's nothing we can do here.
+            throw new IllegalStateException("Cannot check permission extension with null permission.");
 
         return sender.hasPermission(this.commandPermission + "." + extension);
     }
@@ -549,7 +591,11 @@ public abstract class KCommand implements TabExecutor {
 
         //Check for the command context.
         CommandContext builtContext = buildContext(sender, label, args, true);
-        if(builtContext == null) {
+        if (builtContext == null) {
+            return;
+        }
+
+        if (!this.checkRequirements(builtContext)) {
             return;
         }
 

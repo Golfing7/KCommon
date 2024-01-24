@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.command;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -13,11 +15,13 @@ public @interface Cmd {
     /**
      * The name of the command.
      */
+    @NotNull
     String name();
 
     /**
      * The aliases of the command.
      */
+    @NotNull
     String[] aliases() default {};
 
     /**
@@ -25,7 +29,7 @@ public @interface Cmd {
      * <p>
      * If set to the sentinel {@link #GENERATE_PERMISSION}, this will generate a permission with the following format:
      * <br>
-     * <code>PLUGIN_NAME.command[.{MODULE_NAME}].{COMMAND_NAME}[.{SUB_COMMAND}...]</code>
+     * <code>PLUGIN_NAME[.{MODULE_NAME}].command.{COMMAND_NAME}[.{SUB_COMMAND}...]</code>
      * <br>
      * As an example, the command <code>/kmodules enable (some-module)</code> would have the permission 'kcommon.command.kmodules.enable'.
      * </p>
@@ -35,12 +39,16 @@ public @interface Cmd {
     /**
      * The visibility of this command.
      */
+    @NotNull
     CommandVisibility visibility() default CommandVisibility.PROTECTED;
 
+    @NotNull
     String description() default "No provided description";
 
     /**
      * If the command should be only for players.
+     * @deprecated use {@link }
      */
+    @Deprecated
     boolean forPlayers() default false;
 }
