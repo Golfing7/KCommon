@@ -49,6 +49,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
     private ModuleManifest manifest;
 
     public final void onEnable() {
+        try {
+            this.saveDefaultConfig();
+        } catch (IllegalArgumentException ignored) {} // Config doesn't exist
         this.commandManager = new CommandManager(this);
         this.menuManager = new MenuManager(this);
         //Setup PAPI.

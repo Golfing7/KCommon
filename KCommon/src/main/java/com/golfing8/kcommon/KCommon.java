@@ -47,12 +47,18 @@ public class KCommon extends KPlugin{
         }
 
         if (getConfig().contains("mongo")) {
-            String username = getConfig().getString("mongo.username");
-            String password = getConfig().getString("mongo.password");
-            String address = getConfig().getString("mongo.address");
-            int port = getConfig().getInt("mongo.port");
-            String database = getConfig().getString("mongo.database");
-            this.connector = new MongoConnector(username, password, address, port, database);
+            if (getConfig().contains("mongo.connection-string") && getConfig().getString("mongo.connection-string").isEmpty()) {
+                String username = getConfig().getString("mongo.username");
+                String password = getConfig().getString("mongo.password");
+                String address = getConfig().getString("mongo.address");
+                int port = getConfig().getInt("mongo.port");
+                String database = getConfig().getString("mongo.database");
+                this.connector = new MongoConnector(username, password, address, port, database);
+            } else {
+                String connectionString = getConfig().getString("mongo.connection-string");
+                String database = getConfig().getString("mongo.database");
+                this.connector = new MongoConnector(connectionString, database);
+            }
             this.connector.connect();
             getLogger().info("Connected to MongoDB");
         }
