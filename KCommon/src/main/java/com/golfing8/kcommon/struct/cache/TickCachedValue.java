@@ -13,7 +13,7 @@ public class TickCachedValue<T> implements CachedValue<T> {
     @Getter
     private final long tickExpiryTime;
     /** The tick time-stamp of the last time the value was updated. */
-    private long lastTickSet;
+    private long lastTickSet = Long.MIN_VALUE; // Minimum value so we always update it
     private T value;
 
     @Override
