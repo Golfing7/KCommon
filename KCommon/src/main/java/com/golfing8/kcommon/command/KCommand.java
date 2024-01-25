@@ -238,6 +238,7 @@ public abstract class KCommand implements TabExecutor {
         }
 
         this.setupPermission();
+        this.internalOnRegister();
     }
 
     /**
@@ -716,6 +717,11 @@ public abstract class KCommand implements TabExecutor {
 
         return gatherTabCompletions(commandSender, s, strings);
     }
+
+    /**
+     * Used to register internals for {@link MCommand}.
+     */
+    void internalOnRegister() {}
 
     /**
      * Run when this command is registered. Should be used for bootstrapping things like command arguments.

@@ -3,15 +3,14 @@ package com.golfing8.kcommon.config.lang;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
+import com.golfing8.kcommon.util.Reflection;
+import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.base.Preconditions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents a class that contains a language config and can allow sending of config messages.
@@ -157,9 +156,10 @@ public interface LangConfigContainer {
      *
      * @param key the key of the value.
      * @param value the actual value.
+     * @return the message that is actually in the config.
      */
-    default void addLanguageConstant(String key, List<String> value) {
-        addLanguageConstant(key, Message.builder().messages(value).build());
+    default Message addLanguageConstant(String key, List<String> value) {
+        return addLanguageConstant(key, Message.builder().messages(value).build());
     }
 
     /**
@@ -167,10 +167,33 @@ public interface LangConfigContainer {
      *
      * @param key the key of the value.
      * @param value the actual value.
+     * @return the message that is actually in the config.
      */
-    default void addLanguageConstant(String key, Message value) {
+    default Message addLanguageConstant(String key, Message value) {
         String formatted = getFormattedPrefix(key);
         getLangConfig().addLanguageConstant(formatted, value);
+        return getLangConfig().getMessage(formatted);
+    }
+
+    /**
+     * Loads the language enums attached to this class.
+     */
+    default void loadLangEnums() {
+        Set<Class<?>> nestedClasses = Reflection.getAllNestedClasses(getClass());
+        for (Class<?> clazz : nestedClasses) {
+            // Check that we're operating on an enum and a LangEnum instance.
+            if (!LangEnum.class.isAssignableFrom(clazz) || !clazz.isEnum())
+                continue;
+
+            LangEnum[] enums = (LangEnum[]) clazz.getEnumConstants();
+            for (LangEnum langEnum : enums) {
+                Enum<?> enumValue = (Enum<?>) langEnum;
+                String yamlPath = StringUtil.enumToYaml(enumValue.name());
+                String formattedPath = getFormattedPrefix(yamlPath);
+                addLanguageConstant(formattedPath, new Message(langEnum.getMessage()));
+                langEnum.setMessage(getLangConfig().getMessage(formattedPath));
+            }
+        }
     }
 
     /**

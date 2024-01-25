@@ -3,9 +3,11 @@ package com.golfing8.kcommon.util;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import lombok.var;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -116,6 +118,33 @@ public final class Reflection {
 
         for (Field field : clazz.getFields()) {
             if (map.containsKey(field.getName()))
+                continue;
+
+            FieldHandle<?> handle = new FieldHandle<>(field);
+            map.put(field.getName(), handle);
+        }
+        return map;
+    }
+
+    /**
+     * Gets all fields on a class with a given annotation.
+     *
+     * @param clazz the class.
+     * @param annoClass the annotation's class.
+     * @return the fields with that annotation.
+     */
+    public static Map<String, FieldHandle<?>> getFieldsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annoClass) {
+        Map<String, FieldHandle<?>> map = new HashMap<>();
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.getAnnotation(annoClass) == null)
+                continue;
+
+            FieldHandle<?> handle = new FieldHandle<>(field);
+            map.put(field.getName(), handle);
+        }
+
+        for (Field field : clazz.getFields()) {
+            if (map.containsKey(field.getName()) || field.getAnnotation(annoClass) == null)
                 continue;
 
             FieldHandle<?> handle = new FieldHandle<>(field);

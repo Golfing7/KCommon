@@ -480,6 +480,7 @@ public class StringUtil {
      * Converts a camelCasedString to a yaml-cased-string.
      *
      * @param camelCase the camel case string.
+     * @return the yaml cased string.
      */
     public static String camelToYaml(String camelCase) {
         StringBuilder builder = new StringBuilder();
@@ -494,6 +495,15 @@ public class StringUtil {
             }
         }
         return builder.toString();
+    }
+
+    /**
+     * Converts an ENUM_CASED_STRING to a yaml-cased-string
+     * @param enumCase the enum cased string.
+     * @return the yaml cased string.
+     */
+    public static String enumToYaml(String enumCase) {
+        return enumCase.toLowerCase().replace("_", "-").replace("$", ".");
     }
 
     //Taken from spigot

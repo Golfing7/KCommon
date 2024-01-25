@@ -46,6 +46,14 @@ public abstract class MCommand<T extends Module> extends KCommand implements Lan
     }
 
     @Override
+    final void internalOnRegister() {
+        if (this.supportsLangEnums()) {
+            this.loadLangEnums();
+            this.getLangConfig().save();
+        }
+    }
+
+    @Override
     protected String getCommandPermissionPrefix() {
         return this.module.getModuleName();
     }
