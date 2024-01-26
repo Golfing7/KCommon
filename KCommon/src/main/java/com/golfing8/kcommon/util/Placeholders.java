@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @UtilityClass
@@ -23,20 +24,25 @@ public final class Placeholders {
         List<String> keys = new ArrayList<>();
         List<Object> values = new ArrayList<>();
 
-        for (int i = 0; i < placeholders.length; i++) {
-            Object placeholder = placeholders[i];
-
-            if(i % 2 == 0) {
-                if (placeholder instanceof Placeholder) {
-                    Placeholder pObj = (Placeholder) placeholder;
-                    keys.add(pObj.getLabel());
-                    values.add(pObj.getValue());
-                } else {
-                    keys.add(placeholder.toString());
-                }
-            } else {
-                values.add(placeholder);
+        boolean awaitingValue = false;
+        for (Object placeholder : placeholders) {
+            if (placeholder instanceof Placeholder) {
+                Placeholder pObj = (Placeholder) placeholder;
+                keys.add(pObj.getLabel()); // Assume the keys from the placeholder are already formatted properly.
+                values.add(pObj.getValue());
+                continue;
             }
+
+            if (awaitingValue) {
+                values.add(placeholder.toString());
+                awaitingValue = false;
+            } else {
+                keys.add("{" + placeholder.toString() + "}");
+                awaitingValue = true;
+            }
+        }
+        if (awaitingValue) {
+            throw new IllegalArgumentException(String.format("Unbalanced placeholders provided! keys=%s values=%s", keys, values));
         }
 
         sp.keys(keys.toArray(new String[0]));
@@ -82,18 +88,12 @@ public final class Placeholders {
             for (int i = 0; i < keys.size() && i < values.size(); i++) {
                 Object o = values.get(i).get();
                 String value = o == null ? "null" : o.toString();
-                toSend = toSend.replace("{" + keys.get(i) + "}", value);
+                toSend = toSend.replace(keys.get(i), value);
             }
             return toSend;
         }
         public StringPlaceholders send(Player player){
-            String toSend = message;
-            for (int i = 0; i < keys.size() && i < values.size(); i++) {
-                Object o = values.get(i).get();
-                String value = o == null ? "null" : o.toString();
-                toSend = toSend.replace("{" + keys.get(i) + "}", value);
-            }
-            player.sendMessage(toSend);
+            player.sendMessage(get());
             return this;
         }
     }

@@ -35,7 +35,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
         var fieldHandles = typeFieldCache.containsKey(type.getType()) ?
                 typeFieldCache.get(type.getType()) :
-                Reflection.getAllFields(type.getType());
+                Reflection.getAllFieldHandles(type.getType());
 
         CASerializable instance;
         try {
@@ -76,7 +76,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
         var fieldHandles = typeFieldCache.containsKey(object.getClass()) ?
                 typeFieldCache.get(object.getClass()) :
-                Reflection.getAllFields(object.getClass());
+                Reflection.getAllFieldHandles(object.getClass());
 
         // Load and serialize all fields...
         Map<String, Object> primitives = new HashMap<>();

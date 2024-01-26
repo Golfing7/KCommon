@@ -2,10 +2,12 @@ package com.golfing8.kcommon.data.local;
 
 import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.key.FieldIndexer;
+import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.util.MapUtil;
 import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +26,11 @@ public class FieldIndexerLocal<T extends DataSerializable> implements FieldIndex
 
     public FieldIndexerLocal(DataManagerLocal<T> local) {
         this.dataManager = local;
-        this.fieldHandleMap = new ConcurrentHashMap<>(Reflection.getAllFields(getIndexClass()));
+        this.fieldHandleMap = new ConcurrentHashMap<>();
+        Set<Field> allFields = Reflection.getAllFields(getIndexClass());
+        for (Field field : allFields) {
+            this.fieldHandleMap.put(field.getName(), new FieldHandle<>(field));
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.lang;
 
+import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
@@ -10,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -30,12 +32,12 @@ public interface LangConfigContainer {
     }
 
     /**
-     * Gets the formatted prefix with the given postfix.
+     * Gets the formatted path with the given postfix.
      *
      * @param postfix the postfix to append.
-     * @return the formatted prefix.
+     * @return the formatted path.
      */
-    default String getFormattedPrefix(String postfix) {
+    default String formatPath(String postfix) {
         String prefix = getPrefix();
         if(prefix.endsWith("."))
             prefix = prefix.substring(0, prefix.length() - 1);
@@ -71,7 +73,7 @@ public interface LangConfigContainer {
      * @param placeholders the placeholders to apply to the message.
      */
     default void sendDefaultMessage(CommandSender sender, String key, Message defaultMsg, Placeholder... placeholders) {
-        String formatted = getFormattedPrefix(key);
+        String formatted = formatPath(key);
         Message message = getLangConfig().getMessage(formatted);
         if(message == null) {
             //Define the message.
@@ -98,7 +100,7 @@ public interface LangConfigContainer {
                                    String key,
                                    @Nullable Collection<Placeholder> placeholders,
                                    @Nullable Collection<MultiLinePlaceholder> multiLinePlaceholders) {
-        String formatted = getFormattedPrefix(key);
+        String formatted = formatPath(key);
         Message message = getLangConfig().getMessage(formatted);
         Preconditions.checkNotNull(message, String.format("Tried to send message with key %s from config %s but it does not exist!", formatted, this.getLangConfig().getConfigPath()));
 
@@ -120,7 +122,7 @@ public interface LangConfigContainer {
      * @param placeholders the placeholders to apply to the message
      */
     default void sendConfigMessage(CommandSender sender, String key, Placeholder... placeholders) {
-        String formatted = getFormattedPrefix(key);
+        String formatted = formatPath(key);
         Message message = getLangConfig().getMessage(formatted);
         Preconditions.checkNotNull(message, String.format("Tried to send message with key %s from config %s but it does not exist!", formatted, this.getLangConfig().getConfigPath()));
         message.send(sender, placeholders);
@@ -134,7 +136,7 @@ public interface LangConfigContainer {
      * @param placeholders the placeholders to apply to the message
      */
     default void sendConfigMessage(CommandSender sender, String key, Object... placeholders) {
-        String formatted = getFormattedPrefix(key);
+        String formatted = formatPath(key);
         Message message = getLangConfig().getMessage(formatted);
         Preconditions.checkNotNull(message, String.format("Tried to send message with key %s from config %s but it does not exist!", formatted, this.getLangConfig().getConfigPath()));
 
@@ -170,39 +172,35 @@ public interface LangConfigContainer {
      * @return the message that is actually in the config.
      */
     default Message addLanguageConstant(String key, Message value) {
-        String formatted = getFormattedPrefix(key);
+        String formatted = formatPath(key);
         getLangConfig().addLanguageConstant(formatted, value);
         return getLangConfig().getMessage(formatted);
     }
 
     /**
      * Loads the language enums attached to this class.
+     * <p>
+     * Note that this will only load the lowest level class' annotated fields.
+     * If you have a class structure similar to: {@code LangConfigContainer -> A -> B}, only B's fields will load.
+     * </p>
      */
-    default void loadLangEnums() {
-        Set<Class<?>> nestedClasses = Reflection.getAllNestedClasses(getClass());
-        for (Class<?> clazz : nestedClasses) {
-            // Check that we're operating on an enum and a LangEnum instance.
-            if (!LangEnum.class.isAssignableFrom(clazz) || !clazz.isEnum())
+    default void loadLangFields() {
+        Set<Field> allFields = Reflection.getAllFields(this.getClass());
+        for (Field field : allFields) {
+            if (!field.isAnnotationPresent(LangConf.class))
                 continue;
 
-            LangEnum[] enums = (LangEnum[]) clazz.getEnumConstants();
-            for (LangEnum langEnum : enums) {
-                Enum<?> enumValue = (Enum<?>) langEnum;
-                String yamlPath = StringUtil.enumToYaml(enumValue.name());
-                String formattedPath = getFormattedPrefix(yamlPath);
-                addLanguageConstant(formattedPath, new Message(langEnum.getMessage()));
-                langEnum.setMessage(getLangConfig().getMessage(formattedPath));
-            }
-        }
-    }
+            if (Message.class != field.getType())
+                throw new RuntimeException(String.format("Field MUST be of Message type! Was %s", field.getType().toString()));
 
-    /**
-     * If the LangConfig managing this container should reflectively load language enums for the implementor of this interface.
-     *
-     * @return true if this supports lang enums.
-     */
-    default boolean supportsLangEnums() {
-        return true;
+            FieldHandle<?> handle = new FieldHandle<>(field);
+            String key = StringUtil.camelToYaml(field.getName());
+            String formattedPath = formatPath(key);
+            Message defaultValue = (Message) handle.get(this);
+            getLangConfig().addLanguageConstant(formattedPath, defaultValue);
+            handle.set(this, getLangConfig().getMessage(formattedPath));
+        }
+        getLangConfig().save();
     }
 
     /**

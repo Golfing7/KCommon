@@ -109,7 +109,20 @@ public final class Reflection {
      * @param clazz the clazz.
      * @return all fields, mapped from their name.
      */
-    public static Map<String, FieldHandle<?>> getAllFields(Class<?> clazz) {
+    public static Set<Field> getAllFields(Class<?> clazz) {
+        Set<Field> fields = new HashSet<>();
+        Collections.addAll(fields, clazz.getDeclaredFields());
+        Collections.addAll(fields, clazz.getFields());
+        return fields;
+    }
+
+    /**
+     * Gets all declared or accessible field handles for the given class.
+     *
+     * @param clazz the clazz.
+     * @return all fields, mapped from their name.
+     */
+    public static Map<String, FieldHandle<?>> getAllFieldHandles(Class<?> clazz) {
         Map<String, FieldHandle<?>> map = new HashMap<>();
         for (Field field : clazz.getDeclaredFields()) {
             FieldHandle<?> handle = new FieldHandle<>(field);
@@ -127,30 +140,49 @@ public final class Reflection {
     }
 
     /**
+     * Gets ALL fields regardless of openness of the given class up to the parent class.
+     * <p>
+     * Particularly, we keep gathering fields of classes, until {@link Class#isAssignableFrom(Class)} returns false with the parent class.
+     * </p>
+     *
+     * @param clazz the class.
+     * @param parent the parent class to reach to.
+     * @return all fields up to and including the parent class.
+     */
+    public static Set<Field> getAllFieldsUpToIncluding(Class<?> clazz, Class<?> parent) {
+        Set<Field> fields = new HashSet<>();
+        Class<?> current = clazz;
+        while (current != Object.class && !parent.isAssignableFrom(current)) {
+            Collections.addAll(fields, current.getDeclaredFields());
+            current = current.getSuperclass();
+        }
+        Collections.addAll(fields, clazz.getFields()); // Finally take care of public fields and such...
+        return fields;
+    }
+
+    /**
      * Gets all fields on a class with a given annotation.
      *
      * @param clazz the class.
      * @param annoClass the annotation's class.
      * @return the fields with that annotation.
      */
-    public static Map<String, FieldHandle<?>> getFieldsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annoClass) {
-        Map<String, FieldHandle<?>> map = new HashMap<>();
+    public static Set<Field> getFieldsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annoClass) {
+        Set<Field> fields = new HashSet<>();
         for (Field field : clazz.getDeclaredFields()) {
             if (field.getAnnotation(annoClass) == null)
                 continue;
 
-            FieldHandle<?> handle = new FieldHandle<>(field);
-            map.put(field.getName(), handle);
+            fields.add(field);
         }
 
         for (Field field : clazz.getFields()) {
-            if (map.containsKey(field.getName()) || field.getAnnotation(annoClass) == null)
+            if (field.getAnnotation(annoClass) == null)
                 continue;
 
-            FieldHandle<?> handle = new FieldHandle<>(field);
-            map.put(field.getName(), handle);
+            fields.add(field);
         }
-        return map;
+        return fields;
     }
 
     /**

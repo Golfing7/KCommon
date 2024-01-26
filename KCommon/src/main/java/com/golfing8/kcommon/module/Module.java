@@ -239,9 +239,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         //Register this module as a listener.
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
 
-        if (this.supportsLangEnums()) {
-            this.loadLangEnums();
-        }
+        this.loadLangFields();
         this.registerPermissions();
         this.registerSubPermissions();
         this.onEnable();
