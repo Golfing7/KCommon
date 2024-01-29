@@ -686,6 +686,9 @@ public class StringUtil {
     }
 
     public static String timeFormatted(int duration, boolean dayFirst){
+        if (duration <= 0)
+            return "0s";
+
         int seconds = duration % 60;
         int minutes = (duration / 60) % 60;
         int hours = ((duration / 60) / 60) % 24;
@@ -703,6 +706,9 @@ public class StringUtil {
     }
 
     public static String timeFormattedNoSeconds(int duration, boolean dayFirst){
+        if (duration <= 0)
+            return "0m";
+
         int minutes = (duration) % 60;
         int hours = ((duration) / 60) % 24;
         int days = ((duration) / 60) / 24;
@@ -717,6 +723,9 @@ public class StringUtil {
     }
 
     public static String timeFormattedOptionalSeconds(int duration){
+        if (duration <= 0)
+            return "0s";
+
         int seconds = duration % 60;
         int minutes = (duration / 60) % 60;
         int hours = ((duration / 60) / 60) % 24;
@@ -734,6 +743,9 @@ public class StringUtil {
     }
 
     public static String timeFormattedNoSecondsExtended(int duration, boolean dayFirst){
+        if (duration <= 0)
+            return "0 minutes";
+
         int minutes = (duration) % 60;
         int hours = ((duration) / 60) % 24;
         int days = ((duration) / 60) / 24;
@@ -748,6 +760,9 @@ public class StringUtil {
     }
 
     public static String timeFormattedPotion(int duration, boolean dayFirst){
+        if (duration <= 0)
+            return "00:00";
+
         int seconds = duration % 60;
         int minutes = (duration / 60);
 

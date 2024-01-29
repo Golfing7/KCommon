@@ -63,6 +63,8 @@ public final class Modules {
     @Nullable
     public static Module getModule(@Nonnull String moduleName) {
         Preconditions.checkNotNull(moduleName);
+        if (!SMODULE_MAP.containsKey(moduleName.toLowerCase()))
+            return null;
         return SMODULE_MAP.get(moduleName.toLowerCase()).get(0);
     }
 
