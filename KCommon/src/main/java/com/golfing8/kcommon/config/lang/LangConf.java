@@ -16,4 +16,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface LangConf {}
+public @interface LangConf {
+    String path() default "";
+}

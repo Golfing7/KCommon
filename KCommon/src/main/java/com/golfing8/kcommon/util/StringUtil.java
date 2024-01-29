@@ -506,6 +506,21 @@ public class StringUtil {
         return enumCase.toLowerCase().replace("_", "-").replace("$", ".");
     }
 
+    /**
+     * Strips the suffix from the given string.
+     * @param message the message.
+     * @param suffixes the suffixes.
+     * @return the stripped suffix.
+     */
+    public static String stripSuffixes(String message, String... suffixes) {
+        for (String suffix : suffixes) {
+            if (message.endsWith(suffix)) {
+                return message.substring(0, message.length() - suffix.length());
+            }
+        }
+        return message;
+    }
+
     //Taken from spigot
 
     public static void sendCenteredMessage(Player player, String message){

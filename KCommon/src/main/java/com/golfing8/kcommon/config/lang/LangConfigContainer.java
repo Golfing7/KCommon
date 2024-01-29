@@ -193,8 +193,9 @@ public interface LangConfigContainer {
             if (Message.class != field.getType())
                 throw new RuntimeException(String.format("Field MUST be of Message type! Was %s", field.getType().toString()));
 
+            LangConf conf = field.getAnnotation(LangConf.class);
             FieldHandle<?> handle = new FieldHandle<>(field);
-            String key = StringUtil.camelToYaml(field.getName());
+            String key = conf.path().isEmpty() ? StringUtil.camelToYaml(StringUtil.stripSuffixes(field.getName(), "Message", "Msg")) : conf.path();
             String formattedPath = formatPath(key);
             Message defaultValue = (Message) handle.get(this);
             getLangConfig().addLanguageConstant(formattedPath, defaultValue);
