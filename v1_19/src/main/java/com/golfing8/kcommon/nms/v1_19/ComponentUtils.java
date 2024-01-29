@@ -16,22 +16,22 @@ public class ComponentUtils {
 
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
     private static final Map<String, String> legacyColorMap = new HashMap<>(){{
-                put("0", "<reset><black>");
-                put("1", "<reset><dark_blue>");
-                put("2", "<reset><dark_green>");
-                put("3", "<reset><dark_aqua>");
-                put("4", "<reset><dark_red>");
-                put("5", "<reset><dark_purple>");
-                put("6", "<reset><gold>");
-                put("7", "<reset><gray>");
-                put("8", "<reset><dark_gray>");
-                put("9", "<reset><blue>");
-                put("a", "<reset><green>");
-                put("b", "<reset><aqua>");
-                put("c", "<reset><red>");
-                put("d", "<reset><light_purple>");
-                put("e", "<reset><yellow>");
-                put("f", "<reset><white>");
+                put("0", "<black>");
+                put("1", "<dark_blue>");
+                put("2", "<dark_green>");
+                put("3", "<dark_aqua>");
+                put("4", "<dark_red>");
+                put("5", "<dark_purple>");
+                put("6", "<gold>");
+                put("7", "<gray>");
+                put("8", "<dark_gray>");
+                put("9", "<blue>");
+                put("a", "<green>");
+                put("b", "<aqua>");
+                put("c", "<red>");
+                put("d", "<light_purple>");
+                put("e", "<yellow>");
+                put("f", "<white>");
                 put("n", "<underlined>");
                 put("m", "<strikethrough>");
                 put("k", "<obfuscated>");
