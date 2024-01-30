@@ -76,6 +76,15 @@ public class RectangleRegion implements Region {
         return 0.0D; // Planes don't have volume.
     }
 
+    /**
+     * Gets the area of the region.
+     *
+     * @return the area.
+     */
+    public double getArea() {
+        return (maxX - minX) * (maxZ - minZ);
+    }
+
     @Override
     public double getDistance(Vector vector) {
         if (isPositionWithin(vector))
