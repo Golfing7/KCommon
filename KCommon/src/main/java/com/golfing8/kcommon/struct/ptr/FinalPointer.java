@@ -9,7 +9,7 @@ import java.util.Objects;
  * @param <T>
  */
 @RequiredArgsConstructor
-public class FinalPointer<T> {
+public class FinalPointer<T> implements Pointer<T> {
     /** The value of this pointer */
     private final T value;
 

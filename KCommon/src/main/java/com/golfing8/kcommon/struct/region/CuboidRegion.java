@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.struct.region;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -13,14 +15,11 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * A cuboid region occupying a rectangular prism area in three-dimensional space.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE) // For serialization
 public class CuboidRegion implements Region {
-    /**
-     * The absolute center of this region.
-     */
-    private final transient BlockVector center;
     /** The world that this region belongs to, can be null */
-    private final World world;
-    private final double minX, maxX, minY, maxY, minZ, maxZ;
+    private World world;
+    private double minX, maxX, minY, maxY, minZ, maxZ;
 
     //Creates a cuboid region with all the given bounds.
     public CuboidRegion(double minX, double maxX, double minY, double maxY, double minZ, double maxZ) {
@@ -35,11 +34,6 @@ public class CuboidRegion implements Region {
         this.minZ = Math.min(minZ, maxZ);
         this.maxZ = Math.max(minZ, maxZ);
 
-        //Resolve the middle of the location.
-        double middleX = (this.maxX + this.minX) / 2D;
-        double middleY = (this.maxY + this.minY) / 2D;
-        double middleZ = (this.maxZ + this.minZ) / 2D;
-        this.center = new BlockVector(middleX, middleY, middleZ);
         this.world = world;
     }
 
@@ -97,7 +91,10 @@ public class CuboidRegion implements Region {
 
     @Override
     public BlockVector getCenter() {
-        return new BlockVector(this.center);
+        double middleX = (this.maxX + this.minX) / 2D;
+        double middleY = (this.maxY + this.minY) / 2D;
+        double middleZ = (this.maxZ + this.minZ) / 2D;
+        return new BlockVector(middleX, middleY, middleZ);
     }
 
     @Override

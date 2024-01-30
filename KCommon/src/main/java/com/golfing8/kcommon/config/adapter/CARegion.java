@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
+import com.golfing8.kcommon.struct.region.RectangleRegion;
 import com.golfing8.kcommon.struct.region.Region;
 import org.bukkit.World;
 
@@ -24,15 +25,26 @@ public class CARegion implements ConfigAdapter<Region> {
         Map<String, Object> map = (Map<String, Object>) entry.getPrimitive();
         if (map.containsKey("region-type")) {
             World world = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofString((String) map.get("world")), World.class);
-            return new CuboidRegion(
-                    (double) map.get("min-x"),
-                    (double) map.get("max-x"),
-                    (double) map.get("min-y"),
-                    (double) map.get("max-y"),
-                    (double) map.get("min-z"),
-                    (double) map.get("max-z"),
-                    world
-            );
+            String regionType = (String) map.get("region-type");
+            switch (regionType) {
+                case "CUBOID":
+                    return new CuboidRegion(
+                            (double) map.get("min-x"),
+                            (double) map.get("max-x"),
+                            (double) map.get("min-y"),
+                            (double) map.get("max-y"),
+                            (double) map.get("min-z"),
+                            (double) map.get("max-z"),
+                            world);
+                case "RECTANGLE":
+                    return new RectangleRegion(
+                            (double) map.get("min-x"),
+                            (double) map.get("max-x"),
+                            (double) map.get("min-z"),
+                            (double) map.get("max-z"),
+                            world
+                    );
+            }
         }
         return null;
     }
@@ -48,6 +60,12 @@ public class CARegion implements ConfigAdapter<Region> {
             section.put("max-y", region.getMaximumYValue());
             section.put("max-z", region.getMaximumZValue());
             section.put("region-type", "CUBOID");
+        } else if (region instanceof RectangleRegion) {
+            section.put("min-x", region.getMinimumXValue());
+            section.put("min-z", region.getMinimumZValue());
+            section.put("max-x", region.getMaximumXValue());
+            section.put("max-z", region.getMaximumZValue());
+            section.put("region-type", "RECTANGLE");
         }
         if (region.getWorld() != null) {
             section.put("world", region.getWorld().getName());

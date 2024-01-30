@@ -11,7 +11,7 @@ import java.util.Objects;
  * The implementation of equals and hashcode follows the value of the tracked field, rather than any of the fields in this class.
  */
 @RequiredArgsConstructor
-public class FieldPointer<T> {
+public class FieldPointer<T> implements Pointer<T> {
     /** The instance of the object */
     private final @Nullable Object instance;
     /** The handle of the field */
