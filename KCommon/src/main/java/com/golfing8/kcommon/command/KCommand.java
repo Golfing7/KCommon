@@ -550,7 +550,7 @@ public abstract class KCommand implements TabExecutor {
             return;
         }
 
-        MS.pass(sender, "&cArgument '{ARGUMENT}' at position {POSITION} is invalid! Was expecting a '{TYPE}', you entered {ACTUAL}!",
+        getPlugin().sendConfigMessage(sender, "invalid-argument",
                 "POSITION", this.commandArguments.indexOf(argument), "ARGUMENT", argument.getName(), "TYPE", argument.getArgument().getDescription(), "ACTUAL", actual);
     }
 
@@ -565,7 +565,7 @@ public abstract class KCommand implements TabExecutor {
             return;
         }
 
-        MS.pass(sender, "&cArgument '{ARGUMENT}' at position {POSITION} was missing! Was expecting a '{TYPE}'!",
+        getPlugin().sendConfigMessage(sender, "missing-argument",
                 "POSITION", this.commandArguments.indexOf(argument), "ARGUMENT", argument.getName(), "TYPE", argument.getArgument().getDescription());
     }
 
@@ -578,7 +578,7 @@ public abstract class KCommand implements TabExecutor {
         if (this.visibility == CommandVisibility.PRIVATE || this.visibility == CommandVisibility.PROTECTED) {
             MS.pass(sender, SpigotConfig.unknownCommandMessage);
         } else {
-            MS.pass(sender, "&cYou don't have permission to use this command!");
+            getPlugin().sendConfigMessage(sender, "no-permission");
         }
     }
 

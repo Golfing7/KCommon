@@ -30,6 +30,19 @@ public class RectangleRegion implements Region {
         this.world = world;
     }
 
+    /**
+     * Checks if the region overlaps with this region.
+     *
+     * @param region the region.
+     * @return if it overlaps.
+     */
+    public boolean overlaps(RectangleRegion region) {
+        if (this.minX > region.maxX || region.minX > this.maxX)
+            return false;
+
+        return !(this.minZ > region.maxZ) && !(region.minZ > this.maxZ);
+    }
+
     @Override
     public World getWorld() {
         return world;

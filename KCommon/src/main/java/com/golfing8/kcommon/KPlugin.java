@@ -109,6 +109,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
     protected void loadLangConstants() {
         this.langConfig.addLanguageConstant("kore-reload-command-reloaded", "&aReloaded the &e{MODULE} &amodule in &e{TIME}ms&a.");
         this.langConfig.addLanguageConstant("generic-command-not-player", "&cOnly players can do that!");
+        this.langConfig.addLanguageConstant("invalid-argument", "&cArgument '{ARGUMENT}' at position {POSITION} is invalid! Was expecting a '{TYPE}', you entered {ACTUAL}!");
+        this.langConfig.addLanguageConstant("missing-argument", "&cArgument '{ARGUMENT}' at position {POSITION} was missing! Was expecting a '{TYPE}'!");
+        this.langConfig.addLanguageConstant("no-permission", "&cYou don't have permission to use this command!");
     }
 
     private void saveModuleManifest() {
