@@ -98,6 +98,15 @@ public class RectangleRegion implements Region {
         return (maxX - minX) * (maxZ - minZ);
     }
 
+    /**
+     * Gets the block area of the region.
+     *
+     * @return the block area.
+     */
+    public int getBlockArea() {
+        return (int) ((Math.ceil(maxX + 1e-7) - minX) * (Math.ceil(maxZ + 1e-7) - minZ));
+    }
+
     @Override
     public double getDistance(Vector vector) {
         if (isPositionWithin(vector))
@@ -117,7 +126,7 @@ public class RectangleRegion implements Region {
     }
 
     @Override
-    public Region grow(double toGrow) {
+    public RectangleRegion grow(double toGrow) {
         return new RectangleRegion(this.minX - toGrow, this.maxX + toGrow, this.minZ - toGrow, this.maxZ + toGrow);
     }
 
