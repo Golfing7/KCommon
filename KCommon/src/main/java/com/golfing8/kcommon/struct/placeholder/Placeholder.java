@@ -28,10 +28,7 @@ public class Placeholder {
 
     @Override
     public String toString() {
-        return "Placeholder{" +
-                "label='" + label + '\'' +
-                ", value='" + value + '\'' +
-                '}';
+        return value;
     }
 
     /**

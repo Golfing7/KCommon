@@ -26,17 +26,17 @@ public final class Placeholders {
 
         boolean awaitingValue = false;
         for (Object placeholder : placeholders) {
-            if (placeholder instanceof Placeholder) {
-                Placeholder pObj = (Placeholder) placeholder;
-                keys.add(pObj.getLabel()); // Assume the keys from the placeholder are already formatted properly.
-                values.add(pObj.getValue());
-                continue;
-            }
-
             if (awaitingValue) {
                 values.add(placeholder.toString());
                 awaitingValue = false;
             } else {
+                if (placeholder instanceof Placeholder) {
+                    Placeholder pObj = (Placeholder) placeholder;
+                    keys.add(pObj.getLabel()); // Assume the keys from the placeholder are already formatted properly.
+                    values.add(pObj.getValue());
+                    continue;
+                }
+
                 keys.add("{" + placeholder.toString() + "}");
                 awaitingValue = true;
             }

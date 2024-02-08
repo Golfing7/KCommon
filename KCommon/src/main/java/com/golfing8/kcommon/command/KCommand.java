@@ -328,7 +328,7 @@ public abstract class KCommand implements TabExecutor {
     @Nullable
     private CommandContext buildContext(CommandSender sender, String label, String[] args, boolean verbose) {
         if (args.length > 0 && HELP_PATTERN.matcher(args[0]).matches()) {
-            handleHelpMessage(sender, true);
+            handleHelpMessage(sender, null);
             return null;
         }
 
@@ -367,7 +367,7 @@ public abstract class KCommand implements TabExecutor {
                     handleMissingArgument(sender, builtCommandArgument);
 
                     // Check if the help command should be sent.
-                    handleHelpMessage(sender, i == 0);
+                    handleHelpMessage(sender, null);
                 }
                 return null;
             }
@@ -511,19 +511,16 @@ public abstract class KCommand implements TabExecutor {
      * Handles a user that is requesting a help message for this command.
      *
      * @param sender the sender.
-     * @param recursive if a help message for sub commands should be printed.
+     * @param lastArgument the last argument provided in the command.
      */
-    private void handleHelpMessage(CommandSender sender, boolean recursive) {
+    private void handleHelpMessage(CommandSender sender, String lastArgument) {
         if (!canSee(sender)) {
             return;
         }
 
         MS.pass(sender, "&e----- &6Help for command: /{COMMAND} &e-----", "COMMAND", this.getFullCommandChain());
         MS.pass(sender, getDescriptiveCommandHelp(sender));
-        // Recursively handle sub commands.
-        if (recursive) {
-            handleHelpMessage0(sender);
-        }
+        handleHelpMessage0(sender, lastArgument);
     }
 
     /**
@@ -531,10 +528,13 @@ public abstract class KCommand implements TabExecutor {
      *
      * @param sender the sender.
      */
-    private void handleHelpMessage0(CommandSender sender) {
+    private void handleHelpMessage0(CommandSender sender, String lastArgument) {
         for (KCommand sub : this.subcommands) {
+            if (lastArgument != null && !sub.getCommandName().startsWith(lastArgument.toLowerCase()))
+                continue;
+
             MS.pass(sender, sub.getDescriptiveCommandHelp(sender));
-            sub.handleHelpMessage0(sender);
+            sub.handleHelpMessage0(sender, null);
         }
     }
 
@@ -738,6 +738,6 @@ public abstract class KCommand implements TabExecutor {
      */
     protected void execute(CommandContext context) {
         // Send a help message.
-        this.handleHelpMessage(context.getSender(), context.getArguments().size() == 0);
+        this.handleHelpMessage(context.getSender(), context.getArguments().isEmpty() ? null : context.getArguments().get(0));
     }
 }
