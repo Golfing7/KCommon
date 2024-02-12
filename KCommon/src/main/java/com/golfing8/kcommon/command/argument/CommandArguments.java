@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.command.argument;
 
 import com.golfing8.kcommon.KPlugin;
+import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.command.argument.type.BooleanCommandArgument;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.Modules;
@@ -38,6 +39,14 @@ public final class CommandArguments {
     }, (context) -> {
         OfflinePlayer player = Bukkit.getOfflinePlayer(context.getArgument());
         return player != null && player.getName().equalsIgnoreCase(context.getArgument());
+    }, Bukkit::getOfflinePlayer);
+
+    /** A command argument for all offline players that have played before */
+    public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER_PLAYED_BEFORE = new CommandArgument<>("An offline player", (context) -> {
+        return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());
+    }, (context) -> {
+        OfflinePlayer ifCached = NMS.getTheNMS().getOfflinePlayerIfCached(context.getArgument());
+        return ifCached != null && ifCached.getName().equalsIgnoreCase(context.getArgument());
     }, Bukkit::getOfflinePlayer);
 
     /** Used for parsing raw booleans. The formatting of the inputs will be true/false */

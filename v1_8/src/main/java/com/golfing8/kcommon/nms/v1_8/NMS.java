@@ -24,6 +24,7 @@ import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -75,6 +76,12 @@ public class NMS implements NMSAccess {
     @Override
     public void sendMiniMessage(CommandSender player, String string) {
         player.sendMessage(string);
+    }
+
+    @Override
+    public OfflinePlayer getOfflinePlayerIfCached(String str) {
+        UserCache userCache = MinecraftServer.getServer().getUserCache();
+        return userCache.getProfile(str) == null ? null : Bukkit.getOfflinePlayer(str);
     }
 
     @Override

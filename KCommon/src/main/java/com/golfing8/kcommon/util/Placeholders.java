@@ -16,8 +16,7 @@ public final class Placeholders {
     public static String parseFully(String message, Object... placeholders){
         if (placeholders == null || placeholders.length == 0)
             return message;
-        if (placeholders.length % 2 != 0)
-            throw new IllegalArgumentException("Cannot parse a placeholder length that is not divisible by 2!");
+
 
         StringPlaceholders sp = new StringPlaceholders(message);
 
