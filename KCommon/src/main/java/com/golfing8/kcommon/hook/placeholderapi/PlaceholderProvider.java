@@ -81,7 +81,7 @@ public interface PlaceholderProvider {
         if (bestEntry == null) {
             return "Unimplemented";
         }
-        return bestEntry.getValue().get(player, Arrays.copyOfRange(parameters, mostMatches, bestEntry.getKey().getSplitLabel().length));
+        return bestEntry.getValue().get(player, Arrays.copyOfRange(parameters, mostMatches, parameters.length));
     }
 
     /**
@@ -112,6 +112,6 @@ public interface PlaceholderProvider {
         if (bestEntry == null) {
             return "Unimplemented";
         }
-        return bestEntry.getValue().get(p1, p2, Arrays.copyOfRange(parameters, mostMatches, bestEntry.getKey().getSplitLabel().length));
+        return bestEntry.getValue().get(p1, p2, Arrays.copyOfRange(parameters, mostMatches, parameters.length));
     }
 }
