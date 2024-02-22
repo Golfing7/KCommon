@@ -142,6 +142,15 @@ public class Message {
     }
 
     /**
+     * Checks if this message is empty, meaning that if any variant of {@code send} is called, nothing happens.
+     *
+     * @return if this message is empty.
+     */
+    public boolean isEmpty() {
+        return this.isSimple() && (this.messages == null || this.messages.isEmpty());
+    }
+
+    /**
      * Sends this message to the given player with the placeholders.
      *
      * @param sender the sender.
