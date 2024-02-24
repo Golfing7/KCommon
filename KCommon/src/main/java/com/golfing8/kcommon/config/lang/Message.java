@@ -24,22 +24,23 @@ import java.util.*;
 /**
  * A message which can represent a string or a list of strings.
  */
+@Getter
 @Builder
 public class Message {
     /**
      * The message to send to the player, can be a string or list.
      */
-    @Getter @Nullable
-    private final List<String> messages;
-    @Getter @Nullable
+    @Nullable
+    private List<String> messages;
+    @Nullable
     private List<SoundWrapper> sounds;
     /**
      * The title to display to the user, can be null.
      */
-    @Getter @Nullable
+    @Nullable
     private Title title;
     /** The message for the player's action bar */
-    @Getter @Nullable
+    @Nullable
     private String actionBar;
 
     /**
@@ -52,7 +53,11 @@ public class Message {
      *
      * @param message the message to load from.
      */
-    public Message(Object message) {
+    public Message(@Nullable Object message) {
+        if (message == null) {
+            return;
+        }
+
         if(message instanceof String) {
             this.messages = Lists.newArrayList(message.toString());
         }else if(message instanceof List) {
@@ -134,6 +139,15 @@ public class Message {
      */
     public boolean isSimple() {
         return (this.sounds == null || this.sounds.isEmpty()) && (this.title == null) && (this.actionBar == null);
+    }
+
+    /**
+     * Checks if this message is empty, meaning that if any variant of {@code send} is called, nothing happens.
+     *
+     * @return if this message is empty.
+     */
+    public boolean isEmpty() {
+        return this.isSimple() && (this.messages == null || this.messages.isEmpty());
     }
 
     /**
