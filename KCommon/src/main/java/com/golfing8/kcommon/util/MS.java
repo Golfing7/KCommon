@@ -161,6 +161,9 @@ public final class MS {
      * @return the parsed message.
      */
     public static String parseSingle(String message, Placeholder... placeholders) {
+        if (message == null)
+            return null;
+
         for(Placeholder placeholder : placeholders) {
             message = message.replace(placeholder.getLabel(), placeholder.getValue());
         }
@@ -179,6 +182,9 @@ public final class MS {
      * @return the parsed message.
      */
     public static String parseSingle(String message, Collection<Placeholder> placeholders) {
+        if(message == null)
+            return null;
+
         for(Placeholder placeholder : placeholders) {
             message = message.replace(placeholder.getLabel(), placeholder.getValue());
         }
