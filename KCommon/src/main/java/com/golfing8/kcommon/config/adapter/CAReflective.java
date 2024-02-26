@@ -18,6 +18,8 @@ import java.util.Map;
  * This config adapter reflectively serializes and deserializes the incoming object.
  */
 public class CAReflective implements ConfigAdapter<CASerializable> {
+    private static final String KEY_FIELD_NAME = "_key";
+
     private final Map<Class<?>, Map<String, FieldHandle<?>>> typeFieldCache = new HashMap<>();
     private final Map<Class<?>, Constructor<?>> constructorCache = new HashMap<>();
 
@@ -56,6 +58,10 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             if (!handle.shouldSerialize())
                 continue;
 
+            // Don't serialize the field name.
+            if (handle.getField().getName().equals(KEY_FIELD_NAME))
+                continue;
+
             Object primitiveValue = primitives.get(StringUtil.camelToYaml(fieldEntry.getKey()));
             if (primitiveValue == null) {
                 handle.set(instance, null);
@@ -65,6 +71,10 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             var fieldType = new FieldType(handle.getField());
             Object deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue), fieldType);
             handle.set(instance, deserialized);
+        }
+        // Set the key field name if necessary.
+        if (fieldHandles.containsKey(KEY_FIELD_NAME) && entry.getSource() != null && entry.getSource().getName() != null) {
+            fieldHandles.get(KEY_FIELD_NAME).set(instance, entry.getSource().getName());
         }
         return instance;
     }
@@ -84,6 +94,10 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
         for (var fieldEntry : fieldHandles.entrySet()) {
             var handle = fieldEntry.getValue();
             if (!handle.shouldSerialize())
+                continue;
+
+            // Don't serialize the field name.
+            if (handle.getField().getName().equals(KEY_FIELD_NAME))
                 continue;
 
             ConfigPrimitive primitiveValue = ConfigTypeRegistry.toPrimitive(handle.get(object));
