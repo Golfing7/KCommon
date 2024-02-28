@@ -78,6 +78,18 @@ public final class ConfigPrimitive {
         return (T) primitive;
     }
 
+    public ConfigPrimitive getSubValue(String key) {
+        if (this.source == null) {
+            throw new IllegalArgumentException("Source is null!");
+        }
+
+        if (!this.source.isConfigurationSection(key)) {
+            return new ConfigPrimitive(this.source.get(key));
+        }
+
+        return ConfigPrimitive.ofSection(this.source.getConfigurationSection(key));
+    }
+
     public static ConfigPrimitive of(Object value) {
         if (value instanceof Number ||
                 value instanceof String ||
@@ -111,6 +123,10 @@ public final class ConfigPrimitive {
 
     static ConfigPrimitive ofTrusted(Object value) {
         return new ConfigPrimitive(value);
+    }
+
+    static ConfigPrimitive ofTrusted(Object value, ConfigurationSection source) {
+        return new ConfigPrimitive(value, source);
     }
 
     public static ConfigPrimitive ofValue(ConfigEntry entry) {

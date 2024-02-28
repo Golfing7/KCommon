@@ -62,14 +62,15 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             if (handle.getField().getName().equals(KEY_FIELD_NAME))
                 continue;
 
-            Object primitiveValue = primitives.get(StringUtil.camelToYaml(fieldEntry.getKey()));
+            String key = StringUtil.camelToYaml(fieldEntry.getKey());
+            Object primitiveValue = primitives.get(key);
             if (primitiveValue == null) {
                 handle.set(instance, null);
                 continue;
             }
 
             var fieldType = new FieldType(handle.getField());
-            Object deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue), fieldType);
+            Object deserialized = ConfigTypeRegistry.getFromType(entry.getSubValue(key), fieldType);
             handle.set(instance, deserialized);
         }
         // Set the key field name if necessary.

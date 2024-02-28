@@ -56,7 +56,7 @@ public class CAMap implements ConfigAdapter<Map> {
             if (adapter == null) {
                 values.put(adaptedKey, mapEntry.getValue());
             } else {
-                values.put(adaptedKey, adapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getValue()), valueFieldType));
+                values.put(adaptedKey, adapter.toPOJO(entry.getSubValue(mapEntry.getKey()), valueFieldType));
             }
         }
 

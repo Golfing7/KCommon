@@ -9,6 +9,8 @@ import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+
 /**
  * A menu container that supports multiple pages of display.
  * <p>
@@ -18,13 +20,14 @@ import org.bukkit.entity.Player;
 public abstract class PagedMenuContainer extends PlayerMenuContainer {
     private static final ItemStackBuilder DEFAULT_PAGE = new ItemStackBuilder()
             .material(XMaterial.OAK_SIGN)
-            .name("{DIRECTION} Page");
+            .name("&a{DIRECTION} Page");
 
     /** The parent config section containing the information of the paged menu */
     @Getter
     private final ConfigurationSection parentSection;
     /** The last known size of the menu */
-    private int lastSize = -1;
+    @Getter
+    private int lastSize;
 
     /** The page that is currently being displayed */
     @Getter
@@ -39,6 +42,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
 
         this.parentSection = section;
         this.maxPage = section.getInt("max-page", 0);
+        this.lastSize = section.getInt("size");
     }
 
     @Override
@@ -114,6 +118,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
                         DEFAULT_PAGE.addPlaceholders(Placeholder.curly("DIRECTION", "Previous")),
                         MenuUtils.getCartCoordsFromSlot(builder.getSize() - 9))
                 );
+                builder.specialPlaceholders("previous-page", () -> Collections.singleton(Placeholder.curly("DIRECTION", "Previous")));
                 builder.bindTo("previous-page", (event) -> {
                     setPage(page - 1);
                 });
@@ -126,6 +131,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
                         DEFAULT_PAGE.addPlaceholders(Placeholder.curly("DIRECTION", "Next")),
                         MenuUtils.getCartCoordsFromSlot(builder.getSize() - 1))
                 );
+                builder.specialPlaceholders("next-page", () -> Collections.singleton(Placeholder.curly("DIRECTION", "Next")));
                 builder.bindTo("next-page", (event) -> {
                     setPage(page + 1);
                 });
