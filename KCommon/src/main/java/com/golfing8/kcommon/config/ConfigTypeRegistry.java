@@ -292,11 +292,9 @@ public class ConfigTypeRegistry {
                     if(yCoordinate < 1 || yCoordinate > 9)
                         throw new ImproperlyConfiguredValueException(section.getConfigurationSection("slot"), "y", "A value 1-9");
 
-                    return new MenuCoordinate(xCoordinate, yCoordinate, section.getInt("page"));
+                    return new MenuCoordinate(xCoordinate, yCoordinate);
                 }else {
-                    MenuCoordinate slot = MenuUtils.getCartCoordsFromSlot(section.getInt("slot"));
-                    slot.setPage(section.getInt("page"));
-                    return slot;
+                    return MenuUtils.getCartCoordsFromSlot(section.getInt("slot"));
                 }
             }else {
                 throw new ImproperlyConfiguredValueException(section, "slot", "a 'slot' key");

@@ -38,6 +38,11 @@ public class SimpleGUIItem {
     @Nullable @Getter @Setter
     private Supplier<Collection<MultiLinePlaceholder>> specialMPlaceholders;
 
+    public SimpleGUIItem(ItemStackBuilder item, MenuCoordinate slot) {
+        this.item = item;
+        this.slot = slot;
+    }
+
     public SimpleGUIItem(ConfigurationSection section) {
         this.item = new ItemStackBuilder(section);
         this.slot = ConfigTypeRegistry.interpretSection(section, MenuCoordinate.class);

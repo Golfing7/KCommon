@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
  * Represents a class that contains a menu.
  */
 public abstract class MenuContainer {
-    private Menu menu;
+    protected Menu menu;
 
     /**
      * Called when the menu needs to be loaded. May be lazily loaded.

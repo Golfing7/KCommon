@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 public final class MenuBuilder {
+    @Getter
     private int size = 27;
     private boolean canExpire = true, clickable;
     @Getter
@@ -63,6 +64,7 @@ public final class MenuBuilder {
      */
     private List<SimpleGUIItem> otherGUIItems = new ArrayList<>();
     /** The type of menu being built */
+    @Getter
     private MenuShapeType menuShapeType;
     /** This will be run in the same tick the inventory has been closed */
     @Getter
@@ -119,6 +121,16 @@ public final class MenuBuilder {
 
     public static MenuBuilder builder() {
         return new MenuBuilder();
+    }
+
+    /**
+     * Sets the special item with the given key.
+     *
+     * @param key the key.
+     * @param item the item.
+     */
+    public void setSpecialItem(String key, SimpleGUIItem item) {
+        this.specialGUIItems.put(key, item);
     }
 
     public SimpleGUIItem getSpecialItem(String key) {
