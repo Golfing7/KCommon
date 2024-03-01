@@ -2,6 +2,7 @@ package com.golfing8.kcommon.struct.particle;
 
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
 /**
@@ -24,6 +25,15 @@ public class ParticleSpiral extends ParticleCircle{
     {
         this.periods = periods;
         return this;
+    }
+
+    public ParticleSpiral() {}
+
+    protected ParticleSpiral(ConfigurationSection section) {
+        super(section);
+
+        this.length = section.getDouble("length", 1.0D);
+        this.periods = section.getDouble("periods", 1.0D);
     }
 
     @Override

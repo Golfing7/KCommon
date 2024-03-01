@@ -4,6 +4,7 @@ import com.golfing8.kcommon.util.VectorUtil;
 import lombok.Getter;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
 import java.awt.*;
@@ -71,6 +72,17 @@ public abstract class Particle {
         this.pitch = pitch;
         this.yaw = yaw;
         this.roll = roll;
+    }
+
+    protected Particle(ConfigurationSection section) {
+        this.pitch = section.getDouble("pitch");
+        this.yaw = section.getDouble("yaw");
+        this.roll = section.getDouble("roll");
+
+        this.from = new Color(Integer.parseInt(section.getString("from-color"), 16));
+        this.to = new Color(Integer.parseInt(section.getString("to-color"), 16));
+
+        this.particleSize = section.getDouble("particle-size");
     }
 
     /**

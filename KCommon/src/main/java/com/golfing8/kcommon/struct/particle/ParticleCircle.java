@@ -3,6 +3,7 @@ package com.golfing8.kcommon.struct.particle;
 import com.golfing8.kcommon.util.VectorUtil;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
 /**
@@ -15,6 +16,13 @@ public class ParticleCircle extends Particle{
     public ParticleCircle radius(double radius){
         this.radius = radius;
         return this;
+    }
+
+    public ParticleCircle() {}
+
+    protected ParticleCircle(ConfigurationSection section) {
+        super(section);
+        this.radius = section.getDouble("radius", 1.0D);
     }
 
     @Override

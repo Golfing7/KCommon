@@ -1,6 +1,9 @@
 package com.golfing8.kcommon.struct.particle;
 
+import com.golfing8.kcommon.config.ConfigEntry;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
 /**
@@ -16,6 +19,13 @@ public class ParticleLine extends Particle{
         this.startingPointOffset = startingPointOffset;
 
         this.endPointOffset = endPointOffset;
+    }
+
+    protected ParticleLine(ConfigurationSection section) {
+        super(section);
+
+        this.endPointOffset = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "end-point"), Vector.class);
+        this.startingPointOffset = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "start-point"), Vector.class);
     }
 
     @Override

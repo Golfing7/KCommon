@@ -3,6 +3,7 @@ package com.golfing8.kcommon.struct.particle;
 import com.google.common.collect.Lists;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -13,6 +14,12 @@ import java.util.List;
 public class ParticleSphere extends ParticleCircle{
     private final List<WaveEffect> effectList = Lists.newArrayList();
     private final int stepModifier = 24;
+
+    public ParticleSphere() {}
+
+    protected ParticleSphere(ConfigurationSection section) {
+        super(section);
+    }
 
     @Override
     public void spawnAt(Location location) {
