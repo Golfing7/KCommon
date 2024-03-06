@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.commented;
 
 import com.golfing8.kcommon.KCommon;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,10 +44,18 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
      * @param insertion the lines to insert.
      */
     public void insertLinesOnCurrentKey(String... insertion) {
-        String indent = StringUtils.repeat(" ", lastIndent * 2);
+        String indent = StringUtils.repeat(" ", this.lastIndent * 2);
         insertion = Arrays.stream(insertion).map(str -> indent + str).toArray(String[]::new);
         this.transformedLines.addAll(linesInserted + this.lastKeyIndex - 1, Arrays.asList(insertion));
         linesInserted += insertion.length;
+    }
+
+    public void insertComment(String... insertion) {
+        for (String str : this.junk) {
+            if (str.startsWith("#"))
+                return;
+        }
+        insertLinesOnCurrentKey(insertion);
     }
 
     @Override
@@ -75,6 +84,7 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
                 if (nextKey != null) {
                     String toReturn = nextKey;
                     nextKey = null;
+                    lastIndent = indent;
                     return toReturn;
                 }
                 // Check if we should throw an exception.
