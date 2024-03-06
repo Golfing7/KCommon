@@ -85,7 +85,7 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
 
             // Update indent and key path
             int nextIndent = getIndent(line);
-            keys = keys.subList(0, nextIndent);
+            keys = keys.subList(0, Math.min(nextIndent, keys.size()));
             String strippedLine = StringUtils.strip(line);
             if (strippedLine.charAt(0) == '\'')
                 strippedLine = strippedLine.replace("'", "");
