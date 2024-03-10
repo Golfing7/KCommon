@@ -19,7 +19,6 @@ repositories {
 
 tasks {
     shadowJar {
-        relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.pkore.nbtapi")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
