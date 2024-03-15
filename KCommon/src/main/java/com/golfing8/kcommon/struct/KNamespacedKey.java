@@ -21,8 +21,8 @@ public class KNamespacedKey {
     private final String key;
 
     public KNamespacedKey(String namespace, String key) {
-        Preconditions.checkArgument((namespace != null && VALID_NAMESPACE.matcher(namespace).matches()), "Invalid namespace. Must be [a-z0-9._-]: %s", namespace);
-        Preconditions.checkArgument((key != null && VALID_KEY.matcher(key).matches()), "Invalid key. Must be [a-z0-9/._-]: %s", key);
+        Preconditions.checkArgument((namespace != null && VALID_NAMESPACE.matcher(namespace).matches()), String.format("Invalid namespace. Must be [a-z0-9._-]: %s", namespace));
+        Preconditions.checkArgument((key != null && VALID_KEY.matcher(key).matches()), String.format("Invalid key. Must be [a-z0-9/._-]: %s", key));
         this.namespace = namespace;
         this.key = key;
         String string = toString();
@@ -34,10 +34,10 @@ public class KNamespacedKey {
         Preconditions.checkArgument((key != null), "Key cannot be null");
         this.namespace = plugin.getName().toLowerCase(Locale.ROOT);
         this.key = key.toLowerCase(Locale.ROOT);
-        Preconditions.checkArgument(VALID_NAMESPACE.matcher(this.namespace).matches(), "Invalid namespace. Must be [a-z0-9._-]: %s", this.namespace);
-        Preconditions.checkArgument(VALID_KEY.matcher(this.key).matches(), "Invalid key. Must be [a-z0-9/._-]: %s", this.key);
+        Preconditions.checkArgument(VALID_NAMESPACE.matcher(this.namespace).matches(), String.format("Invalid namespace. Must be [a-z0-9._-]: %s", this.namespace));
+        Preconditions.checkArgument(VALID_KEY.matcher(this.key).matches(), String.format("Invalid key. Must be [a-z0-9/._-]: %s", this.key));
         String string = toString();
-        Preconditions.checkArgument((string.length() < 256), "KNamespacedKey must be less than 256 characters (%s)", string);
+        Preconditions.checkArgument((string.length() < 256), String.format("KNamespacedKey must be less than 256 characters (%s)", string));
     }
 
     
