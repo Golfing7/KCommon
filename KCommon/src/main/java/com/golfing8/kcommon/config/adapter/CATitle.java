@@ -15,15 +15,19 @@ public class CATitle implements ConfigAdapter<Title> {
     @Override
     @SuppressWarnings("unchecked")
     public Title toPOJO(ConfigPrimitive entry, FieldType type) {
+        if (entry.getPrimitive() instanceof String) {
+            return new Title((String) entry.getPrimitive(), null, Title.DEFAULT_IN, Title.DEFAULT_STAY, Title.DEFAULT_OUT);
+        }
+
         Map<String, Object> items = (Map<String, Object>) entry.getPrimitive();
         if (items == null)
             return null;
 
-        String title = (String) items.get("title");
-        String subTitle = (String) items.get("subtitle");
-        int inTime = (Integer) items.get("in");
-        int stayTime = (Integer) items.get("stay");
-        int outTime = (Integer) items.get("out");
+        String title = (String) items.getOrDefault("title", null);
+        String subTitle = (String) items.getOrDefault("subtitle", null);
+        int inTime = (Integer) items.getOrDefault("in", 10);
+        int stayTime = (Integer) items.getOrDefault("stay", 60);
+        int outTime = (Integer) items.getOrDefault("out", 10);
         return new Title(title, subTitle, inTime, stayTime, outTime);
     }
 

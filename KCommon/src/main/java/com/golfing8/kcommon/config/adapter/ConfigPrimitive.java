@@ -78,9 +78,10 @@ public final class ConfigPrimitive {
         return (T) primitive;
     }
 
+    @SuppressWarnings({"rawtypes"})
     public ConfigPrimitive getSubValue(String key) {
         if (this.source == null) {
-            throw new IllegalArgumentException("Source is null!");
+            return new ConfigPrimitive(((Map) this.getPrimitive()).get(key));
         }
 
         if (!this.source.isConfigurationSection(key)) {

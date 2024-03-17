@@ -68,20 +68,22 @@ public class Message {
             //Check for the title
             this.title = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "title"),
                     new FieldType(Title.class));
-            Object oMsg = section.get("message");
+
+            if (section.contains("message")) {
+                Object oMsg = section.get("message");
+                //Get the actual message.
+                if(oMsg instanceof String) {
+                    this.messages = Lists.newArrayList(oMsg.toString());
+                }else if(oMsg instanceof List) {
+                    this.messages = new ArrayList<>();
+                    ((List<?>) oMsg).forEach(object -> this.messages.add(object.toString()));
+                }else {
+                    throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", oMsg));
+                }
+            }
 
             // Read the action bar.
             this.actionBar = section.getString("actionbar");
-
-            //Get the actual message.
-            if(oMsg instanceof String) {
-                this.messages = Lists.newArrayList(oMsg.toString());
-            }else if(oMsg instanceof List) {
-                this.messages = new ArrayList<>();
-                ((List<?>) oMsg).forEach(object -> this.messages.add(object.toString()));
-            }else {
-                throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", oMsg));
-            }
 
             //Load the sounds.
             this.sounds = new ArrayList<>();
@@ -96,19 +98,21 @@ public class Message {
             Map section = (Map) message;
             //Check for the title
             this.title = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofNullable(section.get("title")), Title.class);
-            Object oMsg = section.get("message");
 
             // Read the action bar.
             this.actionBar = (String) section.get("actionbar");
 
-            //Get the actual message.
-            if(oMsg instanceof String) {
-                this.messages = Lists.newArrayList(oMsg.toString());
-            }else if(oMsg instanceof List) {
-                this.messages = new ArrayList<>();
-                ((List<?>) oMsg).forEach(object -> this.messages.add(object.toString()));
-            }else {
-                throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", oMsg));
+            if (section.containsKey("messages")) {
+                //Get the actual message.
+                Object oMsg = section.get("message");
+                if(oMsg instanceof String) {
+                    this.messages = Lists.newArrayList(oMsg.toString());
+                }else if(oMsg instanceof List) {
+                    this.messages = new ArrayList<>();
+                    ((List<?>) oMsg).forEach(object -> this.messages.add(object.toString()));
+                }else {
+                    throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", oMsg));
+                }
             }
 
             //Load the sounds.

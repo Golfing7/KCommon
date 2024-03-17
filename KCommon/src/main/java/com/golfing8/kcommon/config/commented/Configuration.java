@@ -83,7 +83,7 @@ public class Configuration extends YamlConfiguration implements Config {
         ConfigTransformer transformer = new ConfigTransformer(yamlString);
         for (String key : transformer) {
             if (comments.containsKey(key))
-                transformer.insertLinesOnCurrentKey(comments.get(key));
+                transformer.insertComment(comments.get(key));
         }
 
         return String.join("\n", transformer.getTransformedLines());

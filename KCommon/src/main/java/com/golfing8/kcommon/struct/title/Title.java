@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
  */
 @Data
 public class Title {
+    public static final int DEFAULT_IN = 10, DEFAULT_STAY = 60, DEFAULT_OUT = 10;
+
     /**
      * The title to show to the player.
      */
