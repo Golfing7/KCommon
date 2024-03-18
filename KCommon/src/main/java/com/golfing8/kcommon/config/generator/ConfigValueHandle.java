@@ -42,22 +42,25 @@ public class ConfigValueHandle {
      * @return true if the config was modified, false if not
      */
     public boolean load(ConfigurationSection sourceSection, String path, boolean readOnly) {
-        if (!sourceSection.contains(path)) {
-            if (readOnly)
-                return false;
+        try {
+            if (!sourceSection.contains(path)) {
+                if (readOnly)
+                    return false;
 
-            if (annotation != null && sourceSection instanceof Config) {
-                ((Config) sourceSection).set(path, handle.get(instance), this.annotation.value());
+                if (annotation != null && sourceSection instanceof Config) {
+                    ((Config) sourceSection).set(path, handle.get(instance), this.annotation.value());
+                } else {
+                    ConfigPrimitive adapted = ConfigTypeRegistry.toPrimitive(handle.get(instance));
+                    sourceSection.set(path, adapted.unwrap());
+                }
+                return true;
             } else {
-                ConfigPrimitive adapted = ConfigTypeRegistry.toPrimitive(handle.get(instance));
-                sourceSection.set(path, adapted.unwrap());
+                Object fromType = ConfigTypeRegistry.getFromType(new ConfigEntry(sourceSection, path), handle.getField());
+                handle.set(instance, fromType);
+                return false;
             }
-            return true;
-        } else {
-            Object fromType = ConfigTypeRegistry.getFromType(new ConfigEntry(sourceSection, path), handle.getField());
-            handle.set(instance, fromType);
-            return false;
-        }
+        } catch (Exception exc) {
+            throw new RuntimeException(String.format("Failed to load config value at path %s", path), exc);        }
     }
 
     /**
