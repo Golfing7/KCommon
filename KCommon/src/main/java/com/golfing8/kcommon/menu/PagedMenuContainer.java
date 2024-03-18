@@ -66,6 +66,29 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
     protected abstract Menu loadMenu(MenuBuilder builder);
 
     /**
+     * Gets the maximum page that needs to be used for the given amount of elements.
+     *
+     * @param elements the amount of elements.
+     * @return the max page.
+     */
+    public int getMaxPage(int elements) {
+        return (int) Math.ceil(elements / (getLastSize() - 9F) - 1);
+    }
+
+    /**
+     * Gets the size of the menu required for the given elements.
+     * <p>
+     * The resulting number includes the 9 slots at the bottom of the GUI for the menu buttons.
+     * </p>
+     *
+     * @param elements the elements.
+     * @return the size of the menu.
+     */
+    public int getMenuSize(int elements) {
+        return Math.max((int) Math.ceil(elements / 9F) * 9 + 9, 54);
+    }
+
+    /**
      * Updates the current page and re-opens the inventory for the player if necessary.
      *
      * @param page the page.
