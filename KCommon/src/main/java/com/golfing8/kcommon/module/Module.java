@@ -8,10 +8,7 @@ import com.golfing8.kcommon.config.generator.ConfigClassWrapper;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
 import com.golfing8.kcommon.config.lang.Message;
-import com.golfing8.kcommon.data.DataManager;
 import com.golfing8.kcommon.data.DataManagerContainer;
-import com.golfing8.kcommon.data.DataSerializable;
-import com.golfing8.kcommon.data.local.DataManagerLocal;
 import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
@@ -39,7 +36,7 @@ import java.util.*;
  * Represents an abstract module with functionality on the server. These modules are the basis of functionality
  * for the KCommon suite of plugins. All 'Features' should be implemented through an extension of this class.
  */
-public abstract class Module implements Listener, LangConfigContainer, DataManagerContainer, PlaceholderProvider {
+public abstract class Module implements Listener, LangConfigContainer, PlaceholderProvider {
 
     /**
      * Gets a module instance associated with the given type for the call.
@@ -57,14 +54,6 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
      * Maps a permission label to its given permission level.
      */
     private final Map<String, PermissionLevel> permissionLevels;
-    /**
-     * The map of all data managers used by this module.
-     */
-    private final Map<String, DataManager<?>> dataManagers;
-    /**
-     * Maps the datamanager's data class to the data manager itself.
-     */
-    private final Map<Class<?>, DataManager<?>> c2DataManager;
 
     /**
      * The owning plugin of this module.
@@ -154,8 +143,6 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.moduleName = moduleName;
         this.moduleCommands = new ArrayList<>();
         this.permissionLevels = new HashMap<>();
-        this.dataManagers = new HashMap<>();
-        this.c2DataManager = new HashMap<>();
         this.moduleTasks = new HashSet<>();
         this.moduleDependencies = new HashSet<>(moduleDependencies);
         this.pluginDependencies = new HashSet<>(pluginDependencies);
@@ -178,8 +165,6 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.namespacedKey = new KNamespacedKey(this.plugin, this.moduleName);
         this.moduleCommands = new ArrayList<>();
         this.permissionLevels = new HashMap<>();
-        this.dataManagers = new HashMap<>();
-        this.c2DataManager = new HashMap<>();
         this.moduleTasks = new HashSet<>();
         this.placeholders = new TreeMap<>();
         this.relationalPlaceholders = new TreeMap<>();
@@ -270,7 +255,10 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         this.langConfig.save();
 
         this.onDisable();
-        this.dataManagers.values().forEach(DataManager::shutdown);
+        // If this module supports data managers, shut them down.
+        if (this instanceof DataManagerContainer) {
+            ((DataManagerContainer) this).shutdownDataManagers();
+        }
         HandlerList.unregisterAll(this);
 
         //Unregister all commands associated with this module.
@@ -291,9 +279,7 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         //Clear some data structures.
         this.subListeners.clear();
         this.moduleTasks.clear();
-        this.dataManagers.clear();
         this.moduleCommands.clear();
-        this.c2DataManager.clear();
         this.permissionLevels.clear();
         this.configWrapper.unregister();
         this.relationalPlaceholders.clear();
@@ -421,26 +407,6 @@ public abstract class Module implements Listener, LangConfigContainer, DataManag
         getPlugin().getServer().getPluginManager().registerEvents(listener, getPlugin());
 
         this.subListeners.add(listener);
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T extends DataSerializable> Map<Class<T>, DataManager<T>> getDataManagerMap() {
-        return (Map) c2DataManager;
-    }
-
-    /**
-     * Adds a data manager with the given key and data class to this module's data manager map
-     *
-     * @param key the key of the data manager
-     * @param dataClass the data class
-     * @param <T> the type of the data
-     */
-    public final <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass) {
-        DataManager<T> dataManager = new DataManagerLocal<>(key, plugin, dataClass);
-        this.c2DataManager.put(dataClass, dataManager);
-        this.dataManagers.put(key.toLowerCase(), dataManager);
-        return dataManager;
     }
 
     /**

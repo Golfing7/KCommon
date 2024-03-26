@@ -1,12 +1,10 @@
 package com.golfing8.kcommon.data;
 
+import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.data.local.DataManagerLocal;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents a container of data managers.
@@ -15,13 +13,19 @@ import java.util.UUID;
  * </p>
  */
 public interface DataManagerContainer {
+    Map<Class<? extends DataManagerContainer>, Map<Class<?>, DataManager<?>>> c2DataManagers = new HashMap<>();
+    Map<Class<? extends DataManagerContainer>, Map<String, DataManager<?>>> dataManagers = new HashMap<>();
+
     /**
      * Gets the data manager map backing this container.
      *
      * @return the map.
      * @param <T> the type of data serializable.
      */
-    <T extends DataSerializable> Map<Class<T>, DataManager<T>> getDataManagerMap();
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default <T extends DataSerializable> Map<Class<T>, DataManager<T>> getDataManagerMap() {
+        return (Map) c2DataManagers.computeIfAbsent(this.getClass(), (k) -> new HashMap<>());
+    }
 
     /**
      * Adds a data manager with the given key and data class to this module's data manager map
@@ -30,7 +34,30 @@ public interface DataManagerContainer {
      * @param dataClass the data class
      * @param <T> the type of the data
      */
-    <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass);
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    default <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass) {
+        DataManagerLocal<T> local = new DataManagerLocal<>(key, KCommon.getInstance(), dataClass);
+        Map c2DataMap = c2DataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
+        Map dataMap = dataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
+        c2DataMap.put(dataClass, local);
+        dataMap.put(key, local);
+        return local;
+    }
+
+    /**
+     * Clears the backing data maps for this data manager.
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    default void shutdownDataManagers() {
+        Map c2DataMap = c2DataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
+        Map dataMap = dataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
+        c2DataMap.values().forEach(obj -> {
+            ((DataManager) obj).shutdown();
+        });
+
+        c2DataMap.clear();
+        dataMap.clear();
+    }
 
     /**
      * Gets the data manager associated with the given data class.
