@@ -29,19 +29,19 @@ public class CARegion implements ConfigAdapter<Region> {
             switch (regionType) {
                 case "CUBOID":
                     return new CuboidRegion(
-                            (double) map.get("min-x"),
-                            (double) map.get("max-x"),
-                            (double) map.get("min-y"),
-                            (double) map.get("max-y"),
-                            (double) map.get("min-z"),
-                            (double) map.get("max-z"),
+                            ((Number) map.get("min-x")).doubleValue(),
+                            ((Number) map.get("max-x")).doubleValue(),
+                            ((Number) map.get("min-y")).doubleValue(),
+                            ((Number) map.get("max-y")).doubleValue(),
+                            ((Number) map.get("min-z")).doubleValue(),
+                            ((Number) map.get("max-z")).doubleValue(),
                             world);
                 case "RECTANGLE":
                     return new RectangleRegion(
-                            (double) map.get("min-x"),
-                            (double) map.get("max-x"),
-                            (double) map.get("min-z"),
-                            (double) map.get("max-z"),
+                            ((Number) map.get("min-x")).doubleValue(),
+                            ((Number) map.get("max-x")).doubleValue(),
+                            ((Number) map.get("min-z")).doubleValue(),
+                            ((Number) map.get("max-z")).doubleValue(),
                             world
                     );
             }
