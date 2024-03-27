@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Represents a container of data managers.
  * <p>
- * Classes that implement this act as Class -> DataManager maps.
+ * Classes that implement this act as Class to DataManager maps.
  * </p>
  */
 public interface DataManagerContainer {

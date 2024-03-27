@@ -149,7 +149,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
     }
 
     /**
-     * This implementation doesn't clear the backing array, but instead sets our head & tail to null, setting all values in the link to null.
+     * This implementation doesn't clear the backing array, but instead sets our head and tail to null, setting all values in the link to null.
      * This flags them as "dead" which allows us to overwrite them in the array.
      */
     @Override

@@ -22,7 +22,7 @@ import java.util.Map;
 public final class Modules {
     /**
      * Maps modules from their name to their instance.
-     * <p />
+     * <br>
      * Note that module names are stored as lowercase strings to ensure that no two modules can share
      * similar names.
      */

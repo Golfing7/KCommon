@@ -16,9 +16,10 @@ import java.util.*;
 
 /**
  * Represents a class that contains a language config and can allow sending of config messages.
- * <p />
+ * <p>
  * Note that an implementation of this interface does NOT mean that its lang config is unique!
  * Commands and modules SHARE one language config!
+ * </p>
  */
 public interface LangConfigContainer {
 
@@ -48,9 +49,10 @@ public interface LangConfigContainer {
 
     /**
      * Sends a config message to the player, if it doesn't exist in the config it is added.
-     * <p />
+     * <p>
      * This method should be avoided in favor of using {@link LangConfig#addLanguageConstant(String, List)}.
      * It is provided for the sake of convenience.
+     * </p>
      *
      * @param sender the receiver of the message.
      * @param key the key of the message.
@@ -63,9 +65,10 @@ public interface LangConfigContainer {
 
     /**
      * Sends a config message to the player, if it doesn't exist in the config it is added.
-     * <p />
+     * <p>
      * This method should be avoided in favor of using {@link LangConfig#addLanguageConstant(String, List)}.
      * It is provided for the sake of convenience.
+     * </p>
      *
      * @param sender the receiver of the message.
      * @param key the key of the message.

@@ -23,6 +23,7 @@ import java.util.Random;
  */
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
 public class EntityEquipment implements CASerializable {
 
     static {
@@ -30,17 +31,17 @@ public class EntityEquipment implements CASerializable {
     }
 
     /** The entity's helmet */
-    private final EntityEquipmentPiece helmet;
+    private EntityEquipmentPiece helmet;
     /** The entity's chestplate */
-    private final EntityEquipmentPiece chestplate;
+    private EntityEquipmentPiece chestplate;
     /** The entity's leggings */
-    private final EntityEquipmentPiece leggings;
+    private EntityEquipmentPiece leggings;
     /** The entity's boots */
-    private final EntityEquipmentPiece boots;
+    private EntityEquipmentPiece boots;
     /** The entity's item in hand */
-    private final EntityEquipmentPiece hand;
+    private EntityEquipmentPiece hand;
     /** The entity's off-hand item */
-    private final EntityEquipmentPiece offHand;
+    private EntityEquipmentPiece offHand;
 
     /**
      * Applies the equipment to the given entity.
@@ -62,7 +63,7 @@ public class EntityEquipment implements CASerializable {
             equipment.setLeggingsDropChance(-(float) leggings.getChanceToDrop() / 100);
         }
         if (boots != null) {
-            equipment.setHelmet(boots.buildBukkitStack(entity));
+            equipment.setBoots(boots.buildBukkitStack(entity));
             equipment.setBootsDropChance(-(float) boots.getChanceToDrop() / 100);
         }
         if (hand != null) {

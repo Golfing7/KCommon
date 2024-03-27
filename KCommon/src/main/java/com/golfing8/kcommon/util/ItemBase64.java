@@ -32,10 +32,9 @@ public class ItemBase64 {
     /**
      *
      * A method to serialize an {@link ItemStack} array to Base64 String.
-     *
-     * <p />
-     *
+     * <p>
      * Based off of {@link #toBase64(Inventory)}.
+     * </p>
      *
      * @param items to turn into a Base64 String.
      * @return Base64 string of the items.
@@ -64,12 +63,10 @@ public class ItemBase64 {
 
     /**
      * A method to serialize an inventory to Base64 string.
-     *
-     * <p />
-     *
+     * <p>
      * Special thanks to Comphenix in the Bukkit forums or also known
      * as aadnk on GitHub.
-     *
+     * </p>
      * <a href="https://gist.github.com/aadnk/8138186">Original Source</a>
      *
      * @param inventory to serialize
@@ -116,10 +113,11 @@ public class ItemBase64 {
      *
      * A method to get an {@link Inventory} from an encoded, Base64, string.
      *
-     * <p />
+     * <p>
      *
      * Special thanks to Comphenix in the Bukkit forums or also known
      * as aadnk on GitHub.
+     * </p>
      *
      * <a href="https://gist.github.com/aadnk/8138186">Original Source</a>
      *
@@ -162,9 +160,9 @@ public class ItemBase64 {
     /**
      * Gets an array of ItemStacks from Base64 string.
      *
-     * <p />
-     *
+     * <p>
      * Base off of {@link #fromBase64(String)}.
+     * </p>
      *
      * @param data Base64 string to convert to ItemStack array.
      * @return ItemStack array created from the Base64 string.

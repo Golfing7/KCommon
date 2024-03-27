@@ -5,7 +5,7 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import java.util.LinkedHashMap;
 
 /**
- * An adapter for POJO <-> {@link ConfigPrimitive} values.
+ * An adapter for POJO to and from {@link ConfigPrimitive} values.
  * <p>
  * Each adapter represents a one-to-many model with POJOs.
  * For example, a {@link ConfigAdapter} may implement an adapter for ALL enum types, using {@link String} as the basis.

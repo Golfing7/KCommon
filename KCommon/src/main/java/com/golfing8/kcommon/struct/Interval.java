@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Represents an interval between X1 and X2.
- * If X1 > X2, the iterator will iterate backwards.
+ * If X1 is greater than X2, the iterator will iterate backwards.
  */
 public class Interval implements Iterable<Double> {
     public static final int STOP = 0;

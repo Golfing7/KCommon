@@ -33,7 +33,7 @@ public class Placeholder {
 
     /**
      * Generates a placeholder from a list with the default convention for naming.
-     * <p />
+     * <br>
      * Uses the <code>valueFormat</code> for formatting values. If null, simply uses the default string from the list.
      *
      * @param label the label, which is surrounded with {} and uppercased.

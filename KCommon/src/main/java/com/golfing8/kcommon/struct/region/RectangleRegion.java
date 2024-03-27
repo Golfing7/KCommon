@@ -8,6 +8,7 @@ import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Represents a region that exists on the X-Z plane and infinitely on the Y plane.
@@ -134,6 +135,14 @@ public class RectangleRegion implements Region {
     public boolean isPositionWithin(Vector vector) {
         return vector.getX() >= this.minX && vector.getX() <= this.maxX &&
                 vector.getZ() >= this.minZ && vector.getZ() <= this.maxZ;
+    }
+
+    @Override
+    public Vector getRandomPosition() {
+        double x = ThreadLocalRandom.current().nextDouble(this.minX, this.maxX + 1e-6);
+        double z = ThreadLocalRandom.current().nextDouble(this.minZ, this.maxZ + 1e-6);
+
+        return new Vector(x, 0, z);
     }
 
     @Override

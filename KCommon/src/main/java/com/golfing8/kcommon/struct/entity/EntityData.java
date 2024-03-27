@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import org.bukkit.entity.*;
 
 /**
- * Represents 'extra' data for an entity. Used specifically for server versions < 1.13
+ * Represents 'extra' data for an entity. Used specifically for server versions less than 1.13
  */
 @Builder
 @EqualsAndHashCode

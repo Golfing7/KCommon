@@ -6,6 +6,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * An abstract region in three-dimensional space.
  */
@@ -93,6 +95,13 @@ public interface Region extends Iterable<BlockVector> {
      * @return true if it's within the region, false if not.
      */
     boolean isPositionWithin(Vector vector);
+
+    /**
+     * Gets a random position within this region.
+     *
+     * @return the random position.
+     */
+    Vector getRandomPosition();
 
     /**
      * Checks if the given location is within this region.

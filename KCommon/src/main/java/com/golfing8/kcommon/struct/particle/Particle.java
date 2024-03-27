@@ -89,7 +89,7 @@ public abstract class Particle {
      * Meshes two colors into one with a certain percentage of the second color.
      * @param first the first color to mesh
      * @param second the second color to mesh
-     * @param percentage the decimal of the second color it will be. MUST BE 0 <= percentage <= 1! When
+     * @param percentage the decimal of the second color it will be. MUST BE {@code 0 <= percentage <= 1}! When
      *                   percentage is 1, the second color is returned, when it's 0, the first is returned.
      * @return the meshed color
      */

@@ -43,7 +43,7 @@ public interface DataManager<T extends DataSerializable> {
 
     /**
      * Gets the object from the data manager, or null if it doesn't exist.
-     * <p />
+     * <br>
      * If the object did exist, it is saved in the cache.
      *
      * @param key the key

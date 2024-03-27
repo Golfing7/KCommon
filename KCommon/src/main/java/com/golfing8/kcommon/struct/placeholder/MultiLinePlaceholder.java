@@ -8,19 +8,19 @@ import java.util.List;
 
 /**
  * Used specifically in cases where multiple lines are replaced.
- * <p/>
+ * <br>
  * An item with text "something %PLACEHOLDER%" in its lore will do the following
- * <p/>
- * - "Some text"<p />
- * - "Something Something" <p />
- * - "something %PLACEHOLDER%" <p />
+ * <br>
+ * - "Some text"<br>
+ * - "Something Something" <br>
+ * - "something %PLACEHOLDER%" <br>
  * and the replacement of lines counting 1-3 would be:
- * <p />
- * - "Some text"<p />
- * - "Something Something" <p />
- * - "1" <p />
- * - "2" <p />
- * - "3" <p />
+ * <br>
+ * - "Some text"<br>
+ * - "Something Something" <br>
+ * - "1" <br>
+ * - "2" <br>
+ * - "3" <br>
  * Note that the line with the placeholder is deleted and replaced with the first line of the placeholder. This is true with messages as well.
  *
  */

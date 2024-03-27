@@ -13,7 +13,7 @@ import java.lang.reflect.Type;
 /**
  * A type adapter for bukkit worlds.
  *
- * Adaptations are simply done in World -> String & String -> World form.
+ * Adaptations are simply done in World to String and String to World form.
  */
 public enum WorldAdapterFactory implements TypeAdapterFactory {
     INSTANCE;

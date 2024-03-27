@@ -17,12 +17,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
  * A rule that controls the modification of the world.
  * <p>
  * This includes ALL modifications, such as:
+ * </p>
  * <ol>
  * <li>Hanging entity placement and manipulation (Paintings, item frames)</li>
  * <li>Tile placement and destruction (Blocks)</li>
- * <li>Interaction of blocks (Opening doors)</li
+ * <li>Interaction of blocks (Opening doors)</li>
  * </ol>
- * </p>
  */
 @Builder
 public class WorldModificationRule extends RegionRule {

@@ -170,11 +170,11 @@ public final class Timestamp implements Cloneable {
      * Parses the given timestamp from the string.
      * <p>
      * Formatting should be match one of the following: (optional)
+     * </p>
      * <ol>
      * <li>hh:mm(:ss)</li>
      * <li>MM-DD-YYYY(-hh:mm(:ss))</li>
      * </ol>
-     * </p>
      *
      * @param timestamp the timestamp.
      * @return the parsed timestamp.

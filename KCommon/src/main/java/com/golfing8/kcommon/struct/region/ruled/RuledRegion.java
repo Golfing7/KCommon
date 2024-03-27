@@ -20,14 +20,13 @@ import java.util.Set;
  * A region that contains certain rules that are enforced.
  * <p>
  * These rules may be something like:
+ * </p>
  * <ol>
  * <li>Players may not break blocks</li>
  * <li>Players may not place blocks</li>
  * <li>A command whitelist/blacklist</li>
  * <li>Whitelisted/blacklisted entry</li>
  * </ol>
- *
- * </p>
  */
 @RequiredArgsConstructor
 public class RuledRegion implements Region {
@@ -122,6 +121,11 @@ public class RuledRegion implements Region {
     @Override
     public boolean isPositionWithin(Vector vector) {
         return backingRegion.isPositionWithin(vector);
+    }
+
+    @Override
+    public Vector getRandomPosition() {
+        return backingRegion.getRandomPosition();
     }
 
     @NotNull
