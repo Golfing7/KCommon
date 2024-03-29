@@ -279,6 +279,7 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAVector());
         registerAdapter(new CAColorBukkit());
         registerAdapter(new CAColorAWT());
+        registerAdapter(new CADrop());
 
         registerAdapter(MenuCoordinate.class, (section) -> {
             if(section.contains("slot")) {

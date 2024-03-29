@@ -41,16 +41,6 @@ tasks {
     }
 
     publishToMavenLocal {
-        if (!file("BuildTools").exists()) {
-            exec {
-                try {
-                    commandLine("./build.sh")
-                } catch (_: Exception) {
-                    println("Skipping installation step.")
-                }
-            }
-        }
-
         dependsOn(build)
     }
 }

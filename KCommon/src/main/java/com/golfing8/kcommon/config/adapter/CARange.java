@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.adapter;
 
+import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 
@@ -16,7 +17,7 @@ public class CARange implements ConfigAdapter<Range> {
         if (entry.getPrimitive() == null)
             return null;
 
-        String[] splitValue = ((String) entry.getPrimitive()).split(":");
+        String[] splitValue = ConfigPrimitive.coerceBoxedToString(entry.unwrap()).split(":");
         double minimum = Double.parseDouble(splitValue[0]);
         // If there's only one number, just interpret it as a single point.
         if (splitValue.length == 1) {
