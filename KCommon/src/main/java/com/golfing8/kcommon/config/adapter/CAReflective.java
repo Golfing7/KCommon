@@ -63,6 +63,10 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
                 continue;
 
             String key = StringUtil.camelToYaml(fieldEntry.getKey());
+            // Don't override default values if the value is not present at all.
+            if (!primitives.containsKey(key))
+                continue;
+
             Object primitiveValue = primitives.get(key);
             if (primitiveValue == null) {
                 handle.set(instance, null);
