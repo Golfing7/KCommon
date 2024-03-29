@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.nms.struct.PotionData;
+import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.inventory.ItemFlag;
@@ -54,6 +55,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             builder.glowing((Boolean) primitiveValue.get("glowing"));
         if (primitiveValue.containsKey("skull-texture"))
             builder.skullB64((String) primitiveValue.get("skull-texture"));
+        if (primitiveValue.containsKey("variable-amount"))
+            builder.variableAmount(ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitiveValue.get("variable-amount")), Range.class));
         if (primitiveValue.containsKey("enchantments")) {
             Map<String, Object> enchantments = (Map<String, Object>) primitiveValue.get("enchantments");
             for (Map.Entry<String, Object> enchant : enchantments.entrySet()) {
@@ -94,6 +97,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("glowing", true);
         if (builder.getSkullB64() != null)
             objects.put("skull-texture", builder.getSkullB64());
+        if (builder.getVariableAmount() != null)
+            objects.put("variable-amount", ConfigTypeRegistry.toPrimitive(builder.getVariableAmount()));
         if (builder.getEnchantments() != null && !builder.getEnchantments().isEmpty()) {
             Map<String, Integer> enchantments = new HashMap<>();
             builder.getEnchantments().forEach((k, v) -> {

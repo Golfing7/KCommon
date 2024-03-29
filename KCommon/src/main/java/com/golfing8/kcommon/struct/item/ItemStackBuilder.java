@@ -4,8 +4,11 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.deanveloper.skullcreator.SkullCreator;
 import com.golfing8.kcommon.NMS;
+import com.golfing8.kcommon.config.ConfigEntry;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
 import com.golfing8.kcommon.nms.struct.PotionData;
+import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
@@ -40,6 +43,13 @@ public final class ItemStackBuilder {
      * The amount of items in the stack.
      */
     private int amount = 1;
+    /**
+     * An amount for the item, will override {@link #amount} if set.
+     */
+    private Range variableAmount;
+    private int newAmount() {
+        return variableAmount == null ? amount : variableAmount.getRandomI();
+    }
     /**
      * Item durability, should only be used in cases of older versions.
      */
@@ -118,6 +128,7 @@ public final class ItemStackBuilder {
     public ItemStackBuilder(ItemStackBuilder toCopy) {
         this.itemType = toCopy.itemType;
         this.amount = toCopy.amount;
+        this.variableAmount = toCopy.variableAmount;
         this.itemDurability = toCopy.itemDurability;
         this.unbreakable = toCopy.unbreakable;
         this.itemName = toCopy.itemName;
@@ -154,6 +165,9 @@ public final class ItemStackBuilder {
         this.itemName = section.getString("name", null);
         this.itemLore = section.contains("lore") ? section.getStringList("lore") : null;
         this.amount = Math.max(section.getInt("amount", 1), 1);
+        if (section.contains("variable-amount")) {
+            this.variableAmount = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "variable-amount"), Range.class);
+        }
 
         //Load the enchantments.
         if(section.contains("enchantments")) {
@@ -200,6 +214,11 @@ public final class ItemStackBuilder {
 
     public ItemStackBuilder amount(int amount) {
         this.amount = amount;
+        return this;
+    }
+
+    public ItemStackBuilder variableAmount(Range range) {
+        this.variableAmount = range;
         return this;
     }
 
@@ -313,7 +332,7 @@ public final class ItemStackBuilder {
             if (itemDurability > 0) {
                 newCopy.setDurability(itemDurability);
             }
-            newCopy.setAmount(amount);
+            newCopy.setAmount(newAmount());
         }
 
         ItemMeta meta = newCopy.getItemMeta();
