@@ -9,6 +9,7 @@ import com.golfing8.kcommon.struct.drop.DropTable;
 import com.golfing8.kcommon.struct.drop.ItemDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.golfing8.kcommon.util.MapUtil;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
@@ -36,10 +37,15 @@ public class CADrop implements ConfigAdapter<Drop> {
         double chance = primitive.containsKey("chance") ?
                 (double) ConfigPrimitive.coerceStringToBoxed(primitive.get("chance").toString(), Double.class) :
                 1.0D;
-        if (primitive.containsKey("items")) {
-            FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
-            Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
-            return new ItemDrop(chance, group, items);
+        if (primitive.containsKey("items") || primitive.containsKey("item")) {
+            if (primitive.containsKey("item")) {
+                ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
+                return new ItemDrop(chance, group, MapUtil.of("item", deserialized));
+            } else {
+                FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
+                Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
+                return new ItemDrop(chance, group, items);
+            }
         } else if (primitive.containsKey("commands")) {
             FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {});
             List<String> commands = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("commands")), fieldType);
@@ -60,7 +66,12 @@ public class CADrop implements ConfigAdapter<Drop> {
         }
 
         if (object instanceof ItemDrop) {
-            serialized.put("items", ConfigTypeRegistry.toPrimitive(((ItemDrop) object).getItems()));
+            ItemDrop itemDrop = (ItemDrop) object;
+            if (itemDrop.getItems().size() == 1) {
+                serialized.put("item", ConfigTypeRegistry.toPrimitive(itemDrop.getItems().values().stream().findFirst().get()));
+            } else {
+                serialized.put("items", ConfigTypeRegistry.toPrimitive(((ItemDrop) object).getItems()));
+            }
             return ConfigPrimitive.ofMap(serialized);
         } else if (object instanceof CommandDrop) {
             serialized.put("commands", ConfigTypeRegistry.toPrimitive(((CommandDrop) object).getDrop()));
