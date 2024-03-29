@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * Drops can range from items, messages, and commands.
  * </p>
  */
+@CASerializable.Options(flatten = true)
 public class DropTable implements CASerializable {
     /**
      * Maps the key of the drop to its instance.
@@ -23,6 +24,13 @@ public class DropTable implements CASerializable {
      * Maps drops from their group name.
      */
     private transient Map<String, List<Drop<?>>> dropGroups = new HashMap<>();
+
+    @Override
+    public void onDeserialize() {
+        for (var entry : dropTable.entrySet()) {
+            dropGroups.computeIfAbsent(entry.getValue().getDropGroup(), (k) -> new ArrayList<>()).add(entry.getValue());
+        }
+    }
 
     /**
      * Generates a random set of drops.

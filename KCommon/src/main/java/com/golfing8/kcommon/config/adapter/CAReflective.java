@@ -7,11 +7,12 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
 import lombok.var;
-import org.bukkit.Bukkit;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +54,12 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             KCommon.getInstance().getLogger().severe(String.format("Failed to deserialize type %s!", type.getType().getName()));
             throw new RuntimeException(e);
         }
+
+        // Check if we should try flattening the data.
+        CASerializable.Options options = type.getType().getAnnotation(CASerializable.Options.class);
+        boolean flatten = options != null && options.flatten();
+
+        Map<String, FieldHandle<?>> serializableFields = new HashMap<>();
         for (var fieldEntry : fieldHandles.entrySet()) {
             var handle = fieldEntry.getValue();
             if (!handle.shouldSerialize())
@@ -62,8 +69,20 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             if (handle.getField().getName().equals(KEY_FIELD_NAME))
                 continue;
 
-            String key = StringUtil.camelToYaml(fieldEntry.getKey());
+            serializableFields.put(fieldEntry.getKey(), fieldEntry.getValue());
+        }
+
+        for (var fieldEntry : serializableFields.entrySet()) {
+            var handle = fieldEntry.getValue();
+            if (flatten && serializableFields.size() == 1) {
+                var fieldType = new FieldType(handle.getField());
+                Object deserialized = ConfigTypeRegistry.getFromType(entry, fieldType);
+                handle.set(instance, deserialized);
+                continue;
+            }
+
             // Don't override default values if the value is not present at all.
+            String key = StringUtil.camelToYaml(fieldEntry.getKey());
             if (!primitives.containsKey(key))
                 continue;
 
@@ -81,6 +100,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
         if (fieldHandles.containsKey(KEY_FIELD_NAME) && entry.getSource() != null && entry.getSource().getName() != null) {
             fieldHandles.get(KEY_FIELD_NAME).set(instance, entry.getSource().getName());
         }
+        instance.onDeserialize();
         return instance;
     }
 
@@ -89,6 +109,8 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
         if (object == null)
             return ConfigPrimitive.ofNull();
 
+        CASerializable.Options options = object.getClass().getAnnotation(CASerializable.Options.class);
+        boolean flatten = options != null && options.flatten();
         var fieldHandles = typeFieldCache.containsKey(object.getClass()) ?
                 typeFieldCache.get(object.getClass()) :
                 Reflection.getAllFieldHandles(object.getClass());
@@ -107,6 +129,15 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
             ConfigPrimitive primitiveValue = ConfigTypeRegistry.toPrimitive(handle.get(object));
             primitives.put(StringUtil.camelToYaml(fieldEntry.getKey()), primitiveValue.unwrap());
+        }
+        object.onSerialize();
+
+        // Try to do flattening if possible
+        if (flatten && primitives.size() <= 1) {
+            if (primitives.isEmpty())
+                return ConfigPrimitive.ofMap(Collections.emptyMap());
+
+            return ConfigPrimitive.of(primitives.values().stream().findFirst().get());
         }
         return ConfigPrimitive.ofMap(primitives);
     }

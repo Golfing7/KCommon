@@ -38,13 +38,14 @@ public class CADrop implements ConfigAdapter<Drop> {
                 (double) ConfigPrimitive.coerceStringToBoxed(primitive.get("chance").toString(), Double.class) :
                 1.0D;
         if (primitive.containsKey("items") || primitive.containsKey("item")) {
+            boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
-                return new ItemDrop(chance, group, MapUtil.of("item", deserialized));
+                return new ItemDrop(chance, group, MapUtil.of("item", deserialized), giveDirectly);
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
-                return new ItemDrop(chance, group, items);
+                return new ItemDrop(chance, group, items, giveDirectly);
             }
         } else if (primitive.containsKey("commands")) {
             FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {});

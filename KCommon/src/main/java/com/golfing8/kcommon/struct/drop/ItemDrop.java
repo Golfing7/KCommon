@@ -20,9 +20,11 @@ import java.util.stream.Collectors;
 @Getter
 public class ItemDrop extends Drop<ItemStack> {
     private Map<String, ItemStackBuilder> items;
-    public ItemDrop(double chance, String dropGroup, Map<String, ItemStackBuilder> items) {
+    private boolean giveDirectly;
+    public ItemDrop(double chance, String dropGroup, Map<String, ItemStackBuilder> items, boolean giveDirectly) {
         super(chance, dropGroup);
         this.items = items;
+        this.giveDirectly = giveDirectly;
     }
 
     @Override
@@ -46,6 +48,6 @@ public class ItemDrop extends Drop<ItemStack> {
 
     @Override
     public boolean isPhysical() {
-        return true;
+        return !giveDirectly;
     }
 }
