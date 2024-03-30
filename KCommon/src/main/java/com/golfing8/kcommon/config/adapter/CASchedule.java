@@ -4,6 +4,7 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.time.Schedule;
 import com.golfing8.kcommon.struct.time.TimeLength;
 import com.golfing8.kcommon.struct.time.Timestamp;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class CASchedule implements ConfigAdapter<Schedule> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Schedule object) {
+    public ConfigPrimitive toPrimitive(@NotNull Schedule object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

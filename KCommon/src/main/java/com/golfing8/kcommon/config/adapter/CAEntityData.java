@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.entity.EntityData;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 public class CAEntityData implements ConfigAdapter<EntityData> {
     @Override
@@ -19,7 +20,7 @@ public class CAEntityData implements ConfigAdapter<EntityData> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(EntityData object) {
+    public ConfigPrimitive toPrimitive(@NotNull EntityData object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

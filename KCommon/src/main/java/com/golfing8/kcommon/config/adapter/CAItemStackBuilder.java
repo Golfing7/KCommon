@@ -8,6 +8,7 @@ import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.inventory.ItemFlag;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,7 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(ItemStackBuilder builder) {
+    public ConfigPrimitive toPrimitive(@NotNull ItemStackBuilder builder) {
         if (builder == null)
             return ConfigPrimitive.ofNull();
 

@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.MapUtil;
 import org.bukkit.util.BlockVector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class CABlockVector implements ConfigAdapter<BlockVector> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(BlockVector object) {
+    public ConfigPrimitive toPrimitive(@NotNull BlockVector object) {
         return ConfigPrimitive.ofMap(MapUtil.of("x", object.getX(),
                 "y", object.getY(),
                 "z", object.getZ()));

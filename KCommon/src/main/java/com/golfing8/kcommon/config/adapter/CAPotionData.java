@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class CAPotionData implements ConfigAdapter<PotionData> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(PotionData object) {
+    public ConfigPrimitive toPrimitive(@NotNull PotionData object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

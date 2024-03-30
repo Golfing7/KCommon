@@ -4,6 +4,7 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.map.RangeMap;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -64,7 +65,7 @@ public class CAMap implements ConfigAdapter<Map> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Map object) {
+    public ConfigPrimitive toPrimitive(@NotNull Map object) {
         Map<String, Object> primitive = new HashMap<>();
         for (Object oentry : object.entrySet()) {
             Map.Entry entry = (Map.Entry) oentry;

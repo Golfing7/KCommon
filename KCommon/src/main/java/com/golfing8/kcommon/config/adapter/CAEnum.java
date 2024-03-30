@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A config adapter implementation for enums.
@@ -27,7 +28,7 @@ public class CAEnum implements ConfigAdapter<Enum> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Enum object) {
+    public ConfigPrimitive toPrimitive(@NotNull Enum object) {
         return ConfigPrimitive.ofString(object.name());
     }
 }

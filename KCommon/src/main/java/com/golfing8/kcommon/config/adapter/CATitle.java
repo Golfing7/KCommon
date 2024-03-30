@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.title.Title;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class CATitle implements ConfigAdapter<Title> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Title title) {
+    public ConfigPrimitive toPrimitive(@NotNull Title title) {
         Map<String, Object> items = new HashMap<>();
         items.put("title", title.getTitle());
         items.put("subtitle", title.getSubtitle());

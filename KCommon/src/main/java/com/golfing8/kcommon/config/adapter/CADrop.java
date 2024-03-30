@@ -13,6 +13,7 @@ import com.golfing8.kcommon.util.MapUtil;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public class CADrop implements ConfigAdapter<Drop> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Drop object) {
+    public ConfigPrimitive toPrimitive(@NotNull Drop object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

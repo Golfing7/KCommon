@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -35,7 +36,7 @@ public class CASet implements ConfigAdapter<Set> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Set object) {
+    public ConfigPrimitive toPrimitive(@NotNull Set object) {
         List<Object> primitives = new ArrayList<>();
         for (Object value : object) {
             Class<?> objectType = value.getClass();

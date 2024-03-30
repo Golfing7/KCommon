@@ -1,6 +1,8 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 
@@ -29,7 +31,7 @@ public interface ConfigAdapter<T> {
      * @param type the actual type of POJO we desire.
      * @return the POJO.
      */
-    T toPOJO(ConfigPrimitive entry, FieldType type);
+    @Nullable T toPOJO(ConfigPrimitive entry, FieldType type);
 
     /**
      * Converts the POJO to a config primitive.
@@ -37,5 +39,5 @@ public interface ConfigAdapter<T> {
      * @param object the POJO.
      * @return the primitive.
      */
-    ConfigPrimitive toPrimitive(T object);
+    ConfigPrimitive toPrimitive(@NotNull T object);
 }

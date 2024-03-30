@@ -3,6 +3,8 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,12 +23,27 @@ public class CALocation implements ConfigAdapter<Location> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Location toPOJO(ConfigPrimitive entry, FieldType type) {
         if (entry.getPrimitive() == null)
             return null;
 
-        Map<String, Object> map = (Map<String, Object>) entry.getPrimitive();
+        // Check serialization type
+        if (entry.getPrimitive() instanceof String) {
+            String[] split = entry.getPrimitive().toString().split(":");
+            double x = Double.parseDouble(split[0]);
+            double y = Double.parseDouble(split[1]);
+            double z = Double.parseDouble(split[2]);
+            World world = Bukkit.getWorld(split[3]);
+            float yaw = 0.0F;
+            float pitch = 0.0F;
+            if (split.length == 6) {
+                yaw = Float.parseFloat(split[4]);
+                pitch = Float.parseFloat(split[5]);
+            }
+            return new Location(world, x, y, z, yaw, pitch);
+        }
+
+        Map<String, Object> map = entry.unwrap();
         String sWorld = (String) map.get("world");
         double x = (double) map.getOrDefault("x", DEF_COORD);
         double y = (double) map.getOrDefault("y", DEF_COORD);
@@ -37,16 +54,16 @@ public class CALocation implements ConfigAdapter<Location> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Location object) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("world", object.getWorld().getName());
-        data.put("x", object.getX());
-        data.put("y", object.getY());
-        data.put("z", object.getZ());
-        if (object.getYaw() != DEF_YAW)
-            data.put("yaw", object.getYaw());
-        if (object.getPitch() != DEF_PITCH)
-            data.put("pitch", object.getPitch());
-        return ConfigPrimitive.ofMap(data);
+    public ConfigPrimitive toPrimitive(@NotNull Location object) {
+        StringBuilder locationSerialization = new StringBuilder();
+        locationSerialization.append(object.getX()).append(":");
+        locationSerialization.append(object.getY()).append(":");
+        locationSerialization.append(object.getZ()).append(":");
+        locationSerialization.append(object.getWorld().getName());
+        if (object.getYaw() != DEF_YAW || object.getPitch() != DEF_PITCH) {
+            locationSerialization.append(":").append(object.getYaw());
+            locationSerialization.append(":").append(object.getPitch());
+        }
+        return ConfigPrimitive.ofString(locationSerialization.toString());
     }
 }

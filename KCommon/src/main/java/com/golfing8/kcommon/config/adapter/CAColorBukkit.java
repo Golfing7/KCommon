@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.Color;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Adapts bukkit colors.
@@ -30,7 +31,7 @@ public class CAColorBukkit implements ConfigAdapter<Color> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Color object) {
+    public ConfigPrimitive toPrimitive(@NotNull Color object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

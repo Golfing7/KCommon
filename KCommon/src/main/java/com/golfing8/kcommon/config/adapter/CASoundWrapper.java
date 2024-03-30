@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XSound;
 import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class CASoundWrapper implements ConfigAdapter<SoundWrapper> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(SoundWrapper wrapper) {
+    public ConfigPrimitive toPrimitive(@NotNull SoundWrapper wrapper) {
         Map<String, Object> items = new HashMap<>();
         items.put("sound", wrapper.getSound().name());
         items.put("pitch", wrapper.getPitch());

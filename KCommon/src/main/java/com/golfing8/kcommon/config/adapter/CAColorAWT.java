@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
@@ -31,7 +32,7 @@ public class CAColorAWT implements ConfigAdapter<Color> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Color object) {
+    public ConfigPrimitive toPrimitive(@NotNull Color object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -32,7 +33,7 @@ public class CAZonedDateTime implements ConfigAdapter<ZonedDateTime> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(ZonedDateTime object) {
+    public ConfigPrimitive toPrimitive(@NotNull ZonedDateTime object) {
         Map<String, Object> primitive = new LinkedHashMap<>();
         primitive.put("zone-id", object.getZone().getId());
         primitive.put("year", object.getYear());

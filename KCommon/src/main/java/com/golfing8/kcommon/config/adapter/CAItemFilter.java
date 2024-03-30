@@ -6,6 +6,7 @@ import com.golfing8.kcommon.struct.filter.ItemFilter;
 import com.golfing8.kcommon.struct.filter.StringFilter;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.gson.reflect.TypeToken;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class CAItemFilter implements ConfigAdapter<ItemFilter> {
 
     @Override
     @SuppressWarnings({"rawtypes", "unchekced"})
-    public ConfigPrimitive toPrimitive(ItemFilter object) {
+    public ConfigPrimitive toPrimitive(@NotNull ItemFilter object) {
         Map<String, Object> items = new HashMap<>();
         ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(Set.class);
         if (object.getMaterialFilters() != null && !object.getMaterialFilters().isEmpty()) {

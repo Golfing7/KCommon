@@ -5,6 +5,7 @@ import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.title.Title;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ public class CAMessage implements ConfigAdapter<Message> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public ConfigPrimitive toPrimitive(Message object) {
+    public ConfigPrimitive toPrimitive(@NotNull Message object) {
         if (object.isSimple()) {
             return object.getMessages().size() == 1 ?
                     ConfigPrimitive.ofString(object.getMessages().get(0)) :
