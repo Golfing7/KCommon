@@ -7,13 +7,17 @@ import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
+import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
+import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,6 +27,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -31,6 +36,11 @@ import java.util.*;
  */
 @Getter
 public final class ItemStackBuilder {
+    public static final String ITEMSTACK_ID = "kcommon_id";
+    /**
+     * A string ID to use in reference to this item.
+     */
+    private @Nullable String itemID;
     /**
      * The type of the item stack.
      */
@@ -126,6 +136,7 @@ public final class ItemStackBuilder {
     }
 
     public ItemStackBuilder(ItemStackBuilder toCopy) {
+        this.itemID = toCopy.itemID;
         this.itemType = toCopy.itemType;
         this.amount = toCopy.amount;
         this.variableAmount = toCopy.variableAmount;
@@ -157,6 +168,7 @@ public final class ItemStackBuilder {
         this.itemType = optionalType.get();
         this.placeholders = new ArrayList<>();
         this.multiLinePlaceholders = new ArrayList<>();
+        this.itemID = section.getString("item-id");
         this.glowing = section.getBoolean("glowing");
         this.skullB64 = section.getString("skull-texture");
         this.itemDurability = section.contains("durability") ? (short) section.getInt("durability") : this.itemType.getData();
@@ -165,6 +177,9 @@ public final class ItemStackBuilder {
         this.itemName = section.getString("name", null);
         this.itemLore = section.contains("lore") ? section.getStringList("lore") : null;
         this.amount = Math.max(section.getInt("amount", 1), 1);
+        if (section.contains("nbt-data")) {
+            this.extraData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "nbt-data"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {}));
+        }
         if (section.contains("variable-amount")) {
             this.variableAmount = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "variable-amount"), Range.class);
         }
@@ -204,6 +219,11 @@ public final class ItemStackBuilder {
 
     public ItemStackBuilder skullB64(String b64) {
         this.skullB64 = b64;
+        return this;
+    }
+
+    public ItemStackBuilder itemID(String id) {
+        this.itemID = id;
         return this;
     }
 
@@ -383,6 +403,9 @@ public final class ItemStackBuilder {
 
         //Add the nbt item and extra data.
         NBTItem nbtItem = new NBTItem(newCopy);
+        if (this.itemID != null) {
+            nbtItem.setString(ITEMSTACK_ID, this.itemID);
+        }
         for(Map.Entry<String, Object> entry : this.extraData.entrySet()) {
             setValueInNBT(nbtItem, entry.getKey(), entry.getValue());
         }
@@ -425,5 +448,22 @@ public final class ItemStackBuilder {
             buildFromTemplate();
 
         return new ItemStack(cachedBuild);
+    }
+
+    /**
+     * Reads the item id from the given item stack.
+     *
+     * @param stack the item stack.
+     * @return the item ID, or null if there is no ID present.
+     */
+    public static @Nullable String readItemID(ItemStack stack) {
+        if (stack == null || !stack.hasItemMeta())
+            return null;
+
+        NBTItem nbtItem = new NBTItem(stack);
+        if (!nbtItem.hasTag(ITEMSTACK_ID))
+            return null;
+
+        return nbtItem.getString(ITEMSTACK_ID);
     }
 }
