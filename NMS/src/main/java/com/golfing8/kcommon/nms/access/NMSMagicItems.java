@@ -18,6 +18,13 @@ public interface NMSMagicItems {
     void setUnbreakable(ItemMeta meta, boolean value);
 
     /**
+     * Gets the displayed name of the given item.
+     *
+     * @return the displayed name.
+     */
+    String getDisplayName(ItemStack itemStack);
+
+    /**
      * Sets the base potion effect of the given potion.
      *
      * @param meta the meta.

@@ -2,6 +2,9 @@ package com.golfing8.kcommon.nms.unknown.access;
 
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
@@ -35,6 +38,19 @@ public class MagicItems implements NMSMagicItems {
         Damageable damageable = (Damageable) stack.getItemMeta();
 
         return stack.getType().getMaxDurability() - damageable.getDamage();
+    }
+
+    @Override
+    public String getDisplayName(ItemStack itemStack) {
+        if (itemStack == null)
+            return null;
+
+        Component display = itemStack.displayName();
+        if (display instanceof TranslatableComponent translatable && translatable.args().size() == 1) {
+            return LegacyComponentSerializer.legacyAmpersand().serialize(translatable.args().get(0));
+        } else {
+            return LegacyComponentSerializer.legacyAmpersand().serialize(display);
+        }
     }
 
     @Override
