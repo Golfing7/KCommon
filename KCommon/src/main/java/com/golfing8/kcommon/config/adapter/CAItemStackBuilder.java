@@ -8,6 +8,7 @@ import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.inventory.ItemFlag;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             builder.skullB64((String) primitiveValue.get("skull-texture"));
         if (primitiveValue.containsKey("variable-amount"))
             builder.variableAmount(ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitiveValue.get("variable-amount")), Range.class));
+        if (primitiveValue.containsKey("item-id"))
+            builder.itemID(primitiveValue.get("item-id").toString());
         if (primitiveValue.containsKey("enchantments")) {
             Map<String, Object> enchantments = (Map<String, Object>) primitiveValue.get("enchantments");
             for (Map.Entry<String, Object> enchant : enchantments.entrySet()) {
@@ -74,7 +77,7 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(ItemStackBuilder builder) {
+    public ConfigPrimitive toPrimitive(@NotNull ItemStackBuilder builder) {
         if (builder == null)
             return ConfigPrimitive.ofNull();
 
@@ -99,6 +102,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("skull-texture", builder.getSkullB64());
         if (builder.getVariableAmount() != null)
             objects.put("variable-amount", ConfigTypeRegistry.toPrimitive(builder.getVariableAmount()));
+        if (builder.getItemID() != null)
+            objects.put("item-id", builder.getItemID());
         if (builder.getEnchantments() != null && !builder.getEnchantments().isEmpty()) {
             Map<String, Integer> enchantments = new HashMap<>();
             builder.getEnchantments().forEach((k, v) -> {

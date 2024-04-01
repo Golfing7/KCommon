@@ -6,6 +6,7 @@ import com.golfing8.kcommon.struct.region.CuboidRegion;
 import com.golfing8.kcommon.struct.region.RectangleRegion;
 import com.golfing8.kcommon.struct.region.Region;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,7 +51,7 @@ public class CARegion implements ConfigAdapter<Region> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Region region) {
+    public ConfigPrimitive toPrimitive(@NotNull Region region) {
         Map<String, Object> section = new LinkedHashMap<>();
         if (region instanceof CuboidRegion) {
             section.put("min-x", region.getMinimumXValue());

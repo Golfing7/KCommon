@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.blocks.WeightedCollection;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class CAWeightedCollection implements ConfigAdapter<WeightedCollection> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(WeightedCollection object) {
+    public ConfigPrimitive toPrimitive(@NotNull WeightedCollection object) {
         Map primitiveMap = new HashMap();
         object.getChanceMap().forEach((k, v) -> {
             Class<?> keyType = k.getClass();

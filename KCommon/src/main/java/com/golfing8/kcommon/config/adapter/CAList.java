@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class CAList implements ConfigAdapter<List> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(List object) {
+    public ConfigPrimitive toPrimitive(@NotNull List object) {
         List<Object> primitives = new ArrayList<>();
         for (Object value : object) {
             Class<?> objectType = value.getClass();

@@ -7,6 +7,7 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
 import lombok.var;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -105,7 +106,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(CASerializable object) {
+    public ConfigPrimitive toPrimitive(@NotNull CASerializable object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

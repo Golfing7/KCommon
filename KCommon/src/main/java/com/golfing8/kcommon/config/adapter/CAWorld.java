@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A config adapter for bukkit worlds.
@@ -22,7 +23,7 @@ public class CAWorld implements ConfigAdapter<World> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(World object) {
+    public ConfigPrimitive toPrimitive(@NotNull World object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

@@ -43,6 +43,19 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     }
 
     @Override
+    public String getDisplayName(ItemStack itemStack) {
+        if (itemStack == null)
+            return null;
+
+        if (itemStack.hasItemMeta()) {
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta.hasDisplayName())
+                return meta.getDisplayName();
+        }
+        return new ItemStackV1_8(CraftItemStack.asNMSCopy(itemStack)).getI18DisplayName();
+    }
+
+    @Override
     public int getRemainingItemDurability(ItemStack stack) {
         return stack.getType().getMaxDurability() > 0 ? stack.getType().getMaxDurability() - stack.getDurability() : -1;
     }

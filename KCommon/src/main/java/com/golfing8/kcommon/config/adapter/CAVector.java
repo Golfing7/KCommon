@@ -4,6 +4,7 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class CAVector implements ConfigAdapter<Vector> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Vector object) {
+    public ConfigPrimitive toPrimitive(@NotNull Vector object) {
         return ConfigPrimitive.ofString(object.getX() + ":" + object.getY() + ":" + object.getZ());
     }
 }

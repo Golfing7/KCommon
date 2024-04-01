@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 public class CARange implements ConfigAdapter<Range> {
     private static final double EPSILON = 1e-7;
@@ -28,7 +29,7 @@ public class CARange implements ConfigAdapter<Range> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(Range object) {
+    public ConfigPrimitive toPrimitive(@NotNull Range object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 

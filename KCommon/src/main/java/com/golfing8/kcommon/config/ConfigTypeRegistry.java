@@ -237,16 +237,8 @@ public class ConfigTypeRegistry {
      * @param path the path of the value.
      * @param value the value.
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public static void setInConfig(ConfigurationSection section, String path, Object value) {
-        ConfigAdapter adapter = findAdapter(value.getClass());
-        if (adapter == null) {
-            // Use default set.
-            section.set(path, value);
-            return;
-        }
-
-        section.set(path, adapter.toPrimitive(value).unwrap());
+        section.set(path, toPrimitive(value).unwrap());
     }
 
     // Register some common types.

@@ -62,7 +62,7 @@ public final class MenuBuilder {
     /**
      * The other GUI items to apply in this menu.
      */
-    private List<SimpleGUIItem> otherGUIItems = new ArrayList<>();
+    private Map<String, SimpleGUIItem> otherGUIItems = new HashMap<>();
     /** The type of menu being built */
     @Getter
     private MenuShapeType menuShapeType;
@@ -114,13 +114,21 @@ public final class MenuBuilder {
             ConfigurationSection otherSection = section.getConfigurationSection("other-slots");
             for(String otherKey : otherSection.getKeys(false)) {
                 SimpleGUIItem guiItem = new SimpleGUIItem(otherSection.getConfigurationSection(otherKey));
-                this.otherGUIItems.add(guiItem);
+                this.otherGUIItems.put(otherKey, guiItem);
             }
         }
     }
 
     public static MenuBuilder builder() {
         return new MenuBuilder();
+    }
+
+    public void setOtherItem(String key, SimpleGUIItem item) {
+        this.otherGUIItems.put(key, item);
+    }
+
+    public SimpleGUIItem getOtherItem(String key) {
+        return this.otherGUIItems.get(key);
     }
 
     /**
@@ -307,7 +315,7 @@ public final class MenuBuilder {
         menuSimple.onPostClose(this.postCloseRunnable);
         menuSimple.setBottomClickAction(bottomClickEvent);
 
-        otherGUIItems.forEach(item -> {
+        otherGUIItems.forEach((key, item) -> {
             menuSimple.setItemAt(item.getSlot().getX(), item.getSlot().getY(), item.getItem().buildFromTemplate());
         });
 
@@ -369,7 +377,7 @@ public final class MenuBuilder {
         menuDynamic.setTopClickAction(topClickEvent);
         menuDynamic.setBottomClickAction(bottomClickEvent);
 
-        otherGUIItems.forEach(item -> {
+        otherGUIItems.forEach((key, item) -> {
             menuDynamic.setItemAt(item.getSlot().getX(), item.getSlot().getY(), item.getItem().buildFromTemplate());
         });
 

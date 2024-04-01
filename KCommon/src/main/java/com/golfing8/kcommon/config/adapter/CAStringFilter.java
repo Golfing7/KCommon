@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.filter.StringFilter;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class CAStringFilter implements ConfigAdapter<StringFilter> {
     }
 
     @Override
-    public ConfigPrimitive toPrimitive(StringFilter object) {
+    public ConfigPrimitive toPrimitive(@NotNull StringFilter object) {
         if (object == null)
             return ConfigPrimitive.ofNull();
 
