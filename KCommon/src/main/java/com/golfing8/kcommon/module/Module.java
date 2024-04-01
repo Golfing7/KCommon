@@ -18,19 +18,21 @@ import com.golfing8.kcommon.util.MS;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Represents an abstract module with functionality on the server. These modules are the basis of functionality
@@ -305,40 +307,52 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         String configName = this.getModuleName() + ".yml";
         Path configPath = Paths.get(plugin.getDataFolder().getPath(), configName);
 
-        if(Files.notExists(configPath)) {
-            //Create the parent directory.
-            try{
-                Files.createDirectories(configPath.getParent());
-            }catch(IOException exc) {
-                throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
-            }
+        YamlConfiguration source = new YamlConfiguration();
 
-            try(InputStream resource =
-                        this.plugin.getClass().getResourceAsStream("/" + configName);
-                FileOutputStream writer = new FileOutputStream(configPath.toFile())) {
+        //Create the parent directory.
+        try{
+            Files.createDirectories(configPath.getParent());
+        }catch(IOException exc) {
+            throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
+        }
 
-                //Check that the resource exists
-                if(resource == null) {
-                    if (Files.notExists(configPath))
-                        Files.createFile(configPath);
-                } else {
-                    //Read from the input stream and write the output stream
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = resource.read(buffer)) != -1) {
-                        writer.write(buffer, 0, len);
-                    }
+        try(InputStream resource = this.plugin.getClass().getResourceAsStream("/" + configName);
+            FileOutputStream writer = new FileOutputStream(configPath.toFile())) {
+            ByteArrayOutputStream streamCloner = new ByteArrayOutputStream();
+
+            //Check that the resource exists
+            if(resource == null) {
+                if (Files.notExists(configPath))
+                    Files.createFile(configPath);
+            } else {
+                // Read content
+                //Read from the input stream and write the output stream
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = resource.read(buffer)) != -1) {
+                    streamCloner.write(buffer, 0, len);
+                }
+
+                if (Files.notExists(configPath)) {
+                    writer.write(streamCloner.toByteArray());
                     writer.flush();
                 }
-            }catch(IOException exc) {
-                throw new RuntimeException(String.format("Failed to load config for module %s. Is it missing? (Checked under plugin %s)",
-                        getModuleName(),
-                        getPlugin().getName()), exc);
+
+                try {
+                    source.load(new InputStreamReader(new ByteArrayInputStream(streamCloner.toByteArray())));
+                } catch (InvalidConfigurationException exc) {
+                    getPlugin().getLogger().log(Level.WARNING, String.format("Failed to load source config for module %s.", getModuleName()), exc);
+                }
             }
+        }catch(IOException exc) {
+            throw new RuntimeException(String.format("Failed to load config for module %s. Is it missing? (Checked under plugin %s)",
+                    getModuleName(),
+                    getPlugin().getName()), exc);
         }
 
         //Load the configuration and set it.
         this.mainConfig = new MConfiguration(configPath, this);
+        this.mainConfig.setSource(source);
         this.mainConfig.load();
 
         //First, load the language config.

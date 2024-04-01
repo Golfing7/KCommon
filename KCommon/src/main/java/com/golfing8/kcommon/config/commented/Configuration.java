@@ -5,6 +5,7 @@ import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.OfflinePlayer;
@@ -39,6 +40,10 @@ public class Configuration extends YamlConfiguration implements Config {
     @Getter
     private final Map<String, String[]> comments;
 
+    /** The source configuration that this configuration should mirror */
+    @Getter @Setter
+    private YamlConfiguration source;
+
     public Configuration(Path configPath) {
         this.configPath = configPath;
         this.comments = new HashMap<>();
@@ -60,6 +65,15 @@ public class Configuration extends YamlConfiguration implements Config {
             KCommon.getInstance().getLogger().warning(String.format("Failed to load config file at location %s!", this.configPath));
             throw new RuntimeException(exc);
         }
+    }
+
+    @Override
+    public void ensureExists(String path) {
+        if (this.source == null || this.contains(path) || !this.source.contains(path))
+            return;
+
+        this.set(path, this.source.get(path));
+        this.save();
     }
 
     /**

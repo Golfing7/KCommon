@@ -174,10 +174,6 @@ public class LibraryLoader {
         return getUrl(groupId, artifactId, version, version, repoUrl);
     }
 
-    private static URL getSnapshotDependencyUrl(String groupId, String artifactId, String version, String snapshotVersion, String repoUrl) throws MalformedURLException {
-        return getUrl(groupId, artifactId, version, snapshotVersion, repoUrl);
-    }
-
     @NotNull
     private static URL getUrl(String groupId, String artifactId, String version, String snapshotVersion, String repoUrl) throws MalformedURLException {
         String url = repoUrl.endsWith("/") ? repoUrl : repoUrl + "/";
