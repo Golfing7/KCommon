@@ -92,7 +92,6 @@ dependencies {
 
     implementation(project(":KCommon"))
     implementation(project(":NMS"))
-    implementation(project(":v1_19"))
     implementation(project(":v1_17"))
     implementation(project(":v1_8"))
     implementation(project(":vUnknown"))

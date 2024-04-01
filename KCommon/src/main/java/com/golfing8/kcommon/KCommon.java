@@ -2,7 +2,10 @@ package com.golfing8.kcommon;
 
 import com.golfing8.kcommon.command.impl.KModuleCommand;
 import com.golfing8.kcommon.db.MongoConnector;
+import com.golfing8.kcommon.library.LibraryDefinition;
+import com.golfing8.kcommon.library.LibraryLoader;
 import com.golfing8.kcommon.util.NMSVersion;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -37,9 +40,26 @@ public class KCommon extends KPlugin{
     /** The mongo database connector, can be null if not enabled */
     @Getter
     private @Nullable MongoConnector connector;
+
+    /** Dynamic library loader */
+    protected LibraryLoader libraryLoader;
     @Override
     public void onEnableInner() {
         instance = this;
+        libraryLoader = new LibraryLoader(this, getDataFolder().toPath().resolve("libraries"));
+
+        libraryLoader.addRelocation("de,tr7zw,changeme,nbtapi", "de,tr7zw,kcommon,nbtapi");
+        libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
+
+        libraryLoader.loadAllLibraries(Lists.newArrayList(
+                new LibraryDefinition("de,tr7zw", "item-nbt-api", "2.12.3", "https://repo.codemc.org/repository/maven-public"),
+                new LibraryDefinition("net,objecthunter", "exp4j", "0.4.8"),
+                new LibraryDefinition("com,github,cryptomorin", "XSeries", "9.8.1"),
+                // For Mongo
+                new LibraryDefinition("org,mongodb", "mongodb-driver-core", "4.11.1"),
+                new LibraryDefinition("org,mongodb", "mongodb-driver-sync", "4.11.1"),
+                new LibraryDefinition("org,mongodb", "bson", "4.11.1")
+        ));
 
         if ((economy = setupEconomy()) == null) {
             getServer().getPluginManager().disablePlugin(this);

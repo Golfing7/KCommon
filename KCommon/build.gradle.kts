@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id("java")
     id("com.github.johnrengelman.shadow") version("7.1.2")
@@ -30,10 +32,11 @@ dependencies {
     testImplementation("io.papermc:paper-api:1.12.2")
     testImplementation(project(":NMS"))
 
-    implementation("de.tr7zw:item-nbt-api:2.12.1") //For items.
-    implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
-    implementation("com.github.cryptomorin:XSeries:9.8.1") { isTransitive = false } //For XSeries
-    implementation("org.mongodb:mongodb-driver-sync:4.11.1")
+    compileOnly("de.tr7zw:item-nbt-api:2.12.3") //For items.
+    compileOnly("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
+    compileOnly("com.github.cryptomorin:XSeries:9.8.1") { isTransitive = false } //For XSeries
+    compileOnly("org.mongodb:mongodb-driver-sync:4.11.1")
+    implementation("me.lucko:jar-relocator:1.7")
 
     compileOnly(project(":NMS"))
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0")
