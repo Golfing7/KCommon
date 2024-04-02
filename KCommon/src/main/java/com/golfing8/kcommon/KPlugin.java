@@ -5,6 +5,7 @@ import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.golfing8.kcommon.hook.placeholderapi.KPAPIHook;
+import com.golfing8.kcommon.library.LibraryLoader;
 import com.golfing8.kcommon.menu.Menu;
 import com.golfing8.kcommon.menu.MenuManager;
 import com.golfing8.kcommon.module.Module;
@@ -47,11 +48,14 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
     /** The module manifest */
     @Getter
     private ModuleManifest manifest;
+    /** Dynamic library loader */
+    protected LibraryLoader libraryLoader;
 
     public final void onEnable() {
         try {
             this.saveDefaultConfig();
         } catch (IllegalArgumentException ignored) {} // Config doesn't exist
+        this.libraryLoader = new LibraryLoader(this, getDataFolder().toPath().resolve("libraries"));
         this.commandManager = new CommandManager(this);
         this.menuManager = new MenuManager(this);
         //Setup PAPI.

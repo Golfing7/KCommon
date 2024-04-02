@@ -31,6 +31,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -316,8 +317,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
         }
 
-        try(InputStream resource = this.plugin.getClass().getResourceAsStream("/" + configName);
-            FileOutputStream writer = new FileOutputStream(configPath.toFile())) {
+        try(InputStream resource = this.plugin.getClass().getResourceAsStream("/" + configName)) {
             ByteArrayOutputStream streamCloner = new ByteArrayOutputStream();
 
             //Check that the resource exists
@@ -334,8 +334,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
                 }
 
                 if (Files.notExists(configPath)) {
-                    writer.write(streamCloner.toByteArray());
-                    writer.flush();
+                    Files.write(configPath, streamCloner.toByteArray(), StandardOpenOption.CREATE);
                 }
 
                 try {
