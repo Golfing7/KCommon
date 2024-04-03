@@ -1,7 +1,9 @@
 package com.golfing8.kcommon.module;
 
 import lombok.Getter;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 /**
  * A task that belongs to a module, extending the {@link BukkitRunnable} class to implement itself.
@@ -59,8 +61,6 @@ public class ModuleTask extends BukkitRunnable {
      */
     public ModuleTask start() {
         this.runTask(getModule().getPlugin());
-        this.module.addTask(this);
-        this.started = true;
         return this;
     }
 
@@ -71,8 +71,6 @@ public class ModuleTask extends BukkitRunnable {
      */
     public ModuleTask startAsync() {
         this.runTaskAsynchronously(getModule().getPlugin());
-        this.module.addTask(this);
-        this.started = true;
         return this;
     }
 
@@ -84,8 +82,6 @@ public class ModuleTask extends BukkitRunnable {
      */
     public ModuleTask startLater(long ticks) {
         this.runTaskLater(getModule().getPlugin(), ticks);
-        this.module.addTask(this);
-        this.started = true;
         return this;
     }
 
@@ -97,8 +93,6 @@ public class ModuleTask extends BukkitRunnable {
      */
     public ModuleTask startLaterAsync(long ticks) {
         this.runTaskLaterAsynchronously(getModule().getPlugin(), ticks);
-        this.module.addTask(this);
-        this.started = true;
         return this;
     }
 
@@ -111,8 +105,6 @@ public class ModuleTask extends BukkitRunnable {
      */
     public ModuleTask startTimer(long tickDelay, long tickPeriod) {
         this.runTaskTimer(getModule().getPlugin(), tickDelay, tickPeriod);
-        this.module.addTask(this);
-        this.started = true;
         return this;
     }
 
@@ -125,8 +117,54 @@ public class ModuleTask extends BukkitRunnable {
      */
     public ModuleTask startTimerAsync(long tickDelay, long tickPeriod) {
         this.runTaskTimerAsynchronously(getModule().getPlugin(), tickDelay, tickPeriod);
+        return this;
+    }
+
+    @Override
+    public synchronized BukkitTask runTask(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
+        BukkitTask bukkitTask = super.runTask(plugin);
         this.module.addTask(this);
         this.started = true;
-        return this;
+        return bukkitTask;
+    }
+
+    @Override
+    public synchronized BukkitTask runTaskAsynchronously(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
+        BukkitTask bukkitTask = super.runTaskAsynchronously(plugin);
+        this.module.addTask(this);
+        this.started = true;
+        return bukkitTask;
+    }
+
+    @Override
+    public synchronized BukkitTask runTaskLater(Plugin plugin, long delay) throws IllegalArgumentException, IllegalStateException {
+        BukkitTask bukkitTask = super.runTaskLater(plugin, delay);
+        this.module.addTask(this);
+        this.started = true;
+        return bukkitTask;
+    }
+
+    @Override
+    public synchronized BukkitTask runTaskLaterAsynchronously(Plugin plugin, long delay) throws IllegalArgumentException, IllegalStateException {
+        BukkitTask bukkitTask = super.runTaskLaterAsynchronously(plugin, delay);
+        this.module.addTask(this);
+        this.started = true;
+        return bukkitTask;
+    }
+
+    @Override
+    public synchronized BukkitTask runTaskTimer(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
+        BukkitTask bukkitTask = super.runTaskTimer(plugin, delay, period);
+        this.module.addTask(this);
+        this.started = true;
+        return bukkitTask;
+    }
+
+    @Override
+    public synchronized BukkitTask runTaskTimerAsynchronously(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
+        BukkitTask bukkitTask = super.runTaskTimerAsynchronously(plugin, delay, period);
+        this.module.addTask(this);
+        this.started = true;
+        return bukkitTask;
     }
 }
