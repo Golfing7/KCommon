@@ -238,6 +238,11 @@ public class ConfigTypeRegistry {
      * @param value the value.
      */
     public static void setInConfig(ConfigurationSection section, String path, Object value) {
+        // Special cases for config sections
+        if (value instanceof ConfigurationSection) {
+            section.set(path, value);
+            return;
+        }
         section.set(path, toPrimitive(value).unwrap());
     }
 

@@ -44,6 +44,19 @@ public class KCommon extends KPlugin{
     @Override
     public void onEnableInner() {
         instance = this;
+        libraryLoader.addRelocation("de,tr7zw,changeme,nbtapi", "de,tr7zw,kcommon,nbtapi");
+        libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
+
+        libraryLoader.loadAllLibraries(Lists.newArrayList(
+                new LibraryDefinition("de,tr7zw", "item-nbt-api", "2.12.3", "https://repo.codemc.org/repository/maven-public"),
+                new LibraryDefinition("net,objecthunter", "exp4j", "0.4.8"),
+                new LibraryDefinition("com,github,cryptomorin", "XSeries", "9.8.1"),
+                // For Mongo
+                new LibraryDefinition("org,mongodb", "mongodb-driver-core", "4.11.1"),
+                new LibraryDefinition("org,mongodb", "mongodb-driver-sync", "4.11.1"),
+                new LibraryDefinition("org,mongodb", "bson", "4.11.1")
+        ));
+
         if ((economy = setupEconomy()) == null) {
             getServer().getPluginManager().disablePlugin(this);
             return;
