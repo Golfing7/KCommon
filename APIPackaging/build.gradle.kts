@@ -14,6 +14,8 @@ repositories {
 tasks {
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
+        relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")
+        relocate("com.cryptomorin.xseries", "com.golfing8.shade.com.cryptomorin.xseries")
     }
 
     build {

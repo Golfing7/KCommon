@@ -27,8 +27,8 @@ public class CASoundWrapper implements ConfigAdapter<SoundWrapper> {
         if(!xSoundOptional.isPresent())
             throw new ImproperlyConfiguredValueException(entry.getSource(), "sound");
 
-        double pitch = (Double) items.getOrDefault("pitch", 1.0D);
-        double volume = (Double) items.getOrDefault("volume", 1.0D);
+        double pitch = ((Number) items.getOrDefault("pitch", 1.0D)).doubleValue();
+        double volume = ((Number) items.getOrDefault("volume", 1.0D)).doubleValue();
         int delay = (Integer) items.getOrDefault("delay", 0);
         return new SoundWrapper(xSoundOptional.get(), (float) volume, (float) pitch, delay);
     }

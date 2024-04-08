@@ -198,7 +198,8 @@ public interface LangConfigContainer {
 
             LangConf conf = field.getAnnotation(LangConf.class);
             FieldHandle<?> handle = new FieldHandle<>(field);
-            String key = conf.path().isEmpty() ? StringUtil.camelToYaml(StringUtil.stripSuffixes(field.getName(), "Message", "Msg")) : conf.path();
+            String label = StringUtil.camelToYaml(StringUtil.stripSuffixes(field.getName(), "Message", "Msg"));
+            String key = conf.path().isEmpty() ? label : conf.path() + "." + label;
             String formattedPath = formatPath(key);
             Message defaultValue = (Message) handle.get(this);
             getLangConfig().addLanguageConstant(formattedPath, defaultValue);
