@@ -12,7 +12,6 @@ import com.golfing8.kcommon.data.DataManagerContainer;
 import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
-import com.golfing8.kcommon.struct.PermissionLevel;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
 import lombok.Getter;
@@ -52,11 +51,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     public static <T extends Module> T get(@NotNull T... unused) {
         return (T) Modules.getModule((Class<? extends Module>) unused.getClass().getComponentType());
     }
-
-    /**
-     * Maps a permission label to its given permission level.
-     */
-    private final Map<String, PermissionLevel> permissionLevels;
 
     /**
      * The owning plugin of this module.
@@ -99,16 +93,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     private final Set<Listener> subListeners;
 
     /**
-     * The base permission level's description
-     */
-    @Getter @Setter
-    private String basePermLevelDesc = "The base permission of this module";
-    /**
-     * The admin permission level's description
-     */
-    @Getter @Setter
-    private String adminPermLevelDesc = "The admin level permission of this module";
-    /**
      * The main config for this module.
      */
     @Getter
@@ -145,7 +129,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.namespacedKey = new KNamespacedKey(plugin, moduleName);
         this.moduleName = moduleName;
         this.moduleCommands = new ArrayList<>();
-        this.permissionLevels = new HashMap<>();
         this.moduleTasks = new HashSet<>();
         this.moduleDependencies = new HashSet<>(moduleDependencies);
         this.pluginDependencies = new HashSet<>(pluginDependencies);
@@ -167,7 +150,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.moduleName = info.name();
         this.namespacedKey = new KNamespacedKey(this.plugin, this.moduleName);
         this.moduleCommands = new ArrayList<>();
-        this.permissionLevels = new HashMap<>();
         this.moduleTasks = new HashSet<>();
         this.placeholders = new TreeMap<>();
         this.relationalPlaceholders = new TreeMap<>();
@@ -191,7 +173,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.reload();
 
         for(Module module : Modules.getAll()) {
-            if(module.getModuleDependencies().contains(this.getClass()))
+            if(module.getModuleDependencies().contains(this.getModuleName()))
                 module.reloadWithDependencies();
         }
     }
@@ -228,8 +210,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
 
         this.loadLangFields();
-        this.registerPermissions();
-        this.registerSubPermissions();
         this.onEnable();
         this.enabled = true;
 
@@ -283,7 +263,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.subListeners.clear();
         this.moduleTasks.clear();
         this.moduleCommands.clear();
-        this.permissionLevels.clear();
         this.configWrapper.unregister();
         this.relationalPlaceholders.clear();
         this.placeholders.clear();
@@ -368,14 +347,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         if (modded) {
             mainConfig.save();
         }
-    }
-
-    /**
-     * Registers default permission levels to this module.
-     */
-    private void registerPermissions() {
-        this.permissionLevels.put("base", new PermissionLevel(0.0, "base", this.getBasePermLevelDesc()));
-        this.permissionLevels.put("admin", new PermissionLevel(100.0, "admin", this.getAdminPermLevelDesc()));
     }
 
     /**
@@ -471,12 +442,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     public String getPlaceholderKey() {
         return this.moduleName;
     }
-
-    /**
-     * A method for subclasses to use when registering custom permission levels.
-     * Called immediately before the calling the {@link #onEnable()} method.
-     */
-    protected void registerSubPermissions() {/*Empty by intent*/}
 
     /**
      * Used for loading language constants. This is run before the language config has been 'loaded' so
