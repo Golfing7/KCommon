@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 @Getter
 public class CommandDrop extends Drop<String> {
     private List<String> items;
-    public CommandDrop(double chance, String dropGroup, List<String> commands) {
-        super(chance, dropGroup);
+    public CommandDrop(double chance, String message, List<String> commands) {
+        super(chance, message);
         this.items = commands;
     }
 

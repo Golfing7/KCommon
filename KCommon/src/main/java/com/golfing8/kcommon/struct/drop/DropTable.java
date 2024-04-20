@@ -1,6 +1,12 @@
 package com.golfing8.kcommon.struct.drop;
 
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.CASerializable;
+import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
+import com.golfing8.kcommon.struct.Range;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.var;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -14,22 +20,51 @@ import java.util.concurrent.ThreadLocalRandom;
  * Drops can range from items, messages, and commands.
  * </p>
  */
-@CASerializable.Options(flatten = true)
+@NoArgsConstructor
 public class DropTable implements CASerializable {
+    private static final String DEFAULT_GROUP = "@default";
+    /**
+     * A grouping of drops
+     */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DropGroup implements CASerializable {
+        private String _key;
+        private List<String> drops;
+        private Range dropTargetRange;
+
+        /**
+         * Gets a feasible drop target.
+         *
+         * @return the feasible drop target.
+         */
+        public int getDropTarget() {
+            if (dropTargetRange == null)
+                return -1;
+
+            return Math.min(drops.size(), dropTargetRange.getRandomI());
+        }
+    }
+
     /**
      * Maps the key of the drop to its instance.
      */
-    private Map<String, Drop<?>> dropTable;
-    /**
-     * Maps drops from their group name.
-     */
-    private transient Map<String, List<Drop<?>>> dropGroups = new HashMap<>();
+    private Map<String, Drop<?>> table;
+    private Map<String, DropGroup> groupings;
 
     @Override
-    public void onDeserialize() {
-        for (var entry : dropTable.entrySet()) {
-            dropGroups.computeIfAbsent(entry.getValue().getDropGroup(), (k) -> new ArrayList<>()).add(entry.getValue());
+    public void onDeserialize(ConfigPrimitive primitive) {
+        Set<String> allDrops = new HashSet<>(table.keySet());
+        for (var entry : table.entrySet()) {
+            allDrops.remove(entry.getKey());
         }
+        Map<String, Object> unwrapped = primitive.unwrap();
+        Range dropTargetRange = null;
+        if (unwrapped.containsKey("drop-target-range")) {
+            dropTargetRange = ConfigTypeRegistry.getFromType(primitive.getSubValue("drop-target-range"), Range.class);
+        }
+        groupings.put(DEFAULT_GROUP, new DropGroup(DEFAULT_GROUP, new ArrayList<>(allDrops), dropTargetRange));
     }
 
     /**
@@ -39,16 +74,20 @@ public class DropTable implements CASerializable {
      */
     public List<Drop<?>> generateDrops() {
         List<Drop<?>> drops = new ArrayList<>();
-        for (var entry : dropGroups.entrySet()) {
-            List<Drop<?>> dropList = new ArrayList<>(entry.getValue());
-            while (!dropList.isEmpty()) {
-                int index = ThreadLocalRandom.current().nextInt(dropList.size());
-                Drop<?> drop = dropList.get(index);
+        for (var groupEntry : groupings.entrySet()) {
+            List<String> dropKeys = new ArrayList<>(groupEntry.getValue().getDrops());
+            Collections.shuffle(dropKeys);
+            int dropTarget = groupEntry.getValue().getDropTarget();
+            int collectedDrops = 0;
+            for (String dropKey : dropKeys) {
+                Drop<?> drop = table.get(dropKey);
                 if (!drop.testRandom())
                     continue;
 
                 drops.add(drop);
-                break;
+                collectedDrops++;
+                if (dropTarget >= 0 && collectedDrops >= dropTarget)
+                    break;
             }
         }
         return drops;

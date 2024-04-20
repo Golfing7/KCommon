@@ -15,6 +15,11 @@ public interface CASerializable {
     default void onDeserialize() {}
 
     /**
+     * Called when this object has finished deserialization.
+     */
+    default void onDeserialize(ConfigPrimitive primitive) {}
+
+    /**
      * Called when this object is being serialized.
      */
     default void onSerialize() {}

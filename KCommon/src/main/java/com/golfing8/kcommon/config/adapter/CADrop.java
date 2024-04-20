@@ -34,7 +34,7 @@ public class CADrop implements ConfigAdapter<Drop> {
             return null;
 
         Map<String, Object> primitive = entry.unwrap();
-        String group = primitive.containsKey("group") ? primitive.get("group").toString() : null;
+        String displayName = primitive.containsKey("display-name") ? primitive.get("display-name").toString() : null;
         double chance = primitive.containsKey("chance") ?
                 (double) ConfigPrimitive.coerceStringToBoxed(primitive.get("chance").toString(), Double.class) :
                 1.0D;
@@ -42,16 +42,16 @@ public class CADrop implements ConfigAdapter<Drop> {
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
-                return new ItemDrop(chance, group, MapUtil.of("item", deserialized), giveDirectly);
+                return new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly);
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
-                return new ItemDrop(chance, group, items, giveDirectly);
+                return new ItemDrop(chance, displayName, items, giveDirectly);
             }
         } else if (primitive.containsKey("commands")) {
             FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {});
             List<String> commands = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("commands")), fieldType);
-            return new CommandDrop(chance, group, commands);
+            return new CommandDrop(chance, displayName, commands);
         }
         throw new InvalidConfigException("Drop doesn't have `commands` or `items` key. Which type of drop is it?");
     }
@@ -63,8 +63,8 @@ public class CADrop implements ConfigAdapter<Drop> {
 
         Map<String, Object> serialized = new HashMap<>();
         serialized.put("chance", object.getChance());
-        if (object.getDropGroup() != null) {
-            serialized.put("group", object.getDropGroup());
+        if (object.getDisplayName() != null) {
+            serialized.put("display-name", object.getDisplayName());
         }
 
         if (object instanceof ItemDrop) {

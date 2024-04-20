@@ -1,11 +1,13 @@
 package com.golfing8.kcommon.struct.drop;
 
 import com.golfing8.kcommon.config.adapter.CASerializable;
+import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.random.RandomTestable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -17,8 +19,9 @@ import java.util.List;
 public abstract class Drop<T> implements RandomTestable {
     /** The chance for this drop */
     private double chance;
-    /** The group of the drop */
-    private String dropGroup;
+    /** The display name of this drop */
+    @Getter
+    private @Nullable String displayName;
     /**
      * Gets the set of dropped objects.
      *
@@ -32,6 +35,19 @@ public abstract class Drop<T> implements RandomTestable {
      * @param player the player.
      */
     public abstract void giveTo(Player player);
+
+    /**
+     * Gives the player this drop, or drops it at the given location.
+     *
+     * @param player the player.
+     */
+    public void giveOrDropAt(Player player) {
+        if (isPhysical()) {
+            dropAt(player.getLocation());
+        } else {
+            giveTo(player);
+        }
+    }
 
     /**
      * Drops the items at the given location.

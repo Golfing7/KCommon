@@ -3,6 +3,7 @@
 buildm
 .idea/
 BuildTools
+*/build/*
 
 # Ignore Gradle GUI config
 gradle-app.setting

@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 public class ItemDrop extends Drop<ItemStack> {
     private Map<String, ItemStackBuilder> items;
     private boolean giveDirectly;
-    public ItemDrop(double chance, String dropGroup, Map<String, ItemStackBuilder> items, boolean giveDirectly) {
-        super(chance, dropGroup);
+    public ItemDrop(double chance, String message, Map<String, ItemStackBuilder> items, boolean giveDirectly) {
+        super(chance, message);
         this.items = items;
         this.giveDirectly = giveDirectly;
     }
