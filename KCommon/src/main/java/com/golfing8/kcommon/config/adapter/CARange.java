@@ -19,6 +19,9 @@ public class CARange implements ConfigAdapter<Range> {
             return null;
 
         String[] splitValue = ConfigPrimitive.coerceBoxedToString(entry.unwrap()).split(":");
+        if (splitValue.length <= 1) {
+            splitValue = splitValue[0].split("\\|");
+        }
         double minimum = Double.parseDouble(splitValue[0]);
         // If there's only one number, just interpret it as a single point.
         if (splitValue.length == 1) {
@@ -30,9 +33,6 @@ public class CARange implements ConfigAdapter<Range> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull Range object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         // Check if we should encode it with ints instead of floats. (Makes the config easier to read and work with)
         long minRounded = Math.round(object.getMin());
         long maxRounded = Math.round(object.getMax());
@@ -43,12 +43,12 @@ public class CARange implements ConfigAdapter<Range> {
                 return ConfigPrimitive.ofString(String.valueOf(minRounded));
             }
 
-            return ConfigPrimitive.ofString(minRounded + ":" + maxRounded);
+            return ConfigPrimitive.ofString(minRounded + "|" + maxRounded);
         }
 
         if (Math.abs(object.getMin() - object.getMax()) <= EPSILON) {
             return ConfigPrimitive.ofString(String.valueOf(object.getMin()));
         }
-        return ConfigPrimitive.ofString(object.getMin() + ":" + object.getMax());
+        return ConfigPrimitive.ofString(object.getMin() + "|" + object.getMax());
     }
 }

@@ -62,6 +62,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.placeholderAPIHook = new KPAPIHook(this);
         this.placeholderAPIHook.register();
 
+        // Run the pre-enable inner function
+        this.onPreEnableInner();
+
         //Set up the lang config.
         Path langPath = Paths.get(getDataFolder().getPath(), "kore-lang.yml");
         this.langConfig = new LangConfig(langPath);
@@ -279,6 +282,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         }
     }
 
+    public void onPreEnableInner() {}
     public void onEnableInner() {}
     public void onDisableInner() {}
 }

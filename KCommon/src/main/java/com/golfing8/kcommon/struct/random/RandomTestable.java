@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public interface RandomTestable {
     /**
      * Gets the chance of SUCCESS (true) for this class.
-     * This number should be on the range of 0-1
+     * This number should be on the range of 0-100
      *
      * @return the chance of success.
      */
@@ -25,6 +25,6 @@ public interface RandomTestable {
     }
 
     default boolean testRandom() {
-        return getChance() > getRandomInstance().nextDouble();
+        return getChance() > getRandomInstance().nextDouble() * 100.0D;
     }
 }

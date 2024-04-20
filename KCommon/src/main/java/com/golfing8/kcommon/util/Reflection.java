@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
@@ -44,6 +45,9 @@ public final class Reflection {
 
                     try {
                         Class<?> clazz = loader.loadClass(entry.getName().replace("/", ".").replace(".class", ""));
+                        if ((clazz.getModifiers() & Modifier.ABSTRACT) != 0) // Ignore abstract classes.
+                            continue;
+
                         if (Module.class.isAssignableFrom(clazz) && Module.class != clazz)
                             classes.add((Class<? extends Module>) clazz);
                     } catch (ClassNotFoundException exc) {

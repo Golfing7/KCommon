@@ -55,14 +55,14 @@ public class Range {
     }
 
     /**
-     * Generates a range from a given string. The format should follow 'min-max'. Note that negative numbers are not
+     * Generates a range from a given string. The format should follow 'min|max'. Note that negative numbers are not
      * currently supported.
      *
      * @param string the string to parse from.
      * @return the created range.
      */
     public static Range fromString(String string){
-        String[] split = string.split("-");
+        String[] split = string.split("\\|");
 
         if(split.length == 1){
             split = new String[] {split[0], split[0]};

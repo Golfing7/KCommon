@@ -7,6 +7,7 @@ import lombok.var;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,16 +63,16 @@ public final class ConfigPrimitive {
             });
             return (T) items;
         } else if (primitive instanceof List) {
+            List toReturn = new ArrayList();
             List l = (List) primitive;
-            for (int i = 0; i < l.size(); i++) {
-                Object thing = l.get(i);
+            for (Object thing : l) {
                 if (thing instanceof ConfigPrimitive) {
-                    l.set(i, ((ConfigPrimitive) thing).unwrap());
+                    toReturn.add(((ConfigPrimitive) thing).unwrap());
                 } else {
-                    l.set(i, thing);
+                    toReturn.add(thing);
                 }
             }
-            return (T) l;
+            return (T) toReturn;
         } else if (primitive instanceof ConfigPrimitive) {
             return ((ConfigPrimitive) primitive).unwrap();
         }

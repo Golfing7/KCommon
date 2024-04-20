@@ -42,8 +42,7 @@ public class KCommon extends KPlugin{
     private @Nullable MongoConnector connector;
 
     @Override
-    public void onEnableInner() {
-        instance = this;
+    public void onPreEnableInner() {
         libraryLoader.addRelocation("de,tr7zw,changeme,nbtapi", "de,tr7zw,kcommon,nbtapi");
         libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
 
@@ -56,6 +55,11 @@ public class KCommon extends KPlugin{
                 new LibraryDefinition("org,mongodb", "mongodb-driver-sync", "4.11.1"),
                 new LibraryDefinition("org,mongodb", "bson", "4.11.1")
         ));
+    }
+
+    @Override
+    public void onEnableInner() {
+        instance = this;
 
         if ((economy = setupEconomy()) == null) {
             getServer().getPluginManager().disablePlugin(this);

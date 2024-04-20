@@ -1,11 +1,13 @@
 package com.golfing8.kcommon.module.test.config;
 
+import com.golfing8.kcommon.config.ConfigEntry;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.generator.Conf;
 import com.golfing8.kcommon.config.generator.ConfigClass;
 import com.golfing8.kcommon.config.generator.ConfigClassWrapper;
-import org.apache.commons.lang3.builder.EqualsExclude;
+import com.golfing8.kcommon.struct.drop.DropTable;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -66,5 +68,15 @@ public class CASerializableTest {
         // Load it back.
         SimpleSerializableConf loadedItem = (SimpleSerializableConf) configuration.getWithType("conf-item", SimpleSerializableConf.class);
         assertEquals(config.confItem, loadedItem);
+    }
+
+    @Test
+    public void testDropTableSerialization() throws IOException {
+        Path path = Paths.get("drop-tables.yml");
+        Configuration configuration = new Configuration(path);
+        if (path.toFile().exists()) {
+            configuration.load();
+        }
+        ConfigTypeRegistry.getFromType(new ConfigEntry(configuration, "drop-tables"), DropTable.class);
     }
 }

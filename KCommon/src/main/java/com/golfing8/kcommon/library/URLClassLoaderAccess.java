@@ -26,6 +26,7 @@
 
 package com.golfing8.kcommon.library;
 
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -51,6 +52,7 @@ public abstract class URLClassLoaderAccess {
         } else if (Unsafe.isSupported()) {
             return new Unsafe(classLoader);
         } else {
+            Bukkit.getLogger().severe("Cannot access URLClassLoader!");
             return Noop.INSTANCE;
         }
     }

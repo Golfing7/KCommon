@@ -50,7 +50,7 @@ public class WeightedCollection<T> {
      * Adds a weighted object with chance to the block palette.
      *
      * @param obj the obj to add.
-     * @param chance the chance for it to appear. (Should be 0-1)
+     * @param chance the chance for it to appear. (Should be 0-100)
      */
     public void addWeightedObject(T obj, double chance) {
         this.chanceMap.put(obj, chance);
@@ -68,7 +68,7 @@ public class WeightedCollection<T> {
             return null;
 
         //Get a random number between 0 and 1, then get the value in the range.
-        double inRange = ThreadLocalRandom.current().nextDouble();
+        double inRange = ThreadLocalRandom.current().nextDouble() * 100.0D;
         return this.bakedOdds.get(inRange).getB();
     }
 

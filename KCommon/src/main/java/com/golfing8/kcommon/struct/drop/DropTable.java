@@ -55,16 +55,21 @@ public class DropTable implements CASerializable {
 
     @Override
     public void onDeserialize(ConfigPrimitive primitive) {
-        Set<String> allDrops = new HashSet<>(table.keySet());
-        for (var entry : table.entrySet()) {
-            allDrops.remove(entry.getKey());
+        if (groupings == null)
+            groupings = new HashMap<>();
+
+        if (!groupings.containsKey(DEFAULT_GROUP)) {
+            Set<String> allDrops = new HashSet<>(table.keySet());
+            for (var entry : groupings.entrySet()) {
+                entry.getValue().getDrops().forEach(allDrops::remove);
+            }
+            Map<String, Object> unwrapped = primitive.unwrap();
+            Range dropTargetRange = null;
+            if (unwrapped.containsKey("drop-target-range")) {
+                dropTargetRange = ConfigTypeRegistry.getFromType(primitive.getSubValue("drop-target-range"), Range.class);
+            }
+            groupings.put(DEFAULT_GROUP, new DropGroup(DEFAULT_GROUP, new ArrayList<>(allDrops), dropTargetRange));
         }
-        Map<String, Object> unwrapped = primitive.unwrap();
-        Range dropTargetRange = null;
-        if (unwrapped.containsKey("drop-target-range")) {
-            dropTargetRange = ConfigTypeRegistry.getFromType(primitive.getSubValue("drop-target-range"), Range.class);
-        }
-        groupings.put(DEFAULT_GROUP, new DropGroup(DEFAULT_GROUP, new ArrayList<>(allDrops), dropTargetRange));
     }
 
     /**
@@ -75,20 +80,22 @@ public class DropTable implements CASerializable {
     public List<Drop<?>> generateDrops() {
         List<Drop<?>> drops = new ArrayList<>();
         for (var groupEntry : groupings.entrySet()) {
-            List<String> dropKeys = new ArrayList<>(groupEntry.getValue().getDrops());
-            Collections.shuffle(dropKeys);
             int dropTarget = groupEntry.getValue().getDropTarget();
             int collectedDrops = 0;
-            for (String dropKey : dropKeys) {
-                Drop<?> drop = table.get(dropKey);
-                if (!drop.testRandom())
-                    continue;
+            do {
+                List<String> dropKeys = new ArrayList<>(groupEntry.getValue().getDrops());
+                Collections.shuffle(dropKeys);
+                for (String dropKey : dropKeys) {
+                    Drop<?> drop = table.get(dropKey);
+                    if (!drop.testRandom())
+                        continue;
 
-                drops.add(drop);
-                collectedDrops++;
-                if (dropTarget >= 0 && collectedDrops >= dropTarget)
-                    break;
-            }
+                    drops.add(drop);
+                    collectedDrops++;
+                    if (dropTarget >= 0 && collectedDrops >= dropTarget)
+                        break;
+                }
+            } while (dropTarget >= 0 && collectedDrops < dropTarget);
         }
         return drops;
     }

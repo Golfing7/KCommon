@@ -102,6 +102,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             fieldHandles.get(KEY_FIELD_NAME).set(instance, entry.getSource().getName());
         }
         instance.onDeserialize();
+        instance.onDeserialize(entry);
         return instance;
     }
 
