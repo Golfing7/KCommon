@@ -139,6 +139,8 @@ public final class ItemStackBuilder {
         this.itemID = toCopy.itemID;
         this.itemType = toCopy.itemType;
         this.amount = toCopy.amount;
+        this.customModelData = toCopy.customModelData;
+        this.cachedBuild = toCopy.cachedBuild;
         this.variableAmount = toCopy.variableAmount;
         this.itemDurability = toCopy.itemDurability;
         this.unbreakable = toCopy.unbreakable;
