@@ -1,17 +1,23 @@
 package com.golfing8.kcommon.db;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
+import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
+import org.apache.logging.log4j.spi.ExtendedLogger;
+import org.apache.logging.log4j.spi.LoggerContext;
+import org.bson.BsonDocument;
+import org.bson.BsonInt64;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A connector to the Mongo database.
@@ -63,7 +69,6 @@ public class MongoConnector implements Closeable {
             settingsBuilder.applyConnectionString(new ConnectionString(this.connectionString));
         }
         this.client = MongoClients.create(settingsBuilder.build());
-
         this.database = this.client.getDatabase(databaseName);
     }
 

@@ -51,9 +51,9 @@ public class KCommon extends KPlugin{
                 new LibraryDefinition("net,objecthunter", "exp4j", "0.4.8"),
                 new LibraryDefinition("com,github,cryptomorin", "XSeries", "9.8.1"),
                 // For Mongo
-                new LibraryDefinition("org,mongodb", "mongodb-driver-core", "4.11.1"),
-                new LibraryDefinition("org,mongodb", "mongodb-driver-sync", "4.11.1"),
-                new LibraryDefinition("org,mongodb", "bson", "4.11.1")
+                new LibraryDefinition("org,mongodb", "mongodb-driver-core", "5.0.1"),
+                new LibraryDefinition("org,mongodb", "mongodb-driver-sync", "5.0.1"),
+                new LibraryDefinition("org,mongodb", "bson", "5.0.1")
         ));
     }
 
