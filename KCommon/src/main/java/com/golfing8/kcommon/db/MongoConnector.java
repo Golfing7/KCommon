@@ -8,7 +8,10 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -63,7 +66,6 @@ public class MongoConnector implements Closeable {
             settingsBuilder.applyConnectionString(new ConnectionString(this.connectionString));
         }
         this.client = MongoClients.create(settingsBuilder.build());
-
         this.database = this.client.getDatabase(databaseName);
     }
 
