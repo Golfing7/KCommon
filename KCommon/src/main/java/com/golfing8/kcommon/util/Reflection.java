@@ -44,7 +44,8 @@ public final class Reflection {
                         continue;
 
                     try {
-                        Class<?> clazz = loader.loadClass(entry.getName().replace("/", ".").replace(".class", ""));
+                        String className = entry.getName().replace("/", ".").replace(".class", "");
+                        Class<?> clazz = Class.forName(className, true, loader);
                         if ((clazz.getModifiers() & Modifier.ABSTRACT) != 0) // Ignore abstract classes.
                             continue;
 

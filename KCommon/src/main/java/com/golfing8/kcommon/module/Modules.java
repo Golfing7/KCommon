@@ -54,6 +54,11 @@ public final class Modules {
         return SMODULE_MAP.containsKey(moduleName.toLowerCase());
     }
 
+    public static boolean moduleExists(@Nonnull KNamespacedKey namespacedKey) {
+        Preconditions.checkNotNull(namespacedKey);
+        return MODULE_MAP.containsKey(namespacedKey);
+    }
+
     /**
      * Gets the module with the given name, or null if the module does not exist.
      *

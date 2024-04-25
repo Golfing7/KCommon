@@ -16,6 +16,7 @@ import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -156,6 +157,16 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.moduleDependencies = new HashSet<>(Arrays.asList(info.moduleDependencies()));
         this.pluginDependencies = new HashSet<>(Arrays.asList(info.pluginDependencies()));
         this.subListeners = new HashSet<>();
+
+        for (int i = 0; i < 50; i++) {
+            System.out.println("Registered " + info.name());
+        };
+        // Try to register this module to the registry.
+        if(Modules.moduleExists(this.getNamespacedKey())) {
+            plugin.getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
+            return;
+        }
+        Modules.registerModule(this);
     }
 
     /**
@@ -182,11 +193,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Initializes the module and begins the startup process for it.
      */
     public void initialize() {
-        if(Modules.moduleExists(this.getModuleName())) {
-            plugin.getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
-            return;
-        }
-        Modules.registerModule(this);
         if (getPlugin().getManifest().loadModule(this)) {
             enable();
             plugin.getLogger().info(String.format("Loaded and enabled module: %s", this.getModuleName()));

@@ -5,6 +5,7 @@ import com.golfing8.kcommon.db.MongoConnector;
 import com.golfing8.kcommon.library.LibraryDefinition;
 import com.golfing8.kcommon.library.LibraryLoader;
 import com.golfing8.kcommon.util.NMSVersion;
+import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
@@ -18,10 +19,12 @@ import java.time.ZoneId;
 /**
  * A plugin implementation of {@link KPlugin} so this commons library can be loaded as a standalone.
  */
-public class KCommon extends KPlugin{
+public class KCommon extends KPlugin {
     @Getter
     private static KCommon instance;
-    /** The link to the economy plugin */
+    /**
+     * The link to the economy plugin
+     */
     @Getter
     private Economy economy;
     /**
@@ -37,7 +40,9 @@ public class KCommon extends KPlugin{
     @Getter
     private NMSVersion serverVersion;
 
-    /** The mongo database connector, can be null if not enabled */
+    /**
+     * The mongo database connector, can be null if not enabled
+     */
     @Getter
     private @Nullable MongoConnector connector;
 
@@ -66,20 +71,7 @@ public class KCommon extends KPlugin{
             return;
         }
 
-        if (getConfig().contains("mongo")) {
-            if (getConfig().contains("mongo.connection-string") && getConfig().getString("mongo.connection-string").isEmpty()) {
-                String username = getConfig().getString("mongo.username");
-                String password = getConfig().getString("mongo.password");
-                String address = getConfig().getString("mongo.address");
-                int port = getConfig().getInt("mongo.port");
-                String database = getConfig().getString("mongo.database");
-                this.connector = new MongoConnector(username, password, address, port, database);
-            } else {
-                String connectionString = getConfig().getString("mongo.connection-string");
-                String database = getConfig().getString("mongo.database");
-                this.connector = new MongoConnector(connectionString, database);
-            }
-            this.connector.connect();
+        if (getConfig().contains("mongo") && trySetupMongo()) {
             getLogger().info("Connected to MongoDB");
         }
 
@@ -93,6 +85,28 @@ public class KCommon extends KPlugin{
         this.serverVersion = NMSVersion.fromBukkitPackageName(Bukkit.getServer().getClass().getName().split("\\.")[3]);
         NMS.initialize();
         new KModuleCommand().register();
+    }
+
+    private boolean trySetupMongo() {
+        String username = getConfig().getString("mongo.username");
+        String connectionString = getConfig().getString("mongo.connection-string");
+        if (StringUtil.isEmpty(username) && StringUtil.isEmpty(connectionString))
+            return false;
+
+        if (StringUtil.isEmpty(connectionString)) {
+            String password = getConfig().getString("mongo.password");
+            String address = getConfig().getString("mongo.address");
+            int port = getConfig().getInt("mongo.port");
+            String database = getConfig().getString("mongo.database");
+            this.connector = new MongoConnector(username, password, address, port, database);
+        } else {
+            String database = getConfig().getString("mongo.database");
+            this.connector = new MongoConnector(connectionString, database);
+        }
+
+        this.connector.connect();
+        getLogger().info("Connected to MongoDB");
+        return true;
     }
 
     private Economy setupEconomy() {
