@@ -12,6 +12,7 @@ import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.ModuleInfo;
 import com.golfing8.kcommon.module.ModuleManifest;
 import com.golfing8.kcommon.module.Modules;
+import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.util.Reflection;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -191,12 +192,18 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             }
 
             Module instance;
-            try {
-                Constructor<? extends Module> constructor = mClass.getConstructor();
-                instance = constructor.newInstance();
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                     InvocationTargetException e) {
-                throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), e);
+            // Is the module already registered?
+            // If so, don't re-register it!
+            // This can happen with Kotlin 'object' declarations.
+            KNamespacedKey namespace = new KNamespacedKey(this, info.name());
+            if ((instance = Modules.getModule(namespace)) == null) {
+                try {
+                    Constructor<? extends Module> constructor = mClass.getConstructor();
+                    instance = constructor.newInstance();
+                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                         InvocationTargetException e) {
+                    throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), e);
+                }
             }
 
             instances.put(mClass, instance);
