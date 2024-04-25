@@ -136,6 +136,13 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.placeholders = new TreeMap<>();
         this.relationalPlaceholders = new TreeMap<>();
         this.subListeners = new HashSet<>();
+
+        // Try to register this module to the registry.
+        if(Modules.moduleExists(this.getNamespacedKey())) {
+            plugin.getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
+            return;
+        }
+        Modules.registerModule(this);
     }
 
     public Module(KPlugin plugin, String moduleName) {
@@ -160,7 +167,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         for (int i = 0; i < 50; i++) {
             System.out.println("Registered " + info.name());
-        };
+        }
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
             plugin.getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));

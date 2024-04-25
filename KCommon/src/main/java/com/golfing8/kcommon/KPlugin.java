@@ -176,9 +176,6 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             if (!mClass.getPackage().getName().startsWith(this.getClass().getPackage().getName()))
                 return;
 
-            if (Modules.getModule(mClass) != null)
-                return;
-
             if (!mClass.isAnnotationPresent(ModuleInfo.class))
                 return;
 
