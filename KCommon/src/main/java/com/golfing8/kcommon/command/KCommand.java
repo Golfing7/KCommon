@@ -533,6 +533,9 @@ public abstract class KCommand implements TabExecutor {
             if (lastArgument != null && !sub.getCommandName().startsWith(lastArgument.toLowerCase()))
                 continue;
 
+            if (!sub.canSee(sender))
+                continue;
+
             MS.pass(sender, sub.getDescriptiveCommandHelp(sender));
             sub.handleHelpMessage0(sender, null);
         }
