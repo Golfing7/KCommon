@@ -200,6 +200,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Initializes the module and begins the startup process for it.
      */
     public void initialize() {
+        Modules.registerModule(this);
         if (getPlugin().getManifest().loadModule(this)) {
             enable();
             plugin.getLogger().info(String.format("Loaded and enabled module: %s", this.getModuleName()));
