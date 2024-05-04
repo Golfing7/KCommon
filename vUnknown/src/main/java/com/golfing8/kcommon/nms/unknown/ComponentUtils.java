@@ -12,6 +12,12 @@ import java.util.regex.Pattern;
 public class ComponentUtils {
 
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private static final Pattern AMPERSAND_RGB_3 = Pattern.compile("&#([\\da-fA-F]{3})");
+    private static final Pattern AMPERSAND_RGB_6 = Pattern.compile("&#([\\da-fA-F]{6})");
+    private static final Pattern AMPERSAND_RGB_SPIGOT = Pattern.compile("&x(&[\\da-fA-F]){6}");
+    private static final Pattern SECTION_RGB_3 = Pattern.compile("\u00A7#([\\da-fA-F]{3})");
+    private static final Pattern SECTION_RGB_6 = Pattern.compile("\u00A7#([\\da-fA-F]{6})");
+    private static final Pattern SECTION_RGB_SPIGOT = Pattern.compile("\u00A7x(\u00A7[\\da-fA-F]){6}");
     private static final Map<String, String> legacyColorMap = new HashMap<>(){{
                 put("0", "<black>");
                 put("1", "<dark_blue>");
@@ -48,7 +54,8 @@ public class ComponentUtils {
     }
 
     public static String processLine(String str) {
-        str = replaceLegacyColors(str);
+        str = replaceLegacyColors(str, '&');
+        str = replaceLegacyColors(str, '\u00A7');
         str = StringEscapeUtils.unescapeJava(str);
         return str;
     }
@@ -95,49 +102,48 @@ public class ComponentUtils {
      * Replaces all legacy hex / color codes with the ones we need to support in {@link MiniMessage}.
      *
      * @param message the message to replace the hex codes / colors in
+     * @param colorChar the color character to use
      * @return the string with the replaced colors
      */
-    private static String replaceLegacyColors(String message) {
-        message = replaceColors(message, '&');
-        message = replaceColors(message, '\u00A7');
-
-        Pattern sixCharHex = Pattern.compile("&#([\\da-fA-F]{6})");
+    private static String replaceLegacyColors(String message, char colorChar) {
+        Pattern sixCharHex = colorChar == '&' ? AMPERSAND_RGB_6 : SECTION_RGB_6;
         Matcher matcher = sixCharHex.matcher(message);
         StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
-            StringBuilder replacement = (new StringBuilder(14)).append("<reset>").append("&x");
+            StringBuilder replacement = (new StringBuilder(14)).append("<reset>").append(colorChar).append("x");
             for (char character : matcher.group(1).toCharArray())
-                replacement.append('&').append(character);
+                replacement.append(colorChar).append(character);
             matcher.appendReplacement(sb, replacement.toString());
         }
         matcher.appendTail(sb);
         message = sb.toString();
 
-        Pattern threeCharHex = Pattern.compile("&#([\\da-fA-F]{3})");
+        Pattern threeCharHex = colorChar == '&' ? AMPERSAND_RGB_3 : SECTION_RGB_3;
         matcher = threeCharHex.matcher(message);
         sb = new StringBuilder();
         while (matcher.find()) {
-            StringBuilder replacement = (new StringBuilder(14)).append("<reset>").append("&x");
+            StringBuilder replacement = (new StringBuilder(14)).append("<reset>").append(colorChar).append("x");
             for (char character : matcher.group(1).toCharArray())
-                replacement.append('&').append(character).append("&").append(character);
+                replacement.append(colorChar).append(character).append(colorChar).append(character);
             matcher.appendReplacement(sb, replacement.toString());
         }
         matcher.appendTail(sb);
 
         message = sb.toString();
-        Pattern spigotHexPattern = Pattern.compile("&x(&[\\da-fA-F]){6}");
+        Pattern spigotHexPattern = colorChar == '&' ? AMPERSAND_RGB_SPIGOT : SECTION_RGB_SPIGOT;
         matcher = spigotHexPattern.matcher(message);
         sb = new StringBuilder();
         while (matcher.find()) {
             StringBuilder replacement = (new StringBuilder(9)).append("<reset>").append("<#");
             for (char character : matcher.group().toCharArray()) {
-                if (character != '&' && character != 'x') replacement.append(character);
+                if (character != colorChar && character != 'x') replacement.append(character);
             }
             replacement.append(">");
             matcher.appendReplacement(sb, replacement.toString());
         }
         matcher.appendTail(sb);
         message = sb.toString();
+        message = replaceColors(message, colorChar);
 
         return message;
     }

@@ -32,7 +32,7 @@ public final class MS {
 
         //Try hex coloring, if we're on a version which supports it.
         TRANSFORMERS.add(string -> {
-            if(KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_16))
+            if(true || KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_16))
                 return RGBUtils.INSTANCE.hexColor(string);
             return string;
         });

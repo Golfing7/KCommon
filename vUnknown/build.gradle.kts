@@ -14,6 +14,9 @@ repositories {
 }
 
 dependencies {
+    testImplementation(project(":KCommon"))
+    testImplementation("org.apache.commons:commons-lang3:3.14.0")
+    testImplementation("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 
