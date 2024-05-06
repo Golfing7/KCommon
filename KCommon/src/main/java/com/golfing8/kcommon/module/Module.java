@@ -165,9 +165,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.pluginDependencies = new HashSet<>(Arrays.asList(info.pluginDependencies()));
         this.subListeners = new HashSet<>();
 
-        for (int i = 0; i < 50; i++) {
-            System.out.println("Registered " + info.name());
-        }
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
             plugin.getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
