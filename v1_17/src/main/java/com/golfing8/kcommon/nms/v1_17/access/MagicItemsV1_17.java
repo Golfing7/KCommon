@@ -82,8 +82,18 @@ public class MagicItemsV1_17 implements NMSMagicItems {
     }
 
     @Override
-    public void applyLore(ItemMeta meta, @NotNull List<String> lore) {
+    public void applyLore(ItemMeta meta, List<String> lore) {
         meta.setLore(lore);
+    }
+
+    @Override
+    public String getMMDisplayName(ItemMeta meta) {
+        return meta.getDisplayName();
+    }
+
+    @Override
+    public List<String> getMMLore(ItemMeta meta) {
+        return meta.getLore();
     }
 
     @Override

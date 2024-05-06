@@ -108,9 +108,6 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull CASerializable object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         CASerializable.Options options = object.getClass().getAnnotation(CASerializable.Options.class);
         boolean flatten = options != null && options.flatten();
         var fieldHandles = typeFieldCache.containsKey(object.getClass()) ?

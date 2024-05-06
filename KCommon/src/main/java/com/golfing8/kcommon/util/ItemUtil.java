@@ -48,15 +48,18 @@ public final class ItemUtil {
             return;
 
         ItemMeta meta = itemStack.getItemMeta();
-        if (meta.hasDisplayName())
-            meta.setDisplayName(MS.parseSingle(meta.getDisplayName(), placeholders));
+        if (meta.hasDisplayName()) {
+            String displayName = NMS.getTheNMS().getMagicItems().getMMDisplayName(meta);
+            NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(displayName, placeholders));
+        }
 
         if (!meta.hasLore()) {
             itemStack.setItemMeta(meta);
             return;
         }
 
-        meta.setLore(MS.parseAll(meta.getLore(), placeholders));
+        List<String> lore = NMS.getTheNMS().getMagicItems().getMMLore(meta);
+        NMS.getTheNMS().getMagicItems().applyLore(meta, MS.parseAll(lore, placeholders));
         itemStack.setItemMeta(meta);
     }
 
@@ -75,7 +78,8 @@ public final class ItemUtil {
             return;
         }
 
-        meta.setLore(MS.parseAllMulti(meta.getLore(), placeholders));
+        List<String> lore = NMS.getTheNMS().getMagicItems().getMMLore(meta);
+        NMS.getTheNMS().getMagicItems().applyLore(meta, MS.parseAllMulti(lore, placeholders));
         itemStack.setItemMeta(meta);
     }
 }

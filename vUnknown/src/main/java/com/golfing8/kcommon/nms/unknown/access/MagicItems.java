@@ -5,6 +5,7 @@ import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.nms.unknown.ComponentUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
@@ -81,8 +82,27 @@ public class MagicItems implements NMSMagicItems {
     }
 
     @Override
-    public void applyLore(ItemMeta meta, @NotNull List<String> lore) {
+    public void applyLore(ItemMeta meta, List<String> lore) {
+        if (lore == null) {
+            meta.lore(null);
+            return;
+        }
         meta.lore(ComponentUtils.toComponent(lore));
+    }
+
+    @Override
+    public String getMMDisplayName(ItemMeta meta) {
+        Component display = meta.displayName();
+        return display == null ? null : MiniMessage.miniMessage().serialize(display);
+    }
+
+    @Override
+    public List<String> getMMLore(ItemMeta meta) {
+        List<Component> lore = meta.lore();
+        if (lore == null)
+            return null;
+
+        return lore.stream().map(MiniMessage.miniMessage()::serialize).toList();
     }
 
     @Override

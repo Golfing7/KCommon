@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public class MagicItemsV1_8 implements NMSMagicItems {
@@ -50,8 +51,18 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     }
 
     @Override
-    public void applyLore(ItemMeta meta, @NotNull List<String> lore) {
+    public void applyLore(ItemMeta meta, List<String> lore) {
         meta.setLore(lore);
+    }
+
+    @Override
+    public String getMMDisplayName(ItemMeta meta) {
+        return meta.getDisplayName();
+    }
+
+    @Override
+    public List<String> getMMLore(ItemMeta meta) {
+        return meta.getLore();
     }
 
     @Override

@@ -35,7 +35,23 @@ public interface NMSMagicItems {
      * @param meta the item meta.
      * @param lore the new lore.
      */
-    void applyLore(ItemMeta meta, @NotNull List<String> lore);
+    void applyLore(ItemMeta meta, @Nullable List<String> lore);
+
+    /**
+     * Gets a mini message serialized item name.
+     *
+     * @param meta the meta.
+     * @return the mini message formatted display name.
+     */
+    String getMMDisplayName(ItemMeta meta);
+
+    /**
+     * Gets the mini message serialized lore.
+     *
+     * @param meta the meta of the item.
+     * @return the mini message formatted lore.
+     */
+    List<String> getMMLore(ItemMeta meta);
 
     /**
      * Gets the displayed name of the given item.
