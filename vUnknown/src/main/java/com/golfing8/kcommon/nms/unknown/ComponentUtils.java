@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -50,6 +51,9 @@ public class ComponentUtils {
      * @return the component
      */
     public static Component toComponent(String message) {
+        if (message == null)
+            return null;
+
         return miniMessage.deserialize(processLine(message)).decoration(TextDecoration.ITALIC, false);
     }
 
@@ -66,20 +70,16 @@ public class ComponentUtils {
      * @param lines        the list with strings to convert
      * @return the component
      */
-    public static Component toComponent(List<String> lines) {
-        Component mainComponent = Component.empty();
-        Iterator<String> iterator = lines.iterator();
+    public static List<Component> toComponent(List<@NotNull String> lines) {
+        if (lines.isEmpty())
+            return Collections.emptyList();
 
-        while (iterator.hasNext()) {
-            String line = iterator.next();
-            mainComponent = mainComponent.append(toComponent(line));
-
-            if (iterator.hasNext()) {
-                mainComponent = mainComponent.append(Component.newline());
-            }
+        List<Component> components = new ArrayList<>();
+        for (String line : lines) {
+            components.add(toComponent(line));
         }
 
-        return mainComponent;
+        return components;
     }
 
     /**

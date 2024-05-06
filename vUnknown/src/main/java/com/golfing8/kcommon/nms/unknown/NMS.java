@@ -23,6 +23,9 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 
 public class NMS implements NMSAccess {
@@ -59,6 +62,16 @@ public class NMS implements NMSAccess {
     @Override
     public void sendMiniMessage(CommandSender player, String string) {
         player.sendMessage(ComponentUtils.toComponent(string));
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder holder, int size, String title) {
+        return Bukkit.createInventory(holder, size, ComponentUtils.toComponent(title));
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder holder, InventoryType type, String title) {
+        return Bukkit.createInventory(holder, type, ComponentUtils.toComponent(title));
     }
 
     @Override

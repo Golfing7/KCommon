@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.menu;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
 import com.golfing8.kcommon.menu.marker.NoClickHolder;
@@ -55,9 +56,9 @@ public abstract class MenuAbstract implements Menu {
                         List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders){
         this.menuShape = shape;
         if (shape.getType().isSizeMutable()) {
-            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, shape.getSize(), MS.parseSingle(title, placeholders));
+            this.backingInventory = NMS.getTheNMS().createInventory(clickable ? new NoClickHolder() : null, shape.getSize(), MS.parseSingle(title, placeholders));
         } else {
-            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, shape.getType().getType(), MS.parseSingle(title, placeholders));
+            this.backingInventory = NMS.getTheNMS().createInventory(clickable ? new NoClickHolder() : null, shape.getType().getType(), MS.parseSingle(title, placeholders));
         }
         this.guiItems = new ArrayList<>();
         this.canExpire = canExpire;
@@ -275,7 +276,11 @@ public abstract class MenuAbstract implements Menu {
 
             ItemStack[] contents = getContents();
 
-            this.backingInventory = Bukkit.createInventory(clickable ? new NoClickHolder() : null, size, MS.parseSingle(title, placeholders));
+            if (menuShape.getType().isSizeMutable()) {
+                this.backingInventory = NMS.getTheNMS().createInventory(clickable ? new NoClickHolder() : null, menuShape.getSize(), MS.parseSingle(title, placeholders));
+            } else {
+                this.backingInventory = NMS.getTheNMS().createInventory(clickable ? new NoClickHolder() : null, menuShape.getType().getType(), MS.parseSingle(title, placeholders));
+            }
 
             this.backingInventory.setContents(contents);
 

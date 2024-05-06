@@ -359,13 +359,14 @@ public final class ItemStackBuilder {
 
         ItemMeta meta = newCopy.getItemMeta();
 
-        if(this.itemName != null)
-            meta.setDisplayName(MS.parseSingle(this.itemName, placeholderArr));
+        if(this.itemName != null) {
+            NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(this.itemName, placeholderArr));
+        }
         if(this.itemLore != null && !this.itemLore.isEmpty()) {
             //Parse both single and multi placeholders.
             List<String> firstRun = MS.parseAll(this.itemLore, placeholderArr);
             List<String> secondRun = MS.parseAllMulti(firstRun, multiLinePlaceholders.toArray(new MultiLinePlaceholder[0]));
-            meta.setLore(secondRun);
+            NMS.getTheNMS().getMagicItems().applyLore(meta, secondRun);
         }
 
         if (meta instanceof PotionMeta) {

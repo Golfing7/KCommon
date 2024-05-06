@@ -14,6 +14,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -40,6 +42,16 @@ public class MagicItemsV1_8 implements NMSMagicItems {
         if(nbtCompound.getString("EntityId") == null)return EntityType.PIG;
 
         return translateNMSTypes(nbtCompound.getString("EntityId").toUpperCase());
+    }
+
+    @Override
+    public void applyName(ItemMeta meta, @Nullable String name) {
+        meta.setDisplayName(name);
+    }
+
+    @Override
+    public void applyLore(ItemMeta meta, @NotNull List<String> lore) {
+        meta.setLore(lore);
     }
 
     @Override

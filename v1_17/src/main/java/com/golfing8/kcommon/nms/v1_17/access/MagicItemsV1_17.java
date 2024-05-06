@@ -19,6 +19,10 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class MagicItemsV1_17 implements NMSMagicItems {
     @Override
@@ -70,6 +74,16 @@ public class MagicItemsV1_17 implements NMSMagicItems {
         damageable.setDamage(stack.getType().getMaxDurability() - amount);
 
         return damageable.getDamage() > stack.getType().getMaxDurability();
+    }
+
+    @Override
+    public void applyName(ItemMeta meta, @Nullable String name) {
+        meta.setDisplayName(name);
+    }
+
+    @Override
+    public void applyLore(ItemMeta meta, @NotNull List<String> lore) {
+        meta.setLore(lore);
     }
 
     @Override

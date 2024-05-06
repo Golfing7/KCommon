@@ -12,6 +12,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
 public interface NMSAccess {
     NMSServer getMinecraftServer();
@@ -48,6 +51,26 @@ public interface NMSAccess {
      * @param string the formatted message.
      */
     void sendMiniMessage(CommandSender sender, String string);
+
+    /**
+     * Creates an inventory and attempts to use mini message for the title.
+     *
+     * @param holder the holder of the inventory.
+     * @param size the size of the inventory.
+     * @param title the title of the inventory.
+     * @return the inventory.
+     */
+    Inventory createInventory(InventoryHolder holder, int size, String title);
+
+    /**
+     * Creates an inventory and attempts to use mini message for the title.
+     *
+     * @param holder the holder of the inventory.
+     * @param type the type of the inventory.
+     * @param title the title of the inventory.
+     * @return the inventory.
+     */
+    Inventory createInventory(InventoryHolder holder, InventoryType type, String title);
 
     OfflinePlayer getOfflinePlayerIfCached(String str);
 

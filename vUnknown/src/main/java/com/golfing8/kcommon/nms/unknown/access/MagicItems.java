@@ -2,6 +2,7 @@ package com.golfing8.kcommon.nms.unknown.access;
 
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.nms.unknown.ComponentUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -13,6 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class MagicItems implements NMSMagicItems {
     @Override
@@ -68,6 +73,16 @@ public class MagicItems implements NMSMagicItems {
     @Override
     public void setUnbreakable(ItemMeta meta, boolean value) {
         meta.setUnbreakable(value);
+    }
+
+    @Override
+    public void applyName(ItemMeta meta, @Nullable String name) {
+        meta.displayName(ComponentUtils.toComponent(name));
+    }
+
+    @Override
+    public void applyLore(ItemMeta meta, @NotNull List<String> lore) {
+        meta.lore(ComponentUtils.toComponent(lore));
     }
 
     @Override

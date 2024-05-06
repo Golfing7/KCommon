@@ -7,6 +7,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface NMSMagicItems {
     EntityType getSpawnerType(ItemStack stack);
@@ -16,6 +20,22 @@ public interface NMSMagicItems {
     boolean setRemainingItemDurability(ItemStack stack, int amount);
 
     void setUnbreakable(ItemMeta meta, boolean value);
+
+    /**
+     * Applies the name to the item and tries to use mini message if available.
+     *
+     * @param meta the meta.
+     * @param name the name of the item.
+     */
+    void applyName(ItemMeta meta, @Nullable String name);
+
+    /**
+     * Applies the lore to the given item in mini message format if available.
+     *
+     * @param meta the item meta.
+     * @param lore the new lore.
+     */
+    void applyLore(ItemMeta meta, @NotNull List<String> lore);
 
     /**
      * Gets the displayed name of the given item.

@@ -31,6 +31,9 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Collections;
@@ -76,6 +79,16 @@ public class NMS implements NMSAccess {
     @Override
     public void sendMiniMessage(CommandSender player, String string) {
         player.sendMessage(string);
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder holder, int size, String title) {
+        return Bukkit.createInventory(holder, size, title);
+    }
+
+    @Override
+    public Inventory createInventory(InventoryHolder holder, InventoryType type, String title) {
+        return Bukkit.createInventory(holder, type, title);
     }
 
     @Override
