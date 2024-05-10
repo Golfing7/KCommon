@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 /**
@@ -32,6 +33,21 @@ public class SoundWrapper {
             }, delay);
         }else {
             player.playSound(player.getLocation(), sound.parseSound(), volume, pitch);
+        }
+    }
+
+    /**
+     * Plays the sound at the given location.
+     *
+     * @param location the location to play the sound.
+     */
+    public void send(Location location) {
+        if (delay > 0) {
+            Bukkit.getServer().getScheduler().runTaskLater(KCommon.getInstance(), () -> {
+                location.getWorld().playSound(location, sound.parseSound(), volume, pitch);
+            }, delay);
+        }else {
+            location.getWorld().playSound(location, sound.parseSound(), volume, pitch);
         }
     }
 }
