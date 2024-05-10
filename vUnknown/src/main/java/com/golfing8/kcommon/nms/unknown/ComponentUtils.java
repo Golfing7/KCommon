@@ -60,6 +60,8 @@ public class ComponentUtils {
     public static String processLine(String str) {
         str = replaceLegacyColors(str, '&');
         str = replaceLegacyColors(str, '\u00A7');
+        str = replaceColors(str, '&');
+        str = replaceColors(str, '\u00A7');
         str = StringEscapeUtils.unescapeJava(str);
         return str;
     }
@@ -143,7 +145,6 @@ public class ComponentUtils {
         }
         matcher.appendTail(sb);
         message = sb.toString();
-        message = replaceColors(message, colorChar);
 
         return message;
     }

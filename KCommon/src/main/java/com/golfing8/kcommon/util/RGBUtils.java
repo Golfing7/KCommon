@@ -14,7 +14,7 @@ public class RGBUtils {
 
     private String toChatColor(String hexCode){
         StringBuilder magic = new StringBuilder(ChatColor.COLOR_CHAR + "x");
-        char[] var3 = hexCode.substring(1).toCharArray();
+        char[] var3 = hexCode.substring(2).toCharArray();
 
         for (char c : var3) {
             magic.append(ChatColor.COLOR_CHAR).append(c);
