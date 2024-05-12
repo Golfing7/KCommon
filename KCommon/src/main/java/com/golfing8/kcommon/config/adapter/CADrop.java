@@ -22,6 +22,7 @@ import java.util.Map;
 /**
  * A serializer for {@link Drop}
  */
+@SuppressWarnings("rawtypes")
 public class CADrop implements ConfigAdapter<Drop> {
     @Override
     public Class<Drop> getAdaptType() {
@@ -58,9 +59,6 @@ public class CADrop implements ConfigAdapter<Drop> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull Drop object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         Map<String, Object> serialized = new HashMap<>();
         serialized.put("chance", object.getChance());
         if (object.getDisplayName() != null) {

@@ -6,6 +6,9 @@ import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,6 +28,11 @@ public class Placeholder {
      */
     @Getter
     private final String value;
+
+    public Placeholder(Placeholder placeholder) {
+        this.label = placeholder.label;
+        this.value = placeholder.value;
+    }
 
     @Override
     public String toString() {
@@ -62,6 +70,38 @@ public class Placeholder {
         }
 
         return new Placeholder(trueLabel, listBuilder.toString());
+    }
+
+    /**
+     * Compiles an argument list of placeholders of the format: "LABEL-1" -> value1, "LABEL-2" -> value2, etc.
+     * <p>
+     * If any of the given arguments are already instances of {@link Placeholder}, their label and value are pulled and
+     * treated as if they were supplied separately.
+     * </p>
+     * Null values are not permitted.
+     *
+     * @param objects the objects.
+     * @return the list of parsed placeholders.
+     */
+    public static List<Placeholder> compileCurly(Object... objects) {
+        List<Placeholder> placeholders = new ArrayList<>();
+        int index = 0;
+        while (index < objects.length) {
+            Object object = objects[index];
+            if (object instanceof Placeholder) {
+                placeholders.add(new Placeholder((Placeholder) object));
+                index++;
+            } else {
+                if (index + 1 >= objects.length)
+                    throw new IllegalArgumentException("Unbalanced placeholder list: " + Arrays.toString(objects));
+
+                String key = "{" + objects[index] + "}";
+                String value = objects[index + 1].toString();
+                placeholders.add(new Placeholder(key, value));
+                index += 2;
+            }
+        }
+        return placeholders;
     }
 
     /**

@@ -3,6 +3,7 @@ package com.golfing8.kcommon.struct.title;
 import com.golfing8.kcommon.NMS;
 import lombok.Data;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A wrapper class for a title that can be sent to a player.
@@ -14,11 +15,11 @@ public class Title {
     /**
      * The title to show to the player.
      */
-    private final String title;
+    private final @Nullable String title;
     /**
      * The subtitle to show to the player.
      */
-    private final String subtitle;
+    private final @Nullable String subtitle;
     /**
      * The amount of time, in ticks, for the title to appear.
      */

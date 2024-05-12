@@ -21,6 +21,13 @@ public class SoundWrapper {
     private final float pitch;
     private int delay = 0;
 
+    public SoundWrapper(SoundWrapper wrapper) {
+        this.sound = wrapper.sound;
+        this.volume = wrapper.volume;
+        this.pitch = wrapper.pitch;
+        this.delay = wrapper.delay;
+    }
+
     /**
      * Sends the sound contained by this wrapper to the player.
      *

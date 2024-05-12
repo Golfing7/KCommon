@@ -7,6 +7,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,8 +22,8 @@ import java.util.stream.Collectors;
 public class ItemDrop extends Drop<ItemStack> {
     private Map<String, ItemStackBuilder> items;
     private boolean giveDirectly;
-    public ItemDrop(double chance, String message, Map<String, ItemStackBuilder> items, boolean giveDirectly) {
-        super(chance, message);
+    public ItemDrop(double chance, @Nullable String displayName, Map<String, ItemStackBuilder> items, boolean giveDirectly) {
+        super(chance, displayName);
         this.items = items;
         this.giveDirectly = giveDirectly;
     }

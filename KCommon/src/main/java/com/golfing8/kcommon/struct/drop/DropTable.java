@@ -3,13 +3,19 @@ package com.golfing8.kcommon.struct.drop;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
+import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.struct.Range;
+import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
+import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.util.StringUtil;
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.var;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -53,23 +59,55 @@ public class DropTable implements CASerializable {
     private Map<String, Drop<?>> table;
     private Map<String, DropGroup> groupings;
 
+    public DropTable(Map<String, Drop<?>> drops) {
+        table = new HashMap<>(drops);
+        groupings = new HashMap<>();
+        initDefaultGroup(null);
+    }
+
+    public DropTable(Map<String, Drop<?>> drops, Range dropTargetRange) {
+        table = new HashMap<>(drops);
+        groupings = new HashMap<>();
+        initDefaultGroup(dropTargetRange);
+    }
+
+    public DropTable(Map<String, Drop<?>> drops, Map<String, DropGroup> groups) {
+        table = new HashMap<>(drops);
+        groupings = new HashMap<>(groups);
+        if (!groupings.containsKey(DEFAULT_GROUP))
+            initDefaultGroup(null);
+    }
+
     @Override
     public void onDeserialize(ConfigPrimitive primitive) {
         if (groupings == null)
             groupings = new HashMap<>();
 
         if (!groupings.containsKey(DEFAULT_GROUP)) {
-            Set<String> allDrops = new HashSet<>(table.keySet());
-            for (var entry : groupings.entrySet()) {
-                entry.getValue().getDrops().forEach(allDrops::remove);
-            }
             Map<String, Object> unwrapped = primitive.unwrap();
             Range dropTargetRange = null;
             if (unwrapped.containsKey("drop-target-range")) {
                 dropTargetRange = ConfigTypeRegistry.getFromType(primitive.getSubValue("drop-target-range"), Range.class);
             }
-            groupings.put(DEFAULT_GROUP, new DropGroup(DEFAULT_GROUP, new ArrayList<>(allDrops), dropTargetRange));
+            initDefaultGroup(dropTargetRange);
         }
+
+    }
+
+    /**
+     * Initializes the default group in the groupings map.
+     *
+     * @param dropRange the drop range.
+     */
+    private void initDefaultGroup(@Nullable Range dropRange) {
+        if (groupings.containsKey(DEFAULT_GROUP))
+            return;
+
+        Set<String> allDrops = new HashSet<>(table.keySet());
+        for (var entry : groupings.entrySet()) {
+            entry.getValue().getDrops().forEach(allDrops::remove);
+        }
+        groupings.put(DEFAULT_GROUP, new DropGroup(DEFAULT_GROUP, new ArrayList<>(allDrops), dropRange));
     }
 
     /**
@@ -92,10 +130,11 @@ public class DropTable implements CASerializable {
 
                     drops.add(drop);
                     collectedDrops++;
+                    // If the drop target has an upper bound and we've met it, break!
                     if (dropTarget >= 0 && collectedDrops >= dropTarget)
                         break;
                 }
-            } while (dropTarget >= 0 && collectedDrops < dropTarget);
+            } while (dropTarget >= 0 && collectedDrops < dropTarget); // If we have an upper bound, keep looping til we meet it!
         }
         return drops;
     }
@@ -104,23 +143,79 @@ public class DropTable implements CASerializable {
      * Generates drops and gives them to the player.
      *
      * @param player the player.
+     * @return the drops given to the player
      */
-    public void giveTo(Player player) {
-        generateDrops().forEach(drop -> drop.giveTo(player));
+    public List<Drop<?>> giveTo(Player player) {
+        return giveTo(player, null);
+    }
+
+    /**
+     * Generates drops and gives them to the player.
+     *
+     * @param player the player.
+     * @param dropMessageFormat the message format for if a drop was given.
+     * @return the drops given to the player
+     */
+    public List<Drop<?>> giveTo(Player player, @Nullable Message dropMessageFormat) {
+        List<Drop<?>> drops = generateDrops();
+        drops.forEach(drop -> {
+            drop.giveTo(player);
+        });
+        if (dropMessageFormat != null)
+            sendDropMessage(player, drops, dropMessageFormat);
+        return drops;
     }
 
     /**
      * Gives the player the drops or drops the drops at the given location.
      *
      * @param player the player.
+     * @param location the location
+     * @return the drops given to the player
      */
-    public void giveOrDropAt(Player player, Location location) {
-        generateDrops().forEach(drop -> {
+    public List<Drop<?>> giveOrDropAt(Player player, Location location) {
+        return giveOrDropAt(player, location, null);
+    }
+
+    /**
+     * Gives the player the drops or drops the drops at the given location.
+     *
+     * @param player the player.
+     * @param location the location.
+     * @param dropMessageFormat the message format for if a drop was given.
+     * @return the drops given to the player
+     */
+    public List<Drop<?>> giveOrDropAt(Player player, Location location, @Nullable Message dropMessageFormat) {
+        List<Drop<?>> drops = generateDrops();
+        drops.forEach(drop -> {
             if (drop.isPhysical()) {
                 drop.dropAt(location);
             } else {
                 drop.giveTo(player);
             }
         });
+        if (dropMessageFormat != null)
+            sendDropMessage(player, drops, dropMessageFormat);
+        return drops;
+    }
+
+    /**
+     * Sends a message to a player with drop placeholders parsed in.
+     *
+     * @param player the player.
+     * @param drops the drops parsed in.
+     * @param message the drop message.
+     */
+    private void sendDropMessage(Player player, List<Drop<?>> drops, Message message) {
+        List<String> displayNames = new ArrayList<>(); // don't allocate if you don't have to
+        drops.forEach(drop -> {
+            if (drop.getDisplayName() != null)
+                displayNames.add(drop.getDisplayName());
+        });
+        message.send(player, Lists.newArrayList(
+                Placeholder.curly("TOTAL_REWARDS", StringUtil.parseCommas(drops.size()))
+        ), Lists.newArrayList(
+                MultiLinePlaceholder.percent("REWARDS", displayNames)
+        ));
     }
 }

@@ -17,7 +17,6 @@ public final class Placeholders {
         if (placeholders == null || placeholders.length == 0)
             return message;
 
-
         StringPlaceholders sp = new StringPlaceholders(message);
 
         List<String> keys = new ArrayList<>();

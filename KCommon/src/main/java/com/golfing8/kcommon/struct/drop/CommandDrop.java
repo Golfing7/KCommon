@@ -1,31 +1,26 @@
 package com.golfing8.kcommon.struct.drop;
 
-import com.golfing8.kcommon.struct.item.ItemStackBuilder;
-import com.golfing8.kcommon.util.PlayerUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Represents a Drop for commands.
  */
 @Getter
 public class CommandDrop extends Drop<String> {
-    private List<String> items;
-    public CommandDrop(double chance, String message, List<String> commands) {
-        super(chance, message);
-        this.items = commands;
+    private List<String> commands;
+    public CommandDrop(double chance, @Nullable String displayName, List<String> commands) {
+        super(chance, displayName);
+        this.commands = commands;
     }
 
     @Override
     public List<String> getDrop() {
-        return items;
+        return commands;
     }
 
     @Override

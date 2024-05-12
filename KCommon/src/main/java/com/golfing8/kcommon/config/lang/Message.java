@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A message which can represent a string or a list of strings.
@@ -152,6 +153,53 @@ public class Message {
      */
     public boolean isEmpty() {
         return this.isSimple() && (this.messages == null || this.messages.isEmpty());
+    }
+
+    /**
+     * Clones and parses the given placeholders into this message.
+     *
+     * @param placeholders an argument list of placeholders.
+     * @return the cloned message with the replaced placeholders.
+     */
+    public Message cloneAndParse(Object... placeholders) {
+        List<Placeholder> compiled = Placeholder.compileCurly(placeholders);
+        return cloneAndParse(compiled, Collections.emptyList());
+    }
+
+    /**
+     * Clones and parses the given placeholders into this message.
+     *
+     * @param placeholders the placeholders.
+     * @param multiLinePlaceholders the multi-line placeholders.
+     * @return the cloned message with the replaced placeholders.
+     */
+    public Message cloneAndParse(Collection<Placeholder> placeholders, Collection<MultiLinePlaceholder> multiLinePlaceholders) {
+        List<String> newMessages = null;
+        if (messages != null) {
+            newMessages = MS.parseAllMulti(MS.parseAll(messages, placeholders), multiLinePlaceholders);
+        }
+
+        Title newTitle = null;
+        if (title != null) {
+            newTitle = new Title(
+                    MS.parseSingle(title.getTitle(), placeholders),
+                    MS.parseSingle(title.getSubtitle(), placeholders),
+                    title.getIn(),
+                    title.getStay(),
+                    title.getOut()
+            );
+        }
+
+        String newActionBar = null;
+        if (actionBar != null) {
+            newActionBar = MS.parseSingle(actionBar, placeholders);
+        }
+
+        List<SoundWrapper> newSounds = null;
+        if (sounds != null) {
+            newSounds = sounds.stream().map(SoundWrapper::new).collect(Collectors.toList());
+        }
+        return new Message(newMessages, newSounds, newTitle, newActionBar);
     }
 
     /**

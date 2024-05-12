@@ -29,7 +29,8 @@ public class CALocation implements ConfigAdapter<Location> {
 
         // Check serialization type
         if (entry.getPrimitive() instanceof String) {
-            String[] split = entry.getPrimitive().toString().split(":");
+            String string = entry.getPrimitive().toString();
+            String[] split = string.split("[:;]");
             double x = Double.parseDouble(split[0]);
             double y = Double.parseDouble(split[1]);
             double z = Double.parseDouble(split[2]);
@@ -56,13 +57,13 @@ public class CALocation implements ConfigAdapter<Location> {
     @Override
     public ConfigPrimitive toPrimitive(@NotNull Location object) {
         StringBuilder locationSerialization = new StringBuilder();
-        locationSerialization.append(object.getX()).append(":");
-        locationSerialization.append(object.getY()).append(":");
-        locationSerialization.append(object.getZ()).append(":");
+        locationSerialization.append(object.getX()).append(";");
+        locationSerialization.append(object.getY()).append(";");
+        locationSerialization.append(object.getZ()).append(";");
         locationSerialization.append(object.getWorld().getName());
         if (object.getYaw() != DEF_YAW || object.getPitch() != DEF_PITCH) {
-            locationSerialization.append(":").append(object.getYaw());
-            locationSerialization.append(":").append(object.getPitch());
+            locationSerialization.append(";").append(object.getYaw());
+            locationSerialization.append(";").append(object.getPitch());
         }
         return ConfigPrimitive.ofString(locationSerialization.toString());
     }
