@@ -73,7 +73,7 @@ public class Placeholder {
     }
 
     /**
-     * Compiles an argument list of placeholders of the format: "LABEL-1" -> value1, "LABEL-2" -> value2, etc.
+     * Compiles an argument list of placeholders of the format: {@code "LABEL-1" -> value1, "LABEL-2" -> value2, etc}.
      * <p>
      * If any of the given arguments are already instances of {@link Placeholder}, their label and value are pulled and
      * treated as if they were supplied separately.
