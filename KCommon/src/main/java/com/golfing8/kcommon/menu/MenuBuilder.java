@@ -65,7 +65,7 @@ public final class MenuBuilder {
     private Map<String, SimpleGUIItem> otherGUIItems = new HashMap<>();
     /** The type of menu being built */
     @Getter
-    private MenuShapeType menuShapeType;
+    private MenuShapeType menuShapeType = MenuShapeType.CHEST;
     /** This will be run in the same tick the inventory has been closed */
     @Getter
     private CloseRunnable closeRunnable;
