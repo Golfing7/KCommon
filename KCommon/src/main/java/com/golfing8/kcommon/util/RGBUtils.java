@@ -52,7 +52,6 @@ public class RGBUtils {
 
     private String fixFormat3(String input){
         String text = input;
-        text = text.replace('\u00a7', '&');
         Matcher m = fix3.matcher(text);
         while(m.find()){
             String hexcode = m.group();
