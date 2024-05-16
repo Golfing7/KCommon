@@ -206,6 +206,17 @@ public abstract class KCommand implements TabExecutor {
         return null;
     }
 
+    protected String getGeneratedCommandPermission() {
+        String prefixInsertion = getCommandPermissionPrefix();
+        String builtPrefix;
+        if (StringUtil.isNotEmpty(prefixInsertion)) {
+            builtPrefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + "." + prefixInsertion + ".command.";
+        } else {
+            builtPrefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + ".command.";
+        }
+        return builtPrefix + buildCommandPermissionSuffix();
+    }
+
     /**
      * Sets up the permission for using this command.
      */
@@ -218,14 +229,7 @@ public abstract class KCommand implements TabExecutor {
         if (!this.annotation.permission().equals(Cmd.GENERATE_PERMISSION))
             return;
 
-        String prefixInsertion = getCommandPermissionPrefix();
-        String builtPrefix;
-        if (StringUtil.isNotEmpty(prefixInsertion)) {
-            builtPrefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + "." + prefixInsertion + ".command.";
-        } else {
-            builtPrefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + ".command.";
-        }
-        this.commandPermission = builtPrefix + buildCommandPermissionSuffix();
+        this.commandPermission = getGeneratedCommandPermission();
     }
 
     /**
@@ -255,7 +259,7 @@ public abstract class KCommand implements TabExecutor {
      * Registers this command to the bukkit command map.
      */
     public final void register() {
-        this.plugin.getCommandManager().registerNewCommand(this);
+        this.plugin.getCommandManager().registerNewCommand(this, true);
         this.onRegister();
         this.subRegister();
     }

@@ -11,6 +11,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,9 +24,16 @@ public class CommandManager {
      * The plugin this command manager uses.
      */
     private final Plugin plugin;
+    private boolean needsSync;
 
     public CommandManager(Plugin plugin){
         this.plugin = plugin;
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            if (needsSync) {
+                needsSync = false;
+                syncCommandsIfPossible();
+            }
+        }, 0, 1);
     }
 
     /**
@@ -34,7 +42,7 @@ public class CommandManager {
      * @param command the command.
      * @return the registered plugin command.
      */
-    public PluginCommand registerNewCommand(KCommand command){
+    public PluginCommand registerNewCommand(KCommand command, boolean sync){
         PluginCommand pluginCommand = getCommand(command.getCommandName(), command.getCommandAliases());
 
         getCommandMap().register(plugin.getName(), pluginCommand);
@@ -43,6 +51,9 @@ public class CommandManager {
         pluginCommand.setExecutor(command);
         pluginCommand.setTabCompleter(command);
 
+        if (sync) {
+            needsSync = true;
+        }
         return pluginCommand;
     }
 
@@ -53,6 +64,7 @@ public class CommandManager {
      */
     public void unregisterCommand(KCommand command){
         deregisterCommand(command.getCommandName(), command.getCommandAliases());
+        needsSync = true;
     }
 
     /**
@@ -99,6 +111,17 @@ public class CommandManager {
         }
 
         return commandMap;
+    }
+
+    public void syncCommandsIfPossible() {
+        try {
+            Class<?> craftServer = Bukkit.getServer().getClass();
+            Method syncCommandsMethod = craftServer.getDeclaredMethod("syncCommands");
+
+            syncCommandsMethod.invoke(Bukkit.getServer());
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
+
+        }
     }
 
     /**
