@@ -25,17 +25,17 @@ public final class NMS {
         if(theNMS != null)
             throw new IllegalStateException("NMS is already initialized!");
 
-        String theVersion = version();
-
-        String vSplit = theVersion.split("R")[0];
-
         try{
+            String theVersion = version();
+
+            String vSplit = theVersion.split("R")[0];
+
             Class<?> mainClass = Class.forName("com.golfing8.kcommon.nms." + vSplit.substring(0, vSplit.length() - 1) + ".NMS");
 
             Constructor<?> cons = mainClass.getConstructor(Plugin.class);
 
             theNMS = (NMSAccess) cons.newInstance(KCommon.getInstance());
-        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException ignored) {
+        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | InstantiationException | ArrayIndexOutOfBoundsException ignored) {
             try {
                 Class<?> mainClass = Class.forName("com.golfing8.kcommon.nms.unknown.NMS");
 

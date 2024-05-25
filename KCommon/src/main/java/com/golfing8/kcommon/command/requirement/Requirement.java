@@ -8,6 +8,9 @@ import com.golfing8.kcommon.config.lang.Message;
  * <p>
  * Each requirement should strive to be atomic in nature (i.e. don't check that a player is in a team AND has played for more than a day)
  * </p>
+ * <p>
+ * Each command should strive to put as much requirement/predicate logic inside of the registration of a command, rather than its execution.
+ * </p>
  */
 public interface Requirement {
     /**
