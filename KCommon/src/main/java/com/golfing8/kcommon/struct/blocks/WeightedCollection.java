@@ -68,7 +68,7 @@ public class WeightedCollection<T> {
             return null;
 
         //Get a random number between 0 and 1, then get the value in the range.
-        double inRange = ThreadLocalRandom.current().nextDouble() * 100.0D;
+        double inRange = ThreadLocalRandom.current().nextDouble();
         return this.bakedOdds.get(inRange).getB();
     }
 
