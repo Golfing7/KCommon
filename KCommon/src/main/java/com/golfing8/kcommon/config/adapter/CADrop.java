@@ -38,7 +38,7 @@ public class CADrop implements ConfigAdapter<Drop> {
         String displayName = primitive.containsKey("display-name") ? primitive.get("display-name").toString() : null;
         double chance = primitive.containsKey("chance") ?
                 (double) ConfigPrimitive.coerceStringToBoxed(primitive.get("chance").toString(), Double.class) :
-                1.0D;
+                100.0D;
         if (primitive.containsKey("items") || primitive.containsKey("item")) {
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             if (primitive.containsKey("item")) {
