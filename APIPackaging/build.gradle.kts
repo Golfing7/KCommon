@@ -30,7 +30,7 @@ tasks.getByName<Test>("test") {
 dependencies {
     implementation(parent!!)
 
-    implementation("de.tr7zw:item-nbt-api:2.12.3") //For items.
+    implementation("de.tr7zw:item-nbt-api:2.12.4") //For items.
     implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
     implementation("com.github.cryptomorin:XSeries:9.8.1") //For XSeries
     implementation("org.mongodb:mongodb-driver-sync:4.11.1")
