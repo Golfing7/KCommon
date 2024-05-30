@@ -181,7 +181,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
     private int getExactLocationKey(Position p)
     {
         int x = p.getX() & 15;
-        int y = (p.getY() - 64) & 15;
+        int y = (p.getY() + 64) & 15;
         int z = p.getZ() & 15;
 
         return x << 8 | y << 4 | z;
@@ -189,7 +189,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
 
     private int getHashKey(Position p)
     {
-        int y = (p.getY() - 64) >> RIGHT_BIT_SHIFT;
+        int y = (p.getY() + 64) >> RIGHT_BIT_SHIFT;
 
         if(y >= buckets || y < 0)
             throw new IllegalArgumentException("Point must be defined in y 1-256!");
