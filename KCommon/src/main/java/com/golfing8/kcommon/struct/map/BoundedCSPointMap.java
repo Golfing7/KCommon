@@ -148,6 +148,17 @@ public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
         return entries;
     }
 
+    @Override
+    public ChunkColumn<V> getChunkColumn(int x, int z) {
+        return getChunkColumn(new Position(x * 16, 0, z * 16));
+    }
+
+    @Override
+    @SuppressWarnings("unchekced")
+    public ChunkColumn<V> getChunkColumn(Position position) {
+        return (ChunkColumn<V>) getCol(position).value;
+    }
+
     static class MapEntry<V> implements Entry<Position, V>
     {
         Position key;

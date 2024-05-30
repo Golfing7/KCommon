@@ -124,6 +124,16 @@ public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V>{
         return entries;
     }
 
+    @Override
+    public ChunkColumn<V> getChunkColumn(int x, int z) {
+        return getChunkColumn(new Position(x * 16, 0, z * 16));
+    }
+
+    @Override
+    public ChunkColumn<V> getChunkColumn(Position position) {
+        return storedValues.get(createLongHash(position));
+    }
+
     static class MapEntry<V> implements Entry<Position, V>
     {
         Position key;
