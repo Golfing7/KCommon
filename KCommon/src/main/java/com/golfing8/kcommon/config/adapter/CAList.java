@@ -44,7 +44,7 @@ public class CAList implements ConfigAdapter<List> {
             Class<?> objectType = value.getClass();
             ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(objectType);
             if (adapter == null) {
-                primitives.add(value);
+                primitives.add(ConfigPrimitive.coerceStringToBoxed(value.toString(), objectType));
             } else {
                 primitives.add(adapter.toPrimitive(value).getPrimitive());
             }

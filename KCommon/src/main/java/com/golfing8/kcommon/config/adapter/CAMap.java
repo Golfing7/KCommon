@@ -45,8 +45,8 @@ public class CAMap implements ConfigAdapter<Map> {
         Type valueType = type.getGenericTypes().get(1);
         FieldType keyFieldType = new FieldType(keyType);
         FieldType valueFieldType = new FieldType(valueType);
-        ConfigAdapter<?> adapter = ConfigTypeRegistry.findAdapter(valueType);
         ConfigAdapter<?> keyAdapter = ConfigTypeRegistry.findAdapter(keyType);
+        ConfigAdapter<?> valueAdapter = ConfigTypeRegistry.findAdapter(valueType);
 
         Map<String, Object> primitive = entry.unwrap();
         for (Map.Entry<String, Object> mapEntry : primitive.entrySet()) {
@@ -54,10 +54,10 @@ public class CAMap implements ConfigAdapter<Map> {
                     keyAdapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getKey()), keyFieldType) :
                     ConfigPrimitive.coerceStringToBoxed(mapEntry.getKey(), keyFieldType.getType());
 
-            if (adapter == null) {
-                values.put(adaptedKey, mapEntry.getValue());
+            if (valueAdapter == null) {
+                values.put(adaptedKey, ConfigPrimitive.coerceStringToBoxed(mapEntry.getValue().toString(), valueFieldType.getType()));
             } else {
-                values.put(adaptedKey, adapter.toPOJO(entry.getSubValue(mapEntry.getKey()), valueFieldType));
+                values.put(adaptedKey, valueAdapter.toPOJO(entry.getSubValue(mapEntry.getKey()), valueFieldType));
             }
         }
 
