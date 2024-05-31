@@ -1,9 +1,11 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
     id("com.github.johnrengelman.shadow") version("7.1.2")
     id("maven-publish")
+    kotlin("jvm")
 }
 
 repositories {
@@ -30,6 +32,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
     testImplementation("io.papermc:paper-api:1.12.2")
+    testImplementation(kotlin("test"))
     testImplementation(project(":NMS"))
     testImplementation("org.mongodb:mongodb-driver-sync:5.0.1")
     testImplementation("com.github.cryptomorin:XSeries:9.8.1")
@@ -46,8 +49,17 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("io.papermc:paper-api:1.12.2")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") //Vault
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

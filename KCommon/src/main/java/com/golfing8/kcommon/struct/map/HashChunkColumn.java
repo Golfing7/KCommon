@@ -40,7 +40,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
 
     @Override
     public Iterator<V> iterator() {
-        return new NodeIterator<>(tail);
+        return new NodeIterator<>(head);
     }
 
     @Override
@@ -208,7 +208,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
 
         @Override
         public boolean hasNext() {
-            return current.next != null;
+            return current != null;
         }
 
         @Override
@@ -216,8 +216,9 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
             if(!hasNext())
                 throw new NoSuchElementException();
 
+            V value = (V) current.value;
             current = current.next;
-            return (V) current.value;
+            return value;
         }
     }
 }
