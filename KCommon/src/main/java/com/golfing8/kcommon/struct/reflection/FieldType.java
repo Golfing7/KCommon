@@ -51,6 +51,6 @@ public class FieldType {
     public static FieldType extractFrom(TypeToken<?> token) {
         ParameterizedType foundType = (ParameterizedType) token.getType();
         return new FieldType((Class<?>) foundType.getRawType(),
-                Lists.newArrayList(foundType.getActualTypeArguments()[0]));
+                Lists.newArrayList(foundType.getActualTypeArguments()));
     }
 }

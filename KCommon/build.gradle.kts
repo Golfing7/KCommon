@@ -49,7 +49,6 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("io.papermc:paper-api:1.12.2")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") //Vault
-    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.getByName<Test>("test") {

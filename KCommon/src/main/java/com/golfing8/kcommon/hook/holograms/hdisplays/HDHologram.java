@@ -1,8 +1,12 @@
 package com.golfing8.kcommon.hook.holograms.hdisplays;
 
+import com.gmail.filoghost.holographicdisplays.api.line.ItemLine;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.golfing8.kcommon.hook.holograms.Hologram;
 import lombok.AllArgsConstructor;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 /**
  * Implements a hologram using Holographic Displays.
@@ -16,7 +20,22 @@ public class HDHologram implements Hologram {
 
     @Override
     public void setLine(int index, String line) {
-        ((TextLine) this.backingHologram.getLine(index)).setText(line);
+        if (this.backingHologram.getLine(index) instanceof TextLine) {
+            ((TextLine) this.backingHologram.getLine(index)).setText(line);
+        } else {
+            this.backingHologram.removeLine(index);
+            this.backingHologram.insertTextLine(index, line);
+        }
+    }
+
+    @Override
+    public void setLine(int index, ItemStack line) {
+        if (this.backingHologram.getLine(index) instanceof ItemLine) {
+            ((ItemLine) this.backingHologram.getLine(index)).setItemStack(line);
+        } else {
+            this.backingHologram.removeLine(index);
+            this.backingHologram.insertItemLine(index, line);
+        }
     }
 
     @Override
@@ -43,6 +62,28 @@ public class HDHologram implements Hologram {
     @Override
     public void addLine(int index, String line) {
         this.backingHologram.insertTextLine(index, line);
+    }
+
+    @Override
+    public void addLine(int index, ItemStack itemStack) {
+        this.backingHologram.insertItemLine(index, itemStack);
+    }
+
+    @Override
+    public void setLines(List<String> lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (i >= this.length()) {
+                addLine(line);
+            } else {
+                setLine(i, line);
+            }
+        }
+
+        // Make sure we remove extra lines.
+        for (int i = lines.size(); i < length(); i++) {
+            removeLine(i);
+        }
     }
 
     @Override

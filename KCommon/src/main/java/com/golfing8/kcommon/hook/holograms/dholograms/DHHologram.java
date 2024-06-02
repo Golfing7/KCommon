@@ -5,6 +5,9 @@ import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.DisableCause;
 import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import lombok.AllArgsConstructor;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 /**
  * Implements a hologram using Decent Holograms
@@ -15,6 +18,11 @@ public class DHHologram implements Hologram {
 
     @Override
     public void setLine(int index, String line) {
+        DHAPI.setHologramLine(this.backingHologram, index, line);
+    }
+
+    @Override
+    public void setLine(int index, ItemStack line) {
         DHAPI.setHologramLine(this.backingHologram, index, line);
     }
 
@@ -46,6 +54,19 @@ public class DHHologram implements Hologram {
             DHAPI.addHologramLine(backingHologram, line);
         else
             DHAPI.insertHologramLine(backingHologram, index, line);
+    }
+
+    @Override
+    public void addLine(int index, ItemStack itemStack) {
+        if(index == this.length())
+            DHAPI.addHologramLine(backingHologram, itemStack);
+        else
+            DHAPI.insertHologramLine(backingHologram, index, itemStack);
+    }
+
+    @Override
+    public void setLines(List<String> lines) {
+        DHAPI.setHologramLines(backingHologram, lines);
     }
 
     @Override

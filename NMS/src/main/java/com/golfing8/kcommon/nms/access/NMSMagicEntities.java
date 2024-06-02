@@ -50,6 +50,14 @@ public interface NMSMagicEntities {
 
     void setPersists(Creature entity, boolean value);
 
+    /**
+     * Sets the killer of the given entity to the provided killer, or null.
+     *
+     * @param entity the entity.
+     * @param killer the new killer.
+     */
+    void setKiller(LivingEntity entity, Player killer);
+
     <T extends Entity> T createEntity(World world, Location loc, Class<T> clazz);
 
     <T extends Entity> T spawnEntity(World world, Location loc, Class<T> clazz);

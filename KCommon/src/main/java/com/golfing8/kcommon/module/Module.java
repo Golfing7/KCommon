@@ -398,10 +398,21 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      *
      * @param listener the sub listener.
      */
-    protected final void addSubListener(Listener listener) {
+    public final void addSubListener(Listener listener) {
         getPlugin().getServer().getPluginManager().registerEvents(listener, getPlugin());
 
         this.subListeners.add(listener);
+    }
+
+    /**
+     * Removes the sub listener.
+     *
+     * @param listener the sub listener.
+     */
+    public final void removeSubListener(Listener listener) {
+        HandlerList.unregisterAll(listener);
+
+        this.subListeners.remove(listener);
     }
 
     /**

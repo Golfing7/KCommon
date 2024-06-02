@@ -92,6 +92,11 @@ public class MagicEntities implements NMSMagicEntities {
     }
 
     @Override
+    public void setKiller(LivingEntity entity, Player killer) {
+        entity.setKiller(killer);
+    }
+
+    @Override
     public void setNoClip(Entity entity, boolean value) {
         throw new UnsupportedOperationException();
     }

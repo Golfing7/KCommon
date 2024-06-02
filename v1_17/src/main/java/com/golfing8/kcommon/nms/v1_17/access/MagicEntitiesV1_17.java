@@ -186,6 +186,11 @@ public class MagicEntitiesV1_17 implements NMSMagicEntities {
     }
 
     @Override
+    public void setKiller(LivingEntity entity, Player killer) {
+        entity.setKiller(killer);
+    }
+
+    @Override
     public void setNoClip(Entity entity, boolean value) {
         ((CraftEntity) entity).getHandle().P = value;
     }

@@ -139,6 +139,11 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
     }
 
     @Override
+    public void setKiller(LivingEntity entity, Player killer) {
+        ((CraftLivingEntity) entity).getHandle().killer = ((CraftPlayer) killer).getHandle();
+    }
+
+    @Override
     public boolean canEntitySpawn(LivingEntity entity) {
         EntityLiving living = ((CraftLivingEntity) entity).getHandle();
 

@@ -1,11 +1,20 @@
 package com.golfing8.kcommon.hook.holograms;
 
+import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
+
 /**
  * An empty implementation of {@link Hologram}
  */
 public class EmptyHologram implements Hologram {
     @Override
     public void setLine(int index, String line) {
+
+    }
+
+    @Override
+    public void setLine(int index, ItemStack line) {
 
     }
 
@@ -31,6 +40,16 @@ public class EmptyHologram implements Hologram {
 
     @Override
     public void addLine(int index, String line) {
+
+    }
+
+    @Override
+    public void addLine(int index, ItemStack itemStack) {
+
+    }
+
+    @Override
+    public void setLines(List<String> lines) {
 
     }
 

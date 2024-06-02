@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.var;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -116,6 +117,16 @@ public class DropTable implements CASerializable {
      * @return the drops.
      */
     public List<Drop<?>> generateDrops() {
+        return generateDrops(DropContext.DEFAULT);
+    }
+
+    /**
+     * Generates a random set of drops.
+     *
+     * @param context the drop context
+     * @return the drops.
+     */
+    public List<Drop<?>> generateDrops(@NotNull DropContext context) {
         List<Drop<?>> drops = new ArrayList<>();
         for (var groupEntry : groupings.entrySet()) {
             int dropTarget = groupEntry.getValue().getDropTarget();
@@ -125,7 +136,7 @@ public class DropTable implements CASerializable {
                 Collections.shuffle(dropKeys);
                 for (String dropKey : dropKeys) {
                     Drop<?> drop = table.get(dropKey);
-                    if (!drop.testRandom())
+                    if (!drop.testRandom(context.getBoost()))
                         continue;
 
                     drops.add(drop);
@@ -146,7 +157,20 @@ public class DropTable implements CASerializable {
      * @return the drops given to the player
      */
     public List<Drop<?>> giveTo(Player player) {
-        return giveTo(player, null);
+        return giveTo(new DropContext(player), null);
+    }
+
+    /**
+     * Generates drops and gives them to the player.
+     *
+     * @param context the context.
+     * @return the drops given to the player
+     */
+    public List<Drop<?>> giveTo(DropContext context) {
+        if (context.getPlayer() == null)
+            throw new IllegalArgumentException("Player must not be null when giving drops");
+
+        return giveTo(context, null);
     }
 
     /**
@@ -156,13 +180,13 @@ public class DropTable implements CASerializable {
      * @param dropMessageFormat the message format for if a drop was given.
      * @return the drops given to the player
      */
-    public List<Drop<?>> giveTo(Player player, @Nullable Message dropMessageFormat) {
-        List<Drop<?>> drops = generateDrops();
+    public List<Drop<?>> giveTo(DropContext player, @Nullable Message dropMessageFormat) {
+        List<Drop<?>> drops = generateDrops(player);
         drops.forEach(drop -> {
-            drop.giveTo(player);
+            drop.giveTo(player.getPlayer());
         });
         if (dropMessageFormat != null)
-            sendDropMessage(player, drops, dropMessageFormat);
+            sendDropMessage(player.getPlayer(), drops, dropMessageFormat);
         return drops;
     }
 
@@ -174,28 +198,39 @@ public class DropTable implements CASerializable {
      * @return the drops given to the player
      */
     public List<Drop<?>> giveOrDropAt(Player player, Location location) {
-        return giveOrDropAt(player, location, null);
+        return giveOrDropAt(new DropContext(player), location, null);
     }
 
     /**
      * Gives the player the drops or drops the drops at the given location.
      *
-     * @param player the player.
+     * @param context the drop context.
+     * @param location the location
+     * @return the drops given to the player
+     */
+    public List<Drop<?>> giveOrDropAt(DropContext context, Location location) {
+        return giveOrDropAt(context, location, null);
+    }
+
+    /**
+     * Gives the player the drops or drops the drops at the given location.
+     *
+     * @param context the drop context.
      * @param location the location.
      * @param dropMessageFormat the message format for if a drop was given.
      * @return the drops given to the player
      */
-    public List<Drop<?>> giveOrDropAt(Player player, Location location, @Nullable Message dropMessageFormat) {
-        List<Drop<?>> drops = generateDrops();
+    public List<Drop<?>> giveOrDropAt(DropContext context, Location location, @Nullable Message dropMessageFormat) {
+        List<Drop<?>> drops = generateDrops(context);
         drops.forEach(drop -> {
             if (drop.isPhysical()) {
                 drop.dropAt(location);
             } else {
-                drop.giveTo(player);
+                drop.giveTo(context.getPlayer());
             }
         });
         if (dropMessageFormat != null)
-            sendDropMessage(player, drops, dropMessageFormat);
+            sendDropMessage(context.getPlayer(), drops, dropMessageFormat);
         return drops;
     }
 
