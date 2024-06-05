@@ -25,6 +25,7 @@ import net.minecraft.world.entity.monster.EntitySkeletonWither;
 import net.minecraft.world.entity.monster.EntitySlime;
 import net.minecraft.world.entity.projectile.EntitySmallFireball;
 import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.MovingObjectPositionBlock;
 import net.minecraft.world.phys.MovingObjectPositionEntity;
 import net.minecraft.world.phys.Vec3D;
@@ -167,6 +168,13 @@ public class MagicEntitiesV1_17 implements NMSMagicEntities {
         EntityInsentient insentient = (EntityInsentient) living;
 
         return insentient.getWorld().b(insentient.getEntityType().a(insentient.locX(), insentient.locY(), insentient.locZ())) &&  insentient.a(insentient.t) && insentient.a(insentient.t, EnumMobSpawn.c);
+    }
+
+    @Override
+    public boolean canEntityFit(Entity entity, Location location) {
+        net.minecraft.world.entity.Entity nmsEntity = ((CraftEntity) entity).getHandle();
+        Location offset = location.clone().subtract(entity.getLocation());
+        return nmsEntity.t.getCubes(nmsEntity, nmsEntity.getBoundingBox().d(offset.getX(), offset.getY(), offset.getZ()));
     }
 
     @Override

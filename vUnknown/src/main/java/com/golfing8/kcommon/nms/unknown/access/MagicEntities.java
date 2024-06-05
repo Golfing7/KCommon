@@ -13,9 +13,12 @@ import lombok.AllArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.VoxelShape;
 
 @AllArgsConstructor
 public class MagicEntities implements NMSMagicEntities {
@@ -72,7 +75,30 @@ public class MagicEntities implements NMSMagicEntities {
 
     @Override
     public boolean canEntitySpawn(LivingEntity entity) {
-        throw new UnsupportedOperationException();
+        return canEntityFit(entity);
+    }
+
+    @Override
+    public boolean canEntityFit(Entity entity, Location location) {
+        BoundingBox box = entity.getBoundingBox().shift(location.clone().subtract(entity.getLocation()));
+        int minX = (int) Math.floor(box.getMinX());
+        int minY = (int) Math.max(Math.floor(box.getMinY()) - 1, entity.getWorld().getMinHeight());
+        int minZ = (int) Math.floor(box.getMinZ());
+        int maxX = (int) Math.floor(box.getMaxX());
+        int maxY = (int) Math.min(Math.floor(box.getMaxY()), entity.getWorld().getMaxHeight());
+        int maxZ = (int) Math.floor(box.getMaxZ());
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    Block block = entity.getWorld().getBlockAt(x, y, z);
+                    VoxelShape blockShape = block.getCollisionShape();
+                    if (blockShape.overlaps(box))
+                        return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override

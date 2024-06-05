@@ -23,6 +23,8 @@ import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 @AllArgsConstructor
 public class MagicEntitiesV1_8 implements NMSMagicEntities {
     private final WorldguardHook hook;
@@ -169,6 +171,14 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
             return true;
 
         return ((EntityInsentient) living).canSpawn();
+    }
+
+    @Override
+    public boolean canEntityFit(Entity entity, Location location) {
+        net.minecraft.server.v1_8_R3.Entity nmsEntity = ((CraftEntity) entity).getHandle();
+        Location offset = location.clone().subtract(entity.getLocation());
+        List<AxisAlignedBB> cubes = nmsEntity.world.getCubes(nmsEntity, nmsEntity.getBoundingBox().c(offset.getX(), offset.getY(), offset.getZ()));
+        return cubes.isEmpty();
     }
 
     @Override
