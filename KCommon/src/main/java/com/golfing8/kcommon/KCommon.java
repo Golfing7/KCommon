@@ -3,8 +3,6 @@ package com.golfing8.kcommon;
 import com.golfing8.kcommon.command.impl.KModuleCommand;
 import com.golfing8.kcommon.db.MongoConnector;
 import com.golfing8.kcommon.library.LibraryDefinition;
-import com.golfing8.kcommon.library.LibraryLoader;
-import com.golfing8.kcommon.util.NMSVersion;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -82,8 +80,8 @@ public class KCommon extends KPlugin {
             this.timeZone = ZoneId.of("America/New_York");
         }
         this.debug = getConfig().getBoolean("debug", false);
-        this.serverVersion = NMSVersion.fromBukkitPackageName(Bukkit.getServer().getClass().getName().split("\\.")[3]);
-        NMS.initialize();
+        NMS.initialize(this);
+        this.serverVersion = NMS.getServerVersion();
         new KModuleCommand().register();
     }
 

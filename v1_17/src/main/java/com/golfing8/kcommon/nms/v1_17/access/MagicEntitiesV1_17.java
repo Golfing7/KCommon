@@ -4,6 +4,7 @@ import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.access.NMSMagicEntities;
 import com.golfing8.kcommon.nms.block.NMSBlockData;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityData;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -17,6 +18,7 @@ import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.EntityFallingBlock;
+import net.minecraft.world.entity.monster.EntityCreeper;
 import net.minecraft.world.entity.monster.EntityGiantZombie;
 import net.minecraft.world.entity.monster.EntityGuardianElder;
 import net.minecraft.world.entity.monster.EntitySkeletonWither;
@@ -122,10 +124,12 @@ public class MagicEntitiesV1_17 implements NMSMagicEntities {
         return (Guardian) entityGuardian.getBukkitEntity();
     }
 
-
     @Override
-    public <T extends Entity> T createEntity(World world, Location loc, Class<T> clazz) {
-        return (T) ((CraftWorld) world).createEntity(loc, clazz).getBukkitEntity();
+    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData data) {
+        return (T) world.spawn(loc, data.getEntityType().getEntityClass(), (spawned) -> {
+            if (data.isCreeperCharged())
+                ((Creeper) spawned).setPowered(true);
+        });
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.golfing8.kcommon.nms.access.NMSMagicEntities;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityData;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.mojang.authlib.GameProfile;
 import lombok.AllArgsConstructor;
@@ -47,8 +48,11 @@ public class MagicEntities implements NMSMagicEntities {
     }
 
     @Override
-    public <T extends Entity> T createEntity(World world, Location loc, Class<T> clazz) {
-        throw new UnsupportedOperationException();
+    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData data) {
+        return (T) world.spawn(loc, data.getEntityType().getEntityClass(), (spawned) -> {
+            if (data.isCreeperCharged())
+                ((Creeper) spawned).setPowered(true);
+        });
     }
 
     @Override

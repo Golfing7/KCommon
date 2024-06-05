@@ -2,6 +2,7 @@ package com.golfing8.kcommon.util;
 
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMS;
+import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.title.Title;

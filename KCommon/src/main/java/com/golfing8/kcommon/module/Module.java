@@ -14,6 +14,7 @@ import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
+import com.golfing8.kcommon.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -92,6 +93,10 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Sub-listeners registered to this module.
      */
     private final Set<Listener> subListeners;
+    /**
+     * All registered sub modules.
+     */
+    private final Set<SubModule<?>> subModules;
 
     /**
      * The main config for this module.
@@ -136,6 +141,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.placeholders = new TreeMap<>();
         this.relationalPlaceholders = new TreeMap<>();
         this.subListeners = new HashSet<>();
+        this.subModules = new HashSet<>();
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
@@ -164,6 +170,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.moduleDependencies = new HashSet<>(Arrays.asList(info.moduleDependencies()));
         this.pluginDependencies = new HashSet<>(Arrays.asList(info.pluginDependencies()));
         this.subListeners = new HashSet<>();
+        this.subModules = new HashSet<>();
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
@@ -270,7 +277,14 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         //Unregister sub listeners.
         this.subListeners.forEach(HandlerList::unregisterAll);
 
+        //Unregister sub modules.
+        for (SubModule<?> module : new HashSet<>(this.subModules)) {
+            module.onDisable();
+            HandlerList.unregisterAll(module);
+        }
+
         //Clear some data structures.
+        this.subModules.clear();
         this.subListeners.clear();
         this.moduleTasks.clear();
         this.moduleCommands.clear();
@@ -391,6 +405,44 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     protected synchronized BukkitRunnable addTask(BukkitRunnable task) {
         this.moduleTasks.add(task);
         return task;
+    }
+
+    /**
+     * Adds a submodule to this module.
+     *
+     * @param subModule the module.
+     */
+    public final void addSubModule(SubModule<?> subModule) {
+        // Already registered.
+        if (this.subModules.contains(subModule))
+            return;
+
+        this.subModules.add(subModule);
+        getPlugin().getServer().getPluginManager().registerEvents(subModule, getPlugin());
+        subModule.onEnable();
+
+        // Load the config.
+        boolean save = subModule.loadValues(getMainConfig().createSection(subModule.getPrefix()));
+        if (save) {
+            this.mainConfig.save();
+        }
+
+        // Load lang config
+        subModule.loadLangFields();
+    }
+
+    /**
+     * Removes the submodule.
+     *
+     * @param subModule the submodule.
+     */
+    public final void removeSubModule(SubModule<?> subModule) {
+        if (!this.subModules.contains(subModule))
+            return;
+
+        this.subModules.remove(subModule);
+        HandlerList.unregisterAll(subModule);
+        subModule.onDisable();
     }
 
     /**

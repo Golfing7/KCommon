@@ -1,15 +1,21 @@
-package com.golfing8.kcommon.struct.entity;
+package com.golfing8.kcommon.nms.struct;
 
-import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.util.NMSVersion;
+import com.golfing8.kcommon.NMS;
+import com.golfing8.kcommon.NMSVersion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import org.bukkit.entity.*;
+import lombok.Getter;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Horse;
+import org.bukkit.entity.Skeleton;
 
 /**
  * Represents 'extra' data for an entity. Used specifically for server versions less than 1.13
  */
+@Getter
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
@@ -31,7 +37,7 @@ public class EntityData {
             return "CHARGED_CREEPER";
         }
 
-        if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_13))
+        if (NMS.getServerVersion().isAtOrAfter(NMSVersion.v1_13))
             return entityType.name();
 
         if (skeletonWither) {
@@ -55,7 +61,7 @@ public class EntityData {
             return EntityData.builder().entityType(EntityType.CREEPER).creeperCharged(true).build();
         }
 
-        if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_13))
+        if (NMS.getServerVersion().isAtOrAfter(NMSVersion.v1_13))
             return EntityData.builder().entityType(EntityType.valueOf(val)).build();
         switch (val) {
             case "WITHER_SKELETON":
@@ -88,7 +94,7 @@ public class EntityData {
             return EntityData.builder().entityType(entity.getType()).creeperCharged(((Creeper) entity).isPowered()).build();
         }
 
-        if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_13)) {
+        if (NMS.getServerVersion().isAtOrAfter(NMSVersion.v1_13)) {
             return EntityData.builder().entityType(entity.getType()).build();
         }
 

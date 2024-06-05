@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.nms.v1_8.access;
 
 import com.golfing8.kcommon.nms.WineSpigot;
+import com.golfing8.kcommon.nms.struct.EntityData;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.golfing8.kcommon.nms.access.NMSMagicEntities;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
@@ -106,8 +107,25 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
     }
 
     @Override
-    public <T extends Entity> T createEntity(World world, Location loc, Class<T> clazz) {
-        return (T) ((CraftWorld) world).createEntity(loc, clazz).getBukkitEntity();
+    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData entityData) {
+        net.minecraft.server.v1_8_R3.Entity entity = ((CraftWorld) world).createEntity(loc, entityData.getEntityType().getEntityClass());
+        if (entityData.isCreeperCharged()) {
+            ((EntityCreeper) entity).setPowered(true);
+        }
+
+        if (entityData.isHorseSkeleton()) {
+            ((EntityHorse) entity).setType(4);
+        }
+
+        if (entityData.isHorseUndead()) {
+            ((EntityHorse) entity).setType(3);
+        }
+
+        if (entityData.isSkeletonWither()) {
+            ((EntitySkeleton) entity).setSkeletonType(1);
+        }
+        ((CraftWorld) world).addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        return (T) entity.getBukkitEntity();
     }
 
     @Override

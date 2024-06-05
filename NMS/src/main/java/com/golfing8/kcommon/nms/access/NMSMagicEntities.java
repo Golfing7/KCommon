@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.nms.access;
 
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityData;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -58,7 +59,7 @@ public interface NMSMagicEntities {
      */
     void setKiller(LivingEntity entity, Player killer);
 
-    <T extends Entity> T createEntity(World world, Location loc, Class<T> clazz);
+    <T extends Entity> T spawnEntity(World world, Location loc, EntityData data);
 
     <T extends Entity> T spawnEntity(World world, Location loc, Class<T> clazz);
 
