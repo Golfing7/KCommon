@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.struct;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -8,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * A class that represents a range of numbers.
  */
 @Data
+@RequiredArgsConstructor
 public class Range {
     private final double EPSILON = 0.0001D;
 
@@ -15,6 +17,10 @@ public class Range {
      * The minimum and maximum values of the range.
      */
     private final double min, max;
+
+    public Range(double value) {
+        this.min = this.max = value;
+    }
 
     /**
      * Checks if the given integer is within the range.

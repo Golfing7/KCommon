@@ -94,6 +94,10 @@ public class RangeMap<V> implements Map<Range, V> {
         return this.originalMap.get(key);
     }
 
+    public V put(double key, V value) {
+        return put(new Range(key), value);
+    }
+
     @Override
     public V put(Range key, V value) {
         double minimum = key.getMin();
@@ -165,6 +169,9 @@ public class RangeMap<V> implements Map<Range, V> {
      */
     public static class Builder<T> {
         private List<Pair<Range, T>> values = new ArrayList<>();
+        public Builder<T> put(double key, T object) {
+            return put(new Range(key), object);
+        }
         public Builder<T> put(Range range, T object) {
             this.values.add(new Pair<>(range, object));
             return this;
