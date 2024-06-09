@@ -30,28 +30,20 @@ public final class MenuBuilder {
     private Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
     private List<Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>>> shapeCreation = new ArrayList<>();
     private Map<Integer, ItemStack> specificItems = new HashMap<>();
-    /**
-     * The bottom click action, run when any slot in the bottom inventory is clicked.
-     */
+    /** The bottom click action, run when any slot in the bottom inventory is clicked. */
     private ClickAction bottomClickEvent = null;
     /** The top click event is called when a player clicks the top menu. Regardless if there is a click action on the slot clicked */
     private ClickAction topClickEvent = null;
-    /**
-     * A map containing all special GUI items, mapped from their keys.
-     */
+    /** A map containing all special GUI items, mapped from their keys. */
     private Map<String, SimpleGUIItem> specialGUIItems = new HashMap<>();
     /**
      * A map containing string key bindings to specific items in this GUI.
      * Will be applied to the same slot defined for the 'special gui items' or left out if they are not present.
      */
     private Map<String, ClickAction> specialBindings = new HashMap<>();
-    /**
-     * A map containing placeholders for each special item.
-     */
+    /** A map containing placeholders for each special item. */
     private Map<String, Supplier<Collection<Placeholder>>> specialPlaceholders = new HashMap<>();
-    /**
-     * A map containing multiline placeholders for each special item.
-     */
+    /** A map containing multiline placeholders for each special item. */
     private Map<String, Supplier<Collection<MultiLinePlaceholder>>> specialMPlaceholders = new HashMap<>();
     /** The global placeholders to apply to EVERY string in this menu. */
     @Getter
@@ -59,9 +51,7 @@ public final class MenuBuilder {
     /** The global multiline placeholders for this menu */
     @Getter
     private List<MultiLinePlaceholder> globalMultiLinePlaceholders = new ArrayList<>();
-    /**
-     * The other GUI items to apply in this menu.
-     */
+    /** The other GUI items to apply in this menu. */
     private Map<String, SimpleGUIItem> otherGUIItems = new HashMap<>();
     /** The type of menu being built */
     @Getter
@@ -73,8 +63,7 @@ public final class MenuBuilder {
     @Getter
     private CloseRunnable postCloseRunnable;
 
-    private MenuBuilder() {
-    }
+    private MenuBuilder() {}
 
     /**
      * Creates a menu builder from the given configuration section.

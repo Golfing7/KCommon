@@ -3,6 +3,7 @@ package com.golfing8.kcommon;
 import com.golfing8.kcommon.nms.access.NMSAccess;
 import lombok.Getter;
 import lombok.var;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
@@ -60,7 +61,17 @@ public final class NMS {
             theNMS = (NMSAccess) cons.newInstance(plugin);
         } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |
                  InstantiationException e) {
-            e.printStackTrace();
+            try {
+                Class<?> mainClass = Class.forName("com.golfing8.kcommon.nms.unknown.NMS");
+
+                Constructor<?> cons = mainClass.getConstructor(Plugin.class);
+
+                theNMS = (NMSAccess) cons.newInstance(plugin);
+            } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |
+                     InstantiationException e2) {
+                e2.printStackTrace();
+                Bukkit.getPluginManager().disablePlugin(plugin);
+            }
         }
     }
 }
