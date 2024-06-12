@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.ClickRunnable;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
@@ -22,6 +23,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 public final class MenuBuilder {
+    private static final ItemStackBuilder DEFAULT_FILLER = new ItemStackBuilder()
+            .material(XMaterial.GRAY_STAINED_GLASS_PANE)
+            .name("&7");
+
     @Getter
     private int size = 27;
     private boolean canExpire = true, clickable;
@@ -85,8 +90,15 @@ public final class MenuBuilder {
 
         this.title = section.getString("title");
 
-        if(section.getBoolean("use-filler-item")) {
-            this.filler(new ItemStackBuilder(section.getConfigurationSection("filler-item")).buildFromTemplate());
+        // Checks if either
+        // 1: You've set 'use-filler-item' to true
+        // 2: Have specified a filler-item and have not EXPLICITLY set use-filler-item
+        if(section.getBoolean("use-filler-item") ||
+                (section.contains("filler-item") && !section.contains("use-filler-item"))) {
+            ItemStackBuilder fillerItem = section.contains("filler-item") ?
+                    new ItemStackBuilder(section.getConfigurationSection("filler-item")) :
+                    DEFAULT_FILLER;
+            this.filler(fillerItem.buildFromTemplate());
         }
 
         //Check for the special items.

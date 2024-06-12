@@ -86,6 +86,23 @@ public final class MS {
             }
         });
 
+        // Parses commas into a number.
+        TRANSFORMERS.add(new Function<String, String>() {
+            final Pattern pattern = Pattern.compile("\\$commas\\{[^}]+}");
+
+            @Override
+            public String apply(String s) {
+                Matcher matcher = pattern.matcher(s);
+
+                while(matcher.find()){
+                    String grouped = matcher.group(0);
+
+                    s = s.replace(grouped, StringUtil.parseCommas(grouped.replace("$commas{", "").replace("}", "")));
+                }
+                return s;
+            }
+        });
+
         //Generate a random string made of all the characters provided in the {}.
         TRANSFORMERS.add(new Function<String, String>() {
             private static final int DEFAULT_LENGTH = 8;

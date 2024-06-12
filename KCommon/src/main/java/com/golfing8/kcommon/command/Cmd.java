@@ -47,8 +47,6 @@ public @interface Cmd {
 
     /**
      * If the command should be only for players.
-     * @deprecated use {@link }
      */
-    @Deprecated
     boolean forPlayers() default false;
 }
