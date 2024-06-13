@@ -13,6 +13,7 @@ import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.var;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.MemorySection;
@@ -44,6 +45,15 @@ public class Message {
     /** The message for the player's action bar */
     @Nullable
     private String actionBar;
+    /** If the message should be paged */
+    @Setter
+    private boolean paged;
+    @Setter
+    private int pageHeight = 10;
+    @Setter
+    private String pageHeader = "&6&m----------&r &ePage &e{PAGE}&7/&e{MAX_PAGE} &6&m----------";
+    @Setter
+    private String pageFooter = "&6&m-----------------------------------";
 
     /**
      * Constructs a message depending on the type given.
@@ -125,6 +135,13 @@ public class Message {
                     this.sounds.add(ConfigTypeRegistry.getFromType(ConfigPrimitive.of(entry.getValue()), SoundWrapper.class));
                 }
             }
+
+            if (section.containsKey("paged")) {
+                this.paged = (Boolean) section.get("paged");
+                this.pageHeight = (Integer) section.getOrDefault("page-height", this.pageHeight);
+                this.pageHeader = (String) section.getOrDefault("page-header", this.pageHeader);
+                this.pageFooter = (String) section.getOrDefault("page-header", this.pageFooter);
+            }
         }else {
             throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", message.toString()));
         }
@@ -135,6 +152,18 @@ public class Message {
         this.sounds = sounds == null ? Collections.emptyList() : sounds;
         this.title = title;
         this.actionBar = actionBar;
+    }
+
+    public Message(@Nullable List<String> messages, @Nullable List<SoundWrapper> sounds, @Nullable Title title, @Nullable String actionBar,
+                   boolean paged, int pageHeight, String pageHeader, String pageFooter) {
+        this.messages = messages == null ? Collections.emptyList() : messages;
+        this.sounds = sounds == null ? Collections.emptyList() : sounds;
+        this.title = title;
+        this.actionBar = actionBar;
+        this.paged = paged;
+        this.pageHeight = pageHeight;
+        this.pageHeader = pageHeader;
+        this.pageFooter = pageFooter;
     }
 
     /**
@@ -200,7 +229,7 @@ public class Message {
         if (sounds != null) {
             newSounds = sounds.stream().map(SoundWrapper::new).collect(Collectors.toList());
         }
-        return new Message(newMessages, newSounds, newTitle, newActionBar);
+        return new Message(newMessages, newSounds, newTitle, newActionBar, paged, pageHeight, pageHeader, pageFooter);
     }
 
     /**

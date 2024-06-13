@@ -21,6 +21,10 @@ public final class ProgressBar {
      */
     public static String getProgressBar(double progress, double maxProgress, char barChar, int length)
     {
+        return getProgressBar(progress, maxProgress, barChar, length, COLOR_GREEN, COLOR_LIME, COLOR_GRAY);
+    }
+
+    public static String getProgressBar(double progress, double maxProgress, char barChar, int length, String filledColor, String semiFilledColor, String emptyColor) {
         double percentage = (progress / maxProgress) * 100.0D;
 
         StringBuilder progressBar = new StringBuilder();
@@ -32,11 +36,11 @@ public final class ProgressBar {
             double progressPassBar = percentPerChar * (i + 1);
 
             if(percentage >= progressPassBar)
-                progressBar.append(COLOR_GREEN);
+                progressBar.append(filledColor);
             else if(percentage + percentPerChar >= progressPassBar)
-                progressBar.append(COLOR_LIME);
+                progressBar.append(semiFilledColor);
             else
-                progressBar.append(COLOR_GRAY);
+                progressBar.append(emptyColor);
 
             progressBar.append(barChar);
         }

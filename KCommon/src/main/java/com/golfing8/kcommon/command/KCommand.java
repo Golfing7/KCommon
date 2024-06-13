@@ -508,7 +508,11 @@ public abstract class KCommand implements TabExecutor {
         }
 
         String builtArguments = this.commandArguments.isEmpty() ? "" : " &6" + argumentChain.toString().trim();
-        return MS.parseSingle((consoleSender ? "&c" : "&e") + "/" + commandChain.toString().trim() + builtArguments + " &a" + this.description);
+        String message = getPlugin().getLangConfig().getMessage("command-help-format").getMessages().get(0);
+        return MS.parseSingle(message,
+                "COMMAND", commandChain.toString().trim(),
+                "ARGUMENTS", builtArguments,
+                "DESCRIPTION", getDescription());
     }
 
     /**
@@ -522,7 +526,7 @@ public abstract class KCommand implements TabExecutor {
             return;
         }
 
-        MS.pass(sender, "&e----- &6Help for command: /{COMMAND} &e-----", "COMMAND", this.getFullCommandChain());
+        getPlugin().sendConfigMessage(sender, "command-help-header", "COMMAND", this.getFullCommandChain());
         MS.pass(sender, getDescriptiveCommandHelp(sender));
         handleHelpMessage0(sender, lastArgument);
     }
