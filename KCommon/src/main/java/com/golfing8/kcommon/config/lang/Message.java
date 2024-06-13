@@ -14,6 +14,7 @@ import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.var;
 import org.bukkit.command.CommandSender;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Builder
+@NoArgsConstructor
 public class Message {
     /**
      * The message to send to the player, can be a string or list.
@@ -70,6 +72,7 @@ public class Message {
      * @param message the message to load from.
      */
     public Message(@Nullable Object message) {
+        this();
         if (message == null) {
             return;
         }
@@ -159,6 +162,7 @@ public class Message {
     }
 
     public Message(@Nullable List<String> messages, @Nullable List<SoundWrapper> sounds, @Nullable Title title, @Nullable String actionBar) {
+        this();
         this.messages = messages == null ? Collections.emptyList() : messages;
         this.sounds = sounds == null ? Collections.emptyList() : sounds;
         this.title = title;
@@ -167,6 +171,7 @@ public class Message {
 
     public Message(@Nullable List<String> messages, @Nullable List<SoundWrapper> sounds, @Nullable Title title, @Nullable String actionBar,
                    boolean paged, int pageHeight, String pageHeader, String pageFooter) {
+        this();
         this.messages = messages == null ? Collections.emptyList() : messages;
         this.sounds = sounds == null ? Collections.emptyList() : sounds;
         this.title = title;
@@ -188,8 +193,8 @@ public class Message {
                 (this.title == null) &&
                 (this.actionBar == null) &&
                 !this.isPaged() &&
-                Objects.equals(PagedMessage.DEFAULT_PAGE_HEADER, pageHeader) &&
                 Objects.equals(PagedMessage.DEFAULT_PAGE_HEIGHT, pageHeight) &&
+                Objects.equals(PagedMessage.DEFAULT_PAGE_HEADER, pageHeader) &&
                 Objects.equals(PagedMessage.DEFAULT_PAGE_FOOTER, pageFooter);
     }
 
