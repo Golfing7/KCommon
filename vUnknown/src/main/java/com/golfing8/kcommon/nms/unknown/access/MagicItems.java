@@ -1,8 +1,8 @@
 package com.golfing8.kcommon.nms.unknown.access;
 
+import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
-import com.golfing8.kcommon.nms.unknown.ComponentUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;

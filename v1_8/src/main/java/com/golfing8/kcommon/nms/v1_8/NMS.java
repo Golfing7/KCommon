@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.nms.v1_8;
 
+import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.access.*;
 import com.golfing8.kcommon.nms.v1_8.access.*;
@@ -20,6 +21,7 @@ import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import com.golfing8.kcommon.nms.v1_8.event.PreSpawnSpawnerAdapter;
 import lombok.Getter;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,6 +41,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.Collections;
 
 public class NMS implements NMSAccess {
+    private final BukkitAudiences audiences;
     private final MagicNumbersV1_8 magicNumbersV1_8;
     private final MagicPacketsV1_8 magicPacketsV1_8;
     private final MagicEntitiesV1_8 magicEntitiesV1_8;
@@ -54,6 +57,7 @@ public class NMS implements NMSAccess {
     public NMS(Plugin plugin){
         this.plugin = plugin;
         this.hook = new WorldguardV1_8();
+        this.audiences = BukkitAudiences.create(plugin);
 
         this.magicNumbersV1_8 = new MagicNumbersV1_8();
         this.magicPacketsV1_8 = new MagicPacketsV1_8();
@@ -78,7 +82,7 @@ public class NMS implements NMSAccess {
 
     @Override
     public void sendMiniMessage(CommandSender player, String string) {
-        player.sendMessage(string);
+        audiences.sender(player).sendMessage(ComponentUtils.toComponent(string));
     }
 
     @Override

@@ -6,6 +6,9 @@ import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.exc.CommandInstantiationException;
 import com.golfing8.kcommon.command.requirement.Requirement;
 import com.golfing8.kcommon.command.requirement.RequirementPlayer;
+import com.golfing8.kcommon.config.lang.Message;
+import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
+import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.base.Preconditions;
@@ -287,6 +290,7 @@ public abstract class KCommand implements TabExecutor {
 
         this.subcommands.add(command);
         command.setParent(this);
+        this.subcommands.sort(Comparator.comparing(KCommand::getCommandName));
     }
 
     /**
@@ -526,9 +530,17 @@ public abstract class KCommand implements TabExecutor {
             return;
         }
 
-        getPlugin().sendConfigMessage(sender, "command-help-header", "COMMAND", this.getFullCommandChain());
-        MS.pass(sender, getDescriptiveCommandHelp(sender));
-        handleHelpMessage0(sender, lastArgument);
+        Message message = getPlugin().getLangConfig().getMessage("command-help");
+        List<String> commandHelp = new ArrayList<>();
+        String help = getDescriptiveCommandHelp(sender);
+        if (help != null)
+            commandHelp.add(help);
+        commandHelp.addAll(getHelpMessages0(sender, lastArgument));
+        message.send(
+                sender,
+                Placeholder.compileCurly("COMMAND", this.getFullCommandChain()),
+                Collections.singleton(MultiLinePlaceholder.percent("COMMAND_HELP", commandHelp))
+        );
     }
 
     /**
@@ -536,7 +548,8 @@ public abstract class KCommand implements TabExecutor {
      *
      * @param sender the sender.
      */
-    private void handleHelpMessage0(CommandSender sender, String lastArgument) {
+    private List<String> getHelpMessages0(CommandSender sender, String lastArgument) {
+        List<String> allMessages = new ArrayList<>();
         for (KCommand sub : this.subcommands) {
             if (lastArgument != null && !sub.getCommandName().startsWith(lastArgument.toLowerCase()))
                 continue;
@@ -544,9 +557,12 @@ public abstract class KCommand implements TabExecutor {
             if (!sub.canSee(sender))
                 continue;
 
-            MS.pass(sender, sub.getDescriptiveCommandHelp(sender));
-            sub.handleHelpMessage0(sender, null);
+            String result = sub.getDescriptiveCommandHelp(sender);
+            if (result != null)
+                allMessages.add(result);
+            allMessages.addAll(sub.getHelpMessages0(sender, lastArgument));
         }
+        return allMessages;
     }
 
     /**

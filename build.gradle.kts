@@ -65,6 +65,9 @@ subprojects {
 
     dependencies {
         annotationProcessor("org.projectlombok:lombok:1.18.24")
+        compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
+        compileOnly("net.kyori:adventure-platform-bukkit:4.3.3")
+        compileOnly("net.jodah:expiringmap:0.5.11")
         compileOnly("org.projectlombok:lombok:1.18.24")
         compileOnly("de.tr7zw:item-nbt-api:2.12.4") //For items.
         compileOnly("org.jetbrains:annotations:24.1.0")

@@ -1,6 +1,7 @@
 package com.golfing8.kcommon;
 
 import com.golfing8.kcommon.command.impl.KModuleCommand;
+import com.golfing8.kcommon.command.impl.KPagerCommand;
 import com.golfing8.kcommon.db.MongoConnector;
 import com.golfing8.kcommon.library.LibraryDefinition;
 import com.golfing8.kcommon.util.StringUtil;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.List;
 
 /**
  * A plugin implementation of {@link KPlugin} so this commons library can be loaded as a standalone.
@@ -46,18 +48,29 @@ public class KCommon extends KPlugin {
 
     @Override
     public void onPreEnableInner() {
+        NMS.initialize(this);
+        this.serverVersion = NMS.getServerVersion();
         libraryLoader.addRelocation("de,tr7zw,changeme,nbtapi", "de,tr7zw,kcommon,nbtapi");
         libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
 
-        libraryLoader.loadAllLibraries(Lists.newArrayList(
+        List<LibraryDefinition> libraries = Lists.newArrayList(
                 new LibraryDefinition("de,tr7zw", "item-nbt-api", "2.12.3", "https://repo.codemc.org/repository/maven-public"),
                 new LibraryDefinition("net,objecthunter", "exp4j", "0.4.8"),
                 new LibraryDefinition("com,github,cryptomorin", "XSeries", "9.8.1"),
+                new LibraryDefinition("net,jodah", "expiringmap", "0.5.11"),
                 // For Mongo
                 new LibraryDefinition("org,mongodb", "mongodb-driver-core", "5.0.1"),
                 new LibraryDefinition("org,mongodb", "mongodb-driver-sync", "5.0.1"),
                 new LibraryDefinition("org,mongodb", "bson", "5.0.1")
-        ));
+        );
+        if (serverVersion.isAtOrBefore(NMSVersion.v1_17)) {
+            libraries.add(new LibraryDefinition("me,lucko", "adventure-api", "4.13.0"));
+            libraries.add(new LibraryDefinition("me,lucko", "adventure-platform-api", "4.13.3"));
+            libraries.add(new LibraryDefinition("me,lucko", "adventure-platform-bukkit", "4.13.3"));
+            libraries.add(new LibraryDefinition("net,kyori", "adventure-text-minimessage", "4.17.0"));
+        }
+
+        libraryLoader.loadAllLibraries(libraries);
     }
 
     @Override
@@ -80,9 +93,8 @@ public class KCommon extends KPlugin {
             this.timeZone = ZoneId.of("America/New_York");
         }
         this.debug = getConfig().getBoolean("debug", false);
-        NMS.initialize(this);
-        this.serverVersion = NMS.getServerVersion();
         new KModuleCommand().register();
+        new KPagerCommand().register();
     }
 
     private boolean trySetupMongo() {

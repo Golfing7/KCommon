@@ -4,6 +4,7 @@ import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
+import com.golfing8.kcommon.menu.PagedMenuContainer;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
@@ -49,11 +50,14 @@ public class Message {
     @Setter
     private boolean paged;
     @Setter
-    private int pageHeight = 10;
+    @Builder.Default
+    private int pageHeight = PagedMessage.DEFAULT_PAGE_HEIGHT;
     @Setter
-    private String pageHeader = "&6&m----------&r &ePage &e{PAGE}&7/&e{MAX_PAGE} &6&m----------";
+    @Builder.Default
+    private String pageHeader = PagedMessage.DEFAULT_PAGE_HEADER;
     @Setter
-    private String pageFooter = "&6&m-----------------------------------";
+    @Builder.Default
+    private String pageFooter = PagedMessage.DEFAULT_PAGE_FOOTER;
 
     /**
      * Constructs a message depending on the type given.
@@ -106,6 +110,13 @@ public class Message {
                     this.sounds.add(fromType);
                 }
             }
+
+            if (section.getBoolean("paged")) {
+                this.paged = section.getBoolean("paged");
+                this.pageHeight = (Integer) section.get("page-height", PagedMessage.DEFAULT_PAGE_HEIGHT);
+                this.pageHeader = (String) section.get("page-header", PagedMessage.DEFAULT_PAGE_HEADER);
+                this.pageFooter = (String) section.get("page-footer", PagedMessage.DEFAULT_PAGE_FOOTER);
+            }
         }else if(message instanceof Map) { //In this case the player might be defining a title too.
             Map section = (Map) message;
             //Check for the title
@@ -138,9 +149,9 @@ public class Message {
 
             if (section.containsKey("paged")) {
                 this.paged = (Boolean) section.get("paged");
-                this.pageHeight = (Integer) section.getOrDefault("page-height", this.pageHeight);
-                this.pageHeader = (String) section.getOrDefault("page-header", this.pageHeader);
-                this.pageFooter = (String) section.getOrDefault("page-header", this.pageFooter);
+                this.pageHeight = (Integer) section.getOrDefault("page-height", PagedMessage.DEFAULT_PAGE_HEIGHT);
+                this.pageHeader = (String) section.getOrDefault("page-header", PagedMessage.DEFAULT_PAGE_HEADER);
+                this.pageFooter = (String) section.getOrDefault("page-footer", PagedMessage.DEFAULT_PAGE_FOOTER);
             }
         }else {
             throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", message.toString()));
@@ -173,7 +184,13 @@ public class Message {
      * @return if this message only has simple text messages.
      */
     public boolean isSimple() {
-        return (this.sounds == null || this.sounds.isEmpty()) && (this.title == null) && (this.actionBar == null);
+        return (this.sounds == null || this.sounds.isEmpty()) &&
+                (this.title == null) &&
+                (this.actionBar == null) &&
+                !this.isPaged() &&
+                Objects.equals(PagedMessage.DEFAULT_PAGE_HEADER, pageHeader) &&
+                Objects.equals(PagedMessage.DEFAULT_PAGE_HEIGHT, pageHeight) &&
+                Objects.equals(PagedMessage.DEFAULT_PAGE_FOOTER, pageFooter);
     }
 
     /**
@@ -183,6 +200,14 @@ public class Message {
      */
     public boolean isEmpty() {
         return this.isSimple() && (this.messages == null || this.messages.isEmpty());
+    }
+
+    public PagedMessage toPagedMessage(Object... placeholders) {
+        return new PagedMessage(cloneAndParse(placeholders));
+    }
+
+    public PagedMessage toPagedMessage(Collection<Placeholder> placeholders, Collection<MultiLinePlaceholder> multiLinePlaceholders) {
+        return new PagedMessage(cloneAndParse(placeholders, multiLinePlaceholders));
     }
 
     /**
@@ -229,7 +254,7 @@ public class Message {
         if (sounds != null) {
             newSounds = sounds.stream().map(SoundWrapper::new).collect(Collectors.toList());
         }
-        return new Message(newMessages, newSounds, newTitle, newActionBar, paged, pageHeight, pageHeader, pageFooter);
+        return new Message(newMessages, newSounds, newTitle, newActionBar, paged, pageHeight, MS.parseSingle(pageHeader, placeholders), MS.parseSingle(pageFooter, placeholders));
     }
 
     /**
@@ -240,7 +265,11 @@ public class Message {
      */
     public void send(CommandSender sender, Object... placeholders) {
         if (getMessages() != null) {
-            getMessages().forEach(string -> MS.pass(sender, string, placeholders));
+            if (paged) {
+                toPagedMessage(placeholders).displayTo(sender);
+            } else {
+                getMessages().forEach(string -> MS.pass(sender, string, placeholders));
+            }
         }
 
         if (getTitle() != null && sender instanceof Player) {
@@ -266,8 +295,12 @@ public class Message {
      */
     public void send(CommandSender sender, Placeholder... placeholders) {
         if (getMessages() != null) {
-            MS.parseAll(getMessages(), placeholders)
-                    .forEach(string -> MS.pass(sender, string));
+            if (paged) {
+                toPagedMessage(Arrays.asList(placeholders), Collections.emptyList()).displayTo(sender);
+            } else {
+                MS.parseAll(getMessages(), placeholders)
+                        .forEach(string -> MS.pass(sender, string));
+            }
         }
 
         if (getTitle() != null && sender instanceof Player) {
@@ -295,9 +328,13 @@ public class Message {
                      @Nullable Collection<Placeholder> placeholders,
                      @Nullable Collection<MultiLinePlaceholder> multiLinePlaceholders) {
         if (getMessages() != null) {
-            MS.parseAllMulti(MS.parseAll(getMessages(), placeholders == null ? Collections.emptyList() : placeholders),
-                            multiLinePlaceholders == null ? Collections.emptyList() : multiLinePlaceholders)
-                    .forEach(string -> MS.pass(sender, string));
+            if (paged) {
+                toPagedMessage(placeholders, multiLinePlaceholders).displayTo(sender);
+            } else {
+                MS.parseAllMulti(MS.parseAll(getMessages(), placeholders == null ? Collections.emptyList() : placeholders),
+                                multiLinePlaceholders == null ? Collections.emptyList() : multiLinePlaceholders)
+                        .forEach(string -> MS.pass(sender, string));
+            }
         }
 
         if (getTitle() != null && sender instanceof Player) {

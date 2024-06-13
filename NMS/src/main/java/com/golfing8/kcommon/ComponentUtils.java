@@ -1,4 +1,4 @@
-package com.golfing8.kcommon.nms.unknown;
+package com.golfing8.kcommon;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -6,7 +6,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +23,7 @@ public class ComponentUtils {
     private static final Pattern SECTION_RGB_3 = Pattern.compile("\u00A7#([\\da-fA-F]{3})");
     private static final Pattern SECTION_RGB_6 = Pattern.compile("\u00A7#([\\da-fA-F]{6})");
     private static final Pattern SECTION_RGB_SPIGOT = Pattern.compile("\u00A7x(\u00A7[\\da-fA-F]){6}");
-    private static final Map<String, String> legacyColorMap = new HashMap<>(){{
+    private static final Map<String, String> legacyColorMap = new HashMap<String, String>(){{
                 put("0", "<reset><black>");
                 put("1", "<reset><dark_blue>");
                 put("2", "<reset><dark_green>");
@@ -67,7 +71,7 @@ public class ComponentUtils {
     }
 
     /**
-     * Converts a {@link java.util.List<String>} into a {@link Component}
+     * Converts a {@link List} into a {@link Component}
      *
      * @param lines        the list with strings to convert
      * @return the component
@@ -110,7 +114,7 @@ public class ComponentUtils {
     private static String replaceLegacyColors(String message, char colorChar) {
         Pattern sixCharHex = colorChar == '&' ? AMPERSAND_RGB_6 : SECTION_RGB_6;
         Matcher matcher = sixCharHex.matcher(message);
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             StringBuilder replacement = (new StringBuilder(14)).append("<reset>").append(colorChar).append("x");
             for (char character : matcher.group(1).toCharArray())
@@ -122,7 +126,7 @@ public class ComponentUtils {
 
         Pattern threeCharHex = colorChar == '&' ? AMPERSAND_RGB_3 : SECTION_RGB_3;
         matcher = threeCharHex.matcher(message);
-        sb = new StringBuilder();
+        sb = new StringBuffer();
         while (matcher.find()) {
             StringBuilder replacement = (new StringBuilder(14)).append("<reset>").append(colorChar).append("x");
             for (char character : matcher.group(1).toCharArray())
@@ -134,7 +138,7 @@ public class ComponentUtils {
         message = sb.toString();
         Pattern spigotHexPattern = colorChar == '&' ? AMPERSAND_RGB_SPIGOT : SECTION_RGB_SPIGOT;
         matcher = spigotHexPattern.matcher(message);
-        sb = new StringBuilder();
+        sb = new StringBuffer();
         while (matcher.find()) {
             StringBuilder replacement = (new StringBuilder(9)).append("<reset>").append("<#");
             for (char character : matcher.group().toCharArray()) {

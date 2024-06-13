@@ -262,9 +262,9 @@ public final class MS {
                 }
 
                 //Then start replacing them.
-                toReturn.set(i, line.replace(placeholder.getLabel(), replacement.get(0)));
+                toReturn.set(i, line.replace(placeholder.getLabel(), Objects.toString(replacement.get(0))));
                 for (int j = 1; j < replacement.size(); j++) {
-                    toReturn.add(i + j, line.replace(placeholder.getLabel(), replacement.get(j)));
+                    toReturn.add(i + j, line.replace(placeholder.getLabel(), Objects.toString(replacement.get(j))));
                 }
                 break;
             }

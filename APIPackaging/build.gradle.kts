@@ -32,6 +32,9 @@ dependencies {
 
     implementation("de.tr7zw:item-nbt-api:2.12.4") //For items.
     implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
+
+    implementation("net.kyori:adventure-platform-bukkit:4.3.3")
+    implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("com.github.cryptomorin:XSeries:9.8.1") //For XSeries
     implementation("org.mongodb:mongodb-driver-sync:4.11.1")
 }

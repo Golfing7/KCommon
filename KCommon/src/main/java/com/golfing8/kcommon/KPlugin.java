@@ -3,6 +3,7 @@ package com.golfing8.kcommon;
 import com.golfing8.kcommon.command.CommandManager;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
+import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.golfing8.kcommon.hook.placeholderapi.KPAPIHook;
 import com.golfing8.kcommon.library.LibraryLoader;
@@ -16,6 +17,7 @@ import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.util.Reflection;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -121,7 +123,11 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.langConfig.addLanguageConstant("invalid-argument", "&cArgument '{ARGUMENT}' at position {POSITION} is invalid! Was expecting a '{TYPE}', you entered {ACTUAL}!");
         this.langConfig.addLanguageConstant("missing-argument", "&cArgument '{ARGUMENT}' at position {POSITION} was missing! Was expecting a '{TYPE}'!");
         this.langConfig.addLanguageConstant("no-permission", "&cYou don't have permission to use this command!");
-        this.langConfig.addLanguageConstant("command-help-header", "&e----- &6Help for command: /{COMMAND} &e-----");
+        this.langConfig.addLanguageConstant("command-help", Message.builder()
+                .pageHeader("&6&m-----&r {PREVIOUS} &6Help for command: /{COMMAND} &e{PAGE}&7/&e{MAX_PAGE} {NEXT} &6&m-----")
+                .messages(Lists.newArrayList("%COMMAND_HELP%"))
+                .paged(true)
+                .build());
         this.langConfig.addLanguageConstant("command-help-format", "&e/{COMMAND} &6{ARGUMENTS} &a{DESCRIPTION}");
     }
 

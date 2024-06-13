@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.nms.unknown;
 
+import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.access.*;
 import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.packets.NMSPacket;

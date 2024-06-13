@@ -47,7 +47,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
     public V add(Position p, V v) {
         Preconditions.checkNotNull(p, "Point must not be null!");
         Preconditions.checkNotNull(v, "Null values not allowed!");
-        Preconditions.checkArgument(checkValidLocation(p), "Point must be defined in y 1-256!");
+        Preconditions.checkArgument(checkValidLocation(p), "Point must be defined in y -64-320! Was " + p.getY());
 
         int hashKey = getHashKey(p);
 
@@ -86,7 +86,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
     @Override
     public V remove(Position p) {
         Preconditions.checkNotNull(p, "Point must not be null!");
-        Preconditions.checkArgument(checkValidLocation(p), "Point must be defined in y 1-256!");
+        Preconditions.checkArgument(checkValidLocation(p), "Point must be defined in y -64-320! Was " + p.getY());
 
         int hashKey = getHashKey(p);
 
@@ -121,7 +121,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
     @Override
     public V get(Position p) {
         Preconditions.checkNotNull(p, "Point must not be null!");
-        Preconditions.checkArgument(checkValidLocation(p), "Point must be defined in y 1-256!");
+        Preconditions.checkArgument(checkValidLocation(p), "Point must be defined in y -64-320! Was " + p.getY());
 
         Node exact = getAtExactLocation(p);
 
@@ -192,7 +192,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
         int y = (p.getY() + 64) >> RIGHT_BIT_SHIFT;
 
         if(y >= buckets || y < 0)
-            throw new IllegalArgumentException("Point must be defined in y 1-256!");
+            throw new IllegalArgumentException("Point must be defined in y 1-256! Was " + p.getY());
 
         return y;
     }

@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.lang.Message;
+import com.golfing8.kcommon.config.lang.PagedMessage;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.title.Title;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class CAMessage implements ConfigAdapter<Message> {
     @Override
@@ -34,6 +36,18 @@ public class CAMessage implements ConfigAdapter<Message> {
                     ConfigPrimitive.ofList(object.getMessages());
         }
         Map<String, Object> items = new HashMap<>();
+        if (object.isPaged()) {
+            items.put("paged", true);
+        }
+        if (object.getPageHeader() != null && !Objects.equals(PagedMessage.DEFAULT_PAGE_HEADER, object.getPageHeader())) {
+            items.put("page-header", object.getPageHeader());
+        }
+        if (object.getPageFooter() != null && !Objects.equals(PagedMessage.DEFAULT_PAGE_FOOTER, object.getPageFooter())) {
+            items.put("page-footer", object.getPageFooter());
+        }
+        if (object.getPageHeight() > 0 && !Objects.equals(PagedMessage.DEFAULT_PAGE_HEIGHT, object.getPageHeight())) {
+            items.put("page-height", object.getPageHeight());
+        }
         if (object.getMessages() != null) {
             items.put("message", object.getMessages());
         }

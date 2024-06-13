@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.nms.v1_17;
 
+import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.access.*;
 import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.block.NMSBlockData;
@@ -18,6 +19,7 @@ import com.golfing8.kcommon.nms.v1_17.worldguard.WorldguardV1_17;
 import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
@@ -41,6 +43,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 
 public class NMS implements NMSAccess {
+    private final BukkitAudiences audiences;
+    private final Plugin plugin;
     private final ServerV1_17 server;
     private final WorldguardHook wgHook;
     private final MagicItemsV1_17 magicItemsV1_17;
@@ -52,6 +56,8 @@ public class NMS implements NMSAccess {
     public NMS(Plugin plugin){
         this.server = new ServerV1_17();
         this.wgHook = new WorldguardV1_17();
+        this.plugin = plugin;
+        this.audiences = BukkitAudiences.create(plugin);
 
         this.magicItemsV1_17 = new MagicItemsV1_17();
         this.magicEntitiesV1_17 = new MagicEntitiesV1_17(wgHook, plugin);
@@ -70,7 +76,7 @@ public class NMS implements NMSAccess {
 
     @Override
     public void sendMiniMessage(CommandSender player, String string) {
-        player.sendMessage(string);
+        audiences.sender(player).sendMessage(ComponentUtils.toComponent(string));
     }
 
     @Override
