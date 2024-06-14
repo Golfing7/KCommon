@@ -128,7 +128,8 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
                 .messages(Lists.newArrayList("%COMMAND_HELP%"))
                 .paged(true)
                 .build());
-        this.langConfig.addLanguageConstant("command-help-format", "&e/{COMMAND} &6{ARGUMENTS} &a{DESCRIPTION}");
+        this.langConfig.addLanguageConstant("command-help-none-found", "&cNo command matches found :(");
+        this.langConfig.addLanguageConstant("command-help-format", "&e/{COMMAND}&6{ARGUMENTS} &a{DESCRIPTION}");
     }
 
     private void saveModuleManifest() {

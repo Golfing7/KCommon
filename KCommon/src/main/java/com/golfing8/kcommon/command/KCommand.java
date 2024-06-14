@@ -511,7 +511,7 @@ public abstract class KCommand implements TabExecutor {
             }
         }
 
-        String builtArguments = this.commandArguments.isEmpty() ? "" : " &6" + argumentChain.toString().trim();
+        String builtArguments = this.commandArguments.isEmpty() ? "" : " " + argumentChain.toString().trim();
         String message = getPlugin().getLangConfig().getMessage("command-help-format").getMessages().get(0);
         return MS.parseSingle(message,
                 "COMMAND", commandChain.toString().trim(),
@@ -535,7 +535,10 @@ public abstract class KCommand implements TabExecutor {
         String help = getDescriptiveCommandHelp(sender);
         if (help != null)
             commandHelp.add(help);
-        commandHelp.addAll(getHelpMessages0(sender, lastArgument));
+        commandHelp.addAll(getHelpMessages0(sender, lastArgument != null ? lastArgument.toLowerCase() : lastArgument));
+        if (commandHelp.isEmpty()) {
+            commandHelp.add(getPlugin().getLangConfig().getMessage("command-help-none-found").getMessages().get(0));
+        }
         message.send(
                 sender,
                 Placeholder.compileCurly("COMMAND", this.getFullCommandChain()),
@@ -548,10 +551,10 @@ public abstract class KCommand implements TabExecutor {
      *
      * @param sender the sender.
      */
-    private List<String> getHelpMessages0(CommandSender sender, String lastArgument) {
+    private List<String> getHelpMessages0(CommandSender sender, @Nullable String lastArgument) {
         List<String> allMessages = new ArrayList<>();
         for (KCommand sub : this.subcommands) {
-            if (lastArgument != null && !sub.getCommandName().startsWith(lastArgument.toLowerCase()))
+            if (!matchesForHelpMessage(lastArgument, sub.getCommandName()))
                 continue;
 
             if (!sub.canSee(sender))
@@ -563,6 +566,22 @@ public abstract class KCommand implements TabExecutor {
             allMessages.addAll(sub.getHelpMessages0(sender, lastArgument));
         }
         return allMessages;
+    }
+
+    /**
+     * Checks if the argument matches the command name close enough for it to be displayed in the help message.
+     *
+     * @param argument the argument.
+     * @param commandName the command name.
+     * @return true if the command matches.
+     */
+    private static boolean matchesForHelpMessage(@Nullable String argument, String commandName) {
+        if (argument == null)
+            return true;
+
+        return commandName.startsWith(argument) ||
+                // Levenshtein is calculated with a greater cost for replace/swap as we *really* only want to match prefixes/suffixes.
+                StringUtil.levenshteinDistance(argument, commandName, 1, 1, 2, 2) < argument.length() * 1.5;
     }
 
     /**

@@ -43,8 +43,8 @@ public final class PagedMessage {
 
         this.pageHeader = pageHeader;
         this.pageFooter = pageFooter;
-        this.totalPages = (int) Math.ceil((double) parsedMessages.size() / messagesPerPage);
         this.pagedMessages = Lists.partition(this.parsedMessages, messagesPerPage);
+        this.totalPages = this.pagedMessages.size();
     }
 
     public PagedMessage(Message message) {
