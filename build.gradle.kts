@@ -38,6 +38,8 @@ tasks {
         archiveFileName.set("${project.name}-${project.version}.jar")
         relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")
         relocate("com.cryptomorin.xseries", "com.golfing8.shade.com.cryptomorin.xseries")
+        // Prevent kotlin from being shaded.
+        exclude("kotlin*.jar")
     }
 
     publishToMavenLocal {
