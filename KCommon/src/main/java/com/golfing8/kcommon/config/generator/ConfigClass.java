@@ -16,8 +16,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Acts as a parent class to all class style configs. Every non-transient field in a config class will
@@ -99,6 +101,25 @@ public abstract class ConfigClass {
         this.parent = parent;
         this.self = delegate;
         this.instance = instance;
+    }
+
+    /**
+     * Gets all expected config names from all present annotations.
+     *
+     * @return the expected config names.
+     */
+    public Set<String> getConfigNames() {
+        Set<String> allNames = new HashSet<>();
+        for (ConfigClass child : this.children.values()) {
+            allNames.addAll(child.getConfigNames());
+        }
+        for (ConfigValueHandle handle : this.fieldHandleMap.values()) {
+            if (handle.getAnnotation() == null || handle.getAnnotation().config().equals(Conf.DEFAULT_CONF))
+                continue;
+
+            allNames.add(handle.getAnnotation().config().toLowerCase());
+        }
+        return allNames;
     }
 
     /**

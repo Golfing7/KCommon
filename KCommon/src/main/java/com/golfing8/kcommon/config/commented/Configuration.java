@@ -163,6 +163,14 @@ public class Configuration extends YamlConfiguration implements Config {
         return wrapped.getName();
     }
 
+    public String getFileName() {
+        return this.configPath.getFileName().toString();
+    }
+
+    public String getFileNameNoExtension() {
+        return this.configPath.getFileName().toString().replace(".yml", "");
+    }
+
     @Override
     protected Object getDefault(String path) {
         throw new UnsupportedOperationException();

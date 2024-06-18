@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
+import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -15,7 +17,6 @@ public class CAPotionEffect implements ConfigAdapter<PotionEffect> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public PotionEffect toPOJO(ConfigPrimitive entry, FieldType type) {
         if (entry.getPrimitive() == null)
             return null;
@@ -23,13 +24,15 @@ public class CAPotionEffect implements ConfigAdapter<PotionEffect> {
         if (entry.getPrimitive() instanceof String) {
             String[] data = entry.getPrimitive().toString().split(":");
             PotionEffectType effectType = PotionEffectType.getByName(data[0]);
-            int duration = data.length > 2 ? Integer.parseInt(data[2]) : 999999999;
+            // I'm not sure the actual version this changed, this is merely a guess.
+            int infiniteDuration = KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_17) ? -1 : 999999999;
+            int duration = data.length > 2 ? Integer.parseInt(data[2]) : infiniteDuration;
             int amplifier = data.length > 1 ? Integer.parseInt(data[1]) : 0;
 
             return new PotionEffect(effectType, duration, amplifier);
         }
 
-        Map<String, Object> map = (Map<String, Object>) entry.unwrap();
+        Map<String, Object> map = entry.unwrap();
         PotionEffectType effectType = PotionEffectType.getByName(map.get("effect-type").toString());
 
         int duration = (int) map.getOrDefault("duration", 600);
@@ -42,11 +45,13 @@ public class CAPotionEffect implements ConfigAdapter<PotionEffect> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull PotionEffect object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         // Ambient with particles is default. Serialize as a string.
         if (object.isAmbient() && object.hasParticles()) {
+            if (object.getDuration() > 999999999 || object.getDuration() < 0) {
+                return ConfigPrimitive.ofString(String.join(":",
+                        object.getType().getName(),
+                        String.valueOf(object.getAmplifier())));
+            }
             return ConfigPrimitive.ofString(
                     String.join(":",
                             object.getType().getName(),

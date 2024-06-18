@@ -12,6 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Conf {
+    String DEFAULT_CONF = "@default";
     /**
      * The comment lines to add to a configuration value.
      *
@@ -20,4 +21,6 @@ public @interface Conf {
     String[] value() default {};
 
     String label() default "";
+
+    String config() default DEFAULT_CONF;
 }

@@ -4,15 +4,14 @@ import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.config.commented.Config;
+import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.util.StringUtil;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 /**
  * Acts as a handle to a configuration value.
@@ -42,6 +41,11 @@ public class ConfigValueHandle {
      * @return true if the config was modified, false if not
      */
     public boolean load(ConfigurationSection sourceSection, String path, boolean readOnly) {
+        // If we're loading from an actual config, we should check that the section is a match.
+        if (sourceSection instanceof MConfiguration) {
+            if (!mapsTo((MConfiguration) sourceSection))
+                return false;
+        }
         try {
             if (!sourceSection.contains(path)) {
                 if (readOnly)
@@ -93,5 +97,22 @@ public class ConfigValueHandle {
      */
     public void set(Object obj) {
         handle.set(instance, obj);
+    }
+
+    /**
+     * Checks the that this value handle maps to the given configuration.
+     *
+     * @param configuration the configuration.
+     * @return if this value handle maps to that config.
+     */
+    private boolean mapsTo(MConfiguration configuration) {
+        String fileName = configuration.getFileNameNoExtension();
+        if ((this.annotation == null || this.annotation.config().equals(Conf.DEFAULT_CONF)) && fileName.equals("config"))
+            return true;
+
+        if (this.annotation == null)
+            return false;
+
+        return this.annotation.config().toLowerCase().equals(fileName);
     }
 }

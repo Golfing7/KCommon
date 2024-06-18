@@ -17,6 +17,7 @@ import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -26,6 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -35,13 +37,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 /**
  * Represents an abstract module with functionality on the server. These modules are the basis of functionality
  * for the KCommon suite of plugins. All 'Features' should be implemented through an extension of this class.
  */
 public abstract class Module implements Listener, LangConfigContainer, PlaceholderProvider {
-
     /**
      * Gets a module instance associated with the given type for the call.
      *
@@ -97,12 +99,29 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * All registered sub modules.
      */
     private final Set<SubModule<?>> subModules;
-
     /**
-     * The main config for this module.
+     * Other configs that are linked to this module.
      */
     @Getter
-    private MConfiguration mainConfig;
+    private final Map<String, MConfiguration> configs;
+    public @NotNull MConfiguration getMainConfig() {
+        return configs.get("config");
+    }
+
+    /**
+     * Gets the config under the given key, or creates one if it wasn't previously registered.
+     *
+     * @param key the key of the config.
+     * @return the config.
+     */
+    public @NotNull MConfiguration getConfig(String key) {
+        MConfiguration configuration = configs.get(key);
+        if (configuration == null) {
+            configuration = loadConfig(Paths.get(plugin.getDataFolder().getPath(), moduleName, key + ".yml"));
+            configs.put(key, configuration);
+        }
+        return configuration;
+    }
     /**
      * The language config for this module.
      */
@@ -142,6 +161,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.relationalPlaceholders = new TreeMap<>();
         this.subListeners = new HashSet<>();
         this.subModules = new HashSet<>();
+        this.configs = new HashMap<>();
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
@@ -171,6 +191,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.pluginDependencies = new HashSet<>(Arrays.asList(info.pluginDependencies()));
         this.subListeners = new HashSet<>();
         this.subModules = new HashSet<>();
+        this.configs = new HashMap<>();
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
@@ -291,27 +312,76 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.configWrapper.unregister();
         this.relationalPlaceholders.clear();
         this.placeholders.clear();
-    }
-
-    /**
-     * Gets the child config from its class.
-     *
-     * @param cfgClass the config class.
-     * @return the instance.
-     * @param <T> the type of config.
-     */
-    public <T extends ConfigClass> T getCfg(Class<T> cfgClass) {
-        return this.configWrapper.getChild(cfgClass);
+        this.configs.clear();
     }
 
     /**
      * Loads the main configuration for this module.
      */
     private void loadConfigs() {
-        //Load the constants first.
-        String configName = this.getModuleName() + ".yml";
-        Path configPath = Paths.get(plugin.getDataFolder().getPath(), configName);
+        migrateOldConfigs();
 
+        // Get the config wrapper ready for loading
+        this.configWrapper = new ConfigClassWrapper(null, this.getClass(), this);
+        this.configWrapper.setRequireAnnotation(true);
+        this.configWrapper.initConfig();
+
+        //Create the parent directory.
+        Path parentFolder = Paths.get(plugin.getDataFolder().getPath(), moduleName);
+        try{
+            Files.createDirectories(parentFolder.getParent());
+        }catch(IOException exc) {
+            throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
+        }
+
+        this.configs.put("config", loadConfig(parentFolder.resolve("config.yml")));
+        for (String expectedConfig : this.configWrapper.getConfigNames()) {
+            // Don't re-register the main config
+            if (expectedConfig.equals("config"))
+                continue;
+
+            this.configs.put(expectedConfig, loadConfig(parentFolder.resolve(expectedConfig + ".yml")));
+        }
+
+        //First, load the language config.
+        Path langPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "lang.yml");
+        this.langConfig = new LangConfig(langPath);
+        this.langConfig.load();
+        this.loadLangConstants(this.langConfig);
+    }
+
+    /**
+     * Attempts to migrate old configs from their old location to the updated one.
+     * TODO Remove this after a while.
+     */
+    private void migrateOldConfigs() {
+        Path oldConfigPath = Paths.get(plugin.getDataFolder().getPath(), moduleName + ".yml");
+        Path newConfigPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "config.yml");
+        migrateConfig(oldConfigPath, newConfigPath);
+
+        Path oldLangPath = Paths.get(plugin.getDataFolder().getPath(), moduleName + "-lang.yml");
+        Path newLangPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "lang.yml");
+        migrateConfig(oldLangPath, newLangPath);
+    }
+
+    private void migrateConfig(Path oldPath, Path newPath) {
+        if (Files.notExists(oldPath) || Files.exists(newPath))
+            return;
+
+        try {
+            Files.createDirectories(newPath.getParent());
+            Files.move(oldPath, newPath);
+        } catch (IOException exc) {
+            throw new RuntimeException(String.format("Failed to migrate config from %s to %s!", oldPath, newPath), exc);
+        }
+    }
+
+    /**
+     * Loads the config under the given path.
+     *
+     * @param configPath the path.
+     */
+    private MConfiguration loadConfig(Path configPath) {
         YamlConfiguration source = new YamlConfiguration();
 
         //Create the parent directory.
@@ -321,7 +391,13 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
         }
 
-        try(InputStream resource = this.plugin.getClass().getResourceAsStream("/" + configName)) {
+        // Test the new location for the resource, otherwise fallback on the old one.
+        String resourcePath = "/" + getModuleName() + "/" + configPath.getFileName().toString();
+        if (this.plugin.getClass().getResource(resourcePath) == null) {
+            resourcePath = "/" + configPath.getFileName().toString();
+        }
+
+        try(InputStream resource = this.plugin.getClass().getResourceAsStream(resourcePath)) {
             ByteArrayOutputStream streamCloner = new ByteArrayOutputStream();
 
             //Check that the resource exists
@@ -329,14 +405,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
                 if (Files.notExists(configPath))
                     Files.createFile(configPath);
             } else {
-                // Read content
-                //Read from the input stream and write the output stream
-                byte[] buffer = new byte[1024];
-                int len;
-                while ((len = resource.read(buffer)) != -1) {
-                    streamCloner.write(buffer, 0, len);
-                }
-
+                IOUtils.copy(resource, streamCloner);
                 if (Files.notExists(configPath)) {
                     Files.write(configPath, streamCloner.toByteArray(), StandardOpenOption.CREATE);
                 }
@@ -344,34 +413,27 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
                 try {
                     source.load(new InputStreamReader(new ByteArrayInputStream(streamCloner.toByteArray())));
                 } catch (InvalidConfigurationException exc) {
-                    getPlugin().getLogger().log(Level.WARNING, String.format("Failed to load source config for module %s.", getModuleName()), exc);
+                    getPlugin().getLogger().log(Level.WARNING, String.format("Failed to load source config %s for module %s.",
+                            configPath.getFileName().toString(), getModuleName()), exc);
                 }
             }
         }catch(IOException exc) {
-            throw new RuntimeException(String.format("Failed to load config for module %s. Is it missing? (Checked under plugin %s)",
+            throw new RuntimeException(String.format("Failed to load config %s for module %s. Is it missing? (Checked under plugin %s)",
+                    configPath.getFileName().toString(),
                     getModuleName(),
                     getPlugin().getName()), exc);
         }
 
-        //Load the configuration and set it.
-        this.mainConfig = new MConfiguration(configPath, this);
-        this.mainConfig.setSource(source);
-        this.mainConfig.load();
+        MConfiguration toReturn = new MConfiguration(configPath, this);
+        toReturn.setSource(source);
+        toReturn.load();
 
-        //First, load the language config.
-        Path langPath = Paths.get(plugin.getDataFolder().getPath(), moduleName + "-lang.yml");
-        this.langConfig = new LangConfig(langPath);
-        this.langConfig.load();
-        this.loadLangConstants(this.langConfig);
-
-        // Finally, load the config wrapper.
-        this.configWrapper = new ConfigClassWrapper(null, this.getClass(), this);
-        this.configWrapper.setRequireAnnotation(true);
-        this.configWrapper.initConfig();
-        boolean modded = this.configWrapper.loadValues(this.mainConfig);
+        // Load with the config wrapper.
+        boolean modded = this.configWrapper.loadValues(toReturn);
         if (modded) {
-            mainConfig.save();
+            toReturn.save();
         }
+        return toReturn;
     }
 
     /**
@@ -422,9 +484,11 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         subModule.onEnable();
 
         // Load the config.
-        boolean save = subModule.loadValues(getMainConfig().createSection(subModule.getPrefix()));
-        if (save) {
-            this.mainConfig.save();
+        for (MConfiguration configuration : this.configs.values()) {
+            boolean save = subModule.loadValues(configuration.createSection(subModule.getPrefix()));
+            if (save) {
+                configuration.save();
+            }
         }
 
         // Load lang config
