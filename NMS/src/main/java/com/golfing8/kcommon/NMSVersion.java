@@ -70,7 +70,10 @@ public class NMSVersion implements Comparable<NMSVersion> {
 
     @Override
     public String toString() {
-        return "1." + major + "." + minor;
+        if (minor > 0) {
+            return "1." + major + "." + minor;
+        }
+        return "1." + major;
     }
 
     @Override
@@ -83,7 +86,7 @@ public class NMSVersion implements Comparable<NMSVersion> {
         String version = bukkitVersion.substring(0, bukkitVersion.indexOf("-"));
         String[] split = version.split("\\.");
         int major = Integer.parseInt(String.valueOf(split[1]));
-        int minor = Integer.parseInt(String.valueOf(split[2]));
+        int minor = split.length > 2 ? Integer.parseInt(String.valueOf(split[2])) : 0;
 
         try{
             return new NMSVersion(major, minor);
