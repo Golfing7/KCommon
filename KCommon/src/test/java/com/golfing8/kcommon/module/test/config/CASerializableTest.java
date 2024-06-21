@@ -30,6 +30,7 @@ public class CASerializableTest {
         public int item4 = 523;
     }
 
+    @CASerializable.Options(canDelegate = true)
     public static class SimpleSerializableConf implements CASerializable {
         public int thing1 = 5;
         public int thing2 = 6;
@@ -63,11 +64,31 @@ public class CASerializableTest {
         configClass.initConfig();
         configClass.loadValues(configuration);
         configuration.save();
-//        System.out.println(configuration.saveToString());
 
         // Load it back.
         SimpleSerializableConf loadedItem = (SimpleSerializableConf) configuration.getWithType("conf-item", SimpleSerializableConf.class);
         assertEquals(config.confItem, loadedItem);
+    }
+
+    @Test
+    public void testDelegatedValue() {
+        final String delegatedConfig =
+                "delegated-value:\n" +
+                        "  thing1: 1\n" +
+                        "  thing2: 12\n" +
+                        "\n" +
+                        "item1: 1\n" +
+                        "item2: 1\n" +
+                        "conf-item: delegated-value\n" +
+                        "item-4: 11";
+
+        Path path = Paths.get(getClass().getSimpleName() + "_testDelegatedValue.yml");
+        Configuration configuration = new Configuration(path);
+        configuration.loadFromString(delegatedConfig);
+
+        SimpleSerializableConf config = (SimpleSerializableConf) configuration.getWithType("conf-item", SimpleSerializableConf.class);
+        assertEquals(1, config.thing1);
+        assertEquals(12, config.thing2);
     }
 
     @Test

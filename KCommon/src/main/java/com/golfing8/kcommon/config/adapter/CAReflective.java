@@ -1,12 +1,14 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
 import lombok.var;
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
@@ -35,6 +37,19 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
         if (entry.getPrimitive() == null)
             return null;
 
+        // Get the options of the serializable.
+        CASerializable.Options options = type.getType().getAnnotation(CASerializable.Options.class);
+        if (options != null && options.canDelegate() && entry.getPrimitive() instanceof String && entry.getSource() != null) {
+            String delegatePath = (String) entry.getPrimitive();
+            ConfigurationSection root = entry.getSource().getRoot();
+            // If we don't have the delegate, we can't do anything.
+            if (!root.contains(delegatePath)) {
+                throw new IllegalStateException("Cannot load delegate path " + delegatePath + " under key " + entry.getSource().getCurrentPath() + " as it doesn't exist!");
+            }
+
+            return ConfigTypeRegistry.getFromType(new ConfigEntry(root, delegatePath), type);
+        }
+
         Map<String, Object> primitives = entry.unwrap();
 
         var fieldHandles = typeFieldCache.containsKey(type.getType()) ?
@@ -57,7 +72,6 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
         }
 
         // Check if we should try flattening the data.
-        CASerializable.Options options = type.getType().getAnnotation(CASerializable.Options.class);
         boolean flatten = options != null && options.flatten();
 
         Map<String, FieldHandle<?>> serializableFields = new HashMap<>();

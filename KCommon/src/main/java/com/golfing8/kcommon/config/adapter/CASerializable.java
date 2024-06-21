@@ -32,5 +32,12 @@ public interface CASerializable {
          * @return if flattening should happen.
          */
         boolean flatten() default false;
+
+        /**
+         * If set to true, this will allow a user to specify a path string rather than a section where the data is loaded from.
+         *
+         * @return if the type can delegate.
+         */
+        boolean canDelegate() default false;
     }
 }

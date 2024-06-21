@@ -62,6 +62,7 @@ public class Configuration extends YamlConfiguration implements Config {
             this.wrapped.loadFromString(data);
             loadComments(data);
         } catch (InvalidConfigurationException exc) {
+            exc.printStackTrace();
             KCommon.getInstance().getLogger().warning(String.format("Failed to load config file at location %s!", this.configPath));
             throw new RuntimeException(exc);
         }
