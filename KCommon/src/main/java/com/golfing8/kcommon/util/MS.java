@@ -157,12 +157,22 @@ public final class MS {
             }
         });
 
-        //Check if the player is wanting to send a title.
+        //To roman numeral
         TRANSFORMERS.add(new Function<String, String>() {
+            final Pattern pattern = Pattern.compile("\\$roman\\{(\\d+)}");
             @Override
             public String apply(String s) {
-                if(!s.startsWith("title"))
-                    return s;
+                Matcher matcher = pattern.matcher(s);
+
+                while(matcher.find()){
+                    String grouped = matcher.group(0);
+                    String number = matcher.group(1);
+
+                    try {
+                        int numeral = Integer.parseInt(number);
+                        s = s.replace(grouped, StringUtil.toRoman(numeral));
+                    } catch (NumberFormatException ignored) {}
+                }
                 return s;
             }
         });
