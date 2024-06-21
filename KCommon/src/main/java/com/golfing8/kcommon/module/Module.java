@@ -391,10 +391,11 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
         }
 
+        boolean defaultConfig = configPath.endsWith("config.yml");
         // Test the new location for the resource, otherwise fallback on the old one.
         String resourcePath = "/" + getModuleName() + "/" + configPath.getFileName().toString();
         if (this.plugin.getClass().getResource(resourcePath) == null) {
-            resourcePath = "/" + configPath.getFileName().toString();
+            resourcePath = "/" + (defaultConfig ? moduleName + ".yml" : configPath.getFileName().toString());
         }
 
         try(InputStream resource = this.plugin.getClass().getResourceAsStream(resourcePath)) {
