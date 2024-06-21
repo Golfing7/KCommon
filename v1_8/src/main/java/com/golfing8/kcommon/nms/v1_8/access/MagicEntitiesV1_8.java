@@ -109,8 +109,12 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
     }
 
     @Override
-    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData entityData) {
+    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData entityData, boolean randomizeData) {
         net.minecraft.server.v1_8_R3.Entity entity = ((CraftWorld) world).createEntity(loc, entityData.getEntityType().getEntityClass());
+        if (randomizeData && entity instanceof EntityInsentient) {
+            ((EntityInsentient)entity).prepare(((CraftWorld) world).getHandle().E(new BlockPosition(entity)), null);
+        }
+
         if (entityData.isCreeperCharged()) {
             ((EntityCreeper) entity).setPowered(true);
         }
@@ -203,6 +207,11 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
 
     @Override
     public void setAttribute(LivingEntity entity, EntityAttribute attribute, double value) {
+        if (attribute == EntityAttribute.MAX_HEALTH) {
+            entity.setMaxHealth(value);
+            return;
+        }
+
         NBTEntity nbtEntity = new NBTEntity(entity);
 
         NBTCompoundList nbtCompoundList = nbtEntity.getCompoundList("Attributes");

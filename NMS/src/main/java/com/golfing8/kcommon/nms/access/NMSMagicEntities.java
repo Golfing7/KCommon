@@ -66,7 +66,11 @@ public interface NMSMagicEntities {
      */
     void setKiller(LivingEntity entity, Player killer);
 
-    <T extends Entity> T spawnEntity(World world, Location loc, EntityData data);
+    default <T extends Entity> T spawnEntity(World world, Location loc, EntityData data) {
+        return this.spawnEntity(world, loc, data, true);
+    }
+
+    <T extends Entity> T spawnEntity(World world, Location loc, EntityData data, boolean randomizeData);
 
     <T extends Entity> T spawnEntity(World world, Location loc, Class<T> clazz);
 

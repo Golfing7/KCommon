@@ -31,6 +31,8 @@ import net.minecraft.world.phys.MovingObjectPositionEntity;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.craftbukkit.v1_17_R1.CraftRegionAccessor;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
@@ -126,8 +128,8 @@ public class MagicEntitiesV1_17 implements NMSMagicEntities {
     }
 
     @Override
-    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData data) {
-        return (T) world.spawn(loc, data.getEntityType().getEntityClass(), (spawned) -> {
+    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData data, boolean randomizeData) {
+        return (T) ((CraftRegionAccessor) world).spawn(loc, data.getEntityType().getEntityClass(), randomizeData, (spawned) -> {
             if (data.isCreeperCharged())
                 ((Creeper) spawned).setPowered(true);
         });
@@ -179,17 +181,51 @@ public class MagicEntitiesV1_17 implements NMSMagicEntities {
 
     @Override
     public void setAttribute(LivingEntity entity, EntityAttribute attribute, double value) {
+        AttributeInstance instance = null;
         switch(attribute){
             case ATTACK_DAMAGE:
-                entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(value);
+                instance = entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
                 break;
             case MOVEMENT_SPEED:
-                entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(value);
+                instance = entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
                 break;
             case KB_RESISTANCE:
-                entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(value);
+                instance = entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+                break;
+            case MAX_HEALTH:
+                instance = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+                break;
+            case LUCK:
+                instance = entity.getAttribute(Attribute.GENERIC_LUCK);
+                break;
+            case ARMOR:
+                instance = entity.getAttribute(Attribute.GENERIC_ARMOR);
+                break;
+            case ATTACK_SPEED:
+                instance = entity.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
+                break;
+            case FLYING_SPEED:
+                instance = entity.getAttribute(Attribute.GENERIC_FLYING_SPEED);
+                break;
+            case FOLLOW_RANGE:
+                instance = entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE);
+                break;
+            case ARMOR_TOUGHNESS:
+                instance = entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
+                break;
+            case ATTACK_KNOCKBACK:
+                instance = entity.getAttribute(Attribute.GENERIC_ATTACK_KNOCKBACK);
+                break;
+            case HORSE_JUMP_STRENGTH:
+                instance = entity.getAttribute(Attribute.HORSE_JUMP_STRENGTH);
+                break;
+            case ZOMBIE_SPAWN_REINFORCEMENTS:
+                instance = entity.getAttribute(Attribute.ZOMBIE_SPAWN_REINFORCEMENTS);
                 break;
         }
+
+        if (instance != null)
+            instance.setBaseValue(value);
     }
 
     @Override
