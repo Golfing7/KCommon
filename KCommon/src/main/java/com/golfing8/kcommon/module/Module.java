@@ -300,8 +300,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         //Unregister sub modules.
         for (SubModule<?> module : new HashSet<>(this.subModules)) {
-            module.onDisable();
-            HandlerList.unregisterAll(module);
+            module.unregister();
         }
 
         //Clear some data structures.
@@ -443,7 +442,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * @param runnable the runnable.
      * @return the task.
      */
-    protected synchronized ModuleTask addTask(Runnable runnable) {
+    public synchronized ModuleTask addTask(Runnable runnable) {
         ModuleTask mTask = new ModuleTask(this, runnable);
         this.moduleTasks.add(mTask);
         return mTask;
@@ -454,7 +453,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      *
      * @param task the task to remove.
      */
-    protected synchronized BukkitRunnable removeTask(BukkitRunnable task) {
+    public synchronized BukkitRunnable removeTask(BukkitRunnable task) {
         this.moduleTasks.remove(task);
         return task;
     }
@@ -465,7 +464,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      *
      * @param task the task.
      */
-    protected synchronized BukkitRunnable addTask(BukkitRunnable task) {
+    public synchronized BukkitRunnable addTask(BukkitRunnable task) {
         this.moduleTasks.add(task);
         return task;
     }
@@ -475,12 +474,14 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      *
      * @param subModule the module.
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public final void addSubModule(SubModule<?> subModule) {
         // Already registered.
         if (this.subModules.contains(subModule))
             return;
 
         this.subModules.add(subModule);
+        ((SubModule) subModule).link(this);
         getPlugin().getServer().getPluginManager().registerEvents(subModule, getPlugin());
         subModule.onEnable();
 
@@ -505,9 +506,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         if (!this.subModules.contains(subModule))
             return;
 
-        this.subModules.remove(subModule);
-        HandlerList.unregisterAll(subModule);
-        subModule.onDisable();
+        subModule.unregister();
     }
 
     /**

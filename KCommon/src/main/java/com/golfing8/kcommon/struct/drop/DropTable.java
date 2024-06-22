@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * </p>
  */
 @NoArgsConstructor
+@CASerializable.Options(canDelegate = true)
 public class DropTable implements CASerializable {
     private static final String DEFAULT_GROUP = "@default";
     /**

@@ -9,12 +9,14 @@ import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
 import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
+import lombok.Getter;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.List;
 
 /**
- * Submodules act as 'partner' classes to their parent modules.
+ * Submodules act as 'partner' classes to their parent modules. These classes CAN be singleton.
  * <p>
  * The purpose of submodules are to provide the ability to split a module class into submodules based
  * upon responsibilities, rather than the typical design of 'put all listeners in the module class'.
@@ -25,24 +27,29 @@ import java.util.List;
  * <p>
  * {@link Conf} and {@link LangConf} annotations still work as expected.
  * </p>
+ * <p>
+ * Note that the {@link #module} reference is may be null until {@link #onEnable()} is called.
+ * </p>
  * @param <T>
  */
 public abstract class SubModule<T extends Module> extends ConfigClass implements Listener, LangConfigContainer {
-    public final T module;
-    @SuppressWarnings("unchecked")
+    @Getter
+    private T module;
     public SubModule() {
-        List<Class<?>> classes = Reflection.getSuperParameterizedTypes(this.getClass());
-        if (classes.size() != 1)
-            throw new RuntimeException("Cannot reflectively find module class!");
-
-        Module m = Modules.getModule((Class<? extends Module>) classes.get(0));
-        if (m == null)
-            throw new CommandInstantiationException(String.format("Cannot reflectively find module class! Given class was: %s", classes.get(0)));
-
-        this.module = (T) m;
-
         this.setRequireAnnotation(true);
         this.initConfig();
+    }
+
+    void link(T module) {
+        this.module = module;
+    }
+
+    @Override
+    public void unregister() {
+        super.unregister();
+
+        HandlerList.unregisterAll(this);
+        onDisable();
     }
 
     @Override

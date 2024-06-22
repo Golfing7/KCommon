@@ -4,6 +4,7 @@ import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityData;
+import com.golfing8.kcommon.struct.drop.DropTable;
 import com.golfing8.kcommon.util.MS;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,9 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@CASerializable.Options(canDelegate = true)
 public class EntityDefinition implements CASerializable {
+    private String _key;
     /** The entity type/data that defines the entity */
     @Builder.Default
     private EntityData type = EntityData.fromType(EntityType.PIG);
@@ -58,6 +61,8 @@ public class EntityDefinition implements CASerializable {
     private boolean adult = true;
     /** If normal spawn randomization should occur */
     private boolean randomizeData;
+    /** A drop table that MUST BE HANDLED BY THE USER. Simply spawning this entity WILL NOT override drops */
+    private @Nullable DropTable dropTable;
 
     /**
      * Tries to spawn the entity at the given location.
@@ -74,33 +79,7 @@ public class EntityDefinition implements CASerializable {
         Entity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, type, randomizeData);
         Entity spawnedPassenger = passenger != null ? passenger.spawnEntity(location) : null;
 
-        if (selfSpawned instanceof LivingEntity) {
-            if (maxHealth > 0) {
-                ((LivingEntity) selfSpawned).setMaxHealth(maxHealth);
-            }
-            if (spawnHealth > 0) {
-                ((LivingEntity) selfSpawned).setHealth(spawnHealth);
-            }
-            if (equipment != null) {
-                equipment.apply((LivingEntity) selfSpawned);
-            }
-            if (potionEffects != null) {
-                for (PotionEffect effect : potionEffects) {
-                    ((LivingEntity) selfSpawned).addPotionEffect(effect);
-                }
-            }
-        }
-
-        if (selfSpawned instanceof Zombie) {
-            ((Zombie) selfSpawned).setBaby(!adult);
-        } else if (selfSpawned instanceof Ageable) {
-            if (adult) {
-                ((Ageable) selfSpawned).setAdult();
-            } else {
-                ((Ageable) selfSpawned).setBaby();
-            }
-        }
-
+        applyToEntity(selfSpawned);
         if (spawnedVehicle != null) {
             spawnedVehicle.addPassenger(selfSpawned);
         }
@@ -108,11 +87,79 @@ public class EntityDefinition implements CASerializable {
         if (spawnedPassenger != null) {
             selfSpawned.addPassenger(spawnedPassenger);
         }
+        return selfSpawned;
+    }
+
+    /**
+     * Tries to spawn the entity naturally at the given location.
+     * If the entity cannot be created (or spawned), null is returned.
+     * <p>
+     * In the event this definition contains a vehicle or passenger, all or none of the mobs will be spawned.
+     * </p>
+     *
+     * @param location the location.
+     * @return the spawned entity, or null.
+     */
+    public @Nullable LivingEntity trySpawnNaturallyAt(Location location) {
+        LivingEntity spawnedVehicle = vehicle != null ? vehicle.trySpawnNaturallyAt(location) : null;
+        if (vehicle != null && spawnedVehicle == null)
+            return null;
+        LivingEntity spawnedPassenger = passenger != null ? passenger.trySpawnNaturallyAt(location) : null;
+        if (passenger != null && spawnedPassenger == null) {
+            spawnedVehicle.remove();
+            return null;
+        }
+
+        LivingEntity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, type, randomizeData);
+        applyToEntity(selfSpawned);
+        if (spawnedVehicle != null) {
+            spawnedVehicle.addPassenger(selfSpawned);
+        }
+
+        if (spawnedPassenger != null) {
+            selfSpawned.addPassenger(spawnedPassenger);
+        }
+        // TODO Do spawn checks.
+        return selfSpawned;
+    }
+
+    /**
+     * Tries to apply this definition to the entity.
+     * The entity's type won't be changed.
+     *
+     * @param entity the entity to change.
+     */
+    public void applyToEntity(Entity entity) {
+        if (entity instanceof LivingEntity) {
+            if (maxHealth > 0) {
+                ((LivingEntity) entity).setMaxHealth(maxHealth);
+            }
+            if (spawnHealth > 0) {
+                ((LivingEntity) entity).setHealth(spawnHealth);
+            }
+            if (equipment != null) {
+                equipment.apply((LivingEntity) entity);
+            }
+            if (potionEffects != null) {
+                for (PotionEffect effect : potionEffects) {
+                    ((LivingEntity) entity).addPotionEffect(effect);
+                }
+            }
+        }
+
+        if (entity instanceof Zombie) {
+            ((Zombie) entity).setBaby(!adult);
+        } else if (entity instanceof Ageable) {
+            if (adult) {
+                ((Ageable) entity).setAdult();
+            } else {
+                ((Ageable) entity).setBaby();
+            }
+        }
 
         if (name != null) {
-            selfSpawned.setCustomNameVisible(true);
-            selfSpawned.setCustomName(MS.parseSingle(name));
+            entity.setCustomNameVisible(true);
+            entity.setCustomName(MS.parseSingle(name));
         }
-        return selfSpawned;
     }
 }
