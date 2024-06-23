@@ -5,6 +5,7 @@ import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.random.RandomTestable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -15,13 +16,20 @@ import java.util.List;
  * Represents a singular drop in a {@link DropTable}.
  */
 @Getter
-@AllArgsConstructor
 public abstract class Drop<T> implements RandomTestable {
+    /** The key that was used to load this from the config */
+    @Setter
+    private String _key;
     /** The chance for this drop */
     private double chance;
     /** The display name of this drop */
     @Getter
     private @Nullable String displayName;
+
+    public Drop(double chance, @Nullable String displayName) {
+        this.chance = chance;
+        this.displayName = displayName;
+    }
     /**
      * Gets the set of dropped objects.
      *

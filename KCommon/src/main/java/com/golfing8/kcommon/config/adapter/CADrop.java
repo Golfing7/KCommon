@@ -43,16 +43,22 @@ public class CADrop implements ConfigAdapter<Drop> {
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
-                return new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly);
+                ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly);
+                drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
+                return drop;
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
-                return new ItemDrop(chance, displayName, items, giveDirectly);
+                ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly);
+                drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
+                return drop;
             }
         } else if (primitive.containsKey("commands")) {
             FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {});
             List<String> commands = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("commands")), fieldType);
-            return new CommandDrop(chance, displayName, commands);
+            CommandDrop drop = new CommandDrop(chance, displayName, commands);
+            drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
+            return drop;
         }
         throw new InvalidConfigException("Drop doesn't have `commands` or `items` key. Which type of drop is it?");
     }
