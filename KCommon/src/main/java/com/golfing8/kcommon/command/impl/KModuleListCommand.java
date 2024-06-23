@@ -8,6 +8,7 @@ import com.golfing8.kcommon.command.KCommand;
 import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.Modules;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ public class KModuleListCommand extends KCommand {
     }
 
     @Override
-    protected void execute(CommandContext context) {
+    protected void execute(@NotNull CommandContext context) {
         KPlugin forPlugin = context.next();
         List<Module> modules = Modules.getAll().stream()
                 .filter(mod -> forPlugin == null || mod.getPlugin() == forPlugin)

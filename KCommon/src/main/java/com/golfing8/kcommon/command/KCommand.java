@@ -18,6 +18,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
+import org.jetbrains.annotations.NotNull;
 import org.spigotmc.SpigotConfig;
 
 import javax.annotation.Nullable;
@@ -782,7 +783,7 @@ public abstract class KCommand implements TabExecutor {
     /**
      * Run when a player has executed this command and it needs to function.
      */
-    protected void execute(CommandContext context) {
+    protected void execute(@NotNull CommandContext context) {
         // Send a help message.
         this.handleHelpMessage(context.getSender(), context.getArguments().isEmpty() ? null : context.getArguments().get(0));
     }

@@ -8,6 +8,7 @@ import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.config.lang.PagedMessage;
 import lombok.Getter;
 import net.jodah.expiringmap.ExpiringMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +40,7 @@ public class KPagerCommand extends KCommand {
     }
 
     @Override
-    protected void execute(CommandContext context) {
+    protected void execute(@NotNull CommandContext context) {
         String pagerID = context.next();
         int page = context.next();
 

@@ -263,6 +263,15 @@ public class Message {
     }
 
     /**
+     * An overload for the sake of making Kotlin easier to interop.
+     *
+     * @param sender the sender.
+     */
+    public void send(CommandSender sender) {
+        this.send(sender, new Object[0]);
+    }
+
+    /**
      * Sends this message to the given player with the placeholders.
      *
      * @param sender the sender.

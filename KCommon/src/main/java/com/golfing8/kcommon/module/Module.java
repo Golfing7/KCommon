@@ -20,6 +20,7 @@ import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
@@ -487,7 +488,10 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         // Load the config.
         for (MConfiguration configuration : this.configs.values()) {
-            boolean save = subModule.loadValues(configuration.createSection(subModule.getPrefix()));
+            String prefix = subModule.getPrefix();
+            ConfigurationSection section = prefix.isEmpty() ? configuration :
+                    (configuration.contains(prefix) ? configuration.getConfigurationSection(prefix) : configuration.createSection(prefix));
+            boolean save = subModule.loadValues(section);
             if (save) {
                 configuration.save();
             }

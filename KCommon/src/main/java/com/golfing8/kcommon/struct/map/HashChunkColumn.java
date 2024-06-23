@@ -18,7 +18,6 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
     private static final int RIGHT_BIT_SHIFT = 4;
     private static final int VALID_ARRAY_LOCATIONS = 16 * 16 * (384 / CHUNK_SECTIONS);
 
-    //Must be a power of 2.
     private final int buckets;
 
     private final Node[][] storedObjects;

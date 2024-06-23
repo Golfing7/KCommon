@@ -8,6 +8,7 @@ import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.module.Module;
 import lombok.var;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -36,7 +37,7 @@ public class KModulePlaceholders extends KCommand {
     }
 
     @Override
-    protected void execute(CommandContext context) {
+    protected void execute(@NotNull CommandContext context) {
         Module module = context.next();
         if (module.getPlaceholders().isEmpty() && module.getRelationalPlaceholders().isEmpty()) {
             KCommon.getInstance().sendConfigMessage(context.getSender(), "placeholders-command-none", "MODULE", module.getModuleName());

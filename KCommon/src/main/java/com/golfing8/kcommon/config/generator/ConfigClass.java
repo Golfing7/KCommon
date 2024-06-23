@@ -203,7 +203,11 @@ public abstract class ConfigClass {
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             int modifiers = field.getModifiers();
-            if ((modifiers & (Modifier.STATIC | Modifier.TRANSIENT | Modifier.FINAL)) != 0)
+            if ((modifiers & (Modifier.TRANSIENT | Modifier.FINAL)) != 0)
+                continue;
+
+            // If we don't require the annotation, don't do anything w/ static fields.
+            if (!requireAnnotation && (modifiers & (Modifier.STATIC)) != 0)
                 continue;
 
             // Check for the required annotation.

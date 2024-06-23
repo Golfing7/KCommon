@@ -6,6 +6,7 @@ import com.golfing8.kcommon.command.CommandContext;
 import com.golfing8.kcommon.command.KCommand;
 import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.module.Module;
+import org.jetbrains.annotations.NotNull;
 
 @Cmd(
         name = "reload",
@@ -20,7 +21,7 @@ public class KModuleReloadCommand extends KCommand {
     }
 
     @Override
-    protected void execute(CommandContext context) {
+    protected void execute(@NotNull CommandContext context) {
         Module module = context.next();
         long timeBegin = System.currentTimeMillis();
         module.reloadWithDependencies();

@@ -48,8 +48,8 @@ public class KCommon extends KPlugin {
 
     @Override
     public void onPreEnableInner() {
-        NMS.initialize(this);
-        this.serverVersion = NMS.getServerVersion();
+        this.serverVersion = NMSVersion.loadVersion();
+
         libraryLoader.addRelocation("de,tr7zw,changeme,nbtapi", "de,tr7zw,kcommon,nbtapi");
         libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
 
@@ -71,6 +71,8 @@ public class KCommon extends KPlugin {
         }
 
         libraryLoader.loadAllLibraries(libraries);
+
+        NMS.initialize(this);
     }
 
     @Override

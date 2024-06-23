@@ -86,7 +86,7 @@ public final class ConfigPrimitive {
         }
 
         if (!this.source.isConfigurationSection(key)) {
-            return new ConfigPrimitive(this.source.get(key));
+            return new ConfigPrimitive(this.source.get(key), this.source);
         }
 
         return ConfigPrimitive.ofSection(this.source.getConfigurationSection(key));

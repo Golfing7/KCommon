@@ -6,6 +6,7 @@ import com.golfing8.kcommon.command.CommandContext;
 import com.golfing8.kcommon.command.KCommand;
 import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.module.Module;
+import org.jetbrains.annotations.NotNull;
 
 @Cmd(
         name = "enable",
@@ -20,7 +21,7 @@ public class KModuleEnableCommand extends KCommand {
     }
 
     @Override
-    protected void execute(CommandContext context) {
+    protected void execute(@NotNull CommandContext context) {
         Module module = context.next();
         if (module.getPlugin().getManifest().isActive(module) && module.isEnabled()) {
             KCommon.getInstance().sendConfigMessage(context.getSender(), "enable-command-already");
