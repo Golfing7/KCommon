@@ -16,37 +16,41 @@ import java.util.regex.Pattern;
 
 public class ComponentUtils {
 
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private static final MiniMessage miniMessage;
     private static final Pattern AMPERSAND_RGB_3 = Pattern.compile("&#([\\da-fA-F]{3})");
     private static final Pattern AMPERSAND_RGB_6 = Pattern.compile("&#([\\da-fA-F]{6})");
     private static final Pattern AMPERSAND_RGB_SPIGOT = Pattern.compile("&x(&[\\da-fA-F]){6}");
     private static final Pattern SECTION_RGB_3 = Pattern.compile("\u00A7#([\\da-fA-F]{3})");
     private static final Pattern SECTION_RGB_6 = Pattern.compile("\u00A7#([\\da-fA-F]{6})");
     private static final Pattern SECTION_RGB_SPIGOT = Pattern.compile("\u00A7x(\u00A7[\\da-fA-F]){6}");
-    private static final Map<String, String> legacyColorMap = new HashMap<String, String>(){{
-                put("0", "<reset><black>");
-                put("1", "<reset><dark_blue>");
-                put("2", "<reset><dark_green>");
-                put("3", "<reset><dark_aqua>");
-                put("4", "<reset><dark_red>");
-                put("5", "<reset><dark_purple>");
-                put("6", "<reset><gold>");
-                put("7", "<reset><gray>");
-                put("8", "<reset><dark_gray>");
-                put("9", "<reset><blue>");
-                put("a", "<reset><green>");
-                put("b", "<reset><aqua>");
-                put("c", "<reset><red>");
-                put("d", "<reset><light_purple>");
-                put("e", "<reset><yellow>");
-                put("f", "<reset><white>");
-                put("n", "<underlined>");
-                put("m", "<strikethrough>");
-                put("k", "<obfuscated>");
-                put("o", "<italic>");
-                put("l", "<bold>");
-                put("r", "<reset>");
-    }};
+    private static final Map<String, String> legacyColorMap = new HashMap<>();
+
+    static {
+        legacyColorMap.put("0", "<reset><black>");
+        legacyColorMap.put("1", "<reset><dark_blue>");
+        legacyColorMap.put("2", "<reset><dark_green>");
+        legacyColorMap.put("3", "<reset><dark_aqua>");
+        legacyColorMap.put("4", "<reset><dark_red>");
+        legacyColorMap.put("5", "<reset><dark_purple>");
+        legacyColorMap.put("6", "<reset><gold>");
+        legacyColorMap.put("7", "<reset><gray>");
+        legacyColorMap.put("8", "<reset><dark_gray>");
+        legacyColorMap.put("9", "<reset><blue>");
+        legacyColorMap.put("a", "<reset><green>");
+        legacyColorMap.put("b", "<reset><aqua>");
+        legacyColorMap.put("c", "<reset><red>");
+        legacyColorMap.put("d", "<reset><light_purple>");
+        legacyColorMap.put("e", "<reset><yellow>");
+        legacyColorMap.put("f", "<reset><white>");
+        legacyColorMap.put("n", "<underlined>");
+        legacyColorMap.put("m", "<strikethrough>");
+        legacyColorMap.put("k", "<obfuscated>");
+        legacyColorMap.put("o", "<italic>");
+        legacyColorMap.put("l", "<bold>");
+        legacyColorMap.put("r", "<reset>");
+
+        miniMessage = MiniMessage.miniMessage();
+    }
 
     /**
      * Converts a {@link String} into a {@link Component}

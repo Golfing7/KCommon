@@ -106,7 +106,7 @@ public abstract class KCommand implements TabExecutor {
     @Getter @Setter
     private String commandPermission = "";
     /** A description of this command */
-    @Getter
+    @Getter @Setter
     private String description;
     /**
      * The parent of this command, can be null.
@@ -517,7 +517,7 @@ public abstract class KCommand implements TabExecutor {
         return MS.parseSingle(message,
                 "COMMAND", commandChain.toString().trim(),
                 "ARGUMENTS", builtArguments,
-                "DESCRIPTION", getDescription());
+                "DESCRIPTION", getDescription() == null ? "No description" : getDescription());
     }
 
     /**
