@@ -92,6 +92,10 @@ public interface Menu extends Listener {
 
     void refreshSpecialItems();
 
+    void setSpecialItems(List<SimpleGUIItem> specialItems);
+
+    List<SimpleGUIItem> getSpecialItems();
+
     boolean canExpire();
 
     void setCanExpire(boolean canExpire);

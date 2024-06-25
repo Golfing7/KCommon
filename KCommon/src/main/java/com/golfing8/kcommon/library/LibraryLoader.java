@@ -155,12 +155,14 @@ public class LibraryLoader {
             }
         }
 
-        try {
-            loaderAccess.addURL(path.toFile().toURI().toURL());
-            loadedLibraries.add(path);
-        } catch (Exception e) {
-            KCommon.getInstance().getLogger().severe("Failed to load library, plugin may not work correctly (" + definition.getFormattedName() + ")");
-            e.printStackTrace();
+        synchronized (this) {
+            try {
+                loaderAccess.addURL(path.toFile().toURI().toURL());
+                loadedLibraries.add(path);
+            } catch (Exception e) {
+                KCommon.getInstance().getLogger().severe("Failed to load library, plugin may not work correctly (" + definition.getFormattedName() + ")");
+                e.printStackTrace();
+            }
         }
     }
 

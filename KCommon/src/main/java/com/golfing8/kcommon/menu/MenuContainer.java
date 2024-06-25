@@ -35,4 +35,20 @@ public abstract class MenuContainer {
     public void open(Player player) {
         player.openInventory(getMenu().getGUI());
     }
+
+    /**
+     * Refreshes the opened menu w/ new items, click actions, placeholders, etc.
+     */
+    public void refresh() {
+        if (menu == null)
+            return;
+
+        Menu newMenu = loadMenu();
+
+        menu.setContents(newMenu.getContents());
+        menu.setClickActions(newMenu.getClickActions());
+        menu.setSpecialItems(newMenu.getSpecialItems());
+        menu.refreshSpecialItems();
+        menu.updateViewers();
+    }
 }

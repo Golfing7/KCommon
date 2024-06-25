@@ -183,6 +183,16 @@ public abstract class MenuAbstract implements Menu {
     }
 
     @Override
+    public List<SimpleGUIItem> getSpecialItems() {
+        return new ArrayList<>(this.guiItems);
+    }
+
+    @Override
+    public void setSpecialItems(List<SimpleGUIItem> specialItems) {
+        this.guiItems = new ArrayList<>(specialItems);
+    }
+
+    @Override
     public void setTitle(String title) {
         this.title = MS.parseSingle(title, this.placeholders);
         recreate = true;
