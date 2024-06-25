@@ -21,9 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.VoxelShape;
 
-@AllArgsConstructor
 public class MagicEntities implements NMSMagicEntities {
-    private final WorldguardHook hook;
 
     @Override
     public GameProfile getGameProfile(Player player) {

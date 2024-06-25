@@ -2,7 +2,6 @@ package com.golfing8.kcommon.nms.v1_8.access;
 
 import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.struct.EntityData;
-import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.golfing8.kcommon.nms.access.NMSMagicEntities;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.mojang.authlib.GameProfile;
@@ -25,10 +24,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-@AllArgsConstructor
 public class MagicEntitiesV1_8 implements NMSMagicEntities {
-    private final WorldguardHook hook;
-
     @Override
     public GameProfile getGameProfile(Player player) {
         return ((CraftPlayer) player).getHandle().getProfile();

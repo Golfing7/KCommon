@@ -17,4 +17,11 @@ public interface WorldEditHook {
      * @param path the path.
      */
     void pasteSchematic(Location location, Path path);
+
+    WorldEditHook EMPTY = new WorldEditHook() {
+        @Override
+        public void pasteSchematic(Location location, Path path) {
+
+        }
+    };
 }

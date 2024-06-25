@@ -42,14 +42,14 @@ public class NMS implements NMSAccess {
 
     public NMS(Plugin plugin){
         this.server = new Server();
-        this.wgHook = new Worldguard();
-        this.worldEditHook = new WorldEdit();
 
-        this.magicEntities = new MagicEntities(wgHook);
+        this.magicEntities = new MagicEntities();
         this.magicItems = new MagicItems();
         this.magicNumbers = new MagicNumbers();
         this.magicPackets = new MagicPackets();
         this.magicEvents = new MagicEvents();
+        this.wgHook = Bukkit.getPluginManager().isPluginEnabled("WorldGuard") ? new Worldguard() : WorldguardHook.EMPTY;
+        this.worldEditHook = Bukkit.getPluginManager().isPluginEnabled("WorldEdit") ? new WorldEdit() : WorldEditHook.EMPTY;
 
         Bukkit.getServer().getPluginManager().registerEvents(new PreSpawnSpawnerAdapter(), plugin);
         Bukkit.getServer().getPluginManager().registerEvents(new NewArmorEquipListener(), plugin);

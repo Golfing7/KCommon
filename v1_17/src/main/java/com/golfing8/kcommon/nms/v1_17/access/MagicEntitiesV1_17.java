@@ -57,7 +57,6 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class MagicEntitiesV1_17 implements NMSMagicEntities {
-    private final WorldguardHook hook;
     private final Plugin plugin;
 
     @Override

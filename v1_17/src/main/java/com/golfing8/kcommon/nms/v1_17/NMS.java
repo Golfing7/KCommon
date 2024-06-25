@@ -15,6 +15,7 @@ import com.golfing8.kcommon.nms.v1_17.event.PreSpawnSpawnerAdapter;
 import com.golfing8.kcommon.nms.v1_17.packets.*;
 import com.golfing8.kcommon.nms.v1_17.server.ServerV1_17;
 import com.golfing8.kcommon.nms.v1_17.world.WorldV1_17;
+import com.golfing8.kcommon.nms.v1_17.worldedit.WorldEdit;
 import com.golfing8.kcommon.nms.v1_17.worldguard.WorldguardV1_17;
 import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
@@ -47,6 +48,7 @@ public class NMS implements NMSAccess {
     private final Plugin plugin;
     private final ServerV1_17 server;
     private final WorldguardHook wgHook;
+    private final WorldEditHook worldEditHook;
     private final MagicItemsV1_17 magicItemsV1_17;
     private final MagicEntitiesV1_17 magicEntitiesV1_17;
     private final MagicPacketsV1_17 magicPacketsV1_17;
@@ -55,15 +57,16 @@ public class NMS implements NMSAccess {
 
     public NMS(Plugin plugin){
         this.server = new ServerV1_17();
-        this.wgHook = new WorldguardV1_17();
         this.plugin = plugin;
         this.audiences = BukkitAudiences.create(plugin);
 
         this.magicItemsV1_17 = new MagicItemsV1_17();
-        this.magicEntitiesV1_17 = new MagicEntitiesV1_17(wgHook, plugin);
+        this.magicEntitiesV1_17 = new MagicEntitiesV1_17(plugin);
         this.magicPacketsV1_17 = new MagicPacketsV1_17();
         this.magicNumbersV1_17 = new MagicNumbersV1_17();
         this.magicEventsV1_17 = new MagicEventsV1_17();
+        this.wgHook = Bukkit.getPluginManager().isPluginEnabled("WorldGuard") ? new WorldguardV1_17() : WorldguardHook.EMPTY;
+        this.worldEditHook = Bukkit.getPluginManager().isPluginEnabled("WorldEdit") ? new WorldEdit() : WorldEditHook.EMPTY;
 
         Bukkit.getServer().getPluginManager().registerEvents(new PreSpawnSpawnerAdapter(), plugin);
         Bukkit.getServer().getPluginManager().registerEvents(new NewArmorEquipListener(), plugin);
@@ -71,7 +74,7 @@ public class NMS implements NMSAccess {
 
     @Override
     public WorldEditHook getWorldEditHook() {
-        return (location, path) -> {};
+        return worldEditHook;
     }
 
     @Override
