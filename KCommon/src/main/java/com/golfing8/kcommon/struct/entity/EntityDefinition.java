@@ -81,10 +81,12 @@ public class EntityDefinition implements CASerializable {
 
         applyToEntity(selfSpawned);
         if (spawnedVehicle != null) {
+            spawnedVehicle.setCustomNameVisible(false);
             spawnedVehicle.addPassenger(selfSpawned);
         }
 
         if (spawnedPassenger != null) {
+            selfSpawned.setCustomNameVisible(false);
             selfSpawned.addPassenger(spawnedPassenger);
         }
         return selfSpawned;
@@ -113,10 +115,12 @@ public class EntityDefinition implements CASerializable {
         LivingEntity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, type, randomizeData);
         applyToEntity(selfSpawned);
         if (spawnedVehicle != null) {
+            spawnedVehicle.setCustomNameVisible(false);
             spawnedVehicle.addPassenger(selfSpawned);
         }
 
         if (spawnedPassenger != null) {
+            selfSpawned.setCustomNameVisible(false);
             selfSpawned.addPassenger(spawnedPassenger);
         }
         // TODO Do spawn checks.
