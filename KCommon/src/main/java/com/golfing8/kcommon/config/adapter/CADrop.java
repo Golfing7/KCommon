@@ -1,18 +1,14 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
 import com.golfing8.kcommon.config.InvalidConfigException;
 import com.golfing8.kcommon.struct.drop.CommandDrop;
 import com.golfing8.kcommon.struct.drop.Drop;
-import com.golfing8.kcommon.struct.drop.DropTable;
 import com.golfing8.kcommon.struct.drop.ItemDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.MapUtil;
 import com.google.gson.reflect.TypeToken;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -41,15 +37,17 @@ public class CADrop implements ConfigAdapter<Drop> {
                 100.0D;
         if (primitive.containsKey("items") || primitive.containsKey("item")) {
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
+            boolean fancy = (boolean) primitive.getOrDefault("fancy", false);
+            boolean playerLocked = (boolean) primitive.getOrDefault("player-locked", false);
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
-                ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly);
+                ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
-                ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly);
+                ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly, fancy, playerLocked);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             }
@@ -78,6 +76,9 @@ public class CADrop implements ConfigAdapter<Drop> {
             } else {
                 serialized.put("items", ConfigTypeRegistry.toPrimitive(((ItemDrop) object).getItems()));
             }
+            serialized.put("give-directly", itemDrop.isGiveDirectly());
+            serialized.put("fancy", itemDrop.isFancyDrop());
+            serialized.put("player-locked", itemDrop.isPlayerLocked());
             return ConfigPrimitive.ofMap(serialized);
         } else if (object instanceof CommandDrop) {
             serialized.put("commands", ConfigTypeRegistry.toPrimitive(((CommandDrop) object).getDrop()));

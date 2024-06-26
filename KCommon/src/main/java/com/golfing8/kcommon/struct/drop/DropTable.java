@@ -223,13 +223,7 @@ public class DropTable implements CASerializable {
      */
     public List<Drop<?>> giveOrDropAt(DropContext context, Location location, @Nullable Message dropMessageFormat) {
         List<Drop<?>> drops = generateDrops(context);
-        drops.forEach(drop -> {
-            if (drop.isPhysical()) {
-                drop.dropAt(location);
-            } else {
-                drop.giveTo(context.getPlayer());
-            }
-        });
+        drops.forEach(drop -> drop.giveOrDropAt(context, location));
         if (dropMessageFormat != null)
             sendDropMessage(context.getPlayer(), drops, dropMessageFormat);
         return drops;
@@ -237,12 +231,19 @@ public class DropTable implements CASerializable {
 
     /**
      * Sends a message to a player with drop placeholders parsed in.
+     * <p>
+     * The placeholders parsed in are:
+     * <ol>
+     * <li>TOTAL_REWARDS - The amount of rewards given total</li>
+     * <li>REWARDS - A multi-line placeholder for all the rewards given</li>
+     * </ol>
+     * </p>
      *
      * @param player the player.
      * @param drops the drops parsed in.
      * @param message the drop message.
      */
-    private void sendDropMessage(Player player, List<Drop<?>> drops, Message message) {
+    public void sendDropMessage(Player player, List<Drop<?>> drops, Message message) {
         List<String> displayNames = new ArrayList<>(); // don't allocate if you don't have to
         drops.forEach(drop -> {
             if (drop.getDisplayName() != null)

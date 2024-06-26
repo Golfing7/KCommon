@@ -1,9 +1,11 @@
 package com.golfing8.kcommon.struct.item;
 
+import com.cryptomorin.xseries.XSound;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.event.FancyItemPickupEvent;
 import com.golfing8.kcommon.hook.holograms.Hologram;
 import com.golfing8.kcommon.hook.holograms.HologramProvider;
+import com.golfing8.kcommon.struct.SoundWrapper;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -91,7 +93,7 @@ public class FancyItemDrop extends BukkitRunnable {
         if (this.pickupDelayTicks-- > 0)
             return;
 
-        for (Entity entity : this.location.getNearbyEntities(pickupRange, pickupRange, pickupRange)) {
+        for (Entity entity : this.location.getWorld().getNearbyEntities(location, pickupRange, pickupRange, pickupRange)) {
             if (!(entity instanceof Player))
                 continue;
 
@@ -99,6 +101,7 @@ public class FancyItemDrop extends BukkitRunnable {
             if (!pickupPlayers.isEmpty() && !pickupPlayers.contains(player.getUniqueId()))
                 continue;
 
+            int before = this.items.size();
             this.items.removeIf(item -> {
                 FancyItemPickupEvent fancyPickupEvent = new FancyItemPickupEvent(player, this, item);
                 Bukkit.getPluginManager().callEvent(fancyPickupEvent);
@@ -112,7 +115,18 @@ public class FancyItemDrop extends BukkitRunnable {
                 item.setAmount(leftOver.get(0).getAmount());
                 return false;
             });
+
+            if (before != this.items.size()) {
+                new SoundWrapper(XSound.ENTITY_ITEM_PICKUP, 1.0F, 1.0F).send(player);
+            }
         }
+    }
+
+    public static FancyItemDrop spawn(Location location, Collection<ItemStack> items) {
+        if (items.isEmpty())
+            throw new IllegalArgumentException("Items cannot be empty");
+
+        return new FancyItemDrop(location, items, items.stream().findFirst().get());
     }
 
     public static FancyItemDrop spawn(Location location, Collection<ItemStack> items, ItemStack icon) {

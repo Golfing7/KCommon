@@ -47,13 +47,14 @@ public abstract class Drop<T> implements RandomTestable {
     /**
      * Gives the player this drop, or drops it at the given location.
      *
-     * @param player the player.
+     * @param context the context.
+     * @param location the location.
      */
-    public void giveOrDropAt(Player player) {
+    public void giveOrDropAt(DropContext context, Location location) {
         if (isPhysical()) {
-            dropAt(player.getLocation());
+            dropAt(context, location);
         } else {
-            giveTo(player);
+            giveTo(context.getPlayer());
         }
     }
 
@@ -62,10 +63,10 @@ public abstract class Drop<T> implements RandomTestable {
      *
      * @param location the location.
      */
-    public void dropAt(Location location) {}
+    public void dropAt(DropContext context, Location location) {}
 
     /**
-     * If the drop is physical, that means that the {@link #dropAt(Location)} implementation exists.
+     * If the drop is physical, that means that the {@link #dropAt(DropContext, Location)} implementation exists.
      *
      * @return if this drop is physical.
      */

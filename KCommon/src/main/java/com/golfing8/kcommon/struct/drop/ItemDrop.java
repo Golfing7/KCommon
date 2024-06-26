@@ -1,6 +1,6 @@
 package com.golfing8.kcommon.struct.drop;
 
-import com.golfing8.kcommon.config.adapter.CASerializable;
+import com.golfing8.kcommon.struct.item.FancyItemDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.util.PlayerUtil;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,10 +20,14 @@ import java.util.stream.Collectors;
 public class ItemDrop extends Drop<ItemStack> {
     private Map<String, ItemStackBuilder> items;
     private boolean giveDirectly;
-    public ItemDrop(double chance, @Nullable String displayName, Map<String, ItemStackBuilder> items, boolean giveDirectly) {
+    private boolean fancyDrop;
+    private boolean playerLocked;
+    public ItemDrop(double chance, @Nullable String displayName, Map<String, ItemStackBuilder> items, boolean giveDirectly, boolean fancyDrop, boolean playerLocked) {
         super(chance, displayName);
         this.items = items;
         this.giveDirectly = giveDirectly;
+        this.fancyDrop = fancyDrop;
+        this.playerLocked = playerLocked;
     }
 
     @Override
@@ -41,10 +43,17 @@ public class ItemDrop extends Drop<ItemStack> {
     }
 
     @Override
-    public void dropAt(Location location) {
-        getDrop().forEach(item -> {
-            location.getWorld().dropItemNaturally(location, item);
-        });
+    public void dropAt(DropContext context, Location location) {
+        if (fancyDrop) {
+            FancyItemDrop drop = FancyItemDrop.spawn(location.clone().add(0, 1, 0), items.values().stream().map(ItemStackBuilder::buildFromTemplate).collect(Collectors.toList()));
+            if (playerLocked && context.getPlayer() != null) {
+                drop.getPickupPlayers().add(context.getPlayer().getUniqueId());
+            }
+        } else {
+            getDrop().forEach(item -> {
+                location.getWorld().dropItemNaturally(location, item);
+            });
+        }
     }
 
     @Override
