@@ -45,15 +45,28 @@ public class ItemDrop extends Drop<ItemStack> {
     @Override
     public void dropAt(DropContext context, Location location) {
         if (fancyDrop) {
-            FancyItemDrop drop = FancyItemDrop.spawn(location.clone().add(0, 1, 0), items.values().stream().map(ItemStackBuilder::buildFromTemplate).collect(Collectors.toList()));
-            if (playerLocked && context.getPlayer() != null) {
-                drop.getPickupPlayers().add(context.getPlayer().getUniqueId());
-            }
+            dropFancy(context, location);
         } else {
             getDrop().forEach(item -> {
                 location.getWorld().dropItemNaturally(location, item);
             });
         }
+    }
+
+    /**
+     * Drops the fancy item at the given location.
+     *
+     * @param context the drop context.
+     * @param location the location to drop.
+     * @return the fancy item drop.
+     */
+    public FancyItemDrop dropFancy(DropContext context, Location location) {
+        FancyItemDrop drop = FancyItemDrop.spawn(location.clone().add(0, 1, 0), items.values().stream().map(ItemStackBuilder::buildFromTemplate).collect(Collectors.toList()));
+        if (playerLocked && context.getPlayer() != null) {
+            drop.getPickupPlayers().add(context.getPlayer().getUniqueId());
+        }
+        drop.setSpawnedBy(this);
+        return drop;
     }
 
     @Override

@@ -25,6 +25,7 @@ public abstract class Drop<T> implements RandomTestable {
     /** The display name of this drop */
     @Getter
     private @Nullable String displayName;
+    /** The drop table this drop is linked to. Can be null */
 
     public Drop(double chance, @Nullable String displayName) {
         this.chance = chance;

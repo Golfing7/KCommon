@@ -126,6 +126,11 @@ In the event the minimum target isn't met, we simply randomize the list again an
 
 (Note that as of now if one pass of the list finds and adds the 'diamond' drop, another pass of the list may find the same drop)
 
+### A note on Item Drops
+There are some other options that apply specifically to item drops. They are
+* `fancy` - Spawns a dropped item using a hologram which also displays the item's display name.
+* `player-locked` - Makes it so only the killer (receiver) can pick up the item drop. `fancy` must also be on.
+
 ## Example
 
 ### Dungeon Mob Loot

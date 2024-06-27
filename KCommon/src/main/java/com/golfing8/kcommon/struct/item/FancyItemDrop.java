@@ -2,10 +2,12 @@ package com.golfing8.kcommon.struct.item;
 
 import com.cryptomorin.xseries.XSound;
 import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.event.FancyItemPickupEvent;
+import com.golfing8.kcommon.event.FancyItemPostPickupEvent;
+import com.golfing8.kcommon.event.FancyItemPrePickupEvent;
 import com.golfing8.kcommon.hook.holograms.Hologram;
 import com.golfing8.kcommon.hook.holograms.HologramProvider;
 import com.golfing8.kcommon.struct.SoundWrapper;
+import com.golfing8.kcommon.struct.drop.ItemDrop;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,9 +18,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,6 +41,11 @@ public class FancyItemDrop extends BukkitRunnable {
     private final Hologram displayHologram;
     /** The players that can pick this item up. If empty, everyone can pick it up. */
     private final Set<UUID> pickupPlayers;
+    /** A map used to store metadata on the item */
+    private final Map<String, Object> metadata;
+    /** The item drop this fancy item was dropped by */
+    @Setter
+    private @Nullable ItemDrop spawnedBy;
     @Setter
     private double pickupRange = 1.5D;
     @Setter
@@ -52,6 +62,7 @@ public class FancyItemDrop extends BukkitRunnable {
         this.items = Lists.newArrayList(items);
         this.icon = icon;
         this.pickupPlayers = new HashSet<>();
+        this.metadata = new HashMap<>();
 
         this.displayHologram = HologramProvider.getInstance().createHologram(location);
         if (icon.hasItemMeta() && icon.getItemMeta().hasDisplayName()) {
@@ -103,16 +114,31 @@ public class FancyItemDrop extends BukkitRunnable {
 
             int before = this.items.size();
             this.items.removeIf(item -> {
-                FancyItemPickupEvent fancyPickupEvent = new FancyItemPickupEvent(player, this, item);
-                Bukkit.getPluginManager().callEvent(fancyPickupEvent);
-                if (fancyPickupEvent.isCancelled())
+                FancyItemPrePickupEvent preEvent = new FancyItemPrePickupEvent(player, this, item);
+                Bukkit.getPluginManager().callEvent(preEvent);
+                if (preEvent.isCancelled())
                     return false;
+
+                if (preEvent.isItemConsumed())
+                    return true;
 
                 var leftOver = player.getInventory().addItem(item);
                 if (leftOver.isEmpty())
                     return true;
 
+                ItemStack leftOverItem = leftOver.get(0);
+                // If this was the case, no items were actually added.
+                if (leftOverItem.getAmount() == item.getAmount()) {
+                    return false;
+                }
+
+                ItemStack actuallyAdded = item.clone();
+                actuallyAdded.setAmount(item.getAmount() - leftOverItem.getAmount());
                 item.setAmount(leftOver.get(0).getAmount());
+
+                // Call the event
+                FancyItemPostPickupEvent postEvent = new FancyItemPostPickupEvent(player, this, item);
+                Bukkit.getPluginManager().callEvent(postEvent);
                 return false;
             });
 
