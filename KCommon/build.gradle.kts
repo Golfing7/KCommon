@@ -47,7 +47,7 @@ dependencies {
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0")
     compileOnly("com.github.decentsoftware-eu:decentholograms:2.7.7")
     compileOnly("me.clip:placeholderapi:2.11.2")
-    compileOnly("io.papermc:paper-api:1.12.2")
+    compileOnly("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") //Vault
 }
 

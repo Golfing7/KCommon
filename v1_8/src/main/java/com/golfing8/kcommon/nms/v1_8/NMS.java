@@ -95,6 +95,20 @@ public class NMS implements NMSAccess {
         return Bukkit.createInventory(holder, type, title);
     }
 
+    private Boolean supportsPersistentDataContainers;
+    @Override
+    public boolean supportsPersistentDataContainers() {
+        if (supportsPersistentDataContainers == null) {
+            try {
+                Class.forName("org.bukkit.persistence.PersistentDataContainer");
+                supportsPersistentDataContainers = true;
+            } catch (Throwable thr) {
+                supportsPersistentDataContainers = false;
+            }
+        }
+        return supportsPersistentDataContainers;
+    }
+
     @Override
     public OfflinePlayer getOfflinePlayerIfCached(String str) {
         UserCache userCache = MinecraftServer.getServer().getUserCache();

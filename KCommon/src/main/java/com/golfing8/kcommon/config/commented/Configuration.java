@@ -358,16 +358,6 @@ public class Configuration extends YamlConfiguration implements Config {
     }
 
     @Override
-    public <T extends ConfigurationSerializable> T getSerializable(String path, Class<T> clazz) {
-        return wrapped.getSerializable(path, clazz);
-    }
-
-    @Override
-    public <T extends ConfigurationSerializable> T getSerializable(String path, Class<T> clazz, T def) {
-        return wrapped.getSerializable(path, clazz, def);
-    }
-
-    @Override
     public org.bukkit.util.Vector getVector(String path) {
         return wrapped.getVector(path);
     }
@@ -395,11 +385,6 @@ public class Configuration extends YamlConfiguration implements Config {
     @Override
     public boolean contains(String path) {
         return wrapped.contains(path);
-    }
-
-    @Override
-    public boolean contains(String path, boolean ignoreDefault) {
-        return wrapped.contains(path, ignoreDefault);
     }
 
     @Override

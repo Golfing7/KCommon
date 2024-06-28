@@ -93,6 +93,11 @@ public class NMS implements NMSAccess {
     }
 
     @Override
+    public boolean supportsPersistentDataContainers() {
+        return true;
+    }
+
+    @Override
     public OfflinePlayer getOfflinePlayerIfCached(String str) {
         return Bukkit.getOfflinePlayerIfCached(str);
     }

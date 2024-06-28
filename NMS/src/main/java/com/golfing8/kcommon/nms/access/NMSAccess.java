@@ -72,6 +72,13 @@ public interface NMSAccess {
      */
     Inventory createInventory(InventoryHolder holder, InventoryType type, String title);
 
+    /**
+     * Checks if the server implementation currently supports persistent data containers.
+     *
+     * @return true if the server supports persistent data containers.
+     */
+    boolean supportsPersistentDataContainers();
+
     OfflinePlayer getOfflinePlayerIfCached(String str);
 
     void teleportPlayerNoEvent(Player player, Location location);

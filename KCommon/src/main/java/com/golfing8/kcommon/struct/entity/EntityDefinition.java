@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.entity;
 
+import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
@@ -11,16 +12,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents a defined entity.
@@ -34,6 +38,8 @@ import java.util.Map;
 @AllArgsConstructor
 @CASerializable.Options(canDelegate = true)
 public class EntityDefinition implements CASerializable {
+    public static final String ENTITY_LINK_KEY = "k_entity_link";
+
     private String _key;
     /** The entity type/data that defines the entity */
     @Builder.Default
@@ -61,6 +67,8 @@ public class EntityDefinition implements CASerializable {
     private boolean adult = true;
     /** If normal spawn randomization should occur */
     private boolean randomizeData;
+    /** If this entity will be linked to its vehicle and passenger in health and death time */
+    private boolean linked;
     /** A drop table that MUST BE HANDLED BY THE USER. Simply spawning this entity WILL NOT override drops */
     private @Nullable DropTable dropTable;
 
@@ -75,55 +83,40 @@ public class EntityDefinition implements CASerializable {
      * @return the spawned entity.
      */
     public Entity spawnEntity(Location location) {
-        Entity spawnedVehicle = vehicle != null ? vehicle.spawnEntity(location) : null;
-        Entity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, type, randomizeData);
-        Entity spawnedPassenger = passenger != null ? passenger.spawnEntity(location) : null;
-
-        applyToEntity(selfSpawned);
-        if (spawnedVehicle != null) {
-            spawnedVehicle.setCustomNameVisible(false);
-            spawnedVehicle.addPassenger(selfSpawned);
-        }
-
-        if (spawnedPassenger != null) {
-            selfSpawned.setCustomNameVisible(false);
-            selfSpawned.addPassenger(spawnedPassenger);
-        }
-        return selfSpawned;
+        return spawnEntity(location, UUID.randomUUID());
     }
 
-    /**
-     * Tries to spawn the entity naturally at the given location.
-     * If the entity cannot be created (or spawned), null is returned.
-     * <p>
-     * In the event this definition contains a vehicle or passenger, all or none of the mobs will be spawned.
-     * </p>
-     *
-     * @param location the location.
-     * @return the spawned entity, or null.
-     */
-    public @Nullable LivingEntity trySpawnNaturallyAt(Location location) {
-        LivingEntity spawnedVehicle = vehicle != null ? vehicle.trySpawnNaturallyAt(location) : null;
-        if (vehicle != null && spawnedVehicle == null)
-            return null;
-        LivingEntity spawnedPassenger = passenger != null ? passenger.trySpawnNaturallyAt(location) : null;
-        if (passenger != null && spawnedPassenger == null) {
-            spawnedVehicle.remove();
-            return null;
-        }
+    private Entity spawnEntity(Location location, UUID spawnID) {
+        Entity spawnedVehicle = vehicle != null ? vehicle.spawnEntity(location, spawnID) : null;
+        Entity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, type, randomizeData);
+        Entity spawnedPassenger = passenger != null ? passenger.spawnEntity(location, spawnID) : null;
 
-        LivingEntity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, type, randomizeData);
         applyToEntity(selfSpawned);
         if (spawnedVehicle != null) {
             spawnedVehicle.setCustomNameVisible(false);
-            spawnedVehicle.addPassenger(selfSpawned);
+            spawnedVehicle.setPassenger(selfSpawned);
         }
 
         if (spawnedPassenger != null) {
             selfSpawned.setCustomNameVisible(false);
-            selfSpawned.addPassenger(spawnedPassenger);
+            selfSpawned.setPassenger(spawnedPassenger);
         }
-        // TODO Do spawn checks.
+
+        if (linked) {
+            if (!NMS.getTheNMS().supportsPersistentDataContainers()) {
+                KCommon.getInstance().getLogger().warning("Entity definition " + _key + " set to link entities but server does not support persistent data containers!");
+                return selfSpawned;
+            }
+
+            NamespacedKey namespacedKey = new NamespacedKey(KCommon.getInstance(), ENTITY_LINK_KEY);
+            if (spawnedVehicle != null) {
+                spawnedVehicle.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, spawnID.toString());
+            }
+            if (spawnedPassenger != null) {
+                spawnedPassenger.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, spawnID.toString());
+            }
+            selfSpawned.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, spawnID.toString());
+        }
         return selfSpawned;
     }
 
@@ -165,5 +158,22 @@ public class EntityDefinition implements CASerializable {
             entity.setCustomNameVisible(true);
             entity.setCustomName(MS.parseSingle(name));
         }
+    }
+
+    /**
+     * Gets the given entity's link key.
+     *
+     * @param entity the entity.
+     * @return the entity link key.
+     */
+    public @Nullable UUID getEntityLinkKey(Entity entity) {
+        if (!NMS.getTheNMS().supportsPersistentDataContainers())
+            return null;
+
+        NamespacedKey key = new NamespacedKey(KCommon.getInstance(), ENTITY_LINK_KEY);
+        if (!entity.getPersistentDataContainer().has(key, PersistentDataType.STRING))
+            return null;
+
+        return UUID.fromString(entity.getPersistentDataContainer().get(key, PersistentDataType.STRING));
     }
 }
