@@ -45,12 +45,12 @@ public final class Reflection {
 
                     try {
                         String className = entry.getName().replace("/", ".").replace(".class", "");
-                        Class<?> clazz = Class.forName(className, true, loader);
-                        if ((clazz.getModifiers() & Modifier.ABSTRACT) != 0) // Ignore abstract classes.
+                        Class<?> uninitializedClass = loader.loadClass(className);
+                        if ((uninitializedClass.getModifiers() & Modifier.ABSTRACT) != 0) // Ignore abstract classes.
                             continue;
 
-                        if (Module.class.isAssignableFrom(clazz) && Module.class != clazz)
-                            classes.add((Class<? extends Module>) clazz);
+                        if (Module.class.isAssignableFrom(uninitializedClass) && Module.class != uninitializedClass)
+                            classes.add((Class<? extends Module>) Class.forName(className, true, loader));
                     } catch (ClassNotFoundException exc) {
                         KCommon.getInstance().getLogger().warning(String.format("Failed to load class %s!", entry.getName()));
                         exc.printStackTrace();
