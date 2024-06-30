@@ -18,6 +18,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -187,4 +188,14 @@ public final class CommandArguments {
     }, (context) -> {
         return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
     }, str -> (KPlugin) Bukkit.getServer().getPluginManager().getPlugin(str));
+
+    /** A command argument for parsing java UUIDs. */
+    public static final CommandArgument<UUID> UUID = new CommandArgument<>("uuid", (context) -> Collections.<String>emptyList(), (context) -> {
+        try {
+            java.util.UUID.fromString(context.getArgument());
+            return true;
+        } catch (IllegalArgumentException ignored) {
+            return false;
+        }
+    }, java.util.UUID::fromString);
 }

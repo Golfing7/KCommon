@@ -1,7 +1,7 @@
 package com.golfing8.kcommon.data;
 
-import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.data.local.DataManagerLocal;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -36,7 +36,7 @@ public interface DataManagerContainer {
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     default <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass) {
-        DataManagerLocal<T> local = new DataManagerLocal<>(key, KCommon.getInstance(), dataClass);
+        DataManagerLocal<T> local = new DataManagerLocal<>(key, JavaPlugin.getProvidingPlugin(getClass()), dataClass);
         Map c2DataMap = c2DataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
         Map dataMap = dataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
         c2DataMap.put(dataClass, local);

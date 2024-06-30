@@ -1,10 +1,12 @@
 package com.golfing8.kcommon.menu;
 
 import lombok.Getter;
+import lombok.var;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -13,7 +15,7 @@ public final class MenuManager extends BukkitRunnable {
     @Getter
     private static MenuManager instance;
 
-    private final List<Menu> allMenus;
+    private final Map<UUID, Menu> allMenus;
     private BukkitTask managerTask;
 
     public MenuManager(Plugin plugin) {
@@ -21,7 +23,7 @@ public final class MenuManager extends BukkitRunnable {
 
         this.managerTask = runTaskTimer(plugin, 0, 1);
 
-        this.allMenus = new ArrayList<>();
+        this.allMenus = new HashMap<>();
     }
 
     /**
@@ -31,19 +33,23 @@ public final class MenuManager extends BukkitRunnable {
      * @return the collection of all menus.
      */
     public Collection<Menu> getAll() {
-        return Collections.unmodifiableCollection(allMenus);
+        return Collections.unmodifiableCollection(allMenus.values());
+    }
+
+    public @Nullable Menu getMenu(UUID uuid) {
+        return this.allMenus.get(uuid);
     }
 
     public void addMenu(Menu menu) {
-        this.allMenus.add(menu);
+        this.allMenus.put(menu.getMenuID(), menu);
     }
 
     @Override
     public void run() {
-        Iterator<Menu> menuIterator = allMenus.iterator();
+        var menuIterator = allMenus.entrySet().iterator();
 
         while (menuIterator.hasNext()) {
-            Menu menu = menuIterator.next();
+            Menu menu = menuIterator.next().getValue();
 
             if (menu.canExpire() && menu.getViewers().isEmpty()) {
                 HandlerList.unregisterAll(menu);

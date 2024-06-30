@@ -12,6 +12,7 @@ import com.google.gson.*;
 import lombok.Getter;
 import lombok.val;
 import lombok.var;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +50,17 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         this.directoryPrefix = Paths.get(getPlugin().getDataFolder().getPath(), "data", getKey());
 
         try{
-            if(Files.notExists(this.directoryPrefix))
+
+            if(Files.notExists(this.directoryPrefix)) {
+                // Copy over old file location.
+                // TODO Remove this after a while.
+                Path oldPath = Paths.get(KCommon.getInstance().getDataFolder().getPath(), "data", getKey());
+                if (Files.exists(oldPath)) {
+                    // Move it over.
+                    FileUtils.moveDirectory(oldPath.toFile(), this.directoryPrefix.toFile());
+                }
                 Files.createDirectories(this.directoryPrefix);
+            }
         }catch(IOException exc) {
             throw new RuntimeException(String.format("Failed to create directories for data manager with key %s!", key));
         }

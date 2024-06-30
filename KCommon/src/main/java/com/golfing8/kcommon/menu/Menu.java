@@ -10,10 +10,18 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.golfing8.kcommon.menu.MenuUtils.getSlotFromCartCoords;
 
 public interface Menu extends Listener {
+    /**
+     * Gets a unique ID associated with this menu.
+     *
+     * @return the menu's unique ID.
+     */
+    UUID getMenuID();
+
     /**
      * Gets the shape of this menu.
      * @return the actual shape.

@@ -230,6 +230,17 @@ public final class MS {
      * @param placeholders the placeholders to use
      * @return the built list
      */
+    public static List<String> parseAll(List<String> messages, Object... placeholders) {
+        return parseAll(messages, Placeholder.compileCurly(placeholders));
+    }
+
+    /**
+     * Parses all the messages by calling parseSingle for every message.
+     *
+     * @param messages the messages to parse
+     * @param placeholders the placeholders to use
+     * @return the built list
+     */
     public static List<String> parseAll(List<String> messages, Placeholder... placeholders) {
         return parseAll(messages, Arrays.asList(placeholders));
     }

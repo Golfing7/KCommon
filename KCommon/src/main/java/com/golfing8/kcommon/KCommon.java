@@ -1,5 +1,6 @@
 package com.golfing8.kcommon;
 
+import com.golfing8.kcommon.command.impl.KMenuCommand;
 import com.golfing8.kcommon.command.impl.KModuleCommand;
 import com.golfing8.kcommon.command.impl.KPagerCommand;
 import com.golfing8.kcommon.db.MongoConnector;
@@ -98,6 +99,7 @@ public class KCommon extends KPlugin {
         this.debug = getConfig().getBoolean("debug", false);
         new KModuleCommand().register();
         new KPagerCommand().register();
+        new KMenuCommand().register();
         if (NMS.getTheNMS().supportsPersistentDataContainers())
             getServer().getPluginManager().registerEvents(new LinkedEntityListener(), this);
     }

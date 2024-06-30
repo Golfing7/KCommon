@@ -74,7 +74,6 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.langConfig = new LangConfig(langPath);
         this.langConfig.load();
         this.loadLangConstants();
-        this.langConfig.save();
         this.loadModuleManifest();
 
         this.onEnableInner();
@@ -85,6 +84,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             e.printStackTrace();
             this.getServer().getPluginManager().disablePlugin(this);
         }
+
+        // Finally, save the lang config again in case anything was registered!
+        this.langConfig.save();
     }
 
     public final void onDisable() {

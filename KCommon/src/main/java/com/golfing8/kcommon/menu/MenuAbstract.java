@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public abstract class MenuAbstract implements Menu {
 
@@ -37,6 +38,9 @@ public abstract class MenuAbstract implements Menu {
     private List<Placeholder> placeholders;
     @Getter
     private List<MultiLinePlaceholder> multiLinePlaceholders;
+    /** The menu's ID */
+    @Getter
+    private UUID menuID = UUID.randomUUID();
 
     private Inventory backingInventory;
     private String title;
