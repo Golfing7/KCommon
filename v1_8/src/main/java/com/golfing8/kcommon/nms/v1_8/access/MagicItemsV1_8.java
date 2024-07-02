@@ -95,6 +95,11 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     }
 
     @Override
+    public boolean isUnbreakable(ItemMeta meta) {
+        return meta.spigot().isUnbreakable();
+    }
+
+    @Override
     public void setUnbreakable(ItemMeta meta, boolean value) {
         meta.spigot().setUnbreakable(value);
     }

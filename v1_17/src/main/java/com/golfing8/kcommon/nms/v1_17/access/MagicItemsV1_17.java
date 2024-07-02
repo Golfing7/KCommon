@@ -77,6 +77,11 @@ public class MagicItemsV1_17 implements NMSMagicItems {
     }
 
     @Override
+    public boolean isUnbreakable(ItemMeta meta) {
+        return meta.isUnbreakable();
+    }
+
+    @Override
     public void applyName(ItemMeta meta, @Nullable String name) {
         meta.setDisplayName(name);
     }

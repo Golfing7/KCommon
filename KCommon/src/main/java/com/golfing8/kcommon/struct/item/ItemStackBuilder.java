@@ -125,7 +125,7 @@ public final class ItemStackBuilder {
         this.amount = itemStack.getAmount();
         this.itemDurability = itemStack.getDurability();
         ItemMeta itemMeta = itemStack.getItemMeta();
-        this.unbreakable = itemMeta.spigot().isUnbreakable();
+        this.unbreakable = NMS.getTheNMS().getMagicItems().isUnbreakable(itemMeta);
         this.itemName = itemStack.getItemMeta().getDisplayName();
         this.itemLore = itemMeta.getLore();
         Map<Enchantment, Integer> enchants = itemMeta.getEnchants();

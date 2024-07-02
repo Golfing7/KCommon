@@ -11,7 +11,6 @@ import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.StringUtil;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import lombok.*;
 import org.bukkit.command.Command;
@@ -19,9 +18,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -51,7 +50,23 @@ public abstract class KCommand implements TabExecutor {
         /**
          * The auto-complete function. Can be null.
          */
-        private Function<CommandSender, Object> autoComplete = null;
+        private @Nullable Function<CommandSender, Object> autoComplete = null;
+        /**
+         * If players do not have this required permission extension, they will not be able
+         * to override the auto complete function.
+         * <p>
+         * Note that in a chain of arguments, if a player doesn't have permission for one argument,
+         * the remaining arguments will also be autofilled.
+         * </p>
+         */
+        @Setter
+        private @Nullable String requiredPermissionExtension;
+
+        public BuiltCommandArgument(String name, CommandArgument<?> argument, @Nullable Function<CommandSender, Object> autoComplete) {
+            this.name = name;
+            this.argument = argument;
+            this.autoComplete = autoComplete;
+        }
     }
 
     /**
@@ -64,11 +79,6 @@ public abstract class KCommand implements TabExecutor {
      */
     @Getter
     private final List<String> commandAliases;
-    /**
-     * If this command should only be runnable by players.
-     */
-    @Getter
-    private final boolean onlyForPlayers;
     /**
      * The arguments for this command, kept with a nullable autofill function.
      */
@@ -88,7 +98,7 @@ public abstract class KCommand implements TabExecutor {
      * The requirements for executing this command.
      */
     @Getter
-    private final List<Requirement> commandRequirements = new ArrayList<>();
+    private final Set<Requirement> commandRequirements = new HashSet<>();
     /**
      * The annotation defining the structure of this command.
      */
@@ -131,10 +141,9 @@ public abstract class KCommand implements TabExecutor {
         this.commandPermission = cmd.permission();
         this.commandName = cmd.name();
         this.commandAliases = Arrays.asList(cmd.aliases());
-        this.onlyForPlayers = cmd.forPlayers();
         this.description = cmd.description();
         this.visibility = cmd.visibility();
-        if (this.onlyForPlayers) {
+        if (cmd.forPlayers()) {
             this.commandRequirements.add(RequirementPlayer.getInstance());
         }
     }
@@ -142,11 +151,19 @@ public abstract class KCommand implements TabExecutor {
     public KCommand(String commandName, List<String> commandAliases, boolean forPlayers) {
         this.commandName = commandName;
         this.commandAliases = commandAliases;
-        this.onlyForPlayers = forPlayers;
         this.plugin = (KPlugin) KPlugin.getProvidingPlugin(this.getClass());
-        if (this.onlyForPlayers) {
+        if (forPlayers) {
             this.commandRequirements.add(RequirementPlayer.getInstance());
         }
+    }
+
+    /**
+     * Checks if this command can only be executed by players.
+     *
+     * @return true if only players can execute this command.
+     */
+    public boolean isOnlyForPlayers() {
+        return this.commandRequirements.contains(RequirementPlayer.getInstance());
     }
 
     /**
@@ -300,8 +317,10 @@ public abstract class KCommand implements TabExecutor {
      * @param name the name of the argument.
      * @param argument the argument to add.
      */
-    protected final void addArgument(String name, CommandArgument<?> argument) {
-        this.commandArguments.add(new BuiltCommandArgument(name, argument));
+    protected final BuiltCommandArgument addArgument(String name, CommandArgument<?> argument) {
+        BuiltCommandArgument arg = new BuiltCommandArgument(name, argument);
+        this.commandArguments.add(arg);
+        return arg;
     }
 
     /**
@@ -311,8 +330,10 @@ public abstract class KCommand implements TabExecutor {
      * @param argument the argument to add.
      * @param autofill the autofill function.
      */
-    protected final void addArgument(String name, CommandArgument<?> argument, Function<CommandSender, Object> autofill) {
-        this.commandArguments.add(new BuiltCommandArgument(name, argument, autofill));
+    protected final BuiltCommandArgument addArgument(String name, CommandArgument<?> argument, Function<CommandSender, Object> autofill) {
+        BuiltCommandArgument arg = new BuiltCommandArgument(name, argument, autofill);
+        this.commandArguments.add(arg);
+        return arg;
     }
 
     /**
@@ -352,6 +373,11 @@ public abstract class KCommand implements TabExecutor {
             }
 
             BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
+            if (!canSeeArgument(sender, builtCommandArgument)) {
+                builtArguments.add(builtCommandArgument.autoComplete.apply(sender).toString());
+                // If we fail the 'can see' check once, make sure all remaining arguments are auto completed.
+                break;
+            }
             CommandArgument<?> commandArgument = builtCommandArgument.getArgument();
 
             //Create the argument context and test it.
@@ -454,6 +480,27 @@ public abstract class KCommand implements TabExecutor {
     }
 
     /**
+     * Checks if the player can see the given command argument.
+     * <p>
+     * In particular, this checks if the player has the {@link BuiltCommandArgument#requiredPermissionExtension} permission
+     * and that the command argument is an autocomplete argument.
+     * </p>
+     *
+     * @param sender the command sender.
+     * @param argument the argument.
+     * @return true if they can see the argument.
+     */
+    public boolean canSeeArgument(CommandSender sender, BuiltCommandArgument argument) {
+        if (argument.autoComplete == null)
+            return true;
+
+        if (argument.requiredPermissionExtension == null)
+            return true;
+
+        return checkPermissionExtension(sender, argument.requiredPermissionExtension);
+    }
+
+    /**
      * Checks if the user can see this command.
      *
      * @param sender the sender.
@@ -500,6 +547,10 @@ public abstract class KCommand implements TabExecutor {
         boolean consoleSender = sender instanceof ConsoleCommandSender;
         StringBuilder argumentChain = new StringBuilder();
         for (BuiltCommandArgument argument : this.commandArguments) {
+            // As soon as a player cannot see a command argument, prevent adding the rest.
+            if (!canSeeArgument(sender, argument))
+                break;
+
             // Required or not?
             if (argument.getAutoComplete() == null) {
                 argumentChain.append("(").append(argument.getName()).append(") ");
@@ -536,7 +587,7 @@ public abstract class KCommand implements TabExecutor {
         String help = getDescriptiveCommandHelp(sender);
         if (help != null)
             commandHelp.add(help);
-        commandHelp.addAll(getHelpMessages0(sender, lastArgument != null ? lastArgument.toLowerCase() : lastArgument));
+        commandHelp.addAll(getHelpMessages0(sender, lastArgument != null ? lastArgument.toLowerCase() : null));
         if (commandHelp.isEmpty()) {
             commandHelp.add(getPlugin().getLangConfig().getMessage("command-help-none-found").getMessages().get(0));
         }

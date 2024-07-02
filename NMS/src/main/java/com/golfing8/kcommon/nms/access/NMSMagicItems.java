@@ -19,6 +19,8 @@ public interface NMSMagicItems {
 
     boolean setRemainingItemDurability(ItemStack stack, int amount);
 
+    boolean isUnbreakable(ItemMeta meta);
+
     void setUnbreakable(ItemMeta meta, boolean value);
 
     /**
