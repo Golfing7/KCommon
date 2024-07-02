@@ -231,13 +231,11 @@ public class DropTable implements CASerializable {
 
     /**
      * Sends a message to a player with drop placeholders parsed in.
-     * <p>
      * The placeholders parsed in are:
      * <ol>
      * <li>TOTAL_REWARDS - The amount of rewards given total</li>
      * <li>REWARDS - A multi-line placeholder for all the rewards given</li>
      * </ol>
-     * </p>
      *
      * @param player the player.
      * @param drops the drops parsed in.
