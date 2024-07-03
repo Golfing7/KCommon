@@ -8,7 +8,6 @@ import com.mojang.authlib.GameProfile;
 import de.tr7zw.changeme.nbtapi.NBTCompoundList;
 import de.tr7zw.changeme.nbtapi.NBTEntity;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
-import lombok.AllArgsConstructor;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -203,7 +202,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
 
     @Override
     public void setAttribute(LivingEntity entity, EntityAttribute attribute, double value) {
-        if (attribute == EntityAttribute.MAX_HEALTH) {
+        if (attribute == EntityAttribute.GENERIC_MAX_HEALTH) {
             entity.setMaxHealth(value);
             return;
         }
@@ -216,19 +215,19 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         for (ReadWriteNBT nbtListCompound : nbtCompoundList) {
             switch(nbtListCompound.getString("Name")){
                 case "generic.attackDamage":
-                    if(attribute == EntityAttribute.ATTACK_DAMAGE){
+                    if(attribute == EntityAttribute.GENERIC_ATTACK_DAMAGE){
                         nbtListCompound.setDouble("Base", value);
                         return;
                     }
                     break;
                 case "generic.knockbackResistance":
-                    if(attribute == EntityAttribute.KB_RESISTANCE){
+                    if(attribute == EntityAttribute.GENERIC_KNOCKBACK_RESISTANCE){
                         nbtListCompound.setDouble("Base", value);
                         return;
                     }
                     break;
                 case "generic.movementSpeed":
-                    if(attribute == EntityAttribute.MOVEMENT_SPEED){
+                    if(attribute == EntityAttribute.GENERIC_MOVEMENT_SPEED){
                         nbtListCompound.setDouble("Base", value);
                         return;
                     }

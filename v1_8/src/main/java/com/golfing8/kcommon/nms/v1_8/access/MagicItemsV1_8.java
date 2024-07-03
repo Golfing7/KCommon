@@ -2,23 +2,27 @@ package com.golfing8.kcommon.nms.v1_8.access;
 
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.nms.v1_8.item.ItemStackV1_8;
+import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import net.minecraft.server.v1_8_R3.Items;
-import net.minecraft.server.v1_8_R3.MobEffect;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBTCompoundList;
+import lombok.var;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
@@ -102,6 +106,46 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
     public void setUnbreakable(ItemMeta meta, boolean value) {
         meta.spigot().setUnbreakable(value);
+    }
+
+    @Override
+    public void setAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
+        NBT.modify(stack, (nbt) -> {
+            for (var entry : modifiers.entrySet()) {
+                for (var modifier : entry.getValue()) {
+                    ReadWriteNBTCompoundList list = nbt.getCompoundList("AttributeModifiers");
+                    ReadWriteNBT newCompound = list.addCompound();
+                    newCompound.setLong("UUIDMost", modifier.getUuid().getMostSignificantBits());
+                    newCompound.setLong("UUIDLeast", modifier.getUuid().getLeastSignificantBits());
+                    newCompound.setString("Name", modifier.getName());
+                    newCompound.setDouble("Amount", modifier.getAmount());
+                    newCompound.setInteger("Operation", modifier.getOperation().ordinal());
+
+                    String name = null;
+                    switch (entry.getKey()) {
+                        case GENERIC_MAX_HEALTH:
+                            name = "generic.maxHealth";
+                            break;
+                        case GENERIC_FOLLOW_RANGE:
+                            name = "generic.followRange";
+                            break;
+                        case GENERIC_KNOCKBACK_RESISTANCE:
+                            name = "generic.knockbackResistance";
+                            break;
+                        case GENERIC_MOVEMENT_SPEED:
+                            name = "generic.movementSpeed";
+                            break;
+                        case GENERIC_ATTACK_DAMAGE:
+                            name = "generic.attackDamage";
+                            break;
+                    }
+                    // If the name is still null, just continue.
+                    if (name == null)
+                        continue;
+                    newCompound.setString("AttributeName", name);
+                }
+            }
+        });
     }
 
     @Override

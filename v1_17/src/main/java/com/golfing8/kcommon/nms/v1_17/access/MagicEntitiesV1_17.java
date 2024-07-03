@@ -2,33 +2,17 @@ package com.golfing8.kcommon.nms.v1_17.access;
 
 import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.access.NMSMagicEntities;
-import com.golfing8.kcommon.nms.block.NMSBlockData;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityData;
-import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.mojang.authlib.GameProfile;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.nbt.MojangsonParser;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.EntityFallingBlock;
-import net.minecraft.world.entity.monster.EntityCreeper;
 import net.minecraft.world.entity.monster.EntityGiantZombie;
 import net.minecraft.world.entity.monster.EntityGuardianElder;
 import net.minecraft.world.entity.monster.EntitySkeletonWither;
 import net.minecraft.world.entity.monster.EntitySlime;
-import net.minecraft.world.entity.projectile.EntitySmallFireball;
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.phys.AxisAlignedBB;
-import net.minecraft.world.phys.MovingObjectPositionBlock;
-import net.minecraft.world.phys.MovingObjectPositionEntity;
-import net.minecraft.world.phys.Vec3D;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -38,22 +22,12 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class MagicEntitiesV1_17 implements NMSMagicEntities {
@@ -180,49 +154,7 @@ public class MagicEntitiesV1_17 implements NMSMagicEntities {
 
     @Override
     public void setAttribute(LivingEntity entity, EntityAttribute attribute, double value) {
-        AttributeInstance instance = null;
-        switch(attribute){
-            case ATTACK_DAMAGE:
-                instance = entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-                break;
-            case MOVEMENT_SPEED:
-                instance = entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-                break;
-            case KB_RESISTANCE:
-                instance = entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-                break;
-            case MAX_HEALTH:
-                instance = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-                break;
-            case LUCK:
-                instance = entity.getAttribute(Attribute.GENERIC_LUCK);
-                break;
-            case ARMOR:
-                instance = entity.getAttribute(Attribute.GENERIC_ARMOR);
-                break;
-            case ATTACK_SPEED:
-                instance = entity.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
-                break;
-            case FLYING_SPEED:
-                instance = entity.getAttribute(Attribute.GENERIC_FLYING_SPEED);
-                break;
-            case FOLLOW_RANGE:
-                instance = entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE);
-                break;
-            case ARMOR_TOUGHNESS:
-                instance = entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
-                break;
-            case ATTACK_KNOCKBACK:
-                instance = entity.getAttribute(Attribute.GENERIC_ATTACK_KNOCKBACK);
-                break;
-            case HORSE_JUMP_STRENGTH:
-                instance = entity.getAttribute(Attribute.HORSE_JUMP_STRENGTH);
-                break;
-            case ZOMBIE_SPAWN_REINFORCEMENTS:
-                instance = entity.getAttribute(Attribute.ZOMBIE_SPAWN_REINFORCEMENTS);
-                break;
-        }
-
+        AttributeInstance instance = entity.getAttribute(Attribute.valueOf(attribute.name()));
         if (instance != null)
             instance.setBaseValue(value);
     }

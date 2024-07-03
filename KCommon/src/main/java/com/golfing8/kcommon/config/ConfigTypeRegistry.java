@@ -1,20 +1,17 @@
 package com.golfing8.kcommon.config;
 
-import com.cryptomorin.xseries.XPotion;
 import com.golfing8.kcommon.config.adapter.*;
 import com.golfing8.kcommon.menu.MenuUtils;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -277,6 +274,8 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAColorBukkit());
         registerAdapter(new CAColorAWT());
         registerAdapter(new CADrop());
+        registerAdapter(new CAEntityAttribute());
+        registerAdapter(new CAEntityAttributeModifier());
 
         registerAdapter(MenuCoordinate.class, (section) -> {
             if(section.contains("slot")) {
@@ -301,23 +300,6 @@ public class ConfigTypeRegistry {
         }, (section, coord) -> {
             section.set("slot.x", coord.getX());
             section.set("slot.y", coord.getY());
-        });
-
-        registerAdapter(PotionEffect.class, (section) -> {
-            Optional<XPotion> xPotionOptional = XPotion.matchXPotion(section.getString("type"));
-            if(!xPotionOptional.isPresent())
-                throw new ImproperlyConfiguredValueException(section, "type");
-
-            XPotion xPotion = xPotionOptional.get();
-            int duration = section.getInt("duration");
-            int level = section.getInt("level");
-
-            //Build the effect.
-            return xPotion.buildPotionEffect(duration, level);
-        }, (section, pot) -> {
-            section.set("type", XPotion.matchXPotion(pot.getType()).name());
-            section.set("duration", pot.getDuration());
-            section.set("level", pot.getAmplifier());
         });
     }
 }

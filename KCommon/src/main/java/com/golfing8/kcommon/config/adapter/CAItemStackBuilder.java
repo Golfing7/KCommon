@@ -3,16 +3,20 @@ package com.golfing8.kcommon.config.adapter;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.google.gson.reflect.TypeToken;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +76,10 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             List<String> flags = (List<String>) primitiveValue.get("flags");
             builder.flags(flags.stream().map(ItemFlag::valueOf).toArray(ItemFlag[]::new));
         }
+        if (primitiveValue.containsKey("attribute-modifiers")) {
+            ConfigPrimitive subValue = entry.getSubValue("attribute-modifiers");
+            builder.attributeModifierMap(ConfigTypeRegistry.getFromType(subValue, FieldType.extractFrom(new TypeToken<Map<EntityAttribute, Set<EntityAttributeModifier>>>() {})));
+        }
 
         return builder;
     }
@@ -113,6 +121,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
         }
         if (!builder.getItemFlags().isEmpty())
             objects.put("flags", builder.getItemFlags().stream().map(ItemFlag::name).collect(Collectors.toList()));
+        if (!builder.getAttributeModifierMap().isEmpty())
+            objects.put("attribute-modifiers", ConfigTypeRegistry.toPrimitive(builder.getAttributeModifierMap()).unwrap());
         return ConfigPrimitive.ofMap(objects);
     }
 }

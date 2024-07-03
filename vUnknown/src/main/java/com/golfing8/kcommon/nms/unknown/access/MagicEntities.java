@@ -1,15 +1,10 @@
 package com.golfing8.kcommon.nms.unknown.access;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.access.NMSMagicEntities;
-import com.golfing8.kcommon.nms.reflection.FieldHandle;
-import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityData;
-import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.mojang.authlib.GameProfile;
-import lombok.AllArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -17,7 +12,6 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.VoxelShape;
 
@@ -104,37 +98,37 @@ public class MagicEntities implements NMSMagicEntities {
     public void setAttribute(LivingEntity entity, EntityAttribute attribute, double value) {
         AttributeInstance instance = null;
         switch(attribute){
-            case ATTACK_DAMAGE:
+            case GENERIC_ATTACK_DAMAGE:
                 instance = entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
                 break;
-            case MOVEMENT_SPEED:
+            case GENERIC_MOVEMENT_SPEED:
                 instance = entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
                 break;
-            case KB_RESISTANCE:
+            case GENERIC_KNOCKBACK_RESISTANCE:
                 instance = entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
                 break;
-            case MAX_HEALTH:
+            case GENERIC_MAX_HEALTH:
                 instance = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
                 break;
-            case LUCK:
+            case GENERIC_LUCK:
                 instance = entity.getAttribute(Attribute.GENERIC_LUCK);
                 break;
-            case ARMOR:
+            case GENERIC_ARMOR:
                 instance = entity.getAttribute(Attribute.GENERIC_ARMOR);
                 break;
-            case ATTACK_SPEED:
+            case GENERIC_ATTACK_SPEED:
                 instance = entity.getAttribute(Attribute.GENERIC_ATTACK_SPEED);
                 break;
-            case FLYING_SPEED:
+            case GENERIC_FLYING_SPEED:
                 instance = entity.getAttribute(Attribute.GENERIC_FLYING_SPEED);
                 break;
-            case FOLLOW_RANGE:
+            case GENERIC_FOLLOW_RANGE:
                 instance = entity.getAttribute(Attribute.GENERIC_FOLLOW_RANGE);
                 break;
-            case ARMOR_TOUGHNESS:
+            case GENERIC_ARMOR_TOUGHNESS:
                 instance = entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
                 break;
-            case ATTACK_KNOCKBACK:
+            case GENERIC_ATTACK_KNOCKBACK:
                 instance = entity.getAttribute(Attribute.GENERIC_ATTACK_KNOCKBACK);
                 break;
             case HORSE_JUMP_STRENGTH:

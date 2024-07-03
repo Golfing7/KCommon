@@ -8,6 +8,8 @@ import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
@@ -15,6 +17,7 @@ import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 import com.sun.org.apache.bcel.internal.generic.ObjectType;
@@ -23,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -88,6 +92,8 @@ public final class ItemStackBuilder {
     private Set<ItemFlag> itemFlags = new HashSet<>();
     /** The potion data for this item */
     private PotionData potionData;
+    /** Stores attributes modifiers for the item */
+    private Map<EntityAttribute, Set<EntityAttributeModifier>> attributeModifierMap = new HashMap<>();
     /**
      * The placeholders for the item, applied to all parts.
      */
@@ -264,6 +270,11 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder attributeModifierMap(Map<EntityAttribute, Set<EntityAttributeModifier>> attributeMap) {
+        this.attributeModifierMap = attributeMap;
+        return this;
+    }
+
     public ItemStackBuilder lore(String... lore) {
         this.itemLore = lore == null ? Collections.emptyList() : Arrays.asList(lore);
         return this;
@@ -356,6 +367,8 @@ public final class ItemStackBuilder {
             }
             newCopy.setAmount(newAmount());
         }
+
+        NMS.getTheNMS().getMagicItems().setAttributeModifiers(newCopy, attributeModifierMap);
 
         ItemMeta meta = newCopy.getItemMeta();
 

@@ -1,6 +1,8 @@
 package com.golfing8.kcommon.nms.access;
 
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface NMSMagicItems {
     EntityType getSpawnerType(ItemStack stack);
@@ -22,6 +26,8 @@ public interface NMSMagicItems {
     boolean isUnbreakable(ItemMeta meta);
 
     void setUnbreakable(ItemMeta meta, boolean value);
+
+    void setAttributeModifiers(ItemStack meta, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
 
     /**
      * Applies the name to the item and tries to use mini message if available.

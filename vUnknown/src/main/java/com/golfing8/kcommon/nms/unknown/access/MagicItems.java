@@ -3,11 +3,17 @@ package com.golfing8.kcommon.nms.unknown.access;
 import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
@@ -19,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MagicItems implements NMSMagicItems {
     @Override
@@ -79,6 +87,26 @@ public class MagicItems implements NMSMagicItems {
     @Override
     public void setUnbreakable(ItemMeta meta, boolean value) {
         meta.setUnbreakable(value);
+    }
+
+    @Override
+    public void setAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
+        ItemMeta meta = stack.getItemMeta();
+        Multimap<Attribute, AttributeModifier> tlModifiers = HashMultimap.create();
+        for (var entry : modifiers.entrySet()) {
+            Attribute attribute = Attribute.valueOf(entry.getKey().name());
+            for (EntityAttributeModifier modifier : entry.getValue()) {
+                tlModifiers.put(attribute, new AttributeModifier(
+                        modifier.getUuid(),
+                        modifier.getName(),
+                        modifier.getAmount(),
+                        AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
+                        modifier.getSlot())
+                );
+            }
+        }
+        meta.setAttributeModifiers(tlModifiers);
+        stack.setItemMeta(meta);
     }
 
     @Override
