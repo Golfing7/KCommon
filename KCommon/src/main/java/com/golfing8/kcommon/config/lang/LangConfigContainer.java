@@ -209,6 +209,29 @@ public interface LangConfigContainer {
     }
 
     /**
+     * Loads a language config enum from the given class.
+     *
+     * @param langConfigEnum the enum class.
+     */
+    default void loadLangEnum(Class<? extends LangConfigEnum> langConfigEnum) {
+        if (!langConfigEnum.isEnum())
+            throw new IllegalArgumentException("Class " + langConfigEnum + " is not an enum.");
+
+        for (LangConfigEnum inst : langConfigEnum.getEnumConstants()) {
+            Enum<?> en = (Enum<?>) inst;
+            String name = en.name();
+            String configKey = name.toLowerCase().replace("_", "-");
+            String fullPath = formatPath(configKey);
+            Message defaultValue = inst.getMessage();
+
+            // Save the default and load the actual value.
+            getLangConfig().addLanguageConstant(fullPath, defaultValue);
+            inst.setMessage(getLangConfig().getMessage(fullPath));
+        }
+        getLangConfig().save();
+    }
+
+    /**
      * Gets the lang config backing this container.
      *
      * @return the language config.

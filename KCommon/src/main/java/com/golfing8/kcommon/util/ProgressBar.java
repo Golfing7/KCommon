@@ -11,6 +11,18 @@ public final class ProgressBar {
 
     private ProgressBar() {}
 
+    public static String getProgressBar(double progress) {
+        return getProgressBar(progress, 100.0D);
+    }
+
+    public static String getProgressBar(double progress, double maxProgress) {
+        return getProgressBar(progress, maxProgress, 10);
+    }
+
+    public static String getProgressBar(double progress, double maxProgress, int length) {
+        return getProgressBar(progress, maxProgress, BOX_UNICODE, length);
+    }
+
     /**
      * Returns a progress bar, colored, of "length" length made up of "barChar" characters.
      * @param progress
