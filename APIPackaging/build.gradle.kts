@@ -32,6 +32,7 @@ dependencies {
 
     implementation("de.tr7zw:item-nbt-api:2.13.1") //For items.
     implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
+    implementation("net.jodah:expiringmap:0.5.11")
 
     implementation("net.kyori:adventure-platform-bukkit:4.3.3")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
