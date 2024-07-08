@@ -3,6 +3,7 @@ package com.golfing8.kcommon.command.argument;
 import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.command.argument.type.BooleanCommandArgument;
+import com.golfing8.kcommon.config.ConfigPath;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.struct.KNamespacedKey;
@@ -190,7 +191,7 @@ public final class CommandArguments {
     }, str -> (KPlugin) Bukkit.getServer().getPluginManager().getPlugin(str));
 
     /** A command argument for parsing java UUIDs. */
-    public static final CommandArgument<UUID> UUID = new CommandArgument<>("uuid", (context) -> Collections.<String>emptyList(), (context) -> {
+    public static final CommandArgument<UUID> UUID = new CommandArgument<>("uuid", (context) -> Collections.emptyList(), (context) -> {
         try {
             java.util.UUID.fromString(context.getArgument());
             return true;
@@ -198,4 +199,6 @@ public final class CommandArguments {
             return false;
         }
     }, java.util.UUID::fromString);
+
+    public static final CommandArgument<ConfigPath> CONFIG_PATH = new CommandArgument<>("config path", (context) -> Collections.emptyList(), (context) -> true, ConfigPath::parse);
 }

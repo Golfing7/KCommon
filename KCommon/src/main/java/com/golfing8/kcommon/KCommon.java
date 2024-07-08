@@ -1,5 +1,6 @@
 package com.golfing8.kcommon;
 
+import com.golfing8.kcommon.command.impl.KItemCommand;
 import com.golfing8.kcommon.command.impl.KMenuCommand;
 import com.golfing8.kcommon.command.impl.KModuleCommand;
 import com.golfing8.kcommon.command.impl.KPagerCommand;
@@ -102,6 +103,7 @@ public class KCommon extends KPlugin {
         new KModuleCommand().register();
         new KPagerCommand().register();
         new KMenuCommand().register();
+        new KItemCommand().register();
         if (NMS.getTheNMS().supportsPersistentDataContainers())
             getServer().getPluginManager().registerEvents(new LinkedEntityListener(), this);
     }

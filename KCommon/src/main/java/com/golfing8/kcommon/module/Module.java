@@ -123,6 +123,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         }
         return configuration;
     }
+
     /**
      * The language config for this module.
      */
