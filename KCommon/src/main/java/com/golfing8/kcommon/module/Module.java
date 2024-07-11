@@ -2,6 +2,7 @@ package com.golfing8.kcommon.module;
 
 import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.MCommand;
+import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.config.generator.ConfigClass;
 import com.golfing8.kcommon.config.generator.ConfigClassWrapper;
@@ -13,6 +14,7 @@ import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.util.FileUtil;
 import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.StringUtil;
 import lombok.Getter;
@@ -37,8 +39,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.stream.Stream;
+import java.util.zip.ZipInputStream;
 
 /**
  * Represents an abstract module with functionality on the server. These modules are the basis of functionality
@@ -100,6 +105,8 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * All registered sub modules.
      */
     private final Set<SubModule<?>> subModules;
+    /** The path to the data folder */
+    private Path dataFolder;
     /**
      * Other configs that are linked to this module.
      */
@@ -317,6 +324,29 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     }
 
     /**
+     * Loads a config group from the given name.
+     *
+     * @return the config group.
+     */
+    protected List<Configuration> loadConfigGroup(String groupName) {
+        Path directoryPath = this.dataFolder.resolve(groupName);
+        if (!Files.isDirectory(directoryPath)) {
+            return Collections.emptyList();
+        }
+
+        try (Stream<Path> paths = Files.list(directoryPath)) {
+            List<Configuration> toReturn = new ArrayList<>();
+            paths.forEach(path -> {
+                toReturn.add(loadConfig(path));
+            });
+            return toReturn;
+        } catch (IOException exc) {
+            getPlugin().getLogger().log(Level.WARNING, "Failed to load config group: " + groupName, exc);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
      * Loads the main configuration for this module.
      */
     private void loadConfigs() {
@@ -328,21 +358,32 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.configWrapper.initConfig();
 
         //Create the parent directory.
-        Path parentFolder = Paths.get(plugin.getDataFolder().getPath(), moduleName);
+        this.dataFolder = Paths.get(plugin.getDataFolder().getPath(), moduleName);
+        boolean firstLoad = Files.notExists(dataFolder);
         try{
-            Files.createDirectories(parentFolder.getParent());
+            Files.createDirectories(dataFolder.getParent());
         }catch(IOException exc) {
             throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
         }
 
-        this.configs.put("config", loadConfig(parentFolder.resolve("config.yml")));
+        // First copy everything over from our module's directory.
+        if (firstLoad) {
+            try {
+                FileUtil.copyJarElements(plugin.getFile().toPath(), this.moduleName, dataFolder);
+            } catch (IOException exc) {
+                getPlugin().getLogger().log(Level.SEVERE, String.format("Failed to copy module %s files!", getModuleName()), exc);
+            }
+        }
+
+        this.configs.put("config", loadConfig(dataFolder.resolve("config.yml")));
         for (String expectedConfig : this.configWrapper.getConfigNames()) {
             // Don't re-register the main config
             if (expectedConfig.equals("config"))
                 continue;
 
-            this.configs.put(expectedConfig, loadConfig(parentFolder.resolve(expectedConfig + ".yml")));
+            this.configs.put(expectedConfig, loadConfig(dataFolder.resolve(expectedConfig + ".yml")));
         }
+
 
         //First, load the language config.
         Path langPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "lang.yml");

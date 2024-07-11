@@ -25,6 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.PluginClassLoader;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -114,6 +115,11 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         //Once more save the lang config.
         this.langConfig.save();
         saveModuleManifest();
+    }
+
+    @Override
+    public File getFile() {
+        return super.getFile();
     }
 
     /**
