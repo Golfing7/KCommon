@@ -110,7 +110,7 @@ public class LibraryLoader {
 
         AtomicInteger completed = new AtomicInteger(0);
         for (LibraryDefinition definition : libraryDefinitions) {
-            LOADER_SERVICE.execute(() -> {
+//            LOADER_SERVICE.execute(() -> {
                 try {
                     loadLibrary(definition);
                 } finally {
@@ -120,7 +120,7 @@ public class LibraryLoader {
                         }
                     }
                 }
-            });
+//            });
         }
 
         // Wait until the execution has finished.

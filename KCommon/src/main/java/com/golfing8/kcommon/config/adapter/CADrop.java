@@ -40,7 +40,7 @@ public class CADrop implements ConfigAdapter<Drop> {
             boolean fancy = (boolean) primitive.getOrDefault("fancy", false);
             boolean playerLocked = (boolean) primitive.getOrDefault("player-locked", false);
             boolean lootingEnabled = (boolean) primitive.getOrDefault("looting-enabled", false);
-            String lootingFormula = primitive.getOrDefault("looting-formula", "{LOOTING}").toString();
+            String lootingFormula = primitive.getOrDefault("looting-formula", "rand1({LOOTING})").toString();
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
                 ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, lootingEnabled, lootingFormula);

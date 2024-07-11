@@ -3,6 +3,7 @@ package com.golfing8.kcommon.struct.drop;
 import com.cryptomorin.xseries.XEnchantment;
 import com.golfing8.kcommon.struct.item.FancyItemDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
+import com.golfing8.kcommon.util.MathExpressions;
 import com.golfing8.kcommon.util.PlayerUtil;
 import lombok.Getter;
 import net.objecthunter.exp4j.ExpressionBuilder;
@@ -40,7 +41,7 @@ public class ItemDrop extends Drop<ItemStack> {
         this.fancyDrop = fancyDrop;
         this.playerLocked = playerLocked;
         this.lootingEnabled = lootingEnabled;
-        this.lootingFormula = lootingFormula == null ? "{LOOTING}" : lootingFormula;
+        this.lootingFormula = lootingFormula == null ? "rand1({LOOTING})" : lootingFormula;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class ItemDrop extends Drop<ItemStack> {
         if (lootingLevel <= 0)
             return getDrop();
 
-        int extraDrops = (int) new ExpressionBuilder(this.lootingFormula.replace("{LOOTING}", lootingLevel + "")).build().evaluate();
+        int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", lootingLevel);
         return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
     }
 
