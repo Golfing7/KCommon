@@ -1,9 +1,11 @@
 package com.golfing8.kcommon.struct.drop;
 
+import com.cryptomorin.xseries.XEnchantment;
 import com.golfing8.kcommon.struct.item.FancyItemDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.util.PlayerUtil;
 import lombok.Getter;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -22,12 +24,23 @@ public class ItemDrop extends Drop<ItemStack> {
     private boolean giveDirectly;
     private boolean fancyDrop;
     private boolean playerLocked;
-    public ItemDrop(double chance, @Nullable String displayName, Map<String, ItemStackBuilder> items, boolean giveDirectly, boolean fancyDrop, boolean playerLocked) {
+    private boolean lootingEnabled;
+    private String lootingFormula;
+    public ItemDrop(double chance,
+                    @Nullable String displayName,
+                    Map<String, ItemStackBuilder> items,
+                    boolean giveDirectly,
+                    boolean fancyDrop,
+                    boolean playerLocked,
+                    boolean lootingEnabled,
+                    @Nullable String lootingFormula) {
         super(chance, displayName);
         this.items = items;
         this.giveDirectly = giveDirectly;
         this.fancyDrop = fancyDrop;
         this.playerLocked = playerLocked;
+        this.lootingEnabled = lootingEnabled;
+        this.lootingFormula = lootingFormula == null ? "{LOOTING}" : lootingFormula;
     }
 
     @Override
@@ -35,9 +48,31 @@ public class ItemDrop extends Drop<ItemStack> {
         return items.values().stream().map(ItemStackBuilder::buildFromTemplate).collect(Collectors.toList());
     }
 
+    /**
+     * Gets the drops generated for the given player.
+     *
+     * @param player the player.
+     * @return the generated drops.
+     */
+    public List<ItemStack> getDrop(@Nullable Player player) {
+        if (!lootingEnabled || player == null)
+            return getDrop();
+
+        ItemStack inHand = player.getItemInHand();
+        if (inHand == null || !inHand.hasItemMeta())
+            return getDrop();
+
+        int lootingLevel = inHand.getEnchantmentLevel(XEnchantment.LOOT_BONUS_MOBS.getEnchant());
+        if (lootingLevel <= 0)
+            return getDrop();
+
+        int extraDrops = (int) new ExpressionBuilder(this.lootingFormula.replace("{LOOTING}", lootingLevel + "")).build().evaluate();
+        return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
+    }
+
     @Override
     public void giveTo(Player player) {
-        getDrop().forEach(item -> {
+        getDrop(player).forEach(item -> {
             PlayerUtil.givePlayerItemSafe(player, item);
         });
     }
@@ -47,7 +82,7 @@ public class ItemDrop extends Drop<ItemStack> {
         if (fancyDrop) {
             dropFancy(context, location);
         } else {
-            getDrop().forEach(item -> {
+            getDrop(context.getPlayer()).forEach(item -> {
                 location.getWorld().dropItemNaturally(location, item);
             });
         }
@@ -61,7 +96,7 @@ public class ItemDrop extends Drop<ItemStack> {
      * @return the fancy item drop.
      */
     public FancyItemDrop dropFancy(DropContext context, Location location) {
-        FancyItemDrop drop = FancyItemDrop.spawn(location.clone().add(0, 1, 0), items.values().stream().map(ItemStackBuilder::buildFromTemplate).collect(Collectors.toList()));
+        FancyItemDrop drop = FancyItemDrop.spawn(location.clone().add(0, 1, 0), getDrop(context.getPlayer()));
         if (playerLocked && context.getPlayer() != null) {
             drop.getPickupPlayers().add(context.getPlayer().getUniqueId());
         }

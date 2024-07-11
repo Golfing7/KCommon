@@ -39,15 +39,17 @@ public class CADrop implements ConfigAdapter<Drop> {
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             boolean fancy = (boolean) primitive.getOrDefault("fancy", false);
             boolean playerLocked = (boolean) primitive.getOrDefault("player-locked", false);
+            boolean lootingEnabled = (boolean) primitive.getOrDefault("looting-enabled", false);
+            String lootingFormula = primitive.getOrDefault("looting-formula", "{LOOTING}").toString();
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
-                ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked);
+                ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, lootingEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
-                ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly, fancy, playerLocked);
+                ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly, fancy, playerLocked, lootingEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             }
@@ -79,6 +81,8 @@ public class CADrop implements ConfigAdapter<Drop> {
             serialized.put("give-directly", itemDrop.isGiveDirectly());
             serialized.put("fancy", itemDrop.isFancyDrop());
             serialized.put("player-locked", itemDrop.isPlayerLocked());
+            serialized.put("looting-enabled", itemDrop.isLootingEnabled());
+            serialized.put("looting-formula", itemDrop.getLootingFormula());
             return ConfigPrimitive.ofMap(serialized);
         } else if (object instanceof CommandDrop) {
             serialized.put("commands", ConfigTypeRegistry.toPrimitive(((CommandDrop) object).getDrop()));
