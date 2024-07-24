@@ -21,6 +21,10 @@ public class Position {
         return new Position(this.x + direction.getXShift(), this.y + direction.getYShift(), this.z + direction.getZShift());
     }
 
+    public Position() {
+        this.x = this.y = this.z = 0;
+    }
+
     public Position(Location location){
         this.x = location.getBlockX();
         this.y = location.getBlockY();
