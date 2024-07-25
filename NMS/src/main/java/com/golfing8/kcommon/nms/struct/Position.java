@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 
 @AllArgsConstructor
 @Getter
@@ -45,5 +47,9 @@ public class Position {
 
     public Location toLocation(World world){
         return new Location(world, x, y, z);
+    }
+
+    public BlockVector toVector() {
+        return new BlockVector(x, y, z);
     }
 }
