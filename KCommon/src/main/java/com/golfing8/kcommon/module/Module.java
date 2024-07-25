@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.zip.ZipInputStream;
 
@@ -85,6 +86,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /** The plugin dependencies for this module */
     @Getter
     private final Set<String> pluginDependencies;
+    /** The logger used for this module */
+    @Getter
+    private final Logger logger;
 
     /**
      * If this module is enabled or not. This is simply the module's current state.
@@ -171,6 +175,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.subListeners = new HashSet<>();
         this.subModules = new HashSet<>();
         this.configs = new HashMap<>();
+        this.logger = new ModuleLogger(this);
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
@@ -201,6 +206,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.subListeners = new HashSet<>();
         this.subModules = new HashSet<>();
         this.configs = new HashMap<>();
+        this.logger = new ModuleLogger(this);
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
