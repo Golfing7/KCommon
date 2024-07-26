@@ -360,6 +360,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         // Get the config wrapper ready for loading
         this.configWrapper = new ConfigClassWrapper(null, this.getClass(), this);
+        this.configWrapper.setConfigMappingEnabled(true);
         this.configWrapper.setRequireAnnotation(true);
         this.configWrapper.initConfig();
 

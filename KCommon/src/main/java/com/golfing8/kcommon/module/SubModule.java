@@ -37,6 +37,7 @@ public abstract class SubModule<T extends Module> extends ConfigClass implements
     private T module;
     public SubModule() {
         this.setRequireAnnotation(true);
+        this.setConfigMappingEnabled(true);
         this.initConfig();
     }
 

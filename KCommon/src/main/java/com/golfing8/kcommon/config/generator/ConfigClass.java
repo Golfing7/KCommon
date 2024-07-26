@@ -84,6 +84,9 @@ public abstract class ConfigClass {
     /** If this config class is in 'read only' mode. This will make it so default values are NOT set */
     @Getter @Setter
     private boolean readOnly;
+    /** If config mapping should be enabled for loading/saving values */
+    @Getter @Setter
+    private boolean configMappingEnabled = false;
 
     public ConfigClass() {
         this.parent = null;
@@ -171,7 +174,7 @@ public abstract class ConfigClass {
 
         for (ConfigValueHandle handle : this.fieldHandleMap.values()) {
             String fieldPath = handle.getFormattedPath(path);
-            modified |= handle.load(source, fieldPath, readOnly);
+            modified |= handle.load(source, fieldPath, readOnly, configMappingEnabled);
         }
 
         for (ConfigClass child : children.values()) {

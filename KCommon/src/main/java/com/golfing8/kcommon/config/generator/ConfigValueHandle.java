@@ -38,11 +38,13 @@ public class ConfigValueHandle {
      *
      * @param sourceSection the source section.
      * @param path the path to the value.
+     * @param readOnly if we should only read in values and not write.
+     * @param mappingEnabled if we should pay attention to the MConfiguration's file name.
      * @return true if the config was modified, false if not
      */
-    public boolean load(ConfigurationSection sourceSection, String path, boolean readOnly) {
+    public boolean load(ConfigurationSection sourceSection, String path, boolean readOnly, boolean mappingEnabled) {
         // If we're loading from an actual config, we should check that the section is a match.
-        if (sourceSection instanceof MConfiguration) {
+        if (sourceSection instanceof MConfiguration && mappingEnabled) {
             if (!mapsTo((MConfiguration) sourceSection))
                 return false;
         }
