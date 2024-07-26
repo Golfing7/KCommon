@@ -534,9 +534,13 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         ((SubModule) subModule).link(this);
         getPlugin().getServer().getPluginManager().registerEvents(subModule, getPlugin());
         subModule.onEnable();
+        Set<String> configNames = subModule.getConfigNames();
 
         // Load the config.
         for (MConfiguration configuration : this.configs.values()) {
+            if (!configNames.contains(configuration.getFileNameNoExtension()))
+                continue;
+
             String prefix = subModule.getPrefix();
             ConfigurationSection section = prefix.isEmpty() ? configuration :
                     (configuration.contains(prefix) ? configuration.getConfigurationSection(prefix) : configuration.createSection(prefix));

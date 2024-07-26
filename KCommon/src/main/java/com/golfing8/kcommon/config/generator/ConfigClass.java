@@ -117,10 +117,14 @@ public abstract class ConfigClass {
             allNames.addAll(child.getConfigNames());
         }
         for (ConfigValueHandle handle : this.fieldHandleMap.values()) {
-            if (handle.getAnnotation() == null || handle.getAnnotation().config().equals(Conf.DEFAULT_CONF))
+            if (handle.getAnnotation() == null)
                 continue;
 
-            allNames.add(handle.getAnnotation().config().toLowerCase());
+            if (handle.getAnnotation().config().equals(Conf.DEFAULT_CONF)) {
+                allNames.add("config");
+            } else {
+                allNames.add(handle.getAnnotation().config().toLowerCase());
+            }
         }
         return allNames;
     }

@@ -44,8 +44,8 @@ public class ConfigValueHandle {
      */
     public boolean load(ConfigurationSection sourceSection, String path, boolean readOnly, boolean mappingEnabled) {
         // If we're loading from an actual config, we should check that the section is a match.
-        if (sourceSection instanceof MConfiguration && mappingEnabled) {
-            if (!mapsTo((MConfiguration) sourceSection))
+        if (sourceSection.getRoot() instanceof MConfiguration && mappingEnabled) {
+            if (!mapsTo((MConfiguration) sourceSection.getRoot()))
                 return false;
         }
         try {

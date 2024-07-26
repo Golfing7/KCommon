@@ -199,7 +199,7 @@ public class Configuration extends YamlConfiguration implements Config {
 
     @Override
     public ConfigurationSection getParent() {
-        return wrapped.getParent();
+        return new WrappedConfigurationSection(wrapped.getParent(), this);
     }
 
     @Override
@@ -209,12 +209,12 @@ public class Configuration extends YamlConfiguration implements Config {
 
     @Override
     public org.bukkit.configuration.Configuration getRoot() {
-        return wrapped.getRoot();
+        return this;
     }
 
     @Override
     public ConfigurationSection getDefaultSection() {
-        return wrapped.getDefaultSection();
+        return new WrappedConfigurationSection(wrapped.getDefaultSection(), this);
     }
 
     @Override
@@ -229,7 +229,7 @@ public class Configuration extends YamlConfiguration implements Config {
 
     @Override
     public ConfigurationSection getConfigurationSection(String path) {
-        return wrapped.getConfigurationSection(path);
+        return new WrappedConfigurationSection(wrapped.getConfigurationSection(path), this);
     }
 
     @Override
@@ -429,11 +429,11 @@ public class Configuration extends YamlConfiguration implements Config {
 
     @Override
     public ConfigurationSection createSection(String path) {
-        return wrapped.createSection(path);
+        return new WrappedConfigurationSection(wrapped.createSection(path), this);
     }
 
     @Override
     public ConfigurationSection createSection(String path, Map<?, ?> map) {
-        return wrapped.createSection(path, map);
+        return new WrappedConfigurationSection(wrapped.createSection(path, map), this);
     }
 }
