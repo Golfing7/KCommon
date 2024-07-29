@@ -137,7 +137,8 @@ public class DropTable implements CASerializable {
                 Collections.shuffle(dropKeys);
                 for (String dropKey : dropKeys) {
                     Drop<?> drop = table.get(dropKey);
-                    if (!drop.testRandom(context.getBoost()))
+                    double totalBoost = context.getSpecificBoosts().getOrDefault(dropKey, context.getBoost());
+                    if (!drop.testRandom(totalBoost))
                         continue;
 
                     drops.add(drop);

@@ -40,6 +40,7 @@ public final class MenuBuilder {
     /** The top click event is called when a player clicks the top menu. Regardless if there is a click action on the slot clicked */
     private ClickAction topClickEvent = null;
     /** A map containing all special GUI items, mapped from their keys. */
+    @Getter
     private Map<String, SimpleGUIItem> specialGUIItems = new HashMap<>();
     /**
      * A map containing string key bindings to specific items in this GUI.
