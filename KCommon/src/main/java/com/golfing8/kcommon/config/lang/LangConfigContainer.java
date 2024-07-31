@@ -220,7 +220,7 @@ public interface LangConfigContainer {
         for (LangConfigEnum inst : langConfigEnum.getEnumConstants()) {
             Enum<?> en = (Enum<?>) inst;
             String name = en.name();
-            String configKey = name.toLowerCase().replace("_", "-");
+            String configKey = name.toLowerCase().replace("_", "-").replace("$", ".");
             String fullPath = formatPath(configKey);
             Message defaultValue = inst.getMessage();
 

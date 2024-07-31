@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.util;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
@@ -793,6 +794,21 @@ public class StringUtil {
         }
 
         return toReturn.toString().trim();
+    }
+
+    /**
+     * Formats a location to a nice string
+     *
+     * @param location the location
+     * @param includeWorld if the world should be included
+     * @return the string
+     */
+    public static String formatLocation(Location location, boolean includeWorld) {
+        if (includeWorld) {
+            return String.format("X:%.1f, Y:%.1f, Z:%.1f %s", location.getX(), location.getY(), location.getZ(), location.getWorld().getName());
+        } else {
+            return String.format("X:%.1f, Y:%.1f, Z:%.1f", location.getX(), location.getY(), location.getZ());
+        }
     }
 
     public static boolean isEmpty(CharSequence var0) {
