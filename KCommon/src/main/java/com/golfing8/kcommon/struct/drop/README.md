@@ -130,6 +130,8 @@ In the event the minimum target isn't met, we simply randomize the list again an
 There are some other options that apply specifically to item drops. They are
 * `fancy` - Spawns a dropped item using a hologram which also displays the item's display name.
 * `player-locked` - Makes it so only the killer (receiver) can pick up the item drop. `fancy` must also be on.
+* `looting-enabled` - If players can use looting on the items
+* `fortune-enabled` - If players can use fortune on the items
 
 ## Example
 

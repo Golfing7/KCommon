@@ -26,6 +26,7 @@ public class ItemDrop extends Drop<ItemStack> {
     private boolean fancyDrop;
     private boolean playerLocked;
     private boolean lootingEnabled;
+    private boolean fortuneEnabled;
     private String lootingFormula;
     public ItemDrop(double chance,
                     @Nullable String displayName,
@@ -34,6 +35,7 @@ public class ItemDrop extends Drop<ItemStack> {
                     boolean fancyDrop,
                     boolean playerLocked,
                     boolean lootingEnabled,
+                    boolean fortuneEnabled,
                     @Nullable String lootingFormula) {
         super(chance, displayName);
         this.items = items;
@@ -41,6 +43,7 @@ public class ItemDrop extends Drop<ItemStack> {
         this.fancyDrop = fancyDrop;
         this.playerLocked = playerLocked;
         this.lootingEnabled = lootingEnabled;
+        this.fortuneEnabled = fortuneEnabled;
         this.lootingFormula = lootingFormula == null ? "rand1({LOOTING})" : lootingFormula;
     }
 
@@ -56,19 +59,25 @@ public class ItemDrop extends Drop<ItemStack> {
      * @return the generated drops.
      */
     public List<ItemStack> getDrop(@Nullable Player player) {
-        if (!lootingEnabled || player == null)
+        if (player == null || (!lootingEnabled && !fortuneEnabled))
             return getDrop();
 
         ItemStack inHand = player.getItemInHand();
         if (inHand == null || !inHand.hasItemMeta())
             return getDrop();
 
-        int lootingLevel = inHand.getEnchantmentLevel(XEnchantment.LOOT_BONUS_MOBS.getEnchant());
-        if (lootingLevel <= 0)
-            return getDrop();
+        int lootingLevel;
+        int fortuneLevel;
+        if (lootingEnabled && (lootingLevel = inHand.getEnchantmentLevel(XEnchantment.LOOT_BONUS_MOBS.getEnchant())) > 0) {
+            int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", lootingLevel);
+            return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
+        }
+        if (fortuneEnabled && (fortuneLevel = inHand.getEnchantmentLevel(XEnchantment.LOOT_BONUS_BLOCKS.getEnchant())) > 0) {
+            int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", fortuneLevel);
+            return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
+        }
 
-        int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", lootingLevel);
-        return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
+        return getDrop();
     }
 
     @Override

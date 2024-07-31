@@ -35,6 +35,31 @@ public final class InventoryUtil {
     }
 
     /**
+     * Gets the amount of empty slots in the given inventory
+     *
+     * @param inventory the inventory
+     * @return the amount of empty slots.
+     */
+    public static int countEmptySlots(Inventory inventory) {
+        return countEmptySlots(inventory.getContents());
+    }
+
+    /**
+     * Gets the amount of empty slots in the item array
+     *
+     * @param items the items
+     * @return the amount of empty slots.
+     */
+    public static int countEmptySlots(ItemStack[] items) {
+        int count = 0;
+        for (ItemStack itemStack : items) {
+            if (itemStack == null || itemStack.getType() == XMaterial.AIR.parseMaterial())
+                count++;
+        }
+        return count;
+    }
+
+    /**
      * Updates the items in the inventory given the function
      *
      * @param inventory the inventory

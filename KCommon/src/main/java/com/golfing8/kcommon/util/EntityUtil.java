@@ -2,6 +2,10 @@ package com.golfing8.kcommon.util;
 
 import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.projectiles.ProjectileSource;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,5 +77,22 @@ public class EntityUtil {
             return getTopEntity(originalEntity.getVehicle());
 
         return originalEntity;
+    }
+
+    /**
+     * Gets the source of the given entity. If the entity is already a player, just that is returned.
+     *
+     * @param entity the entity.
+     * @return the real player source
+     */
+    public static @Nullable Player getSource(Entity entity) {
+        if (entity instanceof Player) {
+            return (Player) entity;
+        }
+        if (entity instanceof Projectile) {
+            if (((Projectile) entity).getShooter() instanceof Player)
+                return (Player) ((Projectile) entity).getShooter();
+        }
+        return null;
     }
 }
