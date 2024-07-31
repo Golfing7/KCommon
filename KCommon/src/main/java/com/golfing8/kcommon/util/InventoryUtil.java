@@ -54,4 +54,35 @@ public final class InventoryUtil {
         inventory.setContents(contents);
         return count;
     }
+
+    /**
+     * Removes up to the given amount of items from the given inventory
+     *
+     * @param inventory the inventory
+     * @param amount the amount of items to remove
+     * @param predicate the item predicate
+     * @return the actual amount of items removed.
+     */
+    public static int removeUpTo(Inventory inventory, int amount, Predicate<@NotNull ItemStack> predicate) {
+        int count = 0;
+        ItemStack[] contents = inventory.getContents();
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack itemStack = contents[i];
+            if (itemStack == null || itemStack.getType() == XMaterial.AIR.parseMaterial() || itemStack.getAmount() <= 0)
+                continue;
+
+            int toRemove = Math.min(itemStack.getAmount(), amount - count);
+            if (!predicate.test(itemStack))
+                continue;
+
+            if (toRemove >= itemStack.getAmount()) {
+                contents[i] = null;
+            } else {
+                itemStack.setAmount(itemStack.getAmount() - toRemove);
+            }
+            count += toRemove;
+        }
+        inventory.setContents(contents);
+        return count;
+    }
 }
