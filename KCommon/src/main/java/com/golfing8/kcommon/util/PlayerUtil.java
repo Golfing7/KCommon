@@ -5,6 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Stores utility classes pertaining to players.
  */
@@ -41,7 +44,7 @@ public final class PlayerUtil {
      * @param itemStack the item to give them.
      */
     public static void givePlayerItemSafe(Player player, ItemStack itemStack){
-        givePlayerItemSafe(player, itemStack, false);
+        givePlayerItemsSafe(player, Collections.singleton(itemStack), false);
     }
 
     /**
@@ -52,20 +55,46 @@ public final class PlayerUtil {
      * @param silent if a message should be sent or not.
      */
     public static void givePlayerItemSafe(Player player, ItemStack itemStack, boolean silent){
-        int total = itemStack.getAmount();
+        givePlayerItemsSafe(player, Collections.singleton(itemStack), silent);
+    }
 
-        for(int z = 0; z < total; z += 64){
-            int toGiveThisTime = Math.min(64, total - z);
+    /**
+     * Gives the player the given items or drops them at their feet.
+     *
+     * @param player the player to give the item to.
+     * @param itemStacks the items to give them.
+     */
+    public static void givePlayerItemsSafe(Player player, Collection<ItemStack> itemStacks) {
+        givePlayerItemsSafe(player, itemStacks, false);
+    }
 
-            itemStack.setAmount(toGiveThisTime);
+    /**
+     * Gives the player the given items safely, dropping excess on the ground
+     *
+     * @param player the player
+     * @param itemStacks the item stacks
+     * @param silent if the overflow message should be sent
+     */
+    public static void givePlayerItemsSafe(Player player, Collection<ItemStack> itemStacks, boolean silent) {
+        boolean notify = false;
+        for (ItemStack itemStack : itemStacks) {
+            int total = itemStack.getAmount();
 
-            if(player.getInventory().firstEmpty() == -1){
-                player.getWorld().dropItem(player.getLocation(), itemStack.clone());
-                if(!silent)
-                    player.sendMessage(MS.parseSingle("&cYour inventory was full. Check your feet!"));
-            }else{
-                player.getInventory().addItem(itemStack.clone());
+            for(int z = 0; z < total; z += 64){
+                int toGiveThisTime = Math.min(64, total - z);
+
+                itemStack.setAmount(toGiveThisTime);
+
+                if(player.getInventory().firstEmpty() == -1){
+                    player.getWorld().dropItem(player.getLocation(), itemStack.clone());
+                    if(!silent)
+                        notify = true;
+                }else{
+                    player.getInventory().addItem(itemStack.clone());
+                }
             }
         }
+        if (notify)
+            player.sendMessage(MS.parseSingle("&cYour inventory was full. Check your feet!"));
     }
 }
