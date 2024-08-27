@@ -61,7 +61,7 @@ public class CADrop implements ConfigAdapter<Drop> {
             drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
             return drop;
         }
-        throw new InvalidConfigException("Drop doesn't have `commands` or `items` key. Which type of drop is it?");
+        throw new InvalidConfigException("Drop '%s' doesn't have 'commands' or 'items' key. Which type of drop is it?");
     }
 
     @Override

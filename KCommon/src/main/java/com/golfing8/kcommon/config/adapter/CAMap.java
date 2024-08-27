@@ -57,7 +57,11 @@ public class CAMap implements ConfigAdapter<Map> {
             if (valueAdapter == null) {
                 values.put(adaptedKey, ConfigPrimitive.coerceStringToBoxed(mapEntry.getValue().toString(), valueFieldType.getType()));
             } else {
-                values.put(adaptedKey, valueAdapter.toPOJO(entry.getSubValue(mapEntry.getKey()), valueFieldType));
+                try {
+                    values.put(adaptedKey, valueAdapter.toPOJO(entry.getSubValue(mapEntry.getKey()), valueFieldType));
+                } catch (Throwable thr) {
+                    throw new RuntimeException(String.format("Failed to load map value with type %s under path %s!", valueType.getTypeName(), entry.formatPath(mapEntry.getKey())), thr);
+                }
             }
         }
 
