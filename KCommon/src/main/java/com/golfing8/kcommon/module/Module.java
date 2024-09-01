@@ -219,7 +219,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /**
      * Reloads this module.
      */
-    public void reload() {
+    public final void reload() {
         this.shutdown();
         this.initialize();
     }
@@ -227,7 +227,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /**
      * Recursively reloads this module and ALL modules which directly or indirectly depend on this.
      */
-    public void reloadWithDependencies() {
+    public final void reloadWithDependencies() {
         this.reload();
 
         for(Module module : Modules.getAll()) {
@@ -239,7 +239,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /**
      * Initializes the module and begins the startup process for it.
      */
-    public void initialize() {
+    public final void initialize() {
         Modules.registerModule(this);
         if (getPlugin().getManifest().loadModule(this)) {
             enable();
@@ -252,29 +252,37 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /**
      * Transitively enables this module. Note that this will not change the module's
      * state as according to its plugin's manifest.
+     *
+     * @return if the module enabled successfully
      */
-    public void enable() {
+    public final boolean enable() {
         // Don't enable twice
         if (enabled)
-            return;
+            return false;
 
-        loadConfigs();
+        try {
+            this.loadConfigs();
+            this.loadLangFields();
+        } catch (Throwable exc) {
+            getLogger().log(Level.SEVERE, "Failed to load due to config error!", exc);
+            return false;
+        }
 
         //Register this module as a listener.
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
 
-        this.loadLangFields();
         this.onEnable();
-        this.enabled = true;
 
         //We should save the language config once more as it's possible the commands this feature registered added constants.
         this.langConfig.save();
+        this.enabled = true;
+        return true;
     }
 
     /**
      * Should be called when this module needs to shut down.
      */
-    public void shutdown() {
+    public final void shutdown() {
         this.disable();
         Modules.unregisterModule(this);
     }
@@ -283,7 +291,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Transitively disables this module. Note that this will not change the module's
      * state as according to its plugin's manifest.
      */
-    public void disable() {
+    public final void disable() {
         // Don't disable self twice.
         if (!enabled)
             return;
@@ -301,7 +309,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         //Unregister all commands associated with this module.
         this.moduleCommands.forEach(MCommand::unregister);
         this.moduleCommands.clear();
-        this.enabled = false;
 
         //Unregister tasks, clone for concurrency.
         new ArrayList<>(moduleTasks).forEach(runnable -> {
@@ -327,6 +334,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.relationalPlaceholders.clear();
         this.placeholders.clear();
         this.configs.clear();
+        this.enabled = false;
     }
 
     /**
@@ -334,7 +342,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      *
      * @return the config group.
      */
-    protected List<Configuration> loadConfigGroup(String groupName) {
+    protected final List<Configuration> loadConfigGroup(String groupName) {
         Path directoryPath = this.dataFolder.resolve(groupName);
         if (!Files.isDirectory(directoryPath)) {
             return Collections.emptyList();
@@ -533,7 +541,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.subModules.add(subModule);
         ((SubModule) subModule).link(this);
         getPlugin().getServer().getPluginManager().registerEvents(subModule, getPlugin());
-        subModule.onEnable();
         Set<String> configNames = subModule.getConfigNames();
 
         // Load the config.
@@ -552,6 +559,15 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         // Load lang config
         subModule.loadLangFields();
+        try {
+            subModule.onEnable();
+        } catch (Throwable thr) {
+            getLogger().log(Level.SEVERE, String.format("Failed to enable sub-module %s!", subModule.getClass().getSimpleName()), thr);
+
+            // Unregister the module.
+            this.subModules.remove(subModule);
+            HandlerList.unregisterAll(subModule);
+        }
     }
 
     /**
@@ -564,6 +580,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             return;
 
         subModule.unregister();
+        this.subModules.remove(subModule);
     }
 
     /**
@@ -593,43 +610,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      *
      * @param mCommand the command.
      */
-    protected void addCommand(MCommand<?> mCommand) {
+    protected final void addCommand(MCommand<?> mCommand) {
         this.moduleCommands.add(mCommand);
         mCommand.register();
-    }
-
-    /**
-     * Sends a message to the given sender.
-     *
-     * @param sender the sender to receive the message.
-     * @param message the message to send to the player.
-     * @param placeholders the object placeholders, should be in the format of:
-     *                     PLACEHOLDER_KEY, value, PLACEHOLDER_KEY2, value2
-     */
-    public void sendMessage(CommandSender sender, Message message, Object... placeholders) {
-        message.getMessages().forEach(string -> MS.pass(sender, string, placeholders));
-    }
-
-    /**
-     * Sends a message to the given sender.
-     *
-     * @param sender the sender to receive the message.
-     * @param message the message to send to the player.
-     * @param placeholders the placeholder objects.
-     */
-    public void sendMessage(CommandSender sender, Message message, Placeholder... placeholders) {
-        MS.parseAll(message.getMessages(), placeholders).forEach(string -> MS.pass(sender, string));
-    }
-
-    /**
-     * Sends a message to the given sender.
-     *
-     * @param sender the sender to receive the message.
-     * @param message the message to send to the player.
-     * @param placeholders the placeholder objects.
-     */
-    public void sendMessage(CommandSender sender, Message message, Collection<Placeholder> placeholders) {
-        MS.parseAll(message.getMessages(), placeholders).forEach(string -> MS.pass(sender, string));
     }
 
     @NotNull

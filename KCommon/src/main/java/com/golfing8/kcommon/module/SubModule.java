@@ -14,6 +14,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Submodules act as 'partner' classes to their parent modules. These classes CAN be singleton.
@@ -46,11 +47,15 @@ public abstract class SubModule<T extends Module> extends ConfigClass implements
     }
 
     @Override
-    public void unregister() {
+    public final void unregister() {
         super.unregister();
 
         HandlerList.unregisterAll(this);
-        onDisable();
+        try {
+            onDisable();
+        } catch (Throwable thr) {
+            module.getLogger().log(Level.SEVERE, String.format("Failed to disable sub-module %s!", getClass().getSimpleName()), thr);
+        }
     }
 
     @Override
