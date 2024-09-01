@@ -48,7 +48,11 @@ public class CARangeMap implements ConfigAdapter<RangeMap> {
             if (adapter == null) {
                 rangeMap.put(adaptedKey, mapEntry.getValue());
             } else {
-                rangeMap.put(adaptedKey, adapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getValue()), valueFieldType));
+                try {
+                    rangeMap.put(adaptedKey, adapter.toPOJO(entry.getSubValue(mapEntry.getKey()), valueFieldType));
+                } catch (Throwable thr) {
+                    throw new RuntimeException(String.format("Failed to load map value with type %s under path %s!", valueType.getTypeName(), entry.formatPath(mapEntry.getKey())), thr);
+                }
             }
         }
 

@@ -179,7 +179,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
-            plugin.getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
+            getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
             return;
         }
         Modules.registerModule(this);
@@ -210,7 +210,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
-            plugin.getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
+            getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
             return;
         }
         Modules.registerModule(this);
@@ -242,10 +242,12 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     public final void initialize() {
         Modules.registerModule(this);
         if (getPlugin().getManifest().loadModule(this)) {
-            enable();
-            plugin.getLogger().info(String.format("Loaded and enabled module: %s", this.getModuleName()));
+            if (!enable()) {
+                getLogger().log(Level.SEVERE, "Failed to enable module.");
+            }
+            getLogger().info("Loaded and enabled module.");
         } else {
-            plugin.getLogger().info(String.format("Loaded and disabled module: %s", this.getModuleName()));
+            getLogger().info("Loaded and disabled module.");
         }
     }
 
@@ -355,7 +357,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             });
             return toReturn;
         } catch (IOException exc) {
-            getPlugin().getLogger().log(Level.WARNING, "Failed to load config group: " + groupName, exc);
+            getLogger().log(Level.WARNING, "Failed to load config group: " + groupName, exc);
             return Collections.emptyList();
         }
     }
@@ -386,7 +388,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             try {
                 FileUtil.copyJarElements(plugin.getFile().toPath(), this.moduleName, dataFolder);
             } catch (IOException exc) {
-                getPlugin().getLogger().log(Level.SEVERE, String.format("Failed to copy module %s files!", getModuleName()), exc);
+                getLogger().log(Level.SEVERE, "Failed to copy module files!", exc);
             }
         }
 
@@ -471,8 +473,8 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
                 try {
                     source.load(new InputStreamReader(new ByteArrayInputStream(streamCloner.toByteArray())));
                 } catch (InvalidConfigurationException exc) {
-                    getPlugin().getLogger().log(Level.WARNING, String.format("Failed to load source config %s for module %s.",
-                            configPath.getFileName().toString(), getModuleName()), exc);
+                    getLogger().log(Level.WARNING, String.format("Failed to load source config %s for module.",
+                            configPath.getFileName().toString()), exc);
                 }
             }
         }catch(IOException exc) {

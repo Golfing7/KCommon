@@ -79,6 +79,12 @@ public final class ConfigPrimitive {
         return (T) primitive;
     }
 
+    /**
+     * Gets a value contained within this primitive, retaining the config section source.
+     *
+     * @param key the key
+     * @return the primitive.
+     */
     @SuppressWarnings({"rawtypes"})
     public ConfigPrimitive getSubValue(String key) {
         if (this.source == null) {
@@ -90,6 +96,16 @@ public final class ConfigPrimitive {
         }
 
         return ConfigPrimitive.ofSection(this.source.getConfigurationSection(key));
+    }
+
+    /**
+     * Formats the key onto the path that the {@link #source} source is under.
+     *
+     * @param key the key.
+     * @return the formatted path.
+     */
+    public String formatPath(String key) {
+        return source == null || !source.getCurrentPath().isEmpty() ? key : source.getCurrentPath() + "." + key;
     }
 
     public static ConfigPrimitive of(Object value) {
