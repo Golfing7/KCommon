@@ -96,6 +96,8 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      */
     @Getter
     private transient boolean enabled;
+    /** Used to indicate that the {@link #disable()} method was called during the execution of {@link #onEnable()} */
+    private transient boolean prematureDisable;
 
     /**
      * The list of tasks this module is currently running.
@@ -243,7 +245,8 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         Modules.registerModule(this);
         if (getPlugin().getManifest().loadModule(this)) {
             if (!enable()) {
-                getLogger().log(Level.SEVERE, "Failed to enable module.");
+                getLogger().info("Failed to enable module.");
+                return;
             }
             getLogger().info("Loaded and enabled module.");
         } else {
@@ -265,15 +268,26 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         try {
             this.loadConfigs();
             this.loadLangFields();
-        } catch (Throwable exc) {
-            getLogger().log(Level.SEVERE, "Failed to load due to config error!", exc);
+        } catch (Throwable thr) {
+            getLogger().log(Level.SEVERE, "Failed to load due to config error!", thr);
             return false;
         }
 
         //Register this module as a listener.
         this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
 
-        this.onEnable();
+        this.prematureDisable = false;
+        try {
+            this.onEnable();
+        } catch (Throwable thr) {
+            getLogger().log(Level.SEVERE, "Module failed to enable!", thr);
+            return false;
+        }
+
+        // It's possible that the implementation of onEnable called disable()
+        if (this.prematureDisable) {
+            return false;
+        }
 
         //We should save the language config once more as it's possible the commands this feature registered added constants.
         this.langConfig.save();
@@ -292,11 +306,17 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /**
      * Transitively disables this module. Note that this will not change the module's
      * state as according to its plugin's manifest.
+     * <p>
+     * If this is called from within the implementation of {@link #onEnable()}, the {@link #onDisable()} implementation
+     * will NOT be executed. Instead, a flag will be set that the enable process failed.
+     * </p>
      */
     public final void disable() {
         // Don't disable self twice.
-        if (!enabled)
+        if (!enabled) {
+            prematureDisable = true;
             return;
+        }
 
         //Save the lang config.
         this.langConfig.save();
