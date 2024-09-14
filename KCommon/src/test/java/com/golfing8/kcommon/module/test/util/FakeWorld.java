@@ -31,33 +31,28 @@ public class FakeWorld implements World {
     }
 
     @Override
-    public int getEntityCount() {
-        return 0;
-    }
-
-    @Override
-    public int getTileEntityCount() {
-        return 0;
-    }
-
-    @Override
-    public int getTickableTileEntityCount() {
-        return 0;
-    }
-
-    @Override
-    public int getChunkCount() {
-        return 0;
-    }
-
-    @Override
-    public int getPlayerCount() {
-        return 0;
-    }
-
-    @Override
     public Block getBlockAt(int x, int y, int z) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getDurabilityAt(int i, int i1, int i2) {
+        return 0;
+    }
+
+    @Override
+    public void setDurabilityAt(int i, int i1, int i2, int i3) {
+
+    }
+
+    @Override
+    public long getCustomBlockDataAt(int i, int i1, int i2) {
+        return 0;
+    }
+
+    @Override
+    public void setCustomBlockDataAt(int i, int i1, int i2, long l) {
+
     }
 
     @Override
@@ -106,14 +101,15 @@ public class FakeWorld implements World {
     }
 
     @Override
+    public boolean chunkExists(int i, int i1) {
+        return false;
+    }
+
+    @Override
     public Chunk getChunkAt(Block block) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public boolean isChunkGenerated(int i, int i1) {
-        return false;
-    }
 
     @Override
     public void getChunkAtAsync(int i, int i1, ChunkLoadCallback chunkLoadCallback) {
@@ -221,11 +217,6 @@ public class FakeWorld implements World {
     }
 
     @Override
-    public <T extends Arrow> T spawnArrow(Location location, Vector direction, float speed, float spread, Class<T> clazz) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public boolean generateTree(Location location, TreeType type) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -238,6 +229,16 @@ public class FakeWorld implements World {
     @Override
     public Entity spawnEntity(Location loc, EntityType type) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public LivingEntity spawnCreature(Location location, EntityType entityType) {
+        return null;
+    }
+
+    @Override
+    public LivingEntity spawnCreature(Location location, CreatureType creatureType) {
+        return null;
     }
 
     @Override
@@ -287,11 +288,6 @@ public class FakeWorld implements World {
     }
 
     @Override
-    public Entity getEntity(UUID uuid) {
-        return null;
-    }
-
-    @Override
     public String getName() {
         return name;
     }
@@ -303,11 +299,6 @@ public class FakeWorld implements World {
 
     @Override
     public Location getSpawnLocation() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean setSpawnLocation(Location location) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -402,11 +393,6 @@ public class FakeWorld implements World {
     }
 
     @Override
-    public boolean createExplosion(Entity entity, Location location, float v, boolean b, boolean b1) {
-        return false;
-    }
-
-    @Override
     public Environment getEnvironment() {
         return env;
     }
@@ -427,6 +413,11 @@ public class FakeWorld implements World {
     }
 
     @Override
+    public void setGenerator(ChunkGenerator chunkGenerator) {
+
+    }
+
+    @Override
     public ChunkGenerator getGenerator() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -443,16 +434,6 @@ public class FakeWorld implements World {
 
     @Override
     public <T extends Entity> T spawn(Location location, Class<T> clazz) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public <T extends Entity> T spawn(Location location, Class<T> clazz, Consumer<T> function) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public FallingBlock spawnFallingBlock(Location location, MaterialData data) throws IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -647,21 +628,6 @@ public class FakeWorld implements World {
     }
 
     @Override
-    public void playSound(Location location, String sound, float volume, float pitch) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void playSound(Location location, Sound sound, SoundCategory category, float volume, float pitch) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void playSound(Location location, String sound, SoundCategory category, float volume, float pitch) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public String[] getGameRules() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -684,71 +650,6 @@ public class FakeWorld implements World {
     @Override
     public WorldBorder getWorldBorder() {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void spawnParticle(Particle particle, Location location, int count) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void spawnParticle(Particle particle, double x, double y, double z, int count) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public <T> void spawnParticle(Particle particle, Location location, int count, T data) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public <T> void spawnParticle(Particle particle, double x, double y, double z, int count, T data) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void spawnParticle(Particle particle, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public <T> void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, T data) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public <T> void spawnParticle(Particle particle, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, T data) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, double extra) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void spawnParticle(Particle particle, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public <T> void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, double extra, T data) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public <T> void spawnParticle(Particle particle, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, T data) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public <T> void spawnParticle(Particle particle, List<Player> list, Player player, double v, double v1, double v2, int i, double v3, double v4, double v5, double v6, T t, boolean b) {
-
     }
 
     @Override

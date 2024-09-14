@@ -35,6 +35,9 @@ class ChunkMapTest {
     }
 
     private fun testValues(values: Map<Position, Int>, chunkMap: ChunkStylePointMap<Int>) {
+        for (method in chunkMap::class.java.methods) {
+            println(method.name + " " + method.parameters.contentToString())
+        }
         // Place in some values
         for (pair in values) {
             chunkMap[pair.key] = pair.value

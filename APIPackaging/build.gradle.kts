@@ -16,6 +16,7 @@ tasks {
         archiveFileName.set("${project.name}-${project.version}.jar")
         relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")
         relocate("com.cryptomorin.xseries", "com.golfing8.shade.com.cryptomorin.xseries")
+        relocate("org.objectweb.asm", "com.golfing8.shade.org.objectweb.asm")
     }
 
     build {
@@ -37,7 +38,7 @@ dependencies {
     implementation("net.kyori:adventure-platform-bukkit:4.3.3")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("com.github.cryptomorin:XSeries:9.8.1") //For XSeries
-    implementation("org.mongodb:mongodb-driver-sync:4.11.1")
+    implementation("org.mongodb:mongodb-driver-sync:5.0.1")
 }
 
 publishing {

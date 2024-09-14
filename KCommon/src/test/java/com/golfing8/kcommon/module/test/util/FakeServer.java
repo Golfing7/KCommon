@@ -1,6 +1,8 @@
 package com.golfing8.kcommon.module.test.util;
 
+import com.avaje.ebean.config.ServerConfig;
 import com.destroystokyo.paper.profile.PlayerProfile;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
 import org.bukkit.Warning.WarningState;
 import org.bukkit.World.Environment;
@@ -36,15 +38,7 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.plugin.EventExecutor;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginLoader;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredListener;
-import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.ServicePriority;
-import org.bukkit.plugin.ServicesManager;
-import org.bukkit.plugin.UnknownDependencyException;
+import org.bukkit.plugin.*;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -66,6 +60,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 
 @SuppressWarnings({"NullableProblems"})
@@ -136,6 +131,16 @@ public final class FakeServer implements Server {
     }
 
     @Override
+    public void broadcast(BaseComponent baseComponent) {
+
+    }
+
+    @Override
+    public void broadcast(BaseComponent... baseComponents) {
+
+    }
+
+    @Override
     public String getUpdateFolder() {
         return "update";
     }
@@ -148,6 +153,11 @@ public final class FakeServer implements Server {
     @Override
     public boolean isHardcore() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean useExactLoginLocation() {
+        return false;
     }
 
     @Override
@@ -329,6 +339,11 @@ public final class FakeServer implements Server {
     }
 
     @Override
+    public ScheduledExecutorService getServerExecutor() {
+        return null;
+    }
+
+    @Override
     public ServicesManager getServicesManager() {
         return new ServicesManager() {
             @Override
@@ -440,6 +455,11 @@ public final class FakeServer implements Server {
     @Override
     public boolean dispatchCommand(final CommandSender cs, final String string) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void configureDbConfig(ServerConfig serverConfig) {
+
     }
 
     @Override
@@ -566,6 +586,11 @@ public final class FakeServer implements Server {
             @Override
             public boolean isBanned() {
                 throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void setBanned(boolean b) {
+
             }
 
             @Override
@@ -697,11 +722,6 @@ public final class FakeServer implements Server {
             }
 
             @Override
-            public Spigot spigot() {
-                return null;
-            }
-
-            @Override
             public boolean isPermissionSet(final String name) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
@@ -809,6 +829,11 @@ public final class FakeServer implements Server {
     }
 
     @Override
+    public int getCurrentTick() {
+        return 0;
+    }
+
+    @Override
     public File getWorldContainer() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -885,11 +910,6 @@ public final class FakeServer implements Server {
 
     @Override
     public Inventory createInventory(final InventoryHolder ih, final int i, final String string) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Merchant createMerchant(final String s) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -989,11 +1009,6 @@ public final class FakeServer implements Server {
     }
 
     @Override
-    public BossBar createBossBar(final String s, final BarColor barColor, final BarStyle barStyle, final BarFlag... barFlags) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     @SuppressWarnings("deprecation")
     public UnsafeValues getUnsafe() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -1004,35 +1019,6 @@ public final class FakeServer implements Server {
         return null;
     }
 
-    @Override
-    public void reloadPermissions() {
-
-    }
-
-    @Override
-    public boolean reloadCommandAliases() {
-        return false;
-    }
-
-    @Override
-    public boolean suggestPlayerNamesWhenNullTabCompletions() {
-        return false;
-    }
-
-    @Override
-    public PlayerProfile createProfile(@Nonnull UUID uuid) {
-        return null;
-    }
-
-    @Override
-    public PlayerProfile createProfile(@Nonnull String s) {
-        return null;
-    }
-
-    @Override
-    public PlayerProfile createProfile(@Nullable UUID uuid, @Nullable String s) {
-        return null;
-    }
 
     @Override
     public BanList getBanList(final BanList.Type arg0) {
@@ -1046,12 +1032,6 @@ public final class FakeServer implements Server {
                 return player;
             }
         }
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public UUID getPlayerUniqueId(String s) {
         return null;
     }
 
@@ -1072,33 +1052,8 @@ public final class FakeServer implements Server {
     }
 
     @Override
-    public void reloadData() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Entity getEntity(final UUID uuid) {
-        return getPlayer(uuid);
-    }
-
-    @Override
-    public double[] getTPS() {
-        return new double[0];
-    }
-
-    @Override
     public CommandMap getCommandMap() {
         return null;
-    }
-
-    @Override
-    public Advancement getAdvancement(final NamespacedKey key) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Iterator<Advancement> advancementIterator() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     static class FakePluginManager implements PluginManager {
@@ -1179,10 +1134,6 @@ public final class FakeServer implements Server {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
-        @Override
-        public void disablePlugin(Plugin plugin, boolean b) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
 
         @Override
         public Permission getPermission(final String name) {
@@ -1252,6 +1203,11 @@ public final class FakeServer implements Server {
         @Override
         public boolean useTimings() {
             throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void registerPacketListener(BukkitPacketListener bukkitPacketListener, Plugin plugin) {
+
         }
     }
 }

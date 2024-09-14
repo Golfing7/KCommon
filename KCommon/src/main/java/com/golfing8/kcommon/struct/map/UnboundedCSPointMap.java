@@ -14,7 +14,7 @@ public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V>{
 
     public UnboundedCSPointMap()
     {
-        this.storedValues = new Long2ObjectOpenHashMap<>(8096, 1.0F);
+        this.storedValues = new Long2ObjectOpenHashMap<>(8096);
     }
 
     @Override
