@@ -412,7 +412,7 @@ public final class ItemStackBuilder {
 
         if (this.glowing) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            meta.addEnchant(XEnchantment.DURABILITY.getEnchant(), 0, true);
+            meta.addEnchant(XEnchantment.UNBREAKING.getEnchant(), 0, true);
         }
 
         newCopy.setItemMeta(meta);

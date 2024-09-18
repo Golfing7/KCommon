@@ -36,11 +36,11 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(project(":NMS"))
     testImplementation("org.mongodb:mongodb-driver-sync:5.0.1")
-    testImplementation("com.github.cryptomorin:XSeries:9.8.1")
+    testImplementation("com.github.cryptomorin:XSeries:11.2.1")
 
     compileOnly("de.tr7zw:item-nbt-api:2.13.1") //For items.
     compileOnly("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
-    compileOnly("com.github.cryptomorin:XSeries:9.8.1") //For XSeries
+    compileOnly("com.github.cryptomorin:XSeries:11.2.1") //For XSeries
     compileOnly("org.mongodb:mongodb-driver-sync:4.11.1")
     implementation("me.lucko:jar-relocator:1.7")
 

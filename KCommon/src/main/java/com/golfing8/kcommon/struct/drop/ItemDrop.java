@@ -68,11 +68,11 @@ public class ItemDrop extends Drop<ItemStack> {
 
         int lootingLevel;
         int fortuneLevel;
-        if (lootingEnabled && (lootingLevel = inHand.getEnchantmentLevel(XEnchantment.LOOT_BONUS_MOBS.getEnchant())) > 0) {
+        if (lootingEnabled && (lootingLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.getEnchant())) > 0) {
             int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", lootingLevel);
             return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
         }
-        if (fortuneEnabled && (fortuneLevel = inHand.getEnchantmentLevel(XEnchantment.LOOT_BONUS_BLOCKS.getEnchant())) > 0) {
+        if (fortuneEnabled && (fortuneLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.getEnchant())) > 0) {
             int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", fortuneLevel);
             return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
         }
