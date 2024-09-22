@@ -44,13 +44,16 @@ public final class Reflection {
                         continue;
 
                     try {
-                        String className = entry.getName().replace("/", ".").replace(".class", "");
-                        Class<?> uninitializedClass = loader.loadClass(className);
+                        String className = entry.getName().replace("/", ".").replaceAll("\\.class$", "");
+                        Class<?> uninitializedClass = Class.forName(className, false, loader);
                         if ((uninitializedClass.getModifiers() & Modifier.ABSTRACT) != 0) // Ignore abstract classes.
                             continue;
 
-                        if (Module.class.isAssignableFrom(uninitializedClass) && Module.class != uninitializedClass)
-                            classes.add((Class<? extends Module>) Class.forName(className, true, loader));
+                        if (Module.class.isAssignableFrom(uninitializedClass) && Module.class != uninitializedClass) {
+                            // Load the class properly.
+                            Class<?> initializedClass = loader.loadClass(className);
+                            classes.add((Class<? extends Module>) initializedClass);
+                        }
                     } catch (ClassNotFoundException exc) {
                         KCommon.getInstance().getLogger().warning(String.format("Failed to load class %s!", entry.getName()));
                         exc.printStackTrace();
