@@ -50,10 +50,13 @@ public final class MenuManager extends BukkitRunnable {
 
         while (menuIterator.hasNext()) {
             Menu menu = menuIterator.next().getValue();
+            // If the menu was manually shutdown, just remove it
+            if (!menu.isValid()) {
+                menuIterator.remove();
+                continue;
+            }
 
             if (menu.canExpire() && menu.getViewers().isEmpty()) {
-                HandlerList.unregisterAll(menu);
-
                 menu.shutdown();
                 menuIterator.remove();
             }

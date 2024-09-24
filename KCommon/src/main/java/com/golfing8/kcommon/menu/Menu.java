@@ -130,9 +130,20 @@ public interface Menu extends Listener {
 
     Inventory getGUI();
 
-    default void shutdown() {
-        getViewers().forEach(HumanEntity::closeInventory);
-    }
+    /**
+     * Opens the menu for the given player. If the menu has previously been GCed by the {@link MenuManager} it will be re-opened.
+     *
+     * @param player the player.
+     */
+    void open(Player player);
+
+    /**
+     * Registers this menu to the default {@link MenuManager}.
+     *
+     * @return true if the menu wasn't previously registered.
+     */
+    boolean register();
+    void shutdown();
 
     List<Player> getViewers();
 

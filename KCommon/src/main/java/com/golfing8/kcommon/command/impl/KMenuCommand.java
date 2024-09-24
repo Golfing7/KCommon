@@ -64,6 +64,6 @@ public class KMenuCommand extends KCommand {
             return;
         }
 
-        context.getPlayer().openInventory(menu.getGUI());
+        menu.open(context.getPlayer());
     }
 }

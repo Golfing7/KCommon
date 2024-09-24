@@ -29,6 +29,6 @@ public abstract class PlayerMenuContainer extends MenuContainer{
      * @param player the player.
      */
     public void open(Player player) {
-        player.openInventory(getMenu().getGUI());
+        getMenu().open(player);
     }
 }

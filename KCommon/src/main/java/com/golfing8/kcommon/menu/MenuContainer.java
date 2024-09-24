@@ -33,7 +33,7 @@ public abstract class MenuContainer {
      * @param player the player.
      */
     public void open(Player player) {
-        player.openInventory(getMenu().getGUI());
+        getMenu().open(player);
     }
 
     /**

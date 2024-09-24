@@ -13,8 +13,10 @@ import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -47,7 +49,7 @@ public abstract class MenuAbstract implements Menu {
     private boolean canExpire;
     private int size;
     private boolean clickable;
-    private boolean valid = true;
+    private boolean valid;
 
     private boolean recreate;
 
@@ -72,10 +74,7 @@ public abstract class MenuAbstract implements Menu {
         this.multiLinePlaceholders = multiLinePlaceholders;
 
         this.actionMap = actionMap;
-
-        Bukkit.getServer().getPluginManager().registerEvents(this, KCommon.getInstance());
-
-        MenuManager.getInstance().addMenu(this);
+        register();
     }
 
     @Override
@@ -99,14 +98,36 @@ public abstract class MenuAbstract implements Menu {
     }
 
     @Override
+    public boolean register() {
+        // Are we already registered?
+        if (this.valid)
+            return false;
+
+        this.valid = true;
+        Bukkit.getServer().getPluginManager().registerEvents(this, KCommon.getInstance());
+        MenuManager.getInstance().addMenu(this);
+        return true;
+    }
+
+    @Override
     public void shutdown() {
-        Menu.super.shutdown();
+        getViewers().forEach(HumanEntity::closeInventory);
+        HandlerList.unregisterAll(this);
         valid = false;
     }
 
     @Override
     public Inventory getGUI() {
         return backingInventory;
+    }
+
+    @Override
+    public void open(Player player) {
+        if (!this.valid) {
+            this.register();
+        }
+
+        player.openInventory(this.backingInventory);
     }
 
     @Override
