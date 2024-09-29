@@ -5,6 +5,7 @@ import com.golfing8.kcommon.config.InvalidConfigException;
 import com.golfing8.kcommon.struct.drop.CommandDrop;
 import com.golfing8.kcommon.struct.drop.Drop;
 import com.golfing8.kcommon.struct.drop.ItemDrop;
+import com.golfing8.kcommon.struct.drop.XpDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.MapUtil;
@@ -60,6 +61,10 @@ public class CADrop implements ConfigAdapter<Drop> {
             CommandDrop drop = new CommandDrop(chance, displayName, commands);
             drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
             return drop;
+        } else if (primitive.containsKey("xp")) {
+            int xp = (int) primitive.getOrDefault("xp", 0);
+            boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
+            return new XpDrop(chance, displayName, xp, giveDirectly);
         }
         throw new InvalidConfigException("Drop '%s' doesn't have 'commands' or 'items' key. Which type of drop is it?");
     }
