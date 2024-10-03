@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.golfing8.kcommon.struct.item.FancyItemDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.util.MathExpressions;
+import com.golfing8.kcommon.util.MathUtil;
 import com.golfing8.kcommon.util.PlayerUtil;
 import lombok.Getter;
 import net.objecthunter.exp4j.ExpressionBuilder;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ public class ItemDrop extends Drop<ItemStack> {
     private boolean giveDirectly;
     private boolean fancyDrop;
     private boolean playerLocked;
+    private boolean boostQuantity;
     private boolean lootingEnabled;
     private boolean fortuneEnabled;
     private String lootingFormula;
@@ -34,6 +37,7 @@ public class ItemDrop extends Drop<ItemStack> {
                     boolean giveDirectly,
                     boolean fancyDrop,
                     boolean playerLocked,
+                    boolean boostQuantity,
                     boolean lootingEnabled,
                     boolean fortuneEnabled,
                     @Nullable String lootingFormula) {
@@ -42,6 +46,7 @@ public class ItemDrop extends Drop<ItemStack> {
         this.giveDirectly = giveDirectly;
         this.fancyDrop = fancyDrop;
         this.playerLocked = playerLocked;
+        this.boostQuantity = boostQuantity;
         this.lootingEnabled = lootingEnabled;
         this.fortuneEnabled = fortuneEnabled;
         this.lootingFormula = lootingFormula == null ? "rand1({LOOTING})" : lootingFormula;
@@ -59,31 +64,40 @@ public class ItemDrop extends Drop<ItemStack> {
      * @return the generated drops.
      */
     public List<ItemStack> getDrop(@Nullable Player player) {
-        if (player == null || (!lootingEnabled && !fortuneEnabled))
+        return getDrop(new DropContext(player));
+    }
+
+    public List<ItemStack> getDrop(DropContext context) {
+        if (context.getPlayer() == null || (!lootingEnabled && !fortuneEnabled))
             return getDrop();
 
-        ItemStack inHand = player.getItemInHand();
+        ItemStack inHand = context.getPlayer().getItemInHand();
         if (inHand == null || !inHand.hasItemMeta())
             return getDrop();
 
         int lootingLevel;
         int fortuneLevel;
+        List<ItemStack> itemStacks = new ArrayList<>();
         if (lootingEnabled && (lootingLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.getEnchant())) > 0) {
             int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", lootingLevel);
-            return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
-        }
-        if (fortuneEnabled && (fortuneLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.getEnchant())) > 0) {
+            itemStacks.addAll(getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList()));
+        } else if (fortuneEnabled && (fortuneLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.getEnchant())) > 0) {
             int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", fortuneLevel);
-            return getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList());
+            itemStacks.addAll(getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList()));
+        } else {
+            itemStacks.addAll(getDrop());
         }
 
-        return getDrop();
+        if (boostQuantity) {
+            itemStacks.forEach(item -> item.setAmount(MathUtil.roundRandomly(item.getAmount() * context.getBoost())));
+        }
+        return itemStacks;
     }
 
     @Override
-    public void giveTo(Player player) {
-        getDrop(player).forEach(item -> {
-            PlayerUtil.givePlayerItemSafe(player, item);
+    public void giveTo(DropContext context) {
+        getDrop(context).forEach(item -> {
+            PlayerUtil.givePlayerItemSafe(context.getPlayer(), item);
         });
     }
 
@@ -92,7 +106,7 @@ public class ItemDrop extends Drop<ItemStack> {
         if (fancyDrop) {
             dropFancy(context, location);
         } else {
-            getDrop(context.getPlayer()).forEach(item -> {
+            getDrop(context).forEach(item -> {
                 location.getWorld().dropItemNaturally(location, item);
             });
         }
@@ -106,7 +120,7 @@ public class ItemDrop extends Drop<ItemStack> {
      * @return the fancy item drop.
      */
     public FancyItemDrop dropFancy(DropContext context, Location location) {
-        FancyItemDrop drop = FancyItemDrop.spawn(location.clone().add(0, 1, 0), getDrop(context.getPlayer()));
+        FancyItemDrop drop = FancyItemDrop.spawn(location.clone().add(0, 1, 0), getDrop(context));
         if (playerLocked && context.getPlayer() != null) {
             drop.getPickupPlayers().add(context.getPlayer().getUniqueId());
         }

@@ -40,18 +40,19 @@ public class CADrop implements ConfigAdapter<Drop> {
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             boolean fancy = (boolean) primitive.getOrDefault("fancy", false);
             boolean playerLocked = (boolean) primitive.getOrDefault("player-locked", false);
+            boolean boostQuantity = (boolean) primitive.getOrDefault("boost-quantity", false);
             boolean lootingEnabled = (boolean) primitive.getOrDefault("looting-enabled", false);
             boolean fortuneEnabled = (boolean) primitive.getOrDefault("fortune-enabled", false);
             String lootingFormula = primitive.getOrDefault("looting-formula", "rand1({LOOTING})").toString();
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
-                ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, lootingEnabled, fortuneEnabled, lootingFormula);
+                ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
-                ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly, fancy, playerLocked, lootingEnabled, fortuneEnabled, lootingFormula);
+                ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             }
@@ -64,7 +65,8 @@ public class CADrop implements ConfigAdapter<Drop> {
         } else if (primitive.containsKey("xp")) {
             int xp = (int) primitive.getOrDefault("xp", 0);
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
-            return new XpDrop(chance, displayName, xp, giveDirectly);
+            boolean boostQuantity = (boolean) primitive.getOrDefault("boost-quantity", false);
+            return new XpDrop(chance, displayName, xp, boostQuantity, giveDirectly);
         }
         throw new InvalidConfigException("Drop '%s' doesn't have 'commands' or 'items' key. Which type of drop is it?");
     }

@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.golfing8.kcommon.struct.item.FancyItemDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.util.MathExpressions;
+import com.golfing8.kcommon.util.MathUtil;
 import com.golfing8.kcommon.util.PlayerUtil;
 import com.golfing8.kcommon.util.SetExpFix;
 import lombok.Getter;
@@ -24,13 +25,16 @@ import java.util.stream.Collectors;
 @Getter
 public class XpDrop extends Drop<Integer> {
     private int xp;
+    private boolean boostQuantity;
     private boolean giveDirectly;
     public XpDrop(double chance,
                   @Nullable String displayName,
                   int xp,
+                  boolean boostQuantity,
                   boolean giveDirectly) {
         super(chance, displayName);
         this.xp = xp;
+        this.boostQuantity = boostQuantity;
         this.giveDirectly = giveDirectly;
     }
 
@@ -40,17 +44,19 @@ public class XpDrop extends Drop<Integer> {
     }
 
     @Override
-    public void giveTo(Player player) {
-        SetExpFix.setTotalExperience(player, SetExpFix.getTotalExperience(player) + xp);
+    public void giveTo(DropContext context) {
+        int xpToGive = boostQuantity ? MathUtil.roundRandomly(xp * context.getBoost()) : xp;
+        SetExpFix.setTotalExperience(context.getPlayer(), SetExpFix.getTotalExperience(context.getPlayer()) + xpToGive);
     }
 
     @Override
     public void dropAt(DropContext context, Location location) {
+        int xpToGive = boostQuantity ? MathUtil.roundRandomly(xp * context.getBoost()) : xp;
         if (giveDirectly && context.getPlayer() != null) {
-            SetExpFix.setTotalExperience(context.getPlayer(), SetExpFix.getTotalExperience(context.getPlayer()) + xp);
+            SetExpFix.setTotalExperience(context.getPlayer(), SetExpFix.getTotalExperience(context.getPlayer()) + xpToGive);
         } else {
             ExperienceOrb orb = location.getWorld().spawn(location, ExperienceOrb.class);
-            orb.setExperience(xp);
+            orb.setExperience(xpToGive);
         }
     }
 

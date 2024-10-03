@@ -24,9 +24,9 @@ public class CommandDrop extends Drop<String> {
     }
 
     @Override
-    public void giveTo(Player player) {
+    public void giveTo(DropContext context) {
         getDrop().forEach(command -> {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{PLAYER}", player.getName()));
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{PLAYER}", context.getPlayer().getName()));
         });
     }
 }

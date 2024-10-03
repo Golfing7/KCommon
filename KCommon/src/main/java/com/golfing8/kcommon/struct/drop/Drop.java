@@ -43,7 +43,16 @@ public abstract class Drop<T> implements RandomTestable {
      *
      * @param player the player.
      */
-    public abstract void giveTo(Player player);
+    public void giveTo(Player player) {
+        giveTo(new DropContext(player));
+    }
+
+    /**
+     * Generates drops and gives them to the player.
+     *
+     * @param context the context.
+     */
+    public abstract void giveTo(DropContext context);
 
     /**
      * Gives the player this drop, or drops it at the given location.
