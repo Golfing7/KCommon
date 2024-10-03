@@ -54,7 +54,17 @@ public class ItemDrop extends Drop<ItemStack> {
 
     @Override
     public List<ItemStack> getDrop() {
-        return items.values().stream().map(ItemStackBuilder::buildFromTemplate).collect(Collectors.toList());
+        return getDrop(1.0D);
+    }
+
+    public List<ItemStack> getDrop(double boost) {
+        return items.values().stream().map(builder -> {
+            ItemStack itemStack = builder.buildFromTemplate();
+            if (boost != 1.0D) {
+                itemStack.setAmount(MathUtil.roundRandomly(itemStack.getAmount() * boost));
+            }
+            return itemStack;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -69,11 +79,11 @@ public class ItemDrop extends Drop<ItemStack> {
 
     public List<ItemStack> getDrop(DropContext context) {
         if (context.getPlayer() == null || (!lootingEnabled && !fortuneEnabled))
-            return getDrop();
+            return getDrop(context.getBoost());
 
         ItemStack inHand = context.getPlayer().getItemInHand();
         if (inHand == null || !inHand.hasItemMeta())
-            return getDrop();
+            return getDrop(context.getBoost());
 
         int lootingLevel;
         int fortuneLevel;
