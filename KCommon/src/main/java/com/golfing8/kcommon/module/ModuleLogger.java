@@ -15,7 +15,7 @@ public class ModuleLogger extends Logger {
 
     @Override
     public void log(LogRecord record) {
-        record.setMessage(this.moduleName + record.getMessage());
+        record.setMessage("[" + this.moduleName + "] " + record.getMessage());
         super.log(record);
     }
 }
