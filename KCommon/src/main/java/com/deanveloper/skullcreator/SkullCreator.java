@@ -143,7 +143,7 @@ public class SkullCreator {
         );
 
         if (newerApi()) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "data merge .block " + args);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "data merge block " + args);
         } else {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"blockdata " + args);
         }
