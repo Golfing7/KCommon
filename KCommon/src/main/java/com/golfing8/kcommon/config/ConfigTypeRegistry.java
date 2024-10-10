@@ -276,30 +276,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CADrop());
         registerAdapter(new CAEntityAttribute());
         registerAdapter(new CAEntityAttributeModifier());
-
-        registerAdapter(MenuCoordinate.class, (section) -> {
-            if(section.contains("slot")) {
-                //Check if they're using cartesian style coordinates.
-                if(section.contains("slot.x")) {
-                    int yCoordinate = section.getInt("slot.y");
-                    int xCoordinate = section.getInt("slot.x");
-
-                    //Check the validity of the coordinates.
-                    if(xCoordinate < 1 || xCoordinate > 6)
-                        throw new ImproperlyConfiguredValueException(section.getConfigurationSection("slot"), "x", "A value 1-6");
-                    if(yCoordinate < 1 || yCoordinate > 9)
-                        throw new ImproperlyConfiguredValueException(section.getConfigurationSection("slot"), "y", "A value 1-9");
-
-                    return new MenuCoordinate(xCoordinate, yCoordinate);
-                }else {
-                    return MenuUtils.getCartCoordsFromSlot(section.getInt("slot"));
-                }
-            }else {
-                throw new ImproperlyConfiguredValueException(section, "slot", "a 'slot' key");
-            }
-        }, (section, coord) -> {
-            section.set("slot.x", coord.getX());
-            section.set("slot.y", coord.getY());
-        });
+        registerAdapter(new CAMenuCoordinate());
     }
 }

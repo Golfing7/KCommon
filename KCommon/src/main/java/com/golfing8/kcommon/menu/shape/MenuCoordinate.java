@@ -7,6 +7,11 @@ import lombok.Setter;
 public class MenuCoordinate {
     private final int x, y;
 
+    public MenuCoordinate(int slot) {
+        this.x = (slot % 9) + 1;
+        this.y = (slot / 9) + 1;
+    }
+
     public MenuCoordinate(int x, int y) {
         this.x = x;
         this.y = y;
