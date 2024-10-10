@@ -47,7 +47,7 @@ public abstract class MCommand<T extends Module> extends KCommand implements Lan
 
     @Override
     final void internalOnRegister() {
-        this.loadLangFields();
+        this.loadContainer();
     }
 
     @Override

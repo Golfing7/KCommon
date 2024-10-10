@@ -183,11 +183,12 @@ public interface LangConfigContainer {
     /**
      * Loads the language enums attached to this class.
      * <p>
-     * Note that this will only load the lowest level class' annotated fields.
+     * Note that this will only load the lowest level class' annotated fields & enums.
      * If you have a class structure similar to: {@code LangConfigContainer -> A -> B}, only B's fields will load.
      * </p>
      */
-    default void loadLangFields() {
+    @SuppressWarnings("unchecked")
+    default void loadContainer() {
         Set<Field> allFields = Reflection.getAllFields(this.getClass());
         for (Field field : allFields) {
             if (!field.isAnnotationPresent(LangConf.class))
@@ -204,6 +205,14 @@ public interface LangConfigContainer {
             Message defaultValue = (Message) handle.get(this);
             getLangConfig().addLanguageConstant(formattedPath, defaultValue);
             handle.set(this, getLangConfig().getMessage(formattedPath));
+        }
+
+        Class<?>[] subclasses = this.getClass().getDeclaredClasses();
+        for (Class<?> subclass : subclasses) {
+            if (!subclass.isEnum() || !LangConfigEnum.class.isAssignableFrom(subclass))
+                continue;
+
+            loadLangEnum((Class<? extends LangConfigEnum>) subclass);
         }
         getLangConfig().save();
     }

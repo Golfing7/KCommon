@@ -4,24 +4,16 @@ import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.MCommand;
 import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.commented.MConfiguration;
-import com.golfing8.kcommon.config.generator.ConfigClass;
 import com.golfing8.kcommon.config.generator.ConfigClassWrapper;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
-import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.data.DataManagerContainer;
 import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
-import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.FileUtil;
-import com.golfing8.kcommon.util.MS;
-import com.golfing8.kcommon.util.StringUtil;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.io.IOUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -30,8 +22,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -39,12 +29,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-import java.util.zip.ZipInputStream;
 
 /**
  * Represents an abstract module with functionality on the server. These modules are the basis of functionality
@@ -267,7 +254,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         try {
             this.loadConfigs();
-            this.loadLangFields();
+            this.loadContainer();
         } catch (Throwable thr) {
             getLogger().log(Level.SEVERE, "Failed to load due to config error!", thr);
             return false;
@@ -580,7 +567,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         }
 
         // Load lang config
-        subModule.loadLangFields();
+        subModule.loadContainer();
         try {
             subModule.onEnable();
         } catch (Throwable thr) {
