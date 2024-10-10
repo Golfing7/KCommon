@@ -89,6 +89,15 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
     }
 
     /**
+     * Sets the max page of the GUI by the given amount of expected elements.
+     *
+     * @param elements the elements.
+     */
+    public void setMaxPageByElements(int elements) {
+        this.setMaxPage(this.getMaxPage(elements));
+    }
+
+    /**
      * Updates the current page and re-opens the inventory for the player if necessary.
      *
      * @param page the page.
