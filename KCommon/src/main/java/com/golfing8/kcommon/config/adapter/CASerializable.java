@@ -28,6 +28,20 @@ public interface CASerializable {
     @interface Options {
         /**
          * If set to true, this will try to flatten the serialization.
+         * <p>
+         * Assume you have a type that only has a single serializable field that is an int.
+         * In this case, instead of serializing the type like:
+         * <pre>
+         * {@code
+         * some-parent-section:
+         *     serialized-field: 5
+         * }
+         * it will be serialized as follows:
+         * {@code
+         * some-parent-section: 5
+         * }
+         * </pre>
+         * </p>
          *
          * @return if flattening should happen.
          */
@@ -35,6 +49,8 @@ public interface CASerializable {
 
         /**
          * If set to true, this will allow a user to specify a path string rather than a section where the data is loaded from.
+         * This can help to reduce config redundancy without forcing the developer to write a special
+         * config adapter that uses a registry.
          *
          * @return if the type can delegate.
          */
