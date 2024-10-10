@@ -3,9 +3,11 @@ package com.golfing8.kcommon.struct.blocks;
 import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.map.RangeMap;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -35,6 +37,36 @@ public class WeightedCollection<T> {
         for (int i = 0; i < values.length; i += 2) {
             addWeightedObject((T) values[i], (Double) values[i + 1]);
         }
+    }
+
+    /**
+     * Clears this collection.
+     */
+    public void clear() {
+        chanceMap.clear();
+        bakedOdds.clear();
+    }
+
+    /**
+     * Removes the given item from this collection.
+     *
+     * @param t the item.
+     */
+    public void remove(T t) {
+        this.chanceMap.remove(t);
+        bakeOdds();
+    }
+
+    /**
+     * Removes the given items from this collection.
+     *
+     * @param items the items to remove.
+     */
+    public void removeAll(Collection<T> items) {
+        for (T item : items) {
+            this.chanceMap.remove(item);
+        }
+        bakeOdds();
     }
 
     /**
@@ -70,6 +102,15 @@ public class WeightedCollection<T> {
         //Get a random number between 0 and 1, then get the value in the range.
         double inRange = ThreadLocalRandom.current().nextDouble();
         return this.bakedOdds.get(inRange).getB();
+    }
+
+    /**
+     * Gets all the items in this collection
+     *
+     * @return all items
+     */
+    public Set<T> getAll() {
+        return Collections.unmodifiableSet(this.chanceMap.keySet());
     }
 
     /**

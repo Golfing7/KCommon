@@ -25,4 +25,40 @@ public final class MathUtil {
         else
             return minimum + 1;
     }
+
+    /**
+     * Clamps the given value between the minimum and maximum provided.
+     *
+     * @param value the value.
+     * @param min the minimum
+     * @param max the maximum
+     * @return the clamped value
+     */
+    public static int clamp(int value, int min, int max) {
+        return value < min ? min : value > max ? max : value;
+    }
+
+    /**
+     * Clamps the given value between the minimum and maximum provided.
+     *
+     * @param value the value.
+     * @param min the minimum
+     * @param max the maximum
+     * @return the clamped value
+     */
+    public static long clamp(long value, long min, long max) {
+        return value < min ? min : value > max ? max : value;
+    }
+
+    /**
+     * Clamps the given value between the minimum and maximum provided.
+     *
+     * @param value the value.
+     * @param min the minimum
+     * @param max the maximum
+     * @return the clamped value
+     */
+    public static double clamp(double value, double min, double max) {
+        return value < min ? min : value > max ? max : value;
+    }
 }
