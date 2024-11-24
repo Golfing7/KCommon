@@ -21,8 +21,9 @@ public class NMSVersion implements Comparable<NMSVersion> {
             v1_16 = new NMSVersion(16, -1),
             v1_17 = new NMSVersion(17, -1),
             v1_18 = new NMSVersion(18, -1),
-            v1_19 = new NMSVersion(19, 0),
-            v1_20 = new NMSVersion(20, 0);
+            v1_19 = new NMSVersion(19, -1),
+            v1_20 = new NMSVersion(20, -1),
+            v1_21 = new NMSVersion(21, -1);
 
     private final int major;
     /** Negative values mean that the minor version is insignificant */
@@ -55,6 +56,9 @@ public class NMSVersion implements Comparable<NMSVersion> {
 
     public boolean isAtOrAfter(NMSVersion version) {
         if (this.major == version.major) {
+            if (this.minor == -1 || version.minor == -1)
+                return true;
+
             return this.minor >= version.minor;
         }
 
@@ -63,6 +67,9 @@ public class NMSVersion implements Comparable<NMSVersion> {
 
     public boolean isAtOrBefore(NMSVersion version) {
         if (this.major == version.major) {
+            if (this.minor == -1 || version.minor == -1)
+                return true;
+
             return this.minor <= version.minor;
         }
         return this.major <= version.major;

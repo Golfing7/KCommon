@@ -29,4 +29,30 @@ public @interface ModuleInfo {
      * @return the module's plugin dependencies.
      */
     String[] pluginDependencies() default {};
+
+    /**
+     * The minimum major version that this module will load on.
+     *
+     * @return the minimum major version
+     */
+    int minimumMajorVersion() default -1;
+    /**
+     * The maximum major version that this module will load on.
+     *
+     * @return the maximum major version.
+     */
+    int maximumMajorVersion() default -1;
+
+    /**
+     * The minimum minor version that this module will load on.
+     *
+     * @return the minimum minor version.
+     */
+    int minimumMinorVersion() default -1;
+    /**
+     * The maximum minor version that this module will load on.
+     *
+     * @return the maximum minor version.
+     */
+    int maximumMinorVersion() default -1;
 }

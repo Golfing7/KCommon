@@ -188,6 +188,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         Map<Class<?>, Module> instances = new HashMap<>();
         BiMap<String, Class<?>> nameModuleMap = HashBiMap.create();
 
+        NMSVersion serverVersion = KCommon.getInstance().getServerVersion();
         Reflection.discoverModules((PluginClassLoader) getClassLoader()).forEach(mClass -> {
             //We only want to work on our own modules, not other plugins
             if (!mClass.getPackage().getName().startsWith(this.getClass().getPackage().getName()))
@@ -204,6 +205,20 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
                 if (!Bukkit.getPluginManager().isPluginEnabled(depend)) {
                     return;
                 }
+            }
+
+            // Check if the module is running on the proper server version.
+            if (info.minimumMajorVersion() > 0 && serverVersion.getMajor() < info.minimumMajorVersion()) {
+                return;
+            }
+            if (info.maximumMajorVersion() > 0 && serverVersion.getMajor() > info.maximumMajorVersion()) {
+                return;
+            }
+            if (info.minimumMinorVersion() > 0 && serverVersion.getMinor() < info.minimumMajorVersion()) {
+                return;
+            }
+            if (info.maximumMinorVersion() > 0 && serverVersion.getMinor() > info.maximumMinorVersion()) {
+                return;
             }
 
             Module instance;

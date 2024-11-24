@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.util;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import lombok.var;
