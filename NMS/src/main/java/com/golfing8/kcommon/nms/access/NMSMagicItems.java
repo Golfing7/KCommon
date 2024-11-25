@@ -3,8 +3,10 @@ package com.golfing8.kcommon.nms.access;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
+import com.golfing8.kcommon.nms.struct.Hand;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -95,6 +97,26 @@ public interface NMSMagicItems {
      * @param modelData the custom model data.
      */
     void setCustomModelData(ItemMeta meta, int modelData);
+
+    default void setItemInHand(Player player, Hand hand, ItemStack stack) {
+        switch (hand) {
+            case MAIN:
+                player.getInventory().setItemInMainHand(stack);
+                return;
+            case OFF_HAND:
+                player.getInventory().setItemInOffHand(stack);
+        }
+    }
+
+    default ItemStack getItemInHand(Player player, Hand hand) {
+        switch (hand) {
+            case MAIN:
+                return player.getInventory().getItemInMainHand();
+            case OFF_HAND:
+                return player.getInventory().getItemInOffHand();
+        }
+        return null;
+    }
 
     /**
      * Wraps the given item stack.

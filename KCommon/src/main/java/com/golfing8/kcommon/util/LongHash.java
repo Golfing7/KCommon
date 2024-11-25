@@ -26,4 +26,6 @@ public class LongHash {
     public static int lsw(long l) {
         return (int)(l & -1L) + -2147483648;
     }
+
+
 }

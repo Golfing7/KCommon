@@ -4,6 +4,7 @@ import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
+import com.golfing8.kcommon.nms.struct.Hand;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.nms.v1_8.item.ItemStackV1_8;
 import de.tr7zw.changeme.nbtapi.NBT;
@@ -15,6 +16,7 @@ import lombok.var;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -161,6 +163,22 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
     public void setCustomModelData(ItemMeta meta, int modelData) {
         throw new UnsupportedOperationException("1.8 does not support custom model data.");
+    }
+
+    @Override
+    public ItemStack getItemInHand(Player player, Hand hand) {
+        if (hand == Hand.MAIN) {
+            return player.getItemInHand();
+        }
+        return null;
+    }
+
+    @Override
+    public void setItemInHand(Player player, Hand hand, ItemStack stack) {
+        if (hand == Hand.OFF_HAND)
+            throw new UnsupportedOperationException("Cannot set off hand on 1.8");
+
+        player.setItemInHand(stack);
     }
 
     @Override
