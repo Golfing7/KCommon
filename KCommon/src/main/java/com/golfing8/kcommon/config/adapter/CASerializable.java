@@ -31,6 +31,7 @@ public interface CASerializable {
          * <p>
          * Assume you have a type that only has a single serializable field that is an int.
          * In this case, instead of serializing the type like:
+         * </p>
          * <pre>
          * {@code
          * some-parent-section:
@@ -41,7 +42,6 @@ public interface CASerializable {
          * some-parent-section: 5
          * }
          * </pre>
-         * </p>
          *
          * @return if flattening should happen.
          */

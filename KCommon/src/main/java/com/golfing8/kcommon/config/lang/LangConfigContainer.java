@@ -183,7 +183,7 @@ public interface LangConfigContainer {
     /**
      * Loads the language enums attached to this class.
      * <p>
-     * Note that this will only load the lowest level class' annotated fields & enums.
+     * Note that this will only load the lowest level class' annotated fields and enums.
      * If you have a class structure similar to: {@code LangConfigContainer -> A -> B}, only B's fields will load.
      * </p>
      */
