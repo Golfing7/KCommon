@@ -93,6 +93,20 @@ public final class CommandArguments {
     }, Double::parseDouble);
 
     /**
+     * A command argument to auto-complete non-negative longs.
+     */
+    public static final CommandArgument<Long> NON_NEGATIVE_LONG = new CommandArgument<>("A non negative integer", (context) -> {
+        return Collections.emptyList();
+    }, (context) -> {
+        try{
+            long number = Long.parseLong(context.getArgument());
+            return number >= 0;
+        }catch(NumberFormatException exc) {
+            return false;
+        }
+    }, Long::parseLong);
+
+    /**
      * A command argument to auto-complete doubles.
      */
     public static final CommandArgument<Double> DOUBLE = new CommandArgument<>("A non negative number", (context) -> {

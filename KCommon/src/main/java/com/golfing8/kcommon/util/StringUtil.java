@@ -820,9 +820,7 @@ public class StringUtil {
     }
 
     private final static TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
-
     static {
-
         ROMAN_NUMERALS.put(1000, "M");
         ROMAN_NUMERALS.put(900, "CM");
         ROMAN_NUMERALS.put(500, "D");
@@ -836,9 +834,7 @@ public class StringUtil {
         ROMAN_NUMERALS.put(5, "V");
         ROMAN_NUMERALS.put(4, "IV");
         ROMAN_NUMERALS.put(1, "I");
-
     }
-
     public static String toRoman(int number) {
         if (number == 0)
             return "";
