@@ -29,6 +29,11 @@ public class ParticleLine extends Particle{
     }
 
     @Override
+    public ParticleType getParticleType() {
+        return ParticleType.LINE;
+    }
+
+    @Override
     public void spawnAt(Location location) {
         Vector manipulatedEnd = manipulateToAngles(endPointOffset.clone());
         Vector manipulatedBeginning = manipulateToAngles(startingPointOffset.clone());

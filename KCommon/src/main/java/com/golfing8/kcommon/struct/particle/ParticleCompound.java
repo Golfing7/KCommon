@@ -1,13 +1,20 @@
 package com.golfing8.kcommon.struct.particle;
 
+import com.golfing8.kcommon.config.ConfigEntry;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.Pair;
 import com.google.common.collect.Lists;
+import lombok.var;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ParticleCompound extends Particle{
+public class ParticleCompound extends Particle {
     private final List<Pair<Particle, Vector>> particleOffset;
 
     @Override
@@ -43,6 +50,20 @@ public class ParticleCompound extends Particle{
         this.particleOffset = Lists.newArrayList();
     }
 
+    protected ParticleCompound(ConfigurationSection section) {
+        super(section);
+
+        this.particleOffset = new ArrayList<>();
+        for (String subKey : section.getConfigurationSection("particles").getKeys(false)) {
+            Particle loadedParticle = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "particles." + subKey), Particle.class);
+            Vector offset = section.contains("particles." + subKey + ".offset") ?
+                    ConfigTypeRegistry.getFromType(new ConfigEntry(section, "particles." + subKey + ".offset"), Vector.class) :
+                    new Vector(0, 0, 0);
+
+            addParticle(loadedParticle, offset);
+        }
+    }
+
     public ParticleCompound addParticle(Particle particle, Vector offset){
         if(this == particle)
             throw new IllegalArgumentException("Can't add self to particle compound!");
@@ -63,5 +84,21 @@ public class ParticleCompound extends Particle{
 
             pair.getA().spawnAt(spawnAt);
         }
+    }
+
+    @Override
+    public ParticleType getParticleType() {
+        return ParticleType.COMPOUND;
+    }
+
+    @Override
+    public Map<String, Object> toPrimitive() {
+        Map<String, Object> data = new HashMap<>();
+        int count = 1;
+        for (var pair : this.particleOffset) {
+            data.put("particle-" + count, ConfigTypeRegistry.toPrimitive(pair.getB()).getPrimitive());
+            data.put("particle-" + count++, pair.getA().toPrimitive());
+        }
+        return data;
     }
 }

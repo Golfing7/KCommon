@@ -55,5 +55,12 @@ public interface CASerializable {
          * @return if the type can delegate.
          */
         boolean canDelegate() default false;
+
+        /**
+         * The class to serialize 'up to'. (Parent private fields will be deserialized until and including reaching this parent class)
+         * If this value uses to Object class, only the base class will be deserialized.
+         * @return the class to serialize up to.
+         */
+        Class<?> serializeUpTo() default Object.class;
     }
 }

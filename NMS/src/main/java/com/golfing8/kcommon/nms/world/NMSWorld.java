@@ -19,7 +19,10 @@ public interface NMSWorld extends NMSObject {
 
     NMSTileEntity getTileEntity(Position position);
 
-    void animateChest(NMSTileEntity nmsTileEntity, boolean opening);
+    void animateChest(Position position, boolean opening);
+
+    void forceChestOpen(Position position);
+    void forceChestClose(Position position);
 
     void playEffect(Location location, String effect, int data);
 

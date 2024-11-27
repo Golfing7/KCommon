@@ -9,6 +9,7 @@ import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 
 public class World implements NMSWorld {
@@ -38,8 +39,20 @@ public class World implements NMSWorld {
     }
 
     @Override
-    public void animateChest(NMSTileEntity nmsTileEntity, boolean opening) {
-        throw new UnsupportedOperationException();
+    public void animateChest(Position position, boolean opening) {
+        Location location = position.toLocation(world);
+        Chest chest = (Chest) location.getBlock().getState();
+        chest.open();
+    }
+
+    @Override
+    public void forceChestOpen(Position position) {
+
+    }
+
+    @Override
+    public void forceChestClose(Position position) {
+
     }
 
     @Override

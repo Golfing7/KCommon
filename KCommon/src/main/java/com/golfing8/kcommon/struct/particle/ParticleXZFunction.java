@@ -1,10 +1,15 @@
 package com.golfing8.kcommon.struct.particle;
 
+import com.golfing8.kcommon.config.ConfigEntry;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.Interval;
+import com.golfing8.kcommon.util.MathExpressions;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 /**
@@ -24,6 +29,20 @@ public class ParticleXZFunction extends ParticleFunction{
         this.function = function;
         this.intervalX = intervalX;
         this.intervalZ = intervalZ;
+    }
+
+    protected ParticleXZFunction(ConfigurationSection section) {
+        super(section);
+
+        this.intervalX = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "intervalX"), Interval.class);
+        this.intervalZ = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "intervalZ"), Interval.class);
+        String biFunction = section.getString("function");
+        this.function = (x, z) -> MathExpressions.evaluate(biFunction, "X", x, "Z", z);
+    }
+
+    @Override
+    public ParticleType getParticleType() {
+        return ParticleType.XZ_FUNCTION;
     }
 
     @Override

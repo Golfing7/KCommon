@@ -26,6 +26,11 @@ public class ParticleCircle extends Particle{
     }
 
     @Override
+    public ParticleType getParticleType() {
+        return ParticleType.CIRCLE;
+    }
+
+    @Override
     public void spawnAt(Location location) {
         int segments = (int) (radius * 24);
         for(int segment = 0; segment < segments; segment++)

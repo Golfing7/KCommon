@@ -1,7 +1,9 @@
 package com.golfing8.kcommon.struct;
 
+import com.golfing8.kcommon.config.adapter.CASerializable;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -10,7 +12,7 @@ import java.util.NoSuchElementException;
  * Represents an interval between X1 and X2.
  * If X1 is greater than X2, the iterator will iterate backwards.
  */
-public class Interval implements Iterable<Double> {
+public class Interval implements Iterable<Double>, CASerializable {
     public static final int STOP = 0;
     public static final int CAP = 1;
     public static final int OVERFLOW = 2;
@@ -25,10 +27,11 @@ public class Interval implements Iterable<Double> {
     final double x1, x2;
 
     //We calculate this number upon construction of this object.
-    final int intervalSize;
+    transient final int intervalSize;
 
     //Our overflow behavior. Default is STOP
-    int overflowBehavior = STOP;
+    @Setter @Getter
+    transient int overflowBehavior = STOP;
 
     public Interval(double x1, double x2, double interval)
     {
@@ -51,19 +54,6 @@ public class Interval implements Iterable<Double> {
     public double getIntervalSize()
     {
         return this.intervalSize;
-    }
-
-    /**
-     * Sets the overflow behavior of this interval.
-     * @param behavior the overflow behavior flag.
-     */
-    public void setOverflowBehavior(int behavior)
-    {
-        this.overflowBehavior = behavior;
-    }
-
-    public int getOverflowBehavior() {
-        return overflowBehavior;
     }
 
     @Override

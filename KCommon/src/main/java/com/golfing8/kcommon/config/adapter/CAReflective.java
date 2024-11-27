@@ -52,9 +52,10 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
         Map<String, Object> primitives = entry.unwrap();
 
+        Class<?> maxParentClass = options != null && options.serializeUpTo() != Object.class ? options.serializeUpTo() : Object.class;
         var fieldHandles = typeFieldCache.containsKey(type.getType()) ?
                 typeFieldCache.get(type.getType()) :
-                Reflection.getAllFieldHandles(type.getType());
+                Reflection.getAllFieldHandlesUpToIncluding(type.getType(), maxParentClass);
 
         CASerializable instance;
         try {
@@ -124,9 +125,10 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
     public ConfigPrimitive toPrimitive(@NotNull CASerializable object) {
         CASerializable.Options options = object.getClass().getAnnotation(CASerializable.Options.class);
         boolean flatten = options != null && options.flatten();
+        Class<?> maxParentClass = options != null && options.serializeUpTo() != Object.class ? options.serializeUpTo() : Object.class;
         var fieldHandles = typeFieldCache.containsKey(object.getClass()) ?
                 typeFieldCache.get(object.getClass()) :
-                Reflection.getAllFieldHandles(object.getClass());
+                Reflection.getAllFieldHandlesUpToIncluding(object.getClass(), maxParentClass);
 
         // Load and serialize all fields...
         Map<String, Object> primitives = new HashMap<>();

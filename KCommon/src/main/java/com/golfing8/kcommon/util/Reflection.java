@@ -158,6 +158,40 @@ public final class Reflection {
      * @param parent the parent class to reach to.
      * @return all fields up to and including the parent class.
      */
+    public static Map<String, FieldHandle<?>> getAllFieldHandlesUpToIncluding(Class<?> clazz, Class<?> parent) {
+        Map<String, FieldHandle<?>> fields = new HashMap<>();
+        Class<?> current = clazz;
+        while (current != Object.class && !parent.isAssignableFrom(current)) {
+            for (Field field : current.getDeclaredFields()) {
+                if (fields.containsKey(field.getName()))
+                    continue;
+
+                FieldHandle<?> handle = new FieldHandle<>(field);
+                fields.put(field.getName(), handle);
+            }
+            current = current.getSuperclass();
+        }
+
+        for (Field field : clazz.getFields()) {
+            if (fields.containsKey(field.getName()))
+                continue;
+
+            FieldHandle<?> handle = new FieldHandle<>(field);
+            fields.put(field.getName(), handle);
+        }
+        return fields;
+    }
+
+    /**
+     * Gets ALL fields regardless of openness of the given class up to the parent class.
+     * <p>
+     * Particularly, we keep gathering fields of classes, until {@link Class#isAssignableFrom(Class)} returns false with the parent class.
+     * </p>
+     *
+     * @param clazz the class.
+     * @param parent the parent class to reach to.
+     * @return all fields up to and including the parent class.
+     */
     public static Set<Field> getAllFieldsUpToIncluding(Class<?> clazz, Class<?> parent) {
         Set<Field> fields = new HashSet<>();
         Class<?> current = clazz;

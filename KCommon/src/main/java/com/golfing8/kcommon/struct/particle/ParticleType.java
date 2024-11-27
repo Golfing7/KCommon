@@ -12,6 +12,9 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public enum ParticleType {
     CIRCLE(ParticleCircle::new),
+    COMPOUND(ParticleCompound::new),
+    X_FUNCTION(ParticleXFunction::new),
+    XZ_FUNCTION(ParticleXZFunction::new),
     LINE(ParticleLine::new),
     SPHERE(ParticleSphere::new),
     SPIRAL(ParticleSpiral::new),

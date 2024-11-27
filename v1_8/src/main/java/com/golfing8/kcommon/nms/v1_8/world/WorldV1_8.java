@@ -60,13 +60,50 @@ public class WorldV1_8 implements NMSWorld {
     }
 
     @Override
-    public void animateChest(NMSTileEntity nmsTileEntity, boolean opening) {
-        worldServer.playBlockAction(new BlockPosition(nmsTileEntity.getPosition().getX(),
-                nmsTileEntity.getPosition().getY(),
-                nmsTileEntity.getPosition().getZ()),
-                (Block) nmsTileEntity.getBlock().getHandle(),
+    public void animateChest(Position position, boolean opening) {
+        BlockPosition blockposition = new BlockPosition(position.getX(),
+                position.getY(),
+                position.getZ());
+        worldServer.playBlockAction(blockposition,
+                worldServer.getType(blockposition).getBlock(),
                 1,
                 opening ? 1 : 0);
+    }
+
+    @Override
+    public void forceChestOpen(Position position) {
+        BlockPosition blockposition = new BlockPosition(position.getX(),
+                position.getY(),
+                position.getZ());
+        TileEntity tileEntity = worldServer.getTileEntity(blockposition);
+        if (!(tileEntity instanceof TileEntityChest)) {
+            return;
+        }
+
+        TileEntityChest tileEntityChest = (TileEntityChest) tileEntity;
+        tileEntityChest.l += 1000;
+        worldServer.playBlockAction(blockposition,
+                worldServer.getType(blockposition).getBlock(),
+                1,
+                tileEntityChest.l);
+    }
+
+    @Override
+    public void forceChestClose(Position position) {
+        BlockPosition blockposition = new BlockPosition(position.getX(),
+                position.getY(),
+                position.getZ());
+        TileEntity tileEntity = worldServer.getTileEntity(blockposition);
+        if (!(tileEntity instanceof TileEntityChest)) {
+            return;
+        }
+
+        TileEntityChest tileEntityChest = (TileEntityChest) tileEntity;
+        tileEntityChest.l = Math.max(0, tileEntityChest.l - 1000);
+        worldServer.playBlockAction(blockposition,
+                worldServer.getType(blockposition).getBlock(),
+                1,
+                tileEntityChest.l);
     }
 
     @Override

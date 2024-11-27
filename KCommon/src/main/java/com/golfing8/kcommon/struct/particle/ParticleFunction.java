@@ -2,7 +2,10 @@ package com.golfing8.kcommon.struct.particle;
 
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.util.Vector;
+
+import java.util.Map;
 
 /**
  * Abstract class used for the methods in any "function" particle line.
@@ -43,6 +46,22 @@ public abstract class ParticleFunction extends Particle{
     {
         this.smartFillMaxThreshold = smartFillMaxThreshold;
         return this;
+    }
+
+    public ParticleFunction() {
+        super();
+    }
+
+    protected ParticleFunction(ConfigurationSection section) {
+        super(section);
+
+        this.amplitude = section.getDouble("amplitude", 1.0D);
+        this.smartFill = section.getBoolean("smart-fill", true);
+    }
+
+    @Override
+    public Map<String, Object> toPrimitive() {
+        throw new IllegalArgumentException("Cannot convert function particle to primitive");
     }
 
     protected void smartFillLocations(Location locOne, Location locTwo){

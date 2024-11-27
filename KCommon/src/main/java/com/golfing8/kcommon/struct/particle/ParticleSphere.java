@@ -22,6 +22,11 @@ public class ParticleSphere extends ParticleCircle{
     }
 
     @Override
+    public ParticleType getParticleType() {
+        return ParticleType.SPHERE;
+    }
+
+    @Override
     public void spawnAt(Location location) {
         for(int index = 0; index < effectList.size(); index++)
         {

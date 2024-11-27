@@ -16,6 +16,7 @@ import net.minecraft.world.level.RayTrace;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.entity.TileEntityBeacon;
+import net.minecraft.world.level.block.entity.TileEntityChest;
 import net.minecraft.world.level.block.entity.TileEntityContainer;
 import net.minecraft.world.level.block.entity.TileEntityMobSpawner;
 import net.minecraft.world.level.block.state.IBlockData;
@@ -26,6 +27,7 @@ import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.craftbukkit.v1_17_R1.block.CraftChest;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
@@ -71,13 +73,28 @@ public class WorldV1_17 implements NMSWorld {
     }
 
     @Override
-    public void animateChest(NMSTileEntity nmsTileEntity, boolean opening) {
-        worldServer.playBlockAction(new BlockPosition(nmsTileEntity.getPosition().getX(),
-                nmsTileEntity.getPosition().getY(),
-                nmsTileEntity.getPosition().getZ()),
-                (Block) nmsTileEntity.getBlock().getHandle(),
+    public void animateChest(Position position, boolean opening) {
+        BlockPosition blockposition = new BlockPosition(position.getX(),
+                position.getY(),
+                position.getZ());
+        worldServer.playBlockAction(blockposition,
+                worldServer.getType(blockposition).getBlock(),
                 1,
                 opening ? 1 : 0);
+    }
+
+    @Override
+    public void forceChestOpen(Position position) {
+        Location location = position.toLocation(worldServer.getWorld());
+        CraftChest chest = (CraftChest) location.getBlock().getState();
+        chest.open();
+    }
+
+    @Override
+    public void forceChestClose(Position position) {
+        Location location = position.toLocation(worldServer.getWorld());
+        CraftChest chest = (CraftChest) location.getBlock().getState();
+        chest.close();
     }
 
     @Override

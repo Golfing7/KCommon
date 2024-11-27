@@ -1,6 +1,8 @@
 package com.golfing8.kcommon.menu;
 
+import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
@@ -45,6 +47,6 @@ public class SimpleGUIItem {
 
     public SimpleGUIItem(ConfigurationSection section) {
         this.item = new ItemStackBuilder(section);
-        this.slot = ConfigTypeRegistry.interpretSection(section, MenuCoordinate.class);
+        this.slot = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slot"), MenuCoordinate.class);
     }
 }
