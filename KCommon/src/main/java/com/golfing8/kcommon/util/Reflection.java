@@ -161,7 +161,7 @@ public final class Reflection {
     public static Map<String, FieldHandle<?>> getAllFieldHandlesUpToIncluding(Class<?> clazz, Class<?> parent) {
         Map<String, FieldHandle<?>> fields = new HashMap<>();
         Class<?> current = clazz;
-        while (current != Object.class && !parent.isAssignableFrom(current)) {
+        while (current != Object.class && parent.isAssignableFrom(current)) {
             for (Field field : current.getDeclaredFields()) {
                 if (fields.containsKey(field.getName()))
                     continue;
@@ -195,7 +195,7 @@ public final class Reflection {
     public static Set<Field> getAllFieldsUpToIncluding(Class<?> clazz, Class<?> parent) {
         Set<Field> fields = new HashSet<>();
         Class<?> current = clazz;
-        while (current != Object.class && !parent.isAssignableFrom(current)) {
+        while (current != Object.class && parent.isAssignableFrom(current)) {
             Collections.addAll(fields, current.getDeclaredFields());
             current = current.getSuperclass();
         }
