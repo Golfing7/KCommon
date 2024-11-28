@@ -278,5 +278,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAEntityAttributeModifier());
         registerAdapter(new CAMenuCoordinate());
         registerAdapter(new CAParticle());
+        registerAdapter(new CAMenuBuilder());
     }
 }
