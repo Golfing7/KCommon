@@ -71,6 +71,28 @@ public final class MenuBuilder {
 
     private MenuBuilder() {}
 
+    public MenuBuilder(MenuBuilder other) {
+        this.size = other.size;
+        this.canExpire = other.canExpire;
+        this.clickable = other.clickable;
+        this.title = other.title;
+        this.clickActions = new HashMap<>(other.clickActions);
+        this.shapeCreation = new ArrayList<>(shapeCreation);
+        this.specificItems = new HashMap<>(other.specificItems);
+        this.bottomClickEvent = other.bottomClickEvent;
+        this.topClickEvent = other.topClickEvent;
+        this.specialGUIItems = new HashMap<>(other.specialGUIItems);
+        this.specialBindings = new HashMap<>(other.specialBindings);
+        this.specialPlaceholders = new HashMap<>(other.specialPlaceholders);
+        this.specialMPlaceholders = new HashMap<>(other.specialMPlaceholders);
+        this.globalPlaceholders = new ArrayList<>(other.globalPlaceholders);
+        this.globalMultiLinePlaceholders = new ArrayList<>(other.globalMultiLinePlaceholders);
+        this.otherGUIItems = new HashMap<>(other.otherGUIItems);
+        this.menuShapeType = other.menuShapeType;
+        this.closeRunnable = other.closeRunnable;
+        this.postCloseRunnable = other.postCloseRunnable;
+    }
+
     /**
      * Creates a menu builder from the given configuration section.
      */
