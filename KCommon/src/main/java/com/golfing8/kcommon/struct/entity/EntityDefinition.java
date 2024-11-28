@@ -43,7 +43,7 @@ public class EntityDefinition implements CASerializable {
     private String _key;
     /** The entity type/data that defines the entity */
     @Builder.Default
-    private EntityData type = EntityData.fromType(EntityType.PIG);
+    private EntityData entityType = EntityData.fromType(EntityType.PIG);
     /** The display name of this entity */
     private @Nullable String name;
     /** Any bukkit attributes that will be applied to this entity */
@@ -88,7 +88,7 @@ public class EntityDefinition implements CASerializable {
 
     private Entity spawnEntity(Location location, UUID spawnID) {
         Entity spawnedVehicle = vehicle != null ? vehicle.spawnEntity(location, spawnID) : null;
-        Entity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, type, randomizeData);
+        Entity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, entityType, randomizeData);
         Entity spawnedPassenger = passenger != null ? passenger.spawnEntity(location, spawnID) : null;
 
         applyToEntity(selfSpawned);

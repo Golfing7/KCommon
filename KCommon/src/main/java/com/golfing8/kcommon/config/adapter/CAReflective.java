@@ -15,17 +15,20 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This config adapter reflectively serializes and deserializes the incoming object.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class CAReflective implements ConfigAdapter<CASerializable> {
+    private static final String TYPE_FIELD_NAME = "type";
     private static final String KEY_FIELD_NAME = "_key";
 
     private final Map<Class<?>, Map<String, FieldHandle<?>>> typeFieldCache = new HashMap<>();
     private final Map<Class<?>, Constructor<?>> constructorCache = new HashMap<>();
+    private final Map<Class<?>, CASerializable.TypeResolver> typeResolverCache = new HashMap<>();
 
     @Override
     public Class<CASerializable> getAdaptType() {
@@ -52,23 +55,33 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
         Map<String, Object> primitives = entry.unwrap();
 
-        Class<?> maxParentClass = options != null && options.serializeUpTo() != Object.class ? options.serializeUpTo() : type.getType();
-        var fieldHandles = typeFieldCache.containsKey(type.getType()) ?
-                typeFieldCache.get(type.getType()) :
-                Reflection.getAllFieldHandlesUpToIncluding(type.getType(), maxParentClass);
+        // This handles polymorphism.
+        Class<? extends CASerializable.TypeResolver> typeResolverClass = options != null && options.typeResolverEnum() != CASerializable.TypeResolver.class ?
+                options.typeResolverEnum() :
+                null;
+
+        CASerializable.TypeResolver typeResolver = typeResolverClass != null ?
+                (CASerializable.TypeResolver) Enum.valueOf((Class) typeResolverClass, primitives.get(TYPE_FIELD_NAME).toString().toUpperCase()) :
+                null;
+
+        Class<?> parentClass = getParentSerializableClass((Class<? extends CASerializable>) type.getType());
+        Class<?> deserializationType = typeResolver != null ? typeResolver.getType() : type.getType();
+        var fieldHandles = typeFieldCache.containsKey(deserializationType) ?
+                typeFieldCache.get(deserializationType) :
+                Reflection.getAllFieldHandlesUpToIncluding(deserializationType, parentClass);
 
         CASerializable instance;
         try {
-            Constructor<?> constructor = null;
-            if (constructorCache.containsKey(type.getType())) {
-                constructor = constructorCache.get(type.getType());
+            Constructor<?> constructor;
+            if (constructorCache.containsKey(deserializationType)) {
+                constructor = constructorCache.get(deserializationType);
             } else {
-                constructor = type.getType().getDeclaredConstructor();
+                constructor = deserializationType.getDeclaredConstructor();
                 constructor.setAccessible(true);
             }
             instance = (CASerializable) constructor.newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            KCommon.getInstance().getLogger().severe(String.format("Failed to deserialize type %s!", type.getType().getName()));
+            KCommon.getInstance().getLogger().severe(String.format("Failed to deserialize type %s!", deserializationType.getName()));
             throw new RuntimeException(e);
         }
 
@@ -123,12 +136,12 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull CASerializable object) {
-        CASerializable.Options options = object.getClass().getAnnotation(CASerializable.Options.class);
+        Class<?> parentClass = getParentSerializableClass(object.getClass());
+        CASerializable.Options options = parentClass.getAnnotation(CASerializable.Options.class);
         boolean flatten = options != null && options.flatten();
-        Class<?> maxParentClass = options != null && options.serializeUpTo() != Object.class ? options.serializeUpTo() : object.getClass();
         var fieldHandles = typeFieldCache.containsKey(object.getClass()) ?
                 typeFieldCache.get(object.getClass()) :
-                Reflection.getAllFieldHandlesUpToIncluding(object.getClass(), maxParentClass);
+                Reflection.getAllFieldHandlesUpToIncluding(object.getClass(), parentClass);
 
         // Load and serialize all fields...
         Map<String, Object> primitives = new HashMap<>();
@@ -145,6 +158,19 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             ConfigPrimitive primitiveValue = ConfigTypeRegistry.toPrimitive(handle.get(object));
             primitives.put(StringUtil.camelToYaml(fieldEntry.getKey()), primitiveValue.unwrap());
         }
+        // Check if we need to serialize type.
+        if (options != null && options.typeResolverEnum() != CASerializable.TypeResolver.class) {
+            CASerializable.TypeResolver foundType = typeResolverCache.get(object.getClass());
+            if (foundType != null) {
+                primitives.put(TYPE_FIELD_NAME, foundType.toString());
+            } else {
+                for (CASerializable.TypeResolver resolver : options.typeResolverEnum().getEnumConstants()) {
+                    typeResolverCache.put(resolver.getType(), resolver);
+                }
+                primitives.put(TYPE_FIELD_NAME, Objects.requireNonNull(typeResolverCache.get(object.getClass()), "Type resolver is null. Is a type missing from " + options.typeResolverEnum().getName() + "?"));
+            }
+
+        }
         object.onSerialize();
 
         // Try to do flattening if possible
@@ -155,5 +181,29 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             return ConfigPrimitive.of(primitives.values().stream().findFirst().get());
         }
         return ConfigPrimitive.ofMap(primitives);
+    }
+
+    private static Class<?> getParentSerializableClass(Class<?> clazz) {
+        if (!CASerializable.class.isAssignableFrom(clazz))
+            return null;
+
+        Class<?> current = clazz;
+        while (current != Object.class) {
+            Class<?> superClass = current.getSuperclass();
+            if (superClass == null || !CASerializable.class.isAssignableFrom(superClass)) {
+                // Now, find by interface.
+                for (Class<?> interfaceClass : current.getInterfaces()) {
+                    if (interfaceClass == CASerializable.class)
+                        return current;
+
+                    Class<?> found = getParentSerializableClass(interfaceClass);
+                    if (found != null)
+                        return found;
+                }
+                return current;
+            }
+            current = clazz.getSuperclass();
+        }
+        return null;
     }
 }

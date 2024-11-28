@@ -3,6 +3,7 @@ package com.golfing8.kcommon.module.test.config;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.CASerializable;
+import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.generator.Conf;
 import com.golfing8.kcommon.config.generator.ConfigClass;
@@ -28,6 +29,63 @@ public class CASerializableTest {
         public SimpleSerializableConf confItem;
         @Conf("AAAA")
         public int item4 = 523;
+    }
+
+    @CASerializable.Options(
+            typeResolverEnum = PolymorphicEnum.class
+    )
+    public interface PolymorphicSerializable extends CASerializable {}
+
+    public enum PolymorphicEnum implements CASerializable.TypeResolver {
+        TYPE_1(Type1Serializable.class),
+        TYPE_2(Type2Serializable.class),
+        ;
+
+        Class<?> type;
+        PolymorphicEnum(Class<?> type) {
+            this.type = type;
+        }
+
+        @Override
+        public Class<?> getType() {
+            return type;
+        }
+    }
+
+    public static class Type1Serializable implements PolymorphicSerializable {
+        int data1 = 20;
+        int data2 = 10;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Type1Serializable that = (Type1Serializable) o;
+            return data1 == that.data1 && data2 == that.data2;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data1, data2);
+        }
+    }
+
+    public static class Type2Serializable implements PolymorphicSerializable {
+        String string1 = "Hello World!";
+        String string2 = "Bye World!";
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Type2Serializable that = (Type2Serializable) o;
+            return Objects.equals(string1, that.string1) && Objects.equals(string2, that.string2);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(string1, string2);
+        }
     }
 
     @CASerializable.Options(canDelegate = true)
@@ -99,5 +157,18 @@ public class CASerializableTest {
             configuration.load();
         }
         ConfigTypeRegistry.getFromType(new ConfigEntry(configuration, "drop-tables"), DropTable.class);
+    }
+
+    @Test
+    public void testPolymorphicSerialization() {
+        Type1Serializable type1Real = new Type1Serializable();
+        ConfigPrimitive primitive1 = ConfigTypeRegistry.toPrimitive(type1Real);
+        Type2Serializable type2Real = new Type2Serializable();
+        ConfigPrimitive primitive2 = ConfigTypeRegistry.toPrimitive(type2Real);
+
+        Type1Serializable type1Deserialized = (Type1Serializable) ConfigTypeRegistry.getFromType(primitive1, PolymorphicSerializable.class);
+        Type2Serializable type2Deserialized = (Type2Serializable) ConfigTypeRegistry.getFromType(primitive2, PolymorphicSerializable.class);
+        assertEquals(type1Real, type1Deserialized);
+        assertEquals(type2Real, type2Deserialized);
     }
 }

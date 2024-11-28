@@ -24,6 +24,18 @@ public interface CASerializable {
      */
     default void onSerialize() {}
 
+    /**
+     * A resolver for finding the right type to deserialize.
+     */
+    interface TypeResolver {
+        /**
+         * The type of class to deserialize.
+         *
+         * @return the type.
+         */
+        Class<?> getType();
+    }
+
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE)
     @interface Options {
         /**
@@ -57,10 +69,10 @@ public interface CASerializable {
         boolean canDelegate() default false;
 
         /**
-         * The class to serialize 'up to'. (Parent private fields will be deserialized until and including reaching this parent class)
-         * If this value uses to Object class, only the base class will be deserialized.
-         * @return the class to serialize up to.
+         * The type resolver enum finds the correct type to deserialize from a special {@code type: ENUM} key.
+         *
+         * @return the type resolver enum.
          */
-        Class<?> serializeUpTo() default Object.class;
+        Class<? extends TypeResolver> typeResolverEnum() default TypeResolver.class;
     }
 }
