@@ -2,14 +2,16 @@ package com.golfing8.kcommon.menu.movement;
 
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 
-public class MoveLength {
-    private final MenuCoordinate[] coordinates;
+import java.util.List;
 
-    public MoveLength(MenuCoordinate[] coordinates){
+public class MoveLength {
+    private final List<MenuCoordinate> coordinates;
+
+    public MoveLength(List<MenuCoordinate> coordinates){
         this.coordinates = coordinates;
     }
 
-    public MenuCoordinate[] getCoordinates() {
+    public List<MenuCoordinate> getCoordinates() {
         return coordinates;
     }
 }

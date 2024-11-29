@@ -3,6 +3,9 @@ package com.golfing8.kcommon.menu;
 import com.golfing8.kcommon.menu.movement.MoveLength;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Util class used for some methods in the Menu classes
  */
@@ -86,6 +89,6 @@ public final class MenuUtils {
                 }
             }
         }
-        return new MoveLength(toReturn);
+        return new MoveLength(new ArrayList<>(Arrays.asList(toReturn)));
     }
 }

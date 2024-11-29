@@ -33,7 +33,7 @@ public interface CASerializable {
          *
          * @return the type.
          */
-        Class<?> getType();
+        Class<? extends CASerializable> getType();
     }
 
     @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE)

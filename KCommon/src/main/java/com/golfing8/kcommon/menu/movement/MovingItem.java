@@ -45,7 +45,7 @@ public class MovingItem {
         this.rolloverSpeed = new ResettableNumber(rolloverSpeed);
         this.finalStep = slotProgression.length;
         this.currentStep = 0;
-        this.morphingItem = new MorphingItem(menu, stacks, MenuUtils.getSlotFromCartCoords(menu.getMenuShape().getType(), moveLengths[0].getCoordinates()[0].getX(), moveLengths[0].getCoordinates()[0].getY()), 0, 0, false, null);
+        this.morphingItem = new MorphingItem(menu, stacks, MenuUtils.getSlotFromCartCoords(menu.getMenuShape().getType(), moveLengths[0].getCoordinates().get(0).getX(), moveLengths[0].getCoordinates().get(0).getY()), 0, 0, false, null);
         this.menu = menu;
         this.nonDestructive = nonDestructive;
         this.copySelf = copySelf;
@@ -57,7 +57,7 @@ public class MovingItem {
     private void compileLengths(MoveLength... moveLengths) {
         int totalLength = 0;
         for (MoveLength array : moveLengths) {
-            totalLength += array.getCoordinates().length;
+            totalLength += array.getCoordinates().size();
         }
 
         MenuCoordinate[] coordinates = new MenuCoordinate[totalLength];
@@ -65,9 +65,9 @@ public class MovingItem {
         int index = 0;
 
         for (MoveLength array : moveLengths) {
-            System.arraycopy(array.getCoordinates(), 0, coordinates, index, array.getCoordinates().length);
+            System.arraycopy(array.getCoordinates().toArray(new MenuCoordinate[0]), 0, coordinates, index, array.getCoordinates().size());
 
-            index += array.getCoordinates().length;
+            index += array.getCoordinates().size();
         }
 
         slotProgression = coordinates;
