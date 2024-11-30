@@ -41,13 +41,13 @@ public class CASerializableTest {
         TYPE_2(Type2Serializable.class),
         ;
 
-        Class<?> type;
-        PolymorphicEnum(Class<?> type) {
+        Class<? extends CASerializable> type;
+        PolymorphicEnum(Class<? extends CASerializable> type) {
             this.type = type;
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<? extends CASerializable> getType() {
             return type;
         }
     }

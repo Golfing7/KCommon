@@ -21,7 +21,9 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 import com.sun.org.apache.bcel.internal.generic.ObjectType;
+import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -418,19 +420,21 @@ public final class ItemStackBuilder {
         newCopy.setItemMeta(meta);
 
         //Add the nbt item and extra data.
-        NBTItem nbtItem = new NBTItem(newCopy);
-        if (this.itemID != null) {
-            nbtItem.setString(ITEMSTACK_ID, this.itemID);
-        }
-        for(Map.Entry<String, Object> entry : this.extraData.entrySet()) {
-            setValueInNBT(nbtItem, entry.getKey(), entry.getValue());
-        }
-        cachedBuild = newCopy = nbtItem.getItem();
+        NBT.modify(newCopy, (nbt) -> {
+            if (this.itemID != null) {
+                nbt.setString(ITEMSTACK_ID, this.itemID);
+            }
+            for(Map.Entry<String, Object> entry : this.extraData.entrySet()) {
+                setValueInNBT(nbt, entry.getKey(), entry.getValue());
+            }
+        });
+
+        cachedBuild = newCopy;
         return newCopy;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private void setValueInNBT(NBTItem nbtItem, String key, Object value) {
+    private void setValueInNBT(ReadWriteNBT nbtItem, String key, Object value) {
         if (value instanceof Integer) {
             nbtItem.setInteger(key, (Integer) value);
         } else if (value instanceof Float) {

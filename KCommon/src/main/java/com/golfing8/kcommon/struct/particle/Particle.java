@@ -1,5 +1,11 @@
 package com.golfing8.kcommon.struct.particle;
 
+import com.cryptomorin.xseries.particles.ParticleDisplay;
+import com.cryptomorin.xseries.particles.XParticle;
+import com.golfing8.kcommon.NMS;
+import com.golfing8.kcommon.NMSVersion;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.util.VectorUtil;
 import lombok.Getter;
 import org.bukkit.Effect;
@@ -86,8 +92,8 @@ public abstract class Particle {
         this.yaw = section.getDouble("yaw", 0.0);
         this.roll = section.getDouble("roll", 0.0);
 
-        this.from = new Color(Integer.parseInt(section.getString("from-color", "FFFFFF"), 16));
-        this.to = new Color(Integer.parseInt(section.getString("to-color", "FFFFFF"), 16));
+        this.from = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofString(section.getString("from-color", "FFFFFF")), Color.class);
+        this.to = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofString(section.getString("to-color", "FFFFFF")), Color.class);
 
         this.particleSize = section.getDouble("particle-size", 1.0D);
     }
@@ -149,7 +155,11 @@ public abstract class Particle {
      * @param location the location to spawn the particle at.
      */
     protected void spawnParticle(Location location) {
-        location.getWorld().spigot().playEffect(location, Effect.COLOURED_DUST, 0, 0, Math.max(from.getRed() / 255.0F, 0.001F), from.getGreen() / 255.0F, from.getBlue() / 255.0F, 1, 0, 64);
+        if (NMS.getServerVersion().isAtOrBefore(NMSVersion.v1_8)) {
+            location.getWorld().spigot().playEffect(location, Effect.COLOURED_DUST, 0, 0, Math.max(from.getRed() / 255.0F, 0.001F), from.getGreen() / 255.0F, from.getBlue() / 255.0F, 1, 0, 64);
+        } else {
+            ParticleDisplay.of(XParticle.DUST_COLOR_TRANSITION).withTransitionColor(from, (float) particleSize, to).spawn(location);
+        }
     }
 
     /**

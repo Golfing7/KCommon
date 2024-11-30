@@ -57,7 +57,6 @@ public class KCommon extends KPlugin {
         libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
 
         List<LibraryDefinition> libraries = Lists.newArrayList(
-                new LibraryDefinition("de,tr7zw", "item-nbt-api", "2.14.0", "https://repo.codemc.org/repository/maven-public"),
                 new LibraryDefinition("net,objecthunter", "exp4j", "0.4.8"),
                 new LibraryDefinition("com,github,cryptomorin", "XSeries", "11.3.0"),
                 new LibraryDefinition("net,jodah", "expiringmap", "0.5.11"),

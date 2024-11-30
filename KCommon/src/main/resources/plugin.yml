@@ -2,7 +2,7 @@ author: Golfing8
 main: com.golfing8.kcommon.KCommon
 version: 1.0
 name: KCommon
-api-version: 1.17
+api-version: 1.21
 depend:
   - PlaceholderAPI
   - Vault
