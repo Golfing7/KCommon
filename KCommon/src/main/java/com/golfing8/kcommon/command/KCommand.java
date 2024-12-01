@@ -17,6 +17,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
@@ -61,6 +62,12 @@ public abstract class KCommand implements TabExecutor {
          */
         @Setter
         private @Nullable String requiredPermissionExtension;
+        /**
+         * true = Only players are allowed to use the autofill for this argument.
+         * false = Only console is allowed to autofill this argument.
+         * null = Anyone can autofill this argument.
+         */
+        private @Nullable Boolean autoFillPlayersOnly;
 
         public BuiltCommandArgument(String name, CommandArgument<?> argument, @Nullable Function<CommandSender, Object> autoComplete) {
             this.name = name;
@@ -258,8 +265,12 @@ public abstract class KCommand implements TabExecutor {
      */
     protected final void subRegister() {
         for(KCommand sub : this.subcommands) {
-            sub.onRegister();
-            sub.subRegister();
+            try {
+                sub.onRegister();
+                sub.subRegister();
+            } catch (Exception exc) {
+                throw new RuntimeException("Failed to initialize subcommand " + sub.getCommandName() + "!", exc);
+            }
         }
 
         this.setupPermission();
@@ -374,7 +385,15 @@ public abstract class KCommand implements TabExecutor {
 
             BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
             if (!canSeeArgument(sender, builtCommandArgument)) {
-                builtArguments.add(builtCommandArgument.autoComplete.apply(sender).toString());
+                if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
+                    boolean player = sender instanceof Player;
+                    if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
+                        handleMissingArgument(sender, builtCommandArgument);
+                        continue;
+                    }
+                }
+
+                builtArguments.add(Objects.toString(builtCommandArgument.autoComplete.apply(sender), null));
                 // If we fail the 'can see' check once, make sure all remaining arguments are auto completed.
                 break;
             }
@@ -407,8 +426,16 @@ public abstract class KCommand implements TabExecutor {
                 return null;
             }
 
+            if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
+                boolean player = sender instanceof Player;
+                if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
+                    handleMissingArgument(sender, builtCommandArgument);
+                    continue;
+                }
+            }
+
             //Create the argument context and test it.
-            builtArguments.add(autofill.apply(sender).toString());
+            builtArguments.add(Objects.toString(autofill.apply(sender), null));
         }
         return new CommandContext(sender, label, builtArguments, this);
     }
