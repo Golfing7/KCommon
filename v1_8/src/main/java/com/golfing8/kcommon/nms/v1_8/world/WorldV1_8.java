@@ -17,8 +17,11 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
 
 public class WorldV1_8 implements NMSWorld {
     private final WorldServer worldServer;
@@ -81,7 +84,9 @@ public class WorldV1_8 implements NMSWorld {
         }
 
         TileEntityChest tileEntityChest = (TileEntityChest) tileEntity;
-        tileEntityChest.l += 1000;
+        if (tileEntityChest.l < 1000) {
+            tileEntityChest.l += 1000;
+        }
         worldServer.playBlockAction(blockposition,
                 worldServer.getType(blockposition).getBlock(),
                 1,
@@ -99,7 +104,10 @@ public class WorldV1_8 implements NMSWorld {
         }
 
         TileEntityChest tileEntityChest = (TileEntityChest) tileEntity;
-        tileEntityChest.l = Math.max(0, tileEntityChest.l - 1000);
+        for (HumanEntity he : new ArrayList<>(tileEntityChest.getViewers())) {
+            he.closeInventory();
+        }
+        tileEntityChest.l = 0;
         worldServer.playBlockAction(blockposition,
                 worldServer.getType(blockposition).getBlock(),
                 1,
