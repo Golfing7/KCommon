@@ -73,7 +73,7 @@ public class CAMap implements ConfigAdapter<Map> {
         Map<String, Object> primitive = new HashMap<>();
         for (Object oentry : object.entrySet()) {
             Map.Entry entry = (Map.Entry) oentry;
-            ConfigAdapter valueAdapter = ConfigTypeRegistry.findAdapter(entry.getValue().getClass());
+            ConfigAdapter valueAdapter = entry.getValue() != null ? ConfigTypeRegistry.findAdapter(entry.getValue().getClass()) : null;
             ConfigAdapter keyAdapter = ConfigTypeRegistry.findAdapter(entry.getKey().getClass());
             Object adaptedKey = keyAdapter == null ? ConfigPrimitive.coerceBoxedToString(entry.getKey()) : keyAdapter.toPrimitive(entry.getKey()).unwrap();
             Object adaptedValue = valueAdapter == null ? entry.getValue() : valueAdapter.toPrimitive(entry.getValue()).unwrap();

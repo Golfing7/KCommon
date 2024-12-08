@@ -280,5 +280,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAParticle());
         registerAdapter(new CAMenuBuilder());
         registerAdapter(new CAMoveLength());
+        registerAdapter(new CADynamicEnum());
     }
 }
