@@ -8,12 +8,16 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.util.VectorUtil;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -154,7 +158,7 @@ public abstract class Particle {
      *
      * @param location the location to spawn the particle at.
      */
-    protected void spawnParticle(Location location) {
+    protected void spawnParticle(Collection<Player> player, Location location) {
         if (NMS.getServerVersion().isAtOrBefore(NMSVersion.v1_8)) {
             location.getWorld().spigot().playEffect(location, Effect.COLOURED_DUST, 0, 0, Math.max(from.getRed() / 255.0F, 0.001F), from.getGreen() / 255.0F, from.getBlue() / 255.0F, 1, 0, 64);
         } else {
@@ -167,5 +171,15 @@ public abstract class Particle {
      *
      * @param location the location to spawn the particle at
      */
-    public abstract void spawnAt(Location location);
+    public final void spawnAt(Location location) {
+        spawnAt(null, location);
+    }
+
+    /**
+     * Spawns the particle at the given location, showing it to the given players.
+     *
+     * @param players the players, null if all online players should see it.
+     * @param location the location.
+     */
+    public abstract void spawnAt(@Nullable Collection<Player> players, Location location);
 }

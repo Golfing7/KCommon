@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,7 +29,7 @@ public class ParticleSphere extends ParticleCircle{
     }
 
     @Override
-    public void spawnAt(Location location) {
+    public void spawnAt(Collection<Player> players, Location location) {
         for(int index = 0; index < effectList.size(); index++)
         {
             WaveEffect effect = effectList.get(index);
@@ -83,7 +85,7 @@ public class ParticleSphere extends ParticleCircle{
 
                 Location finalParticleLocation = location.clone().add(offsetVector);
 
-                spawnParticle(finalParticleLocation);
+                spawnParticle(players, finalParticleLocation);
             }
         }
 
@@ -92,13 +94,13 @@ public class ParticleSphere extends ParticleCircle{
 
         manipulateToAngles(top);
 
-        spawnParticle(location.clone().add(top));
+        spawnParticle(players, location.clone().add(top));
 
         Vector bottom = new Vector(0, -radius, 0);
 
         manipulateToAngles(bottom);
 
-        spawnParticle(location.clone().add(bottom));
+        spawnParticle(players, location.clone().add(bottom));
     }
 
     public void startWaveEffectAt(Vector vector, Color waveColor, double angleWidth)

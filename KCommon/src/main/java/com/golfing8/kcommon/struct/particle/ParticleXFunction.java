@@ -6,8 +6,10 @@ import com.golfing8.kcommon.struct.Interval;
 import com.golfing8.kcommon.util.MathExpressions;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -41,7 +43,7 @@ public class ParticleXFunction extends ParticleFunction {
     }
 
     @Override
-    public void spawnAt(Location location) {
+    public void spawnAt(Collection<Player> players, Location location) {
         Location previousParticle = null;
 
         double previousFValue = 0.0D;
@@ -72,7 +74,7 @@ public class ParticleXFunction extends ParticleFunction {
                 smartFillLocations(previousParticle, at);
             }
 
-            spawnParticle(at);
+            spawnParticle(players, at);
 
             previousParticle = at;
 

@@ -7,9 +7,11 @@ import com.google.common.collect.Lists;
 import lombok.var;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +75,7 @@ public class ParticleCompound extends Particle {
     }
 
     @Override
-    public void spawnAt(Location location) {
+    public void spawnAt(Collection<Player> players, Location location) {
         for(Pair<Particle, Vector> pair : particleOffset)
         {
             Vector offset = pair.getB().clone();
@@ -82,7 +84,7 @@ public class ParticleCompound extends Particle {
 
             Location spawnAt = location.clone().add(offset);
 
-            pair.getA().spawnAt(spawnAt);
+            pair.getA().spawnAt(players, spawnAt);
         }
     }
 

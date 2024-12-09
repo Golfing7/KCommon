@@ -4,7 +4,10 @@ import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import java.util.Collection;
 
 /**
  * Represents a "line" of particles between two points.
@@ -34,7 +37,7 @@ public class ParticleLine extends Particle{
     }
 
     @Override
-    public void spawnAt(Location location) {
+    public void spawnAt(Collection<Player> players, Location location) {
         Vector manipulatedEnd = manipulateToAngles(endPointOffset.clone());
         Vector manipulatedBeginning = manipulateToAngles(startingPointOffset.clone());
 
@@ -46,13 +49,13 @@ public class ParticleLine extends Particle{
 
         while(!particleLocation.toVector().isInSphere(finalEndPoint, 0.1))
         {
-            spawnParticle(particleLocation);
+            spawnParticle(players, particleLocation);
 
             particleLocation.add(lineDrawVector);
         }
 
         Location finalLocation = manipulatedBeginning.clone().add(manipulatedEnd).toLocation(location.getWorld());
 
-        spawnParticle(finalLocation);
+        spawnParticle(players, finalLocation);
     }
 }

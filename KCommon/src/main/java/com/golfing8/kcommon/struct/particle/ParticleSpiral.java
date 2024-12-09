@@ -3,7 +3,10 @@ package com.golfing8.kcommon.struct.particle;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import java.util.Collection;
 
 /**
  * Spawns a "spiral" of particles around a certain point with a radius.
@@ -42,7 +45,7 @@ public class ParticleSpiral extends ParticleCircle{
     }
 
     @Override
-    public void spawnAt(Location location) {
+    public void spawnAt(Collection<Player> players, Location location) {
         int segments = (int) (radius * 24);
 
         Vector dir = manipulateToAngles(new Vector(0, length / segments, 0).clone().divide(new Vector(periods, periods, periods)));
@@ -67,7 +70,7 @@ public class ParticleSpiral extends ParticleCircle{
 
             Location particleLocation = currentLocation.clone().add(offset);
 
-            spawnParticle(particleLocation);
+            spawnParticle(players, particleLocation);
 
             currentLocation.add(dir);
         }

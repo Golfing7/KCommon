@@ -4,7 +4,10 @@ import com.golfing8.kcommon.util.VectorUtil;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import java.util.Collection;
 
 /**
  * Spawns a "circle" of particles around a certain point with a radius.
@@ -31,7 +34,7 @@ public class ParticleCircle extends Particle{
     }
 
     @Override
-    public void spawnAt(Location location) {
+    public void spawnAt(Collection<Player> players, Location location) {
         int segments = (int) (radius * 24);
         for(int segment = 0; segment < segments; segment++)
         {
@@ -47,7 +50,7 @@ public class ParticleCircle extends Particle{
 
             Location particleLocation = location.clone().add(offset);
 
-            spawnParticle(particleLocation);
+            spawnParticle(players, particleLocation);
         }
     }
 }
