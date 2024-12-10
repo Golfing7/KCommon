@@ -109,8 +109,8 @@ public abstract class Particle {
         primitive.put("pitch", pitch);
         primitive.put("yaw", yaw);
         primitive.put("roll", roll);
-        primitive.put("from", from);
-        primitive.put("to", to);
+        primitive.put("from", ConfigTypeRegistry.toPrimitive(from).unwrap());
+        primitive.put("to", ConfigTypeRegistry.toPrimitive(to).unwrap());
         primitive.put("particle-size", particleSize);
         return primitive;
     }
