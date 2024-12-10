@@ -60,6 +60,16 @@ public class RangeMap<V> implements Map<Range, V> {
         return get(key) != null;
     }
 
+    /**
+     * An overload to ensure Intellij knows it's fine to use numbers as keys.
+     *
+     * @param key the key.
+     * @return if it contains this key.
+     */
+    public boolean containsKey(Number key) {
+        return this.get(key.doubleValue()) != null;
+    }
+
     @Override
     public boolean containsValue(Object value) {
         return this.rangeMap.containsValue(value);
@@ -71,7 +81,11 @@ public class RangeMap<V> implements Map<Range, V> {
      * @param dKey the number.
      * @return the value.
      */
-    public Pair<Range, V> get(double dKey) {
+    public V get(double dKey) {
+        return getEntryPair(dKey).getB();
+    }
+
+    public Pair<Range, V> getEntryPair(double dKey) {
         Entry<Double, Pair<Range, V>> floor = this.rangeMap.floorEntry(dKey);
         if(floor == null) {
             return null;
@@ -89,7 +103,7 @@ public class RangeMap<V> implements Map<Range, V> {
     @Override
     public V get(Object key) {
         if(key instanceof Number) {
-            return this.get(((Number) key).doubleValue()).getB();
+            return this.get(((Number) key).doubleValue());
         }
         return this.originalMap.get(key);
     }
@@ -107,17 +121,27 @@ public class RangeMap<V> implements Map<Range, V> {
         return old != null ? old.getB() : null;
     }
 
+    /**
+     * An overload to ensure intellij knows it's safe to use numbers as keys.
+     *
+     * @param number the number
+     * @return the removed value
+     */
+    public V remove(Number number) {
+        Pair<Range, V> pair = this.getEntryPair(number.doubleValue());
+        if(pair == null)
+            return null;
+
+        //Remove the values.
+        this.originalMap.remove(pair.getA());
+        this.rangeMap.remove(pair.getA().getMin());
+        return pair.getB();
+    }
+
     @Override
     public V remove(Object key) {
         if(key instanceof Number) {
-            Pair<Range, V> pair = this.get(((Number) key).doubleValue());
-            if(pair == null)
-                return null;
-
-            //Remove the values.
-            this.originalMap.remove(pair.getA());
-            this.rangeMap.remove(pair.getA().getMin());
-            return pair.getB();
+            return remove((Number) key);
         }
 
         //Non ranges not supported here.
