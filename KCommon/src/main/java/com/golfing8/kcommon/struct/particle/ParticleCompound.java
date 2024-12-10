@@ -98,9 +98,12 @@ public class ParticleCompound extends Particle {
         Map<String, Object> data = new HashMap<>();
         int count = 1;
         for (var pair : this.particleOffset) {
-            data.put("particle-" + count, ConfigTypeRegistry.toPrimitive(pair.getB()).getPrimitive());
-            data.put("particle-" + count++, pair.getA().toPrimitive());
+            Map<String, Object> particleData = ConfigTypeRegistry.toPrimitive(pair.getA()).unwrap();
+            particleData.put("offset", ConfigTypeRegistry.toPrimitive(pair.getB()).getPrimitive());
+            data.put("particle-" + count++, particleData);
         }
-        return data;
+        Map<String, Object> particles = new HashMap<>();
+        particles.put("particles", data);
+        return particles;
     }
 }
