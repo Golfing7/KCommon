@@ -6,10 +6,7 @@ import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * A placeholder for a given string. Can be used in messages or things like items. KCommon's general
@@ -96,7 +93,7 @@ public class Placeholder {
                     throw new IllegalArgumentException("Unbalanced placeholder list: " + Arrays.toString(objects));
 
                 String key = "{" + objects[index] + "}";
-                String value = objects[index + 1].toString();
+                String value = Objects.toString(objects[index + 1]);
                 placeholders.add(new Placeholder(key, value));
                 index += 2;
             }

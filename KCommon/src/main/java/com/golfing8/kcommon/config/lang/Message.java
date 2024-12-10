@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.var;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.entity.Player;
@@ -260,6 +261,44 @@ public class Message {
             newSounds = sounds.stream().map(SoundWrapper::new).collect(Collectors.toList());
         }
         return new Message(newMessages, newSounds, newTitle, newActionBar, paged, pageHeight, MS.parseSingle(pageHeader, placeholders), MS.parseSingle(pageFooter, placeholders));
+    }
+
+    public void broadcast() {
+        broadcast(null, null);
+    }
+
+    public void broadcast(Object... placeholders) {
+        this.broadcast(Placeholder.compileCurly(placeholders), null);
+    }
+
+    public void broadcast(@Nullable Collection<Placeholder> placeholders,
+                          @Nullable Collection<MultiLinePlaceholder> multiLinePlaceholders) {
+        if (this.getMessages() != null) {
+            if (paged) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    send(player, placeholders, multiLinePlaceholders);
+                }
+            } else {
+                List<String> parsed = MS.parseAllMulti(MS.parseAll(this.getMessages(), placeholders == null ? Collections.emptyList() : placeholders), multiLinePlaceholders == null ? Collections.emptyList() : multiLinePlaceholders);
+                parsed.forEach(Bukkit::broadcastMessage);
+            }
+        }
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (getTitle() != null) {
+                MS.sendTitle(player, getTitle(), placeholders);
+            }
+
+            if (getActionBar() != null) {
+                NMS.getTheNMS().sendActionBar(player, MS.parseSingle(actionBar, placeholders));
+            }
+
+            if (getSounds() != null) {
+                getSounds().forEach(sound -> {
+                    sound.send(player);
+                });
+            }
+        }
     }
 
     /**
