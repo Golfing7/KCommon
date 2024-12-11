@@ -41,9 +41,6 @@ public class CAColorAWT implements ConfigAdapter<Color> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull Color object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         return ConfigPrimitive.ofString(Integer.toString(object.getRGB(), 16));
     }
 

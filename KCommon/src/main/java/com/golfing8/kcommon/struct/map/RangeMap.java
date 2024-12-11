@@ -55,7 +55,7 @@ public class RangeMap<V> implements Map<Range, V> {
     @Override
     public boolean containsKey(Object key) {
         if(key instanceof Number) {
-            return this.get(((Number) key).doubleValue()) != null;
+            return this.getEntryPair(((Number) key).doubleValue()) != null;
         }
         return get(key) != null;
     }
@@ -67,7 +67,7 @@ public class RangeMap<V> implements Map<Range, V> {
      * @return if it contains this key.
      */
     public boolean containsKey(Number key) {
-        return this.get(key.doubleValue()) != null;
+        return this.getEntryPair(key.doubleValue()) != null;
     }
 
     @Override
@@ -82,7 +82,8 @@ public class RangeMap<V> implements Map<Range, V> {
      * @return the value.
      */
     public V get(double dKey) {
-        return getEntryPair(dKey).getB();
+        Pair<Range, V> entryPair = getEntryPair(dKey);
+        return entryPair == null ? null : entryPair.getB();
     }
 
     public Pair<Range, V> getEntryPair(double dKey) {
