@@ -96,8 +96,8 @@ public abstract class Particle {
         this.yaw = section.getDouble("yaw", 0.0);
         this.roll = section.getDouble("roll", 0.0);
 
-        this.from = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofString(section.getString("from-color", "FFFFFF")), Color.class);
-        this.to = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofString(section.getString("to-color", "FFFFFF")), Color.class);
+        this.from = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofString(section.getString("from", "FFFFFF")), Color.class);
+        this.to = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofString(section.getString("to", "FFFFFF")), Color.class);
 
         this.particleSize = section.getDouble("particle-size", 1.0D);
     }

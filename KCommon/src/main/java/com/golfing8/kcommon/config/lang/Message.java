@@ -129,7 +129,7 @@ public class Message {
             // Read the action bar.
             this.actionBar = (String) section.get("actionbar");
 
-            if (section.containsKey("messages")) {
+            if (section.containsKey("message")) {
                 //Get the actual message.
                 Object oMsg = section.get("message");
                 if(oMsg instanceof String) {
