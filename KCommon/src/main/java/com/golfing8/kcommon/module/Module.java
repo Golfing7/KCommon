@@ -519,6 +519,21 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     }
 
     /**
+     * Adds the given module task to this module.
+     *
+     * @param moduleTask the module task.
+     * @return the same task.
+     */
+    public synchronized ModuleTask addTask(ModuleTask moduleTask) {
+        if (moduleTask.getModule() != this) {
+            throw new IllegalArgumentException("Module task is linked to " + moduleTask.getModule().getModuleName() + ". It cannot be added to " + this.getModuleName() + "!");
+        }
+
+        this.moduleTasks.add(moduleTask);
+        return moduleTask;
+    }
+
+    /**
      * Removes a task from this module's task list.
      *
      * @param task the task to remove.

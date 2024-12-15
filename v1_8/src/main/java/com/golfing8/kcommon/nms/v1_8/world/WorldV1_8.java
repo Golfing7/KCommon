@@ -63,6 +63,22 @@ public class WorldV1_8 implements NMSWorld {
     }
 
     @Override
+    public void refreshChestState(Player player, Position position) {
+        BlockPosition blockposition = new BlockPosition(position.getX(),
+                position.getY(),
+                position.getZ());
+        TileEntity tileEntity = worldServer.getTileEntity(blockposition);
+        if (!(tileEntity instanceof TileEntityChest)) {
+            return;
+        }
+
+        TileEntityChest tec = (TileEntityChest) tileEntity;
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(
+                new PacketPlayOutBlockAction(blockposition, worldServer.getType(position.getX(), position.getY(), position.getZ()).getBlock(), 1, tec.l)
+        );
+    }
+
+    @Override
     public void animateChest(Position position, boolean opening) {
         BlockPosition blockposition = new BlockPosition(position.getX(),
                 position.getY(),

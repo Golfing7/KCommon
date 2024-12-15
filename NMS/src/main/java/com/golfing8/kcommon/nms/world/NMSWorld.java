@@ -19,6 +19,8 @@ public interface NMSWorld extends NMSObject {
 
     NMSTileEntity getTileEntity(Position position);
 
+    default void refreshChestState(Player player, Position position) {}
+
     void animateChest(Position position, boolean opening);
 
     void forceChestOpen(Position position);
