@@ -321,6 +321,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         //Unregister tasks, clone for concurrency.
         new ArrayList<>(moduleTasks).forEach(runnable -> {
+            if (runnable instanceof ModuleTask && !((ModuleTask) runnable).isStarted())
+                return;
+
             try {
                 runnable.cancel();
             } catch (IllegalStateException ignored) {} // Can be thrown if the runnable wasn't scheduled yet
@@ -522,17 +525,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      */
     public synchronized BukkitRunnable removeTask(BukkitRunnable task) {
         this.moduleTasks.remove(task);
-        return task;
-    }
-
-    /**
-     * The task to add to this module. Note that this module will not call the runTask family of methods for
-     * the given task.
-     *
-     * @param task the task.
-     */
-    public synchronized BukkitRunnable addTask(BukkitRunnable task) {
-        this.moduleTasks.add(task);
         return task;
     }
 

@@ -3,6 +3,7 @@ package com.golfing8.kcommon.hook.placeholderapi;
 import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.expansion.Relational;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;

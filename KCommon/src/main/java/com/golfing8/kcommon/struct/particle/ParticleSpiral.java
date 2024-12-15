@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Spawns a "spiral" of particles around a certain point with a radius.
@@ -15,7 +16,7 @@ public class ParticleSpiral extends ParticleCircle{
     //The length of the spiral.
     @Getter
     protected double length = 1;
-    public ParticleSpiral length(int length)
+    public ParticleSpiral length(double length)
     {
         this.length = length;
         return this;
@@ -24,7 +25,7 @@ public class ParticleSpiral extends ParticleCircle{
     //The periods of the spiral.
     private double periods = 1;
 
-    public ParticleSpiral periods(int periods)
+    public ParticleSpiral periods(double periods)
     {
         this.periods = periods;
         return this;
@@ -37,6 +38,14 @@ public class ParticleSpiral extends ParticleCircle{
 
         this.length = section.getDouble("length", 1.0D);
         this.periods = section.getDouble("periods", 1.0D);
+    }
+
+    @Override
+    public Map<String, Object> toPrimitive() {
+        Map<String, Object> primitive = super.toPrimitive();
+        primitive.put("length", this.length);
+        primitive.put("periods", this.periods);
+        return primitive;
     }
 
     @Override

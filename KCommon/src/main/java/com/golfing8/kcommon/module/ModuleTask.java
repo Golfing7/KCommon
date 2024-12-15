@@ -23,7 +23,13 @@ public class ModuleTask<T extends Module> extends BukkitRunnable {
     /**
      * If this task has been started/ran.
      */
+    @Getter
     private boolean started;
+    /** If this is a timer type of task */
+    private boolean timerTask;
+    /** If this task has been run at least once */
+    @Getter
+    private boolean ran;
 
     /**
      * Another constructor to use in the case when the user wants to override the {@link #run()} method.
@@ -42,7 +48,11 @@ public class ModuleTask<T extends Module> extends BukkitRunnable {
 
     @Override
     public void run() {
+        this.ran = true;
         this.task.run();
+        if (!this.timerTask) {
+            this.module.removeTask(this);
+        }
     }
 
     @Override
@@ -157,6 +167,7 @@ public class ModuleTask<T extends Module> extends BukkitRunnable {
         BukkitTask bukkitTask = super.runTaskTimer(plugin, delay, period);
         this.module.addTask(this);
         this.started = true;
+        this.timerTask = true;
         return bukkitTask;
     }
 
@@ -165,6 +176,7 @@ public class ModuleTask<T extends Module> extends BukkitRunnable {
         BukkitTask bukkitTask = super.runTaskTimerAsynchronously(plugin, delay, period);
         this.module.addTask(this);
         this.started = true;
+        this.timerTask = true;
         return bukkitTask;
     }
 }
