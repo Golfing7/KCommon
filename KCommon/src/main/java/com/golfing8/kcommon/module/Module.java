@@ -89,7 +89,8 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /**
      * The list of tasks this module is currently running.
      */
-    private final Set<BukkitRunnable> moduleTasks;
+    @SuppressWarnings("rawtypes")
+    private final Set<ModuleTask> moduleTasks;
     /**
      * Sub-listeners registered to this module.
      */
@@ -321,7 +322,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         //Unregister tasks, clone for concurrency.
         new ArrayList<>(moduleTasks).forEach(runnable -> {
-            if (runnable instanceof ModuleTask && !((ModuleTask) runnable).isStarted())
+            if (!runnable.isStarted())
                 return;
 
             try {
@@ -512,6 +513,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * @param runnable the runnable.
      * @return the task.
      */
+    @SuppressWarnings("rawtypes")
     public synchronized ModuleTask addTask(Runnable runnable) {
         ModuleTask mTask = new ModuleTask(this, runnable);
         this.moduleTasks.add(mTask);
@@ -524,6 +526,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * @param moduleTask the module task.
      * @return the same task.
      */
+    @SuppressWarnings("rawtypes")
     public synchronized ModuleTask addTask(ModuleTask moduleTask) {
         if (moduleTask.getModule() != this) {
             throw new IllegalArgumentException("Module task is linked to " + moduleTask.getModule().getModuleName() + ". It cannot be added to " + this.getModuleName() + "!");
@@ -538,9 +541,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      *
      * @param task the task to remove.
      */
-    public synchronized BukkitRunnable removeTask(BukkitRunnable task) {
+    @SuppressWarnings("rawtypes")
+    public synchronized void removeTask(ModuleTask task) {
         this.moduleTasks.remove(task);
-        return task;
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.module;
 
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -9,7 +10,7 @@ import org.bukkit.scheduler.BukkitTask;
  * A task that belongs to a module, extending the {@link BukkitRunnable} class to implement itself.
  * All ModuleTask instances are linked to a specific module and cancelled when a module is shutdown.
  */
-public class ModuleTask<T extends Module> extends BukkitRunnable {
+public class ModuleTask<T extends Module> {
     /**
      * The module this task belongs to.
      */
@@ -18,8 +19,11 @@ public class ModuleTask<T extends Module> extends BukkitRunnable {
     /**
      * The runnable this task is responsible for.
      */
-    @Getter
-    private final Runnable task;
+    private final Runnable registeredTask;
+    /** The runnable that has been passed in */
+    private final Runnable delegateTask;
+    /** The running bukkit task associated with this module task */
+    private BukkitTask bukkitTask;
     /**
      * If this task has been started/ran.
      */
@@ -30,37 +34,33 @@ public class ModuleTask<T extends Module> extends BukkitRunnable {
     /** If this task has been run at least once */
     @Getter
     private boolean ran;
-
-    /**
-     * Another constructor to use in the case when the user wants to override the {@link #run()} method.
-     *
-     * @param module the module this task belongs to.
-     */
-    public ModuleTask(T module) {
+    protected ModuleTask(T module) {
         this.module = module;
-        this.task = () -> {};
+        this.delegateTask = this::run;
+        this.registeredTask = this::runInternal;
     }
 
     public ModuleTask(T module, Runnable runnable) {
         this.module = module;
-        this.task = runnable;
+        this.delegateTask = runnable;
+        this.registeredTask = this::runInternal;
     }
 
-    @Override
-    public void run() {
+    private void runInternal() {
         this.ran = true;
-        this.task.run();
+        this.delegateTask.run();
         if (!this.timerTask) {
             this.module.removeTask(this);
         }
     }
 
-    @Override
+    protected void run() {}
+
     public synchronized void cancel() throws IllegalStateException {
         if (!this.started)
             return;
 
-        super.cancel();
+        this.bukkitTask.cancel();
         this.module.removeTask(this);
     }
 
@@ -130,50 +130,44 @@ public class ModuleTask<T extends Module> extends BukkitRunnable {
         return this;
     }
 
-    @Override
     public synchronized BukkitTask runTask(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
-        BukkitTask bukkitTask = super.runTask(plugin);
+        this.bukkitTask = Bukkit.getScheduler().runTask(plugin, registeredTask);
         this.module.addTask(this);
         this.started = true;
         return bukkitTask;
     }
 
-    @Override
     public synchronized BukkitTask runTaskAsynchronously(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
-        BukkitTask bukkitTask = super.runTaskAsynchronously(plugin);
+        this.bukkitTask = Bukkit.getScheduler().runTaskAsynchronously(plugin, registeredTask);
         this.module.addTask(this);
         this.started = true;
         return bukkitTask;
     }
 
-    @Override
     public synchronized BukkitTask runTaskLater(Plugin plugin, long delay) throws IllegalArgumentException, IllegalStateException {
-        BukkitTask bukkitTask = super.runTaskLater(plugin, delay);
+        this.bukkitTask = Bukkit.getScheduler().runTaskLater(plugin, registeredTask, delay);
         this.module.addTask(this);
         this.started = true;
         return bukkitTask;
     }
 
-    @Override
     public synchronized BukkitTask runTaskLaterAsynchronously(Plugin plugin, long delay) throws IllegalArgumentException, IllegalStateException {
-        BukkitTask bukkitTask = super.runTaskLaterAsynchronously(plugin, delay);
+        this.bukkitTask = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, registeredTask, delay);
         this.module.addTask(this);
         this.started = true;
         return bukkitTask;
     }
 
-    @Override
     public synchronized BukkitTask runTaskTimer(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
-        BukkitTask bukkitTask = super.runTaskTimer(plugin, delay, period);
+        this.bukkitTask = Bukkit.getScheduler().runTaskTimer(plugin, registeredTask, delay, period);
         this.module.addTask(this);
         this.started = true;
         this.timerTask = true;
         return bukkitTask;
     }
 
-    @Override
     public synchronized BukkitTask runTaskTimerAsynchronously(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
-        BukkitTask bukkitTask = super.runTaskTimerAsynchronously(plugin, delay, period);
+        this.bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, registeredTask, delay, period);
         this.module.addTask(this);
         this.started = true;
         this.timerTask = true;
