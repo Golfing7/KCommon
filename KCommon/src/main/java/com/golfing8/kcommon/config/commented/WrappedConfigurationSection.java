@@ -26,7 +26,11 @@ public class WrappedConfigurationSection implements ConfigurationSection {
 
     @Override
     public Object get(String path) {
-        return wrapped.get(path);
+        Object out = wrapped.get(path);
+        if (out instanceof ConfigurationSection && !(out instanceof WrappedConfigurationSection)) {
+            return new WrappedConfigurationSection((ConfigurationSection) out, originalConfig);
+        }
+        return out;
     }
 
     @Override

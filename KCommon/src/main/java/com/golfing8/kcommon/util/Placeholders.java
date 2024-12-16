@@ -25,7 +25,7 @@ public final class Placeholders {
         boolean awaitingValue = false;
         for (Object placeholder : placeholders) {
             if (awaitingValue) {
-                values.add(placeholder.toString());
+                values.add(Objects.toString(placeholder));
                 awaitingValue = false;
             } else {
                 if (placeholder instanceof Placeholder) {
@@ -35,7 +35,7 @@ public final class Placeholders {
                     continue;
                 }
 
-                keys.add("{" + placeholder.toString() + "}");
+                keys.add("{" + placeholder + "}");
                 awaitingValue = true;
             }
         }

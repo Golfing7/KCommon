@@ -60,7 +60,7 @@ public class ItemDrop extends Drop<ItemStack> {
     public List<ItemStack> getDrop(double boost) {
         return items.values().stream().map(builder -> {
             ItemStack itemStack = builder.buildFromTemplate();
-            if (boost != 1.0D) {
+            if (boost != 1.0D && boostQuantity) {
                 itemStack.setAmount(MathUtil.roundRandomly(itemStack.getAmount() * boost));
             }
             return itemStack;

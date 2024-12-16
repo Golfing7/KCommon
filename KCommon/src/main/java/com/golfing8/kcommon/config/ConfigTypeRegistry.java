@@ -1,16 +1,22 @@
 package com.golfing8.kcommon.config;
 
 import com.golfing8.kcommon.config.adapter.*;
+import com.golfing8.kcommon.config.commented.MConfiguration;
+import com.golfing8.kcommon.config.commented.WrappedConfigurationSection;
 import com.golfing8.kcommon.menu.MenuUtils;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
+import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.common.base.Preconditions;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -19,6 +25,7 @@ import java.util.function.Function;
  * Represents common things for configurations across the plugin.
  */
 public class ConfigTypeRegistry {
+    private static final String DELEGATE_PREFIX = "!delegate!";
     /** A map containing special functions for translating certain things in configs. */
     private static final Map<Class<?>, Function<ConfigurationSection, ?>> CONFIG_TO_VALUE = new HashMap<>();
 
@@ -174,7 +181,16 @@ public class ConfigTypeRegistry {
             return (T) entry.get();
         }
 
-        return (T) adapter.toPOJO(entry.getPrimitive(), field);
+        // Check if the primitive is delegated.
+        ConfigPrimitive primitive = entry.getPrimitive();
+        if (primitive.getPrimitive() instanceof String && entry.getSection() != null) {
+            String path = (String) primitive.getPrimitive();
+            if (path.startsWith(DELEGATE_PREFIX)) {
+                return loadFromDelegate(entry.getSection(), path.substring(DELEGATE_PREFIX.length()), field);
+            }
+        }
+
+        return (T) adapter.toPOJO(primitive, field);
     }
 
     /**
@@ -185,7 +201,6 @@ public class ConfigTypeRegistry {
      * @return the value
      * @param <T> the type of value
      */
-    @SuppressWarnings({"unchecked"})
     public static <T> T getFromType(ConfigPrimitive entry, Class<T> clazz) {
         return getFromType(entry, new FieldType(clazz));
     }
@@ -203,6 +218,14 @@ public class ConfigTypeRegistry {
         ConfigAdapter<? super T> adapter = (ConfigAdapter<? super T>) findAdapter(field.getType());
         if (adapter == null) {
             return (T) entry.getPrimitive();
+        }
+
+        // Check if the primitive is delegated.
+        if (entry.getPrimitive() instanceof String && entry.getSource() != null) {
+            String path = (String) entry.getPrimitive();
+            if (path.startsWith(DELEGATE_PREFIX)) {
+                return loadFromDelegate(entry.getSource(), path.substring(DELEGATE_PREFIX.length()), field);
+            }
         }
 
         return (T) adapter.toPOJO(entry, field);
@@ -241,6 +264,28 @@ public class ConfigTypeRegistry {
             return;
         }
         section.set(path, toPrimitive(value).unwrap());
+    }
+
+    /**
+     * Loads the value from the given config delegate.
+     *
+     * @param context the context section.
+     * @param path the path given for delegation.
+     * @param fieldType the field type.
+     * @return the loaded value, or null if it's not in a config.
+     * @param <T> the type.
+     */
+    private static <T> @Nullable T loadFromDelegate(ConfigurationSection context, String path, FieldType fieldType) {
+        Configuration root = context.getRoot();
+        Module module = root instanceof MConfiguration ? ((MConfiguration) root).getModule() : null;
+        ConfigPath configPath = ConfigPath.parseWithContext(module, root, path);
+
+        // Any options?
+        List<ConfigEntry> enumerate = configPath.enumerate();
+        if (enumerate.isEmpty())
+            return null;
+
+        return getFromType(enumerate.get(0), fieldType);
     }
 
     // Register some common types.

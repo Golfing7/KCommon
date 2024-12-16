@@ -45,20 +45,20 @@ public class CADrop implements ConfigAdapter<Drop> {
             boolean fortuneEnabled = (boolean) primitive.getOrDefault("fortune-enabled", false);
             String lootingFormula = primitive.getOrDefault("looting-formula", "rand1({LOOTING})").toString();
             if (primitive.containsKey("item")) {
-                ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("item")), ItemStackBuilder.class);
+                ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(entry.getSubValue("item"), ItemStackBuilder.class);
                 ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
-                Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("items")), fieldType);
+                Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(entry.getSubValue("item"), fieldType);
                 ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             }
         } else if (primitive.containsKey("commands")) {
             FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {});
-            List<String> commands = ConfigTypeRegistry.getFromType(ConfigPrimitive.of(primitive.get("commands")), fieldType);
+            List<String> commands = ConfigTypeRegistry.getFromType(entry.getSubValue("commands"), fieldType);
             CommandDrop drop = new CommandDrop(chance, displayName, commands);
             drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
             return drop;

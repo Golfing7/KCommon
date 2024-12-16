@@ -146,7 +146,11 @@ public class Configuration extends YamlConfiguration implements Config {
 
     @Override
     public Object get(String path) {
-        return wrapped.get(path);
+        Object out = wrapped.get(path);
+        if (out instanceof ConfigurationSection && !(out instanceof WrappedConfigurationSection)) {
+            return new WrappedConfigurationSection((ConfigurationSection) out, this);
+        }
+        return out;
     }
 
     @Override

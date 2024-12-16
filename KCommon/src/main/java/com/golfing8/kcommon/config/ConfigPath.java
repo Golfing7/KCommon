@@ -6,6 +6,7 @@ import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.Pair;
 import lombok.AllArgsConstructor;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,12 +87,29 @@ public class ConfigPath {
             return enumerate(module);
         }
 
-        MConfiguration configuration = module.getConfigs().get(configName);
-        if (configuration == null) {
-            return Collections.emptyList();
+        MConfiguration configuration = module.getConfig(configName);
+        return enumerate(configuration);
+    }
+
+    /**
+     * Parses a config path with the given context.
+     *
+     * @param moduleContext the module context.
+     * @param configContext the config context.
+     * @param path the path.
+     * @return the config path.
+     */
+    public static ConfigPath parseWithContext(@Nullable Module moduleContext, @Nullable Configuration configContext, String path) {
+        String[] parts = path.split("[:;]");
+        if (parts.length == 1) {
+            return new ConfigPath(moduleContext != null ? moduleContext.getModuleName() : null, configContext != null ? configContext.getName() : null, parts[0]);
         }
 
-        return enumerate(configuration);
+        if (parts.length == 2) {
+            return new ConfigPath(moduleContext != null ? moduleContext.getModuleName() : null, parts[0], parts[1]);
+        }
+
+        return new ConfigPath(parts[0], parts[1], parts[2]);
     }
 
     /**

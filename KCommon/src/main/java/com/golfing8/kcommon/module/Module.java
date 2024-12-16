@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -119,7 +120,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     public @NotNull MConfiguration getConfig(String key) {
         MConfiguration configuration = configs.get(key);
         if (configuration == null) {
-            configuration = loadConfig(Paths.get(plugin.getDataFolder().getPath(), moduleName, key + ".yml"));
+            configuration = loadConfig(Paths.get(plugin.getDataFolder().getPath(), moduleName, key + ".yml"), true);
             configs.put(key, configuration);
         }
         return configuration;
@@ -164,7 +165,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.relationalPlaceholders = new TreeMap<>();
         this.subListeners = new HashSet<>();
         this.subModules = new HashSet<>();
-        this.configs = new HashMap<>();
+        this.configs = new ConcurrentHashMap<>();
         this.logger = new ModuleLogger(this);
 
         // Try to register this module to the registry.
@@ -364,7 +365,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         try (Stream<Path> paths = Files.list(directoryPath)) {
             List<Configuration> toReturn = new ArrayList<>();
             paths.forEach(path -> {
-                toReturn.add(loadConfig(path));
+                toReturn.add(loadConfig(path, true));
             });
             return toReturn;
         } catch (IOException exc) {
@@ -403,15 +404,41 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             }
         }
 
-        this.configs.put("config", loadConfig(dataFolder.resolve("config.yml")));
+        this.configs.put("config", loadConfig(dataFolder.resolve("config.yml"), false));
+        // Load the EXPECTED configs
         for (String expectedConfig : this.configWrapper.getConfigNames()) {
             // Don't re-register the main config
             if (expectedConfig.equals("config"))
                 continue;
 
-            this.configs.put(expectedConfig, loadConfig(dataFolder.resolve(expectedConfig + ".yml")));
+            this.configs.put(expectedConfig, loadConfig(dataFolder.resolve(expectedConfig + ".yml"), false));
         }
+        // Load the configs that are simply present.
+        try (Stream<Path> files = Files.list(dataFolder)) {
+            files.forEach(path -> {
+                if (Files.isDirectory(path))
+                    return;
 
+                if (!path.getFileName().toString().endsWith(".yml"))
+                    return;
+
+                String configName = path.getFileName().toString().replace(".yml", "");
+                if (this.configs.containsKey(configName))
+                    return;
+
+                this.configs.put(configName, loadConfig(path, false));
+            });
+        } catch (IOException exc) {
+            throw new RuntimeException(String.format("Failed to list files in parent directory in module %s!", getModuleName()), exc);
+        }
+        // Load @Conf values.
+        for (Configuration configuration : new ArrayList<>(this.configs.values())) {
+            // Load with the config wrapper.
+            boolean modded = this.configWrapper.loadValues(configuration);
+            if (modded) {
+                configuration.save();
+            }
+        }
 
         //First, load the language config.
         Path langPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "lang.yml");
@@ -450,8 +477,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Loads the config under the given path.
      *
      * @param configPath the path.
+     * @param loadValues if values should be loaded as well.
      */
-    private MConfiguration loadConfig(Path configPath) {
+    private MConfiguration loadConfig(Path configPath, boolean loadValues) {
         YamlConfiguration source = new YamlConfiguration();
 
         //Create the parent directory.
@@ -499,10 +527,12 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         toReturn.setSource(source);
         toReturn.load();
 
-        // Load with the config wrapper.
-        boolean modded = this.configWrapper.loadValues(toReturn);
-        if (modded) {
-            toReturn.save();
+        if (loadValues) {
+            // Load with the config wrapper.
+            boolean modded = this.configWrapper.loadValues(toReturn);
+            if (modded) {
+                toReturn.save();
+            }
         }
         return toReturn;
     }
