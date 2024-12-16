@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config;
 
 import com.golfing8.kcommon.config.adapter.*;
+import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.config.commented.WrappedConfigurationSection;
 import com.golfing8.kcommon.menu.MenuUtils;
@@ -8,8 +9,8 @@ import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.common.base.Preconditions;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -190,7 +191,7 @@ public class ConfigTypeRegistry {
             }
         }
 
-        return (T) adapter.toPOJO(primitive, field);
+        return (T) adapter.toPOJO(entry.getPrimitive(), field);
     }
 
     /**
@@ -276,7 +277,7 @@ public class ConfigTypeRegistry {
      * @param <T> the type.
      */
     private static <T> @Nullable T loadFromDelegate(ConfigurationSection context, String path, FieldType fieldType) {
-        Configuration root = context.getRoot();
+        Configuration root = context.getRoot() instanceof Configuration ? (Configuration) context.getRoot() : null;
         Module module = root instanceof MConfiguration ? ((MConfiguration) root).getModule() : null;
         ConfigPath configPath = ConfigPath.parseWithContext(module, root, path);
 

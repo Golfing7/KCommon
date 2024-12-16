@@ -1,12 +1,12 @@
 package com.golfing8.kcommon.config;
 
+import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.Pair;
 import lombok.AllArgsConstructor;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,7 +102,7 @@ public class ConfigPath {
     public static ConfigPath parseWithContext(@Nullable Module moduleContext, @Nullable Configuration configContext, String path) {
         String[] parts = path.split("[:;]");
         if (parts.length == 1) {
-            return new ConfigPath(moduleContext != null ? moduleContext.getModuleName() : null, configContext != null ? configContext.getName() : null, parts[0]);
+            return new ConfigPath(moduleContext != null ? moduleContext.getModuleName() : null, configContext != null ? configContext.getFileNameNoExtension() : null, parts[0]);
         }
 
         if (parts.length == 2) {
