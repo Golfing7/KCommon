@@ -278,6 +278,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             return false;
         }
 
+        // Add placeholder hook
+        this.plugin.getPlaceholderAPIHook().registerProvider(this);
+
         //We should save the language config once more as it's possible the commands this feature registered added constants.
         this.langConfig.save();
         this.enabled = true;
@@ -338,6 +341,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         for (SubModule<?> module : new HashSet<>(this.subModules)) {
             module.unregister();
         }
+
+        // Remove placeholder hook
+        this.plugin.getPlaceholderAPIHook().unregisterProvider(this);
 
         //Clear some data structures.
         this.subModules.clear();
