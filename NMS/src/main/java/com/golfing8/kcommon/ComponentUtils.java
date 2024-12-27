@@ -102,7 +102,7 @@ public class ComponentUtils {
      */
     private static String replaceColors(String message, char character) {
         for(Map.Entry<String, String> entry : legacyColorMap.entrySet()) {
-            message = message.replaceAll(character + entry.getKey(), entry.getValue());
+            message = message.replace(character + entry.getKey(), entry.getValue());
         }
 
         return message;
