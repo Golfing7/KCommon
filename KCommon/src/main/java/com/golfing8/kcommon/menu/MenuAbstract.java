@@ -12,6 +12,7 @@ import com.golfing8.kcommon.util.ItemUtil;
 import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -50,6 +51,8 @@ public abstract class MenuAbstract implements Menu {
     private int size;
     private boolean clickable;
     private boolean valid;
+    @Getter @Setter
+    private Runnable tickRunnable;
 
     private boolean recreate;
 
@@ -119,6 +122,12 @@ public abstract class MenuAbstract implements Menu {
     @Override
     public Inventory getGUI() {
         return backingInventory;
+    }
+
+    @Override
+    public void onTick() {
+        if (this.tickRunnable != null)
+            this.tickRunnable.run();
     }
 
     @Override

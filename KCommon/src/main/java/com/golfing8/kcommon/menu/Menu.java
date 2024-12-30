@@ -130,6 +130,9 @@ public interface Menu extends Listener {
 
     Inventory getGUI();
 
+    /** A tick method. Called once per second. */
+    void onTick();
+
     /**
      * Opens the menu for the given player. If the menu has previously been GCed by the {@link MenuManager} it will be re-opened.
      *

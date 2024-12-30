@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class MenuManager extends BukkitRunnable {
 
@@ -23,7 +24,7 @@ public final class MenuManager extends BukkitRunnable {
 
         this.managerTask = runTaskTimer(plugin, 0, 1);
 
-        this.allMenus = new HashMap<>();
+        this.allMenus = new ConcurrentHashMap<>();
     }
 
     /**
@@ -59,7 +60,10 @@ public final class MenuManager extends BukkitRunnable {
             if (menu.canExpire() && menu.getViewers().isEmpty()) {
                 menu.shutdown();
                 menuIterator.remove();
+                continue;
             }
+
+            menu.onTick();
 
             if (menu instanceof MenuDynamic) {
                 ((MenuDynamic) menu).tickDynamics();

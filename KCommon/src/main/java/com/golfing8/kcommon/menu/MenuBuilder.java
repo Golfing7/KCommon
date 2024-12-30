@@ -68,6 +68,9 @@ public final class MenuBuilder {
     /** This will be run at the end of the tick the inventory has been closed. Useful for opening another menu */
     @Getter
     private CloseRunnable postCloseRunnable;
+    /** The tick runnable */
+    @Getter
+    private Runnable tickRunnable;
 
     private MenuBuilder() {}
 
@@ -91,6 +94,7 @@ public final class MenuBuilder {
         this.menuShapeType = other.menuShapeType;
         this.closeRunnable = other.closeRunnable;
         this.postCloseRunnable = other.postCloseRunnable;
+        this.tickRunnable = other.tickRunnable;
     }
 
     /**
@@ -167,6 +171,11 @@ public final class MenuBuilder {
 
     public SimpleGUIItem getSpecialItem(String key) {
         return specialGUIItems.get(key);
+    }
+
+    public MenuBuilder tickRunnable(Runnable runnable) {
+        this.tickRunnable = runnable;
+        return this;
     }
 
     public MenuBuilder closeRunnable(CloseRunnable closeRunnable) {
@@ -335,6 +344,7 @@ public final class MenuBuilder {
         MenuSimple menuSimple = new MenuSimple(this.title, new MenuShape(menuShapeType, size), clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuSimple.setContents(contents);
         menuSimple.setTopClickAction(topClickEvent);
+        menuSimple.setTickRunnable(this.tickRunnable);
         menuSimple.onClose(this.closeRunnable);
         menuSimple.onPostClose(this.postCloseRunnable);
         menuSimple.setBottomClickAction(bottomClickEvent);
@@ -396,6 +406,7 @@ public final class MenuBuilder {
 
         MenuDynamic menuDynamic = new MenuDynamic(this.title, new MenuShape(menuShapeType, size), clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
         menuDynamic.setContents(contents);
+        menuDynamic.setTickRunnable(this.tickRunnable);
         menuDynamic.onClose(this.closeRunnable);
         menuDynamic.onPostClose(this.postCloseRunnable);
         menuDynamic.setTopClickAction(topClickEvent);
