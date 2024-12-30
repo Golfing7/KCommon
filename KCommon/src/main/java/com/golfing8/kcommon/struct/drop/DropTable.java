@@ -130,10 +130,10 @@ public class DropTable implements CASerializable {
     public List<Drop<?>> generateDrops(@NotNull DropContext context) {
         List<Drop<?>> drops = new ArrayList<>();
         for (var groupEntry : groupings.entrySet()) {
+            List<String> dropKeys = new ArrayList<>(groupEntry.getValue().getDrops());
             int dropTarget = groupEntry.getValue().getDropTarget();
             int collectedDrops = 0;
             do {
-                List<String> dropKeys = new ArrayList<>(groupEntry.getValue().getDrops());
                 Collections.shuffle(dropKeys);
                 for (String dropKey : dropKeys) {
                     Drop<?> drop = table.get(dropKey);
