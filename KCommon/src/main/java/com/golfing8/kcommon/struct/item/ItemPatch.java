@@ -61,8 +61,9 @@ public class ItemPatch implements CASerializable {
      * Applies this patch to the given builder.
      *
      * @param builder the item builder.
+     * @return the same builder.
      */
-    public void applyToItem(ItemStackBuilder builder) {
+    public ItemStackBuilder applyToItem(ItemStackBuilder builder) {
         if (this.materialPatch != null) {
             String patchedMaterial = this.materialPatch.applyTo(builder.getItemType().name());
             Optional<XMaterial> xMaterial = XMaterial.matchXMaterial(patchedMaterial);
@@ -78,5 +79,6 @@ public class ItemPatch implements CASerializable {
             List<String> patchedLore = Arrays.asList(patchedSerializedLore.split(" \\\\n "));
             builder.lore(patchedLore);
         }
+        return builder;
     }
 }
