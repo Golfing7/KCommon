@@ -118,4 +118,18 @@ public interface DataManager<T extends DataSerializable> {
      * @return true if it does, false if not
      */
     boolean exists(@Nonnull String key);
+
+    /**
+     * Only saves objects which strictly have been changed.
+     *
+     * @param strictSaving if strict saving should be enabled.
+     */
+    void setStrictSaving(boolean strictSaving);
+
+    /**
+     * If strict saving is on.
+     *
+     * @return true if strict saving is on.
+     */
+    boolean isStrictSaving();
 }

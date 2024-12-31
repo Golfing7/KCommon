@@ -3,6 +3,7 @@ package com.golfing8.kcommon.data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
@@ -17,6 +18,8 @@ public abstract class DataManagerAbstract<T extends DataSerializable> implements
     @Getter
     private final Class<T> typeClass;
     private final Constructor<T> typeConstructor;
+    @Getter @Setter
+    private boolean strictSaving = false;
 
     public DataManagerAbstract(String key, Plugin plugin, Class<T> typeClass) {
         this.key = key;

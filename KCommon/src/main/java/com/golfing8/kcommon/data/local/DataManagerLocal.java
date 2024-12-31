@@ -143,7 +143,12 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
     @Override
     public void shutdown() {
-        this.objectCache.forEach((key, value) -> this.store(value));
+        this.objectCache.forEach((key, value) -> {
+            if (isStrictSaving() && !value.hasChanged())
+                return;
+
+            this.store(value);
+        });
     }
 
     @Override
@@ -212,6 +217,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
             throw new RuntimeException(String.format("Failed to write object with type %s with key %s!", this.getTypeClass().getName(), obj.getKey()), e);
         }
         this.objectCache.put(obj.getKey(), obj);
+        obj.markSaved();
         return !replacing;
     }
 
