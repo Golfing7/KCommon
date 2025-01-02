@@ -69,6 +69,8 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
 
         // Run the pre-enable inner function
         this.onPreEnableInner();
+        if (!getServer().getPluginManager().isPluginEnabled(this))
+            return;
 
         //Set up the lang config.
         Path langPath = Paths.get(getDataFolder().getPath(), "kore-lang.yml");
@@ -78,12 +80,16 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.loadModuleManifest();
 
         this.onEnableInner();
+        if (!getServer().getPluginManager().isPluginEnabled(this))
+            return;
+
         try {
             this.reflectivelySetupModules();
         } catch (RuntimeException e) {
             this.getLogger().warning("Failed to reflectively initialize modules! Shutting down...");
             e.printStackTrace();
             this.getServer().getPluginManager().disablePlugin(this);
+            return;
         }
 
         // Finally, save the lang config again in case anything was registered!
