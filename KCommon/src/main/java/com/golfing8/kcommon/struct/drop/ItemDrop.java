@@ -33,6 +33,7 @@ public class ItemDrop extends Drop<ItemStack> {
     private String lootingFormula;
     public ItemDrop(double chance,
                     @Nullable String displayName,
+                    double maxBoost,
                     Map<String, ItemStackBuilder> items,
                     boolean giveDirectly,
                     boolean fancyDrop,
@@ -41,7 +42,7 @@ public class ItemDrop extends Drop<ItemStack> {
                     boolean lootingEnabled,
                     boolean fortuneEnabled,
                     @Nullable String lootingFormula) {
-        super(chance, displayName);
+        super(chance, displayName, maxBoost);
         this.items = items;
         this.giveDirectly = giveDirectly;
         this.fancyDrop = fancyDrop;
@@ -58,10 +59,11 @@ public class ItemDrop extends Drop<ItemStack> {
     }
 
     public List<ItemStack> getDrop(double boost) {
+        double effectiveBoost = Math.min(boost, getMaxBoost());
         return items.values().stream().map(builder -> {
             ItemStack itemStack = builder.buildFromTemplate();
-            if (boost != 1.0D && boostQuantity) {
-                itemStack.setAmount(MathUtil.roundRandomly(itemStack.getAmount() * boost));
+            if (effectiveBoost != 1.0D && boostQuantity) {
+                itemStack.setAmount(MathUtil.roundRandomly(itemStack.getAmount() * effectiveBoost));
             }
             return itemStack;
         }).collect(Collectors.toList());

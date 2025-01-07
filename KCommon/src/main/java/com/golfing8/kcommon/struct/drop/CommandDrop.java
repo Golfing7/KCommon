@@ -13,8 +13,8 @@ import java.util.List;
 @Getter
 public class CommandDrop extends Drop<String> {
     private List<String> commands;
-    public CommandDrop(double chance, @Nullable String displayName, List<String> commands) {
-        super(chance, displayName);
+    public CommandDrop(double chance, @Nullable String displayName, double maxBoost, List<String> commands) {
+        super(chance, displayName, maxBoost);
         this.commands = commands;
     }
 

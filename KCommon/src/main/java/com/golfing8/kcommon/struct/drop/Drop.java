@@ -16,20 +16,26 @@ import java.util.List;
  * Represents a singular drop in a {@link DropTable}.
  */
 @Getter
+@Setter
 public abstract class Drop<T> implements RandomTestable {
     /** The key that was used to load this from the config */
-    @Setter
     private String _key;
     /** The chance for this drop */
     private double chance;
     /** The display name of this drop */
-    @Getter
     private @Nullable String displayName;
-    /** The drop table this drop is linked to. Can be null */
+    /** The maximum boost that this drop can use */
+    private double maxBoost;
 
-    public Drop(double chance, @Nullable String displayName) {
+    /** The drop table this drop is linked to. Can be null */
+    public Drop(double chance, @Nullable String displayName, double maxBoost) {
         this.chance = chance;
         this.displayName = displayName;
+        this.maxBoost = maxBoost;
+    }
+
+    public Drop(double chance, @Nullable String displayName) {
+        this(chance, displayName, Double.MAX_VALUE);
     }
     /**
      * Gets the set of dropped objects.

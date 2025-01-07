@@ -29,10 +29,11 @@ public class XpDrop extends Drop<Integer> {
     private boolean giveDirectly;
     public XpDrop(double chance,
                   @Nullable String displayName,
+                  double maxBoost,
                   int xp,
                   boolean boostQuantity,
                   boolean giveDirectly) {
-        super(chance, displayName);
+        super(chance, displayName, maxBoost);
         this.xp = xp;
         this.boostQuantity = boostQuantity;
         this.giveDirectly = giveDirectly;
@@ -45,13 +46,15 @@ public class XpDrop extends Drop<Integer> {
 
     @Override
     public void giveTo(DropContext context) {
-        int xpToGive = boostQuantity ? MathUtil.roundRandomly(xp * context.getBoost()) : xp;
+        double effectiveBoost = Math.min(context.getBoost(), getMaxBoost());
+        int xpToGive = boostQuantity ? MathUtil.roundRandomly(xp * effectiveBoost) : xp;
         SetExpFix.setTotalExperience(context.getPlayer(), SetExpFix.getTotalExperience(context.getPlayer()) + xpToGive);
     }
 
     @Override
     public void dropAt(DropContext context, Location location) {
-        int xpToGive = boostQuantity ? MathUtil.roundRandomly(xp * context.getBoost()) : xp;
+        double effectiveBoost = Math.min(context.getBoost(), getMaxBoost());
+        int xpToGive = boostQuantity ? MathUtil.roundRandomly(xp * effectiveBoost) : xp;
         if (giveDirectly && context.getPlayer() != null) {
             SetExpFix.setTotalExperience(context.getPlayer(), SetExpFix.getTotalExperience(context.getPlayer()) + xpToGive);
         } else {

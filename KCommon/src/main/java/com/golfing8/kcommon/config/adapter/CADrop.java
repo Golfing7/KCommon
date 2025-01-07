@@ -36,6 +36,9 @@ public class CADrop implements ConfigAdapter<Drop> {
         double chance = primitive.containsKey("chance") ?
                 (double) ConfigPrimitive.coerceStringToBoxed(primitive.get("chance").toString(), Double.class) :
                 100.0D;
+        double maxBoost = primitive.containsKey("max-boost") ?
+                (double) ConfigPrimitive.coerceStringToBoxed(primitive.get("max-boost").toString(), Double.class) :
+                1.0D;
         if (primitive.containsKey("items") || primitive.containsKey("item")) {
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             boolean fancy = (boolean) primitive.getOrDefault("fancy", false);
@@ -46,27 +49,27 @@ public class CADrop implements ConfigAdapter<Drop> {
             String lootingFormula = primitive.getOrDefault("looting-formula", "rand1({LOOTING})").toString();
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(entry.getSubValue("item"), ItemStackBuilder.class);
-                ItemDrop drop = new ItemDrop(chance, displayName, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
+                ItemDrop drop = new ItemDrop(chance, displayName, maxBoost, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(entry.getSubValue("item"), fieldType);
-                ItemDrop drop = new ItemDrop(chance, displayName, items, giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
+                ItemDrop drop = new ItemDrop(chance, displayName, maxBoost, items, giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             }
         } else if (primitive.containsKey("commands")) {
             FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {});
             List<String> commands = ConfigTypeRegistry.getFromType(entry.getSubValue("commands"), fieldType);
-            CommandDrop drop = new CommandDrop(chance, displayName, commands);
+            CommandDrop drop = new CommandDrop(chance, displayName, maxBoost, commands);
             drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
             return drop;
         } else if (primitive.containsKey("xp")) {
             int xp = (int) primitive.getOrDefault("xp", 0);
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             boolean boostQuantity = (boolean) primitive.getOrDefault("boost-quantity", false);
-            return new XpDrop(chance, displayName, xp, boostQuantity, giveDirectly);
+            return new XpDrop(chance, displayName, maxBoost, xp, boostQuantity, giveDirectly);
         }
         throw new InvalidConfigException("Drop '%s' doesn't have 'commands' or 'items' key. Which type of drop is it?");
     }
