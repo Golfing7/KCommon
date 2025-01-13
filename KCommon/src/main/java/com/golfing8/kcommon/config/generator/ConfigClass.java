@@ -5,7 +5,6 @@ import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,7 +68,7 @@ public abstract class ConfigClass {
     private final Class<?> self;
     /** The backing instance of this config */
     @Getter
-    private final Object instance;
+    private final Object configInstance;
     /**
      * The parent class of this config.
      */
@@ -91,19 +90,19 @@ public abstract class ConfigClass {
     public ConfigClass() {
         this.parent = null;
         this.self = this.getClass();
-        this.instance = this;
+        this.configInstance = this;
     }
 
     public ConfigClass(@Nullable ConfigClass parent) {
         this.parent = parent;
         this.self = this.getClass();
-        this.instance = this;
+        this.configInstance = this;
     }
 
-    protected ConfigClass(@Nullable ConfigClass parent, @Nonnull Class<?> delegate, @Nonnull Object instance) {
+    protected ConfigClass(@Nullable ConfigClass parent, @Nonnull Class<?> delegate, @Nonnull Object configInstance) {
         this.parent = parent;
         this.self = delegate;
-        this.instance = instance;
+        this.configInstance = configInstance;
     }
 
     /**
@@ -225,7 +224,7 @@ public abstract class ConfigClass {
 
             //Generate and insert the field.
             FieldHandle<?> generatedHandle = FieldHandles.getHandle(field.getName(), clazz);
-            this.fieldHandleMap.put(field, new ConfigValueHandle(generatedHandle, field.getAnnotation(Conf.class), instance));
+            this.fieldHandleMap.put(field, new ConfigValueHandle(generatedHandle, field.getAnnotation(Conf.class), configInstance));
         }
 
         Class<?> parent = clazz.getSuperclass();
