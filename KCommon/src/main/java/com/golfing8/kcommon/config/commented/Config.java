@@ -12,24 +12,7 @@ import java.util.Collection;
  * Along with comments, other convenience methods have been added.
  * </p>
  */
-public interface Config extends org.bukkit.configuration.Configuration {
-
-    /**
-     * Sets the value at the given path with the given comments.
-     *
-     * @param path the path.
-     * @param value the value.
-     * @param comments the comments.
-     */
-    void set(String path, Object value, String... comments);
-
-    /**
-     * Sets the comments of the given path.
-     *
-     * @param path the path to set.
-     * @param comments the comments to set, or null if they should be cleared.
-     */
-    void setComments(String path, String... comments);
+public interface Config extends org.bukkit.configuration.Configuration, CommentableConfigurationSection {
 
     /**
      * Ensures the given path exists.

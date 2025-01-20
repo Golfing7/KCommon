@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.generator;
 
+import com.golfing8.kcommon.config.commented.CommentableConfigurationSection;
 import com.golfing8.kcommon.config.commented.Config;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
@@ -171,8 +172,8 @@ public abstract class ConfigClass {
     public final boolean loadValues(ConfigurationSection source) {
         String path = buildPath();
         boolean modified = false;
-        if (source instanceof Config && this.confAnnotation != null) {
-            ((Config) source).setComments(path, this.confAnnotation.value());
+        if (source instanceof CommentableConfigurationSection && this.confAnnotation != null) {
+            ((CommentableConfigurationSection) source).setComments(path, this.confAnnotation.value());
         }
 
         for (ConfigValueHandle handle : this.fieldHandleMap.values()) {

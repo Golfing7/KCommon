@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.generator;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
+import com.golfing8.kcommon.config.commented.CommentableConfigurationSection;
 import com.golfing8.kcommon.config.commented.Config;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.util.StringUtil;
@@ -53,8 +54,8 @@ public class ConfigValueHandle {
                 if (readOnly)
                     return false;
 
-                if (annotation != null && sourceSection instanceof Config) {
-                    ((Config) sourceSection).set(path, handle.get(instance), this.annotation.value());
+                if (annotation != null && sourceSection instanceof CommentableConfigurationSection) {
+                    ((CommentableConfigurationSection) sourceSection).set(path, handle.get(instance), this.annotation.value());
                 } else {
                     ConfigPrimitive adapted = ConfigTypeRegistry.toPrimitive(handle.get(instance));
                     sourceSection.set(path, adapted.unwrap());

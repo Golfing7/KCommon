@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 @AllArgsConstructor
-public class WrappedConfigurationSection implements ConfigurationSection {
+public class WrappedConfigurationSection implements CommentableConfigurationSection {
     private final ConfigurationSection wrapped;
     private final com.golfing8.kcommon.config.commented.Configuration originalConfig;
 
@@ -301,6 +301,19 @@ public class WrappedConfigurationSection implements ConfigurationSection {
     @Override
     public void set(String path, Object value) {
         ConfigTypeRegistry.setInConfig(wrapped, path, value);
+    }
+
+    @Override
+    public void set(String path, Object value, String... comments) {
+        setComments(path, comments);
+        set(path, value);
+    }
+
+    @Override
+    public void setComments(String path, String... comments) {
+        if (getRoot() instanceof CommentableConfigurationSection) {
+            ((CommentableConfigurationSection) getRoot()).setComments(getCurrentPath() + "." + path, comments);
+        }
     }
 
     @Override
