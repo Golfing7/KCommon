@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.util;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.nms.item.NMSItem;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
@@ -81,5 +82,15 @@ public final class ItemUtil {
         List<String> lore = NMS.getTheNMS().getMagicItems().getMMLore(meta);
         NMS.getTheNMS().getMagicItems().applyLore(meta, MS.parseAllMulti(lore, placeholders));
         itemStack.setItemMeta(meta);
+    }
+
+    /**
+     * Checks if the item is air or null or has an amount of 0.
+     *
+     * @param check the check.
+     * @return true if the item is air or null.
+     */
+    public static boolean isAirOrNull(ItemStack check){
+        return check == null || check.getType() == XMaterial.AIR.parseMaterial() || check.getAmount() <= 0;
     }
 }
