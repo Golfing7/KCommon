@@ -40,7 +40,7 @@ public class CAColorBukkit implements ConfigAdapter<Color> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull Color object) {
-        return ConfigPrimitive.ofString(Integer.toString(object.asRGB() & 0xFFFFFF, 16));
+        return ConfigPrimitive.ofString(String.format("%06X", object.asRGB() & 0xFFFFFF));
     }
 
     @SuppressWarnings("unchecked")

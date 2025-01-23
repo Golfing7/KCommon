@@ -41,7 +41,7 @@ public class CAColorAWT implements ConfigAdapter<Color> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull Color object) {
-        return ConfigPrimitive.ofString(Integer.toString(object.getRGB() & 0xFFFFFF, 16));
+        return ConfigPrimitive.ofString(String.format("%06X", object.getRGB() & 0xFFFFFF));
     }
 
     @SuppressWarnings("unchecked")

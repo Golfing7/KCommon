@@ -47,12 +47,16 @@ public class World implements NMSWorld {
 
     @Override
     public void forceChestOpen(Position position) {
-
+        Location location = position.toLocation(world);
+        Chest chest = (Chest) location.getBlock().getState();
+        chest.open();
     }
 
     @Override
     public void forceChestClose(Position position) {
-
+        Location location = position.toLocation(world);
+        Chest chest = (Chest) location.getBlock().getState();
+        chest.close();
     }
 
     @Override

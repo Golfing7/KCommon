@@ -20,7 +20,7 @@ public final class MathUtil {
         if (minimum == d)
             return minimum;
 
-        if (ThreadLocalRandom.current().nextDouble() < difference)
+        if (ThreadLocalRandom.current().nextDouble() >= difference)
             return minimum;
         else
             return minimum + 1;
