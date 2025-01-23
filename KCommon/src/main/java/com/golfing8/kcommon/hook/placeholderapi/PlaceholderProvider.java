@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.hook.placeholderapi;
 
 import lombok.var;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
@@ -13,10 +14,10 @@ import java.util.Map;
  */
 public interface PlaceholderProvider {
     interface PlaceholderFunction {
-        String get(Player player, String[] args);
+        String get(OfflinePlayer player, String[] args);
     }
     interface RelPlaceholderFunction {
-        String get(Player player, Player other, String[] args);
+        String get(OfflinePlayer player, Player other, String[] args);
     }
 
     /**
@@ -63,7 +64,7 @@ public interface PlaceholderProvider {
      * @return the parsed placeholder, or null if the default unimplemented placeholder should be returned.
      */
     @Nullable
-    default String onPlaceholderRequest(Player player, String[] parameters) {
+    default String onPlaceholderRequest(OfflinePlayer player, String[] parameters) {
         Map.Entry<KPlaceholderDefinition, PlaceholderFunction> bestEntry = null;
         int mostMatches = 0;
         for (var entry : getPlaceholders().entrySet()) {
