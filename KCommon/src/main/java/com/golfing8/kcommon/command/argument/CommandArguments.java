@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -215,4 +216,10 @@ public final class CommandArguments {
     }, java.util.UUID::fromString);
 
     public static final CommandArgument<ConfigPath> CONFIG_PATH = new CommandArgument<>("config path", (context) -> Collections.emptyList(), (context) -> true, ConfigPath::parse);
+
+    public static final CommandArgument<World> WORLD = new CommandArgument<>("world", (context) -> {
+        return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
+    }, (context) -> {
+        return Bukkit.getWorld(context.getArgument()) != null;
+    }, Bukkit::getWorld);
 }

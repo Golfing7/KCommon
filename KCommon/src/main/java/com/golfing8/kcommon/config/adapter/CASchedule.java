@@ -39,9 +39,6 @@ public class CASchedule implements ConfigAdapter<Schedule> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull Schedule object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         List<String> strings = new ArrayList<>();
         for (Timestamp timestamp : object.getAllTimestamps()) {
             strings.add(timestamp.toConfigString());

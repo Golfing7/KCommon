@@ -100,7 +100,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public T getOrCreate(@NotNull String key) {
+    public synchronized T getOrCreate(@NotNull String key) {
         T obj = getObject(key);
         if (obj != null)
             return obj;
@@ -114,7 +114,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
     @Nullable
     @Override
-    public T getObject(@Nonnull String key) {
+    public synchronized T getObject(@Nonnull String key) {
         if(this.objectCache.containsKey(key))
             return this.objectCache.get(key);
 
@@ -137,12 +137,12 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public List<T> getWhere(String field, Object value, Object... keyValues) {
+    public synchronized List<T> getWhere(String field, Object value, Object... keyValues) {
         return fieldIndexer.getWhere(field, value, keyValues);
     }
 
     @Override
-    public void shutdown() {
+    public synchronized void shutdown() {
         this.objectCache.forEach((key, value) -> {
             if (isStrictSaving() && !value.hasChanged())
                 return;
@@ -152,12 +152,12 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public void uncache(@Nonnull String key) {
+    public synchronized void uncache(@Nonnull String key) {
         this.objectCache.remove(key);
     }
 
     @Override
-    public Map<String, T> getAll() {
+    public synchronized Map<String, T> getAll() {
         Map<String, T> toReturn = Maps.newHashMap();
 
         //Load all from the files
@@ -195,7 +195,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public boolean delete(@Nonnull String key) {
+    public synchronized boolean delete(@Nonnull String key) {
         if(!this.objectExists(key))
             return false;
 
@@ -209,7 +209,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public boolean store(@Nonnull T obj) {
+    public synchronized boolean store(@Nonnull T obj) {
         boolean replacing = this.exists(obj.getKey());
         try{
             this.writeObject(obj);
@@ -222,7 +222,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public boolean exists(@Nonnull String key) {
+    public synchronized boolean exists(@Nonnull String key) {
         return this.objectCache.containsKey(key) || this.objectExists(key);
     }
 
