@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.expansion.Relational;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,7 @@ public class KPAPIHook extends PlaceholderExpansion implements Relational {
     }
 
     @Override
-    public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
+    public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         if(params.isEmpty())
             return "Placeholder is empty";
 
@@ -81,6 +82,11 @@ public class KPAPIHook extends PlaceholderExpansion implements Relational {
         System.arraycopy(parameterSplit, 1, newParams, 0, newParams.length);
         String result = provider.onPlaceholderRequest(player, newParams);
         return result == null ? String.format("%s not found", params) : result;
+    }
+
+    @Override
+    public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
+        return onRequest(player, params);
     }
 
     @Override
