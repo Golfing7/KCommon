@@ -31,29 +31,6 @@ import java.util.Set;
 public abstract class ConfigClass {
     /** Used to store instances of configs globally for easy access. */
     private static final Map<Class<?>, ConfigClass> CONFIG_CLASS_MAP = new HashMap<>();
-    /**
-     * Gets the config class instance associated with the given type for the call.
-     *
-     * @param unused an unused array of objects used to reify the generic.
-     * @return the config class instance.
-     * @param <T> the type.
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends ConfigClass> T get(@NotNull T... unused) {
-        return (T) CONFIG_CLASS_MAP.get(unused.getClass().getComponentType());
-    }
-
-    /**
-     * Gets the config class instance associated with the given class for the call.
-     *
-     * @param type the class type.
-     * @return the config class instance.
-     * @param <T> the type.
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends ConfigClass> T get(@NotNull Class<T> type) {
-        return (T) CONFIG_CLASS_MAP.get(type);
-    }
 
     /**
      * Maps a field to its handle.
