@@ -113,6 +113,14 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
     public void setAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
         NBT.modify(stack, (nbt) -> {
+            // First clear the list
+            if (modifiers == null) {
+                nbt.removeKey("AttributeModifiers");
+                return;
+            }
+
+            nbt.getCompoundList("AttributeModifiers").clear();
+
             for (var entry : modifiers.entrySet()) {
                 for (var modifier : entry.getValue()) {
                     ReadWriteNBTCompoundList list = nbt.getCompoundList("AttributeModifiers");
