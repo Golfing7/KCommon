@@ -46,7 +46,11 @@ public class SimpleGUIItem {
     }
 
     public SimpleGUIItem(ConfigurationSection section) {
-        this.item = new ItemStackBuilder(section);
+        if (section.isConfigurationSection("item")) {
+            this.item = new ItemStackBuilder(section.getConfigurationSection("item"));
+        } else {
+            this.item = new ItemStackBuilder(section);
+        }
         this.slot = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slot"), MenuCoordinate.class);
     }
 }
