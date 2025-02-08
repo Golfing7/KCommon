@@ -139,6 +139,30 @@ public class MagicItemsV1_17 implements NMSMagicItems {
     }
 
     @Override
+    public void setExtraAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
+        ItemMeta unmodifiedMeta = new ItemStack(stack.getType()).getItemMeta();
+        var originalAttributes = unmodifiedMeta.getAttributeModifiers();
+        Multimap<Attribute, AttributeModifier> defaultAttributes = originalAttributes == null ? HashMultimap.create() : HashMultimap.create(originalAttributes);
+        if (modifiers != null) {
+            for (var entry : modifiers.entrySet()) {
+                Attribute attribute = Attribute.valueOf(entry.getKey().name());
+                for (EntityAttributeModifier modifier : entry.getValue()) {
+                    defaultAttributes.put(attribute, new AttributeModifier(
+                            modifier.getUuid(),
+                            modifier.getName(),
+                            modifier.getAmount(),
+                            AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
+                            modifier.getSlot())
+                    );
+                }
+            }
+        }
+        ItemMeta meta = stack.getItemMeta();
+        meta.setAttributeModifiers(defaultAttributes);
+        stack.setItemMeta(meta);
+    }
+
+    @Override
     public void setCustomModelData(ItemMeta meta, int modelData) {
         meta.setCustomModelData(modelData);
     }

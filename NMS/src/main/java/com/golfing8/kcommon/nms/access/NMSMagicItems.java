@@ -31,6 +31,8 @@ public interface NMSMagicItems {
 
     void setAttributeModifiers(ItemStack meta, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
 
+    void setExtraAttributeModifiers(ItemStack meta, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
+
     /**
      * Applies the name to the item and tries to use mini message if available.
      *

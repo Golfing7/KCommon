@@ -24,9 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MagicItems implements NMSMagicItems {
     @Override
@@ -110,6 +108,30 @@ public class MagicItems implements NMSMagicItems {
         } else {
             meta.setAttributeModifiers(null);
         }
+        stack.setItemMeta(meta);
+    }
+
+    @Override
+    public void setExtraAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
+        ItemMeta unmodifiedMeta = new ItemStack(stack.getType()).getItemMeta();
+        var originalAttributes = unmodifiedMeta.getAttributeModifiers();
+        Multimap<Attribute, AttributeModifier> defaultAttributes = originalAttributes == null ? HashMultimap.create() : HashMultimap.create(originalAttributes);
+        if (modifiers != null) {
+            for (var entry : modifiers.entrySet()) {
+                Attribute attribute = Attribute.valueOf(entry.getKey().name());
+                for (EntityAttributeModifier modifier : entry.getValue()) {
+                    defaultAttributes.put(attribute, new AttributeModifier(
+                            modifier.getUuid(),
+                            modifier.getName(),
+                            modifier.getAmount(),
+                            AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
+                            modifier.getSlot())
+                    );
+                }
+            }
+        }
+        ItemMeta meta = stack.getItemMeta();
+        meta.setAttributeModifiers(defaultAttributes);
         stack.setItemMeta(meta);
     }
 

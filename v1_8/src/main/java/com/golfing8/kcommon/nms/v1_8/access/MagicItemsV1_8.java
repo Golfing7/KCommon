@@ -7,12 +7,14 @@ import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.Hand;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.nms.v1_8.item.ItemStackV1_8;
+import com.google.common.collect.Multimap;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBTCompoundList;
 import lombok.var;
+import net.minecraft.server.v1_8_R3.AttributeModifier;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
@@ -22,9 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
@@ -156,6 +156,17 @@ public class MagicItemsV1_8 implements NMSMagicItems {
                 }
             }
         });
+    }
+
+    @Override
+    public void setExtraAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
+        Multimap<String, AttributeModifier> defaultAttributes = CraftItemStack.asNMSCopy(stack).getItem().i();
+        Map<EntityAttribute, Set<EntityAttributeModifier>> newModifiers = modifiers == null ? new HashMap<>() : new HashMap<>(modifiers);
+        for (Map.Entry<String, AttributeModifier> attributeEntry : defaultAttributes.entries()) {
+            newModifiers.computeIfAbsent(EntityAttribute.byName(attributeEntry.getKey()), (k) -> new HashSet<>())
+                    .add(new EntityAttributeModifier(attributeEntry.getValue().a(), attributeEntry.getValue().b(), attributeEntry.getValue().d(), EntityAttributeModifier.Operation.values()[attributeEntry.getValue().c()]));
+        }
+        setAttributeModifiers(stack, modifiers);
     }
 
     @Override
