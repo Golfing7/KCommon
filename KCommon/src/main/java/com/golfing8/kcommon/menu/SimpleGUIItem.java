@@ -46,8 +46,8 @@ public class SimpleGUIItem {
     }
 
     public SimpleGUIItem(ConfigurationSection section) {
-        if (section.isConfigurationSection("item")) {
-            this.item = new ItemStackBuilder(section.getConfigurationSection("item"));
+        if (section.contains("item")) {
+            this.item = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "item"), ItemStackBuilder.class);
         } else {
             this.item = new ItemStackBuilder(section);
         }
