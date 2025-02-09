@@ -15,8 +15,11 @@ import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,6 +32,7 @@ public final class MenuBuilder {
 
     @Getter
     private int size = 27;
+    private @Nullable Player placeholderTarget;
     private boolean canExpire = true, clickable;
     @Getter
     private String title = "&cAspect GUI";
@@ -171,6 +175,11 @@ public final class MenuBuilder {
 
     public SimpleGUIItem getSpecialItem(String key) {
         return specialGUIItems.get(key);
+    }
+
+    public MenuBuilder placeholderTarget(@Nullable Player placeholderTarget) {
+        this.placeholderTarget = placeholderTarget;
+        return this;
     }
 
     public MenuBuilder tickRunnable(Runnable runnable) {
@@ -350,7 +359,7 @@ public final class MenuBuilder {
         menuSimple.setBottomClickAction(bottomClickEvent);
 
         otherGUIItems.forEach((key, item) -> {
-            menuSimple.setItemAt(item.getSlot().getX(), item.getSlot().getY(), item.getItem().buildFromTemplate());
+            menuSimple.setItemAt(item.getSlot().getX(), item.getSlot().getY(), item.getItem().buildFromTemplate(placeholderTarget));
         });
 
         //Attempt to create the special bindings.
@@ -374,7 +383,7 @@ public final class MenuBuilder {
             int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, guiItem.getSlot().getX(), guiItem.getSlot().getY());
             this.addAction(slot, specialBinding.getValue());
             this.setAt(slot,
-                    guiItem.getItem().buildFromTemplate());
+                    guiItem.getItem().buildFromTemplate(placeholderTarget));
             menuSimple.addSpecialItem(guiItem);
         }
 
@@ -413,7 +422,7 @@ public final class MenuBuilder {
         menuDynamic.setBottomClickAction(bottomClickEvent);
 
         otherGUIItems.forEach((key, item) -> {
-            menuDynamic.setItemAt(item.getSlot().getX(), item.getSlot().getY(), item.getItem().buildFromTemplate());
+            menuDynamic.setItemAt(item.getSlot().getX(), item.getSlot().getY(), item.getItem().buildFromTemplate(placeholderTarget));
         });
 
         //Attempt to create the special bindings.
@@ -437,7 +446,7 @@ public final class MenuBuilder {
             int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, guiItem.getSlot().getX(), guiItem.getSlot().getY());
             this.addAction(slot, specialBinding.getValue());
             this.setAt(slot,
-                    guiItem.getItem().buildFromTemplate());
+                    guiItem.getItem().buildFromTemplate(placeholderTarget));
             menuDynamic.addSpecialItem(guiItem);
         }
 

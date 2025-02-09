@@ -26,8 +26,11 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.AccessLevel;
 import lombok.Getter;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -355,9 +358,10 @@ public final class ItemStackBuilder {
     /**
      * Builds an item stack from the given template.
      *
+     * @param placeholderTarget the target for parsing placeholderapi placeholders.
      * @return the item stack built from the template.
      */
-    public ItemStack buildFromTemplate() {
+    public ItemStack buildFromTemplate(@Nullable Player placeholderTarget) {
         ItemStack newCopy;
         Placeholder[] placeholderArr = placeholders.toArray(new Placeholder[0]);
         if (itemType == XMaterial.PLAYER_HEAD && skullB64 != null) {
@@ -375,12 +379,19 @@ public final class ItemStackBuilder {
         ItemMeta meta = newCopy.getItemMeta();
 
         if(this.itemName != null) {
-            NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(this.itemName, placeholderArr));
+            String itemName = this.itemName;
+            if (placeholderTarget != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+                itemName = PlaceholderAPI.setPlaceholders(placeholderTarget, itemName);
+            }
+            NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(itemName, placeholderArr));
         }
         if(this.itemLore != null && !this.itemLore.isEmpty()) {
             //Parse both single and multi placeholders.
             List<String> firstRun = MS.parseAll(this.itemLore, placeholderArr);
             List<String> secondRun = MS.parseAllMulti(firstRun, multiLinePlaceholders.toArray(new MultiLinePlaceholder[0]));
+            if (placeholderTarget != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+                secondRun = PlaceholderAPI.setPlaceholders(placeholderTarget, secondRun);
+            }
             NMS.getTheNMS().getMagicItems().applyLore(meta, secondRun);
         }
 
@@ -433,6 +444,15 @@ public final class ItemStackBuilder {
         return newCopy;
     }
 
+    /**
+     * Builds an item stack from the given template.
+     *
+     * @return the item stack built from the template.
+     */
+    public ItemStack buildFromTemplate() {
+        return this.buildFromTemplate(null);
+    }
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void setValueInNBT(ReadWriteNBT nbtItem, String key, Object value) {
         if (value instanceof Integer) {
@@ -456,6 +476,19 @@ public final class ItemStackBuilder {
         } else if (value instanceof Boolean) {
             nbtItem.setBoolean(key, (Boolean) value);
         }
+    }
+
+    /**
+     * Returns a copy of the cached itemstack, being the last built itemstack from this builder.
+     *
+     * @param placeholderTarget the target for parsing placeholderapi.
+     * @return the cached itemstack.
+     */
+    public ItemStack buildCached(@Nullable Player placeholderTarget) {
+        if (cachedBuild == null)
+            buildFromTemplate(placeholderTarget);
+
+        return new ItemStack(cachedBuild);
     }
 
     /**
