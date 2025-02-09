@@ -14,8 +14,6 @@ import java.util.UUID;
 public abstract class SenderSerializable extends AbstractSerializable {
     /** The player's UUID. */
     private transient UUID playerUUID;
-    /** The cached player object */
-    private transient Player player;
 
     @Override
     public String getKey() {
@@ -43,14 +41,6 @@ public abstract class SenderSerializable extends AbstractSerializable {
      */
     @Nullable
     public Player getPlayer() {
-        if (playerUUID == null)
-            playerUUID = UUID.fromString(super.getKey());
-
-        if (player != null) {
-            if (!player.isOnline())
-                return null;
-            return player;
-        }
-        return player = Bukkit.getPlayer(playerUUID);
+        return Bukkit.getPlayer(playerUUID);
     }
 }

@@ -161,12 +161,17 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
     public void setExtraAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
         Multimap<String, AttributeModifier> defaultAttributes = CraftItemStack.asNMSCopy(stack).getItem().i();
+        // Is the player just wanting to clear 'extra' modifiers?
+        if (defaultAttributes.isEmpty() && modifiers == null) {
+            setAttributeModifiers(stack, null);
+            return;
+        }
         Map<EntityAttribute, Set<EntityAttributeModifier>> newModifiers = modifiers == null ? new HashMap<>() : new HashMap<>(modifiers);
         for (Map.Entry<String, AttributeModifier> attributeEntry : defaultAttributes.entries()) {
             newModifiers.computeIfAbsent(EntityAttribute.byName(attributeEntry.getKey()), (k) -> new HashSet<>())
                     .add(new EntityAttributeModifier(attributeEntry.getValue().a(), attributeEntry.getValue().b(), attributeEntry.getValue().d(), EntityAttributeModifier.Operation.values()[attributeEntry.getValue().c()]));
         }
-        setAttributeModifiers(stack, modifiers);
+        setAttributeModifiers(stack, newModifiers);
     }
 
     @Override
