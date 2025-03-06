@@ -15,6 +15,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.VoxelShape;
 
+import java.util.Arrays;
+
 public class MagicEntities implements NMSMagicEntities {
 
     @Override
@@ -132,11 +134,13 @@ public class MagicEntities implements NMSMagicEntities {
                 instance = entity.getAttribute(Attribute.GENERIC_ATTACK_KNOCKBACK);
                 break;
             case HORSE_JUMP_STRENGTH:
-                instance = entity.getAttribute(Attribute.HORSE_JUMP_STRENGTH);
+                instance = entity.getAttribute(Arrays.stream(Attribute.values()).filter(a -> a.name().contains("JUMP_STRENGTH")).findFirst().orElseThrow());
                 break;
             case ZOMBIE_SPAWN_REINFORCEMENTS:
                 instance = entity.getAttribute(Attribute.ZOMBIE_SPAWN_REINFORCEMENTS);
                 break;
+            case GRAVITY:
+                instance = entity.getAttribute(Attribute.GENERIC_GRAVITY);
         }
 
         if (instance != null)

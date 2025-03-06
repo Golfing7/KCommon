@@ -37,6 +37,7 @@ public enum EntityAttribute {
     PLAYER_SWEEPING_DAMAGE_RATIO,
     HORSE_JUMP_STRENGTH,
     ZOMBIE_SPAWN_REINFORCEMENTS,
+    GRAVITY,
     ;
 
     Set<String> oldNames;
