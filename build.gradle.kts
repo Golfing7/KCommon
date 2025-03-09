@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("com.github.johnrengelman.shadow") version("7.1.2")
+    id("com.gradleup.shadow") version("8.3.6")
     id("maven-publish")
 }
 
@@ -11,7 +11,7 @@ group = "com.golfing8"
 version = commonsVersion
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 repositories {
@@ -31,7 +31,7 @@ repositories {
 
 tasks {
     build {
-        dependsOn(shadowJar)
+        finalizedBy(shadowJar)
     }
 
     shadowJar {
@@ -66,11 +66,11 @@ subprojects {
     }
 
     dependencies {
-        annotationProcessor("org.projectlombok:lombok:1.18.24")
+        annotationProcessor("org.projectlombok:lombok:1.18.36")
         compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
         compileOnly("net.kyori:adventure-platform-bukkit:4.3.3")
         compileOnly("net.jodah:expiringmap:0.5.11")
-        compileOnly("org.projectlombok:lombok:1.18.24")
+        compileOnly("org.projectlombok:lombok:1.18.36")
         compileOnly("de.tr7zw:item-nbt-api:2.14.0") //For items.
         compileOnly("org.jetbrains:annotations:24.1.0")
     }

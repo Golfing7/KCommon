@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    id("com.github.johnrengelman.shadow") version("7.1.2")
+    id("com.gradleup.shadow") version("8.3.6")
     id("maven-publish")
     kotlin("jvm")
 }
