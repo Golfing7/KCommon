@@ -365,7 +365,7 @@ public final class ItemStackBuilder {
         ItemStack newCopy;
         Placeholder[] placeholderArr = placeholders.toArray(new Placeholder[0]);
         if (itemType == XMaterial.PLAYER_HEAD && skullB64 != null) {
-            newCopy = SkullCreator.itemFromBase64(MS.parseSingle(skullB64, placeholderArr));
+            newCopy = SkullCreator.itemWithBase64(XMaterial.PLAYER_HEAD.parseItem(), MS.parseSingle(skullB64, placeholderArr));
         } else {
             newCopy = itemType.parseItem();
             if (itemDurability > 0) {
