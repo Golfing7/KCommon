@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.data.local;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.data.DataManager;
 import com.golfing8.kcommon.data.DataManagerAbstract;
 import com.golfing8.kcommon.data.DataSerializable;

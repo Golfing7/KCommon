@@ -7,6 +7,7 @@ import com.golfing8.kcommon.command.impl.KPagerCommand;
 import com.golfing8.kcommon.db.MongoConnector;
 import com.golfing8.kcommon.library.LibraryDefinition;
 import com.golfing8.kcommon.listener.LinkedEntityListener;
+import com.golfing8.kcommon.listener.PlayerDataListener;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -105,6 +106,7 @@ public class KCommon extends KPlugin {
         new KItemCommand().register();
         if (NMS.getTheNMS().supportsPersistentDataContainers())
             getServer().getPluginManager().registerEvents(new LinkedEntityListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDataListener(), this);
     }
 
     private boolean trySetupMongo() {

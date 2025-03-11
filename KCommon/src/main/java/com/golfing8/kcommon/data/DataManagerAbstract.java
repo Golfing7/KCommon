@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.data;
 
+import com.golfing8.kcommon.KPlugin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
@@ -32,6 +33,11 @@ public abstract class DataManagerAbstract<T extends DataSerializable> implements
         }catch (NoSuchMethodException e) {
             throw new RuntimeException(String.format("Failed to find default constructor for %s class!", typeClass.getName()), e);
         }
+    }
+
+    @Override
+    public Class<T> getDataClass() {
+        return typeClass;
     }
 
     @Override

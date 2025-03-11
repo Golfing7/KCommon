@@ -13,6 +13,13 @@ import java.util.UUID;
  */
 public interface DataManager<T extends DataSerializable> {
     /**
+     * Gets the data class for this data manager.
+     *
+     * @return the data manager.
+     */
+    Class<T> getDataClass();
+
+    /**
      * Gets the key of this data manager.
      *
      * @return the key.
@@ -110,6 +117,13 @@ public interface DataManager<T extends DataSerializable> {
      * @return true if the object didn't previously exist, false if we're replacing something
      */
     boolean store(@Nonnull T obj);
+
+    /**
+     * Saves the object with the given key, if it exists.
+     *
+     * @param key the key.
+     */
+    void save(@Nonnull String key);
 
     /**
      * Checks if an object is stored under the given key in the data manager

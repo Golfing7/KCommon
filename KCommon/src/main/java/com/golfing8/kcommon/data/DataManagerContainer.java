@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.data;
 
 import com.golfing8.kcommon.data.local.DataManagerLocal;
+import com.golfing8.kcommon.data.remote.DataManagerRemote;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
@@ -28,15 +29,28 @@ public interface DataManagerContainer {
     }
 
     /**
+     * Adds a local data manager with the given key.
+     *
+     * @param key the key.
+     * @param dataClass the data class.
+     * @return the data manager
+     * @param <T> the type
+     */
+    default <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass) {
+        return addDataManager(key, dataClass, false);
+    }
+
+    /**
      * Adds a data manager with the given key and data class to this module's data manager map
      *
      * @param key the key of the data manager
      * @param dataClass the data class
+     * @param mongo if a remote data manager should be used
      * @param <T> the type of the data
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    default <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass) {
-        DataManagerLocal<T> local = new DataManagerLocal<>(key, JavaPlugin.getProvidingPlugin(getClass()), dataClass);
+    default <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass, boolean mongo) {
+        DataManager<T> local = mongo ? new DataManagerRemote<>(key, JavaPlugin.getProvidingPlugin(getClass()), dataClass) : new DataManagerLocal<>(key, JavaPlugin.getProvidingPlugin(getClass()), dataClass);
         Map c2DataMap = c2DataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
         Map dataMap = dataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
         c2DataMap.put(dataClass, local);
