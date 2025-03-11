@@ -42,6 +42,7 @@ import java.util.Collections;
 
 public class NMS implements NMSAccess {
     private final BukkitAudiences audiences;
+    private final MagicBlocksV1_8 magicBlocksV1_8;
     private final MagicNumbersV1_8 magicNumbersV1_8;
     private final MagicPacketsV1_8 magicPacketsV1_8;
     private final MagicEntitiesV1_8 magicEntitiesV1_8;
@@ -58,6 +59,7 @@ public class NMS implements NMSAccess {
         this.plugin = plugin;
         this.audiences = BukkitAudiences.create(plugin);
 
+        this.magicBlocksV1_8 = new MagicBlocksV1_8();
         this.magicNumbersV1_8 = new MagicNumbersV1_8();
         this.magicPacketsV1_8 = new MagicPacketsV1_8();
         this.magicEntitiesV1_8 = new MagicEntitiesV1_8();
@@ -172,6 +174,11 @@ public class NMS implements NMSAccess {
                 return new BlockDispenserV1_8((BlockDispenser) Blocks.DISPENSER);
         }
         return new BlockV1_8(CraftMagicNumbers.getBlock(material));
+    }
+
+    @Override
+    public NMSMagicBlocks getMagicBlocks() {
+        return magicBlocksV1_8;
     }
 
     @Override

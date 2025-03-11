@@ -27,6 +27,8 @@ public interface NMSAccess {
 
     NMSBlock getBlock(Material material);
 
+    NMSMagicBlocks getMagicBlocks();
+
     NMSMagicEntities getMagicEntities();
 
     NMSMagicPackets getMagicPackets();

@@ -5,11 +5,13 @@ import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.Hand;
 import com.golfing8.kcommon.nms.struct.PotionData;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +34,8 @@ public interface NMSMagicItems {
     void setAttributeModifiers(ItemStack meta, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
 
     void setExtraAttributeModifiers(ItemStack meta, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
+
+    void setSkullOwningPlayer(SkullMeta meta, OfflinePlayer offlinePlayer);
 
     /**
      * Applies the name to the item and tries to use mini message if available.

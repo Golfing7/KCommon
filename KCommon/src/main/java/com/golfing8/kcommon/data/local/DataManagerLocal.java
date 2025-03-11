@@ -223,6 +223,14 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
+    public synchronized void save(@NotNull String key) {
+        if (!this.objectCache.containsKey(key))
+            return;
+
+        store(this.objectCache.get(key));
+    }
+
+    @Override
     public synchronized boolean exists(@Nonnull String key) {
         return this.objectCache.containsKey(key) || this.objectExists(key);
     }

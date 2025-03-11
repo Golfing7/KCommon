@@ -8,6 +8,7 @@ import com.golfing8.kcommon.nms.struct.Hand;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.golfing8.kcommon.nms.v1_8.item.ItemStackV1_8;
 import com.google.common.collect.Multimap;
+import com.mojang.authlib.GameProfile;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTItem;
@@ -16,12 +17,15 @@ import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBTCompoundList;
 import lombok.var;
 import net.minecraft.server.v1_8_R3.AttributeModifier;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftMetaSkull;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -172,6 +176,12 @@ public class MagicItemsV1_8 implements NMSMagicItems {
                     .add(new EntityAttributeModifier(attributeEntry.getValue().a(), attributeEntry.getValue().b(), attributeEntry.getValue().d(), EntityAttributeModifier.Operation.values()[attributeEntry.getValue().c()]));
         }
         setAttributeModifiers(stack, newModifiers);
+    }
+
+    @Override
+    public void setSkullOwningPlayer(SkullMeta meta, OfflinePlayer offlinePlayer) {
+        CraftMetaSkull metaSkull = (CraftMetaSkull) meta;
+        metaSkull.profile = new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName());
     }
 
     @Override

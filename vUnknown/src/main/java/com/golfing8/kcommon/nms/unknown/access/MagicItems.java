@@ -12,6 +12,7 @@ import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.BlockState;
@@ -21,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -133,6 +135,11 @@ public class MagicItems implements NMSMagicItems {
         ItemMeta meta = stack.getItemMeta();
         meta.setAttributeModifiers(defaultAttributes);
         stack.setItemMeta(meta);
+    }
+
+    @Override
+    public void setSkullOwningPlayer(SkullMeta meta, OfflinePlayer offlinePlayer) {
+        meta.setOwningPlayer(offlinePlayer);
     }
 
     @Override

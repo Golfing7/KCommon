@@ -34,6 +34,7 @@ public class NMS implements NMSAccess {
     private final WorldguardHook wgHook;
     private final WorldEditHook worldEditHook;
 
+    private final MagicBlocks magicBlocks;
     private final MagicItems magicItems;
     private final MagicEntities magicEntities;
     private final MagicPackets magicPackets;
@@ -43,6 +44,7 @@ public class NMS implements NMSAccess {
     public NMS(Plugin plugin){
         this.server = new Server();
 
+        this.magicBlocks = new MagicBlocks();
         this.magicEntities = new MagicEntities();
         this.magicItems = new MagicItems();
         this.magicNumbers = new MagicNumbers();
@@ -108,6 +110,11 @@ public class NMS implements NMSAccess {
     @Override
     public NMSBlock getBlock(Material material) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public NMSMagicBlocks getMagicBlocks() {
+        return magicBlocks;
     }
 
     @Override
