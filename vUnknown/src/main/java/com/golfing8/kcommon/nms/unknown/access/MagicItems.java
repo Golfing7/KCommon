@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.nms.unknown.access;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
@@ -7,10 +9,12 @@ import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.authlib.GameProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
@@ -140,6 +144,14 @@ public class MagicItems implements NMSMagicItems {
     @Override
     public void setSkullOwningPlayer(SkullMeta meta, OfflinePlayer offlinePlayer) {
         meta.setOwningPlayer(offlinePlayer);
+    }
+
+    @Override
+    public void setSkullTexture(SkullMeta meta, String base64Texture) {
+        GameProfile mojProfile = NMSMagicItems.makeProfile(base64Texture);
+        PlayerProfile bukkitProfile = Bukkit.createProfile(mojProfile.getId(), mojProfile.getName());
+        bukkitProfile.setProperty(new ProfileProperty("textures", base64Texture));
+        meta.setPlayerProfile(bukkitProfile);
     }
 
     @Override

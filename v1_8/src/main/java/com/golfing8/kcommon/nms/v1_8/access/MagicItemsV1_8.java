@@ -185,6 +185,12 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     }
 
     @Override
+    public void setSkullTexture(SkullMeta meta, String base64Texture) {
+        CraftMetaSkull metaSkull = (CraftMetaSkull) meta;
+        metaSkull.profile = NMSMagicItems.makeProfile(base64Texture);
+    }
+
+    @Override
     public void setBaseEffect(PotionMeta meta, PotionData data) {
         throw new UnsupportedOperationException("1.8 does not support potion data types."); // TODO Maybe try to find a way?
     }

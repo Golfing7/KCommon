@@ -22,7 +22,7 @@ public class MagicEntities implements NMSMagicEntities {
     @Override
     public GameProfile getGameProfile(Player player) {
         PlayerProfile profile = player.getPlayerProfile();
-        return new GameProfile(profile.getId().toString(), profile.getName());
+        return new GameProfile(profile.getId(), profile.getName());
     }
 
     @Override

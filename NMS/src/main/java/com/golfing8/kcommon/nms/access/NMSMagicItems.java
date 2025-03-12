@@ -5,6 +5,8 @@ import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.Hand;
 import com.golfing8.kcommon.nms.struct.PotionData;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public interface NMSMagicItems {
     EntityType getSpawnerType(ItemStack stack);
@@ -36,6 +39,8 @@ public interface NMSMagicItems {
     void setExtraAttributeModifiers(ItemStack meta, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
 
     void setSkullOwningPlayer(SkullMeta meta, OfflinePlayer offlinePlayer);
+
+    void setSkullTexture(SkullMeta meta, String base64Texture);
 
     /**
      * Applies the name to the item and tries to use mini message if available.
@@ -137,5 +142,16 @@ public interface NMSMagicItems {
             return;
 
         setUnbreakable(itemStack.getItemMeta(), value);
+    }
+
+    static GameProfile makeProfile(String b64) {
+        // random uuid based on the b64 string
+        UUID id = new UUID(
+                b64.substring(b64.length() - 20).hashCode(),
+                b64.substring(b64.length() - 10).hashCode()
+        );
+        GameProfile profile = new GameProfile(id, "Player");
+        profile.getProperties().put("textures", new Property("textures", b64));
+        return profile;
     }
 }
