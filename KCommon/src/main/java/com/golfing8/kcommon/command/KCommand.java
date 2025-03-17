@@ -13,6 +13,7 @@ import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
 import lombok.*;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -131,6 +133,10 @@ public abstract class KCommand implements TabExecutor {
     @Getter @Nullable
     private KCommand parent;
 
+    /** If this command should be run async */
+    @Getter @Setter
+    private boolean async;
+
     /** The last time this command was executed. */
     @Getter
     private long lastExecutionTime;
@@ -150,6 +156,7 @@ public abstract class KCommand implements TabExecutor {
         this.commandAliases = Arrays.asList(cmd.aliases());
         this.description = cmd.description();
         this.visibility = cmd.visibility();
+        this.async = cmd.async();
         if (cmd.forPlayers()) {
             this.commandRequirements.add(RequirementPlayer.getInstance());
         }
@@ -831,7 +838,11 @@ public abstract class KCommand implements TabExecutor {
     @Override
     public final boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         //Immediately pass to the real handler.
-        this.pass(commandSender, s, strings);
+        if (async) {
+            Bukkit.getScheduler().runTaskAsynchronously(this.getPlugin(), () -> this.pass(commandSender, s, strings));
+        } else {
+            this.pass(commandSender, s, strings);
+        }
         return true;
     }
 
