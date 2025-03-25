@@ -37,6 +37,8 @@ public interface NMSAccess {
 
     NMSMagicEvents getMagicEvents();
 
+    NMSMagicInventories getMagicInventories();
+
     WorldguardHook getWGHook();
 
     /**

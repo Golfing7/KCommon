@@ -48,6 +48,7 @@ public class NMS implements NMSAccess {
     private final MagicEntitiesV1_8 magicEntitiesV1_8;
     private final MagicItemsV1_8 magicItemsV1_8;
     private final MagicEventsV1_8 magicEventsV1_8;
+    private final MagicInventoriesV1_8 magicInventoriesV1_8;
 
     private final ServerV1_8 server;
     private final WorldguardHook worldguardHook;
@@ -67,6 +68,7 @@ public class NMS implements NMSAccess {
         this.worldguardHook = Bukkit.getPluginManager().isPluginEnabled("WorldGuard") ? new WorldguardV1_8() : WorldguardHook.EMPTY;
         this.worldEditHook = Bukkit.getPluginManager().isPluginEnabled("WorldEdit") ? new WorldEditV1_8(this) : WorldEditHook.EMPTY;
         this.magicEventsV1_8 = new MagicEventsV1_8();
+        this.magicInventoriesV1_8 = new MagicInventoriesV1_8();
 
         this.server = new ServerV1_8();
 
@@ -199,6 +201,11 @@ public class NMS implements NMSAccess {
     @Override
     public NMSMagicEvents getMagicEvents() {
         return magicEventsV1_8;
+    }
+
+    @Override
+    public NMSMagicInventories getMagicInventories() {
+        return magicInventoriesV1_8;
     }
 
     @Override

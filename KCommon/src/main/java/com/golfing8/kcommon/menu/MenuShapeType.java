@@ -13,6 +13,7 @@ public enum MenuShapeType {
     CHEST(InventoryType.CHEST, 9, 6, true),
     DISPENSER(InventoryType.DISPENSER, 3, 3, false),
     HOPPER(InventoryType.HOPPER, 5, 1, false),
+    ANVIL(InventoryType.ANVIL, 3, 1, false),
     ;
 
     private final InventoryType type;
