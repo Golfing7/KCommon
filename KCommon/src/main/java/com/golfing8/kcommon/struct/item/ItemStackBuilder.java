@@ -116,6 +116,10 @@ public final class ItemStackBuilder {
      */
     private String skullB64;
     /**
+     * The UUID of the owner of the skull. Only applied if this item builder builds a player head.
+     */
+    private UUID skullOwner;
+    /**
      * The last built itemstack for this builder.
      */
     @Getter(AccessLevel.PRIVATE)
@@ -235,6 +239,11 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder skullOwner(UUID skullOwner) {
+        this.skullOwner = skullOwner;
+        return this;
+    }
+
     public ItemStackBuilder itemID(String id) {
         this.itemID = id;
         return this;
@@ -301,6 +310,16 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder addLore(String... lore) {
+        this.itemLore.addAll(Arrays.asList(lore));
+        return this;
+    }
+
+    public ItemStackBuilder addLore(Collection<String> lore) {
+        this.itemLore.addAll(lore);
+        return this;
+    }
+
     public ItemStackBuilder durability(short dura) {
         this.itemDurability = dura;
         return this;
@@ -364,15 +383,21 @@ public final class ItemStackBuilder {
     public ItemStack buildFromTemplate(@Nullable Player placeholderTarget) {
         ItemStack newCopy;
         Placeholder[] placeholderArr = placeholders.toArray(new Placeholder[0]);
-        if (itemType == XMaterial.PLAYER_HEAD && skullB64 != null) {
-            newCopy = SkullCreator.itemWithBase64(XMaterial.PLAYER_HEAD.parseItem(), MS.parseSingle(skullB64, placeholderArr));
+        if (itemType == XMaterial.PLAYER_HEAD) {
+            if (skullB64 != null) {
+                newCopy = SkullCreator.itemWithBase64(XMaterial.PLAYER_HEAD.parseItem(), MS.parseSingle(skullB64, placeholderArr));
+            } else if (skullOwner != null) {
+                newCopy = SkullCreator.itemFromUuid(skullOwner);
+            } else {
+                newCopy = itemType.parseItem();
+            }
         } else {
             newCopy = itemType.parseItem();
             if (itemDurability > 0) {
                 newCopy.setDurability(itemDurability);
             }
-            newCopy.setAmount(newAmount());
         }
+        newCopy.setAmount(newAmount());
 
         NMS.getTheNMS().getMagicItems().setAttributeModifiers(newCopy, attributeModifierMap);
 

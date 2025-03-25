@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.menu.shape;
 
+import com.golfing8.kcommon.menu.MenuUtils;
 import lombok.Data;
 import lombok.Setter;
 
@@ -15,6 +16,10 @@ public class MenuCoordinate {
     public MenuCoordinate(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public int toSlot() {
+        return MenuUtils.getSlotFromCartCoords(x, y);
     }
 
     public String toString() {
