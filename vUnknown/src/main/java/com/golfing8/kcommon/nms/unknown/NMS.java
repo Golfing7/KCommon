@@ -40,7 +40,7 @@ public class NMS implements NMSAccess {
     private final MagicPackets magicPackets;
     private final MagicNumbers magicNumbers;
     private final MagicEvents magicEvents;
-    private final NMSMagicInventories magicInventories;
+    private final MagicInventories magicInventories;
 
     public NMS(Plugin plugin){
         this.server = new Server();
@@ -51,12 +51,13 @@ public class NMS implements NMSAccess {
         this.magicNumbers = new MagicNumbers();
         this.magicPackets = new MagicPackets();
         this.magicEvents = new MagicEvents();
-        this.magicInventories = new NMSMagicInventories() {};
+        this.magicInventories = new MagicInventories();
         this.wgHook = Bukkit.getPluginManager().isPluginEnabled("WorldGuard") ? new Worldguard() : WorldguardHook.EMPTY;
         this.worldEditHook = Bukkit.getPluginManager().isPluginEnabled("WorldEdit") ? new WorldEdit() : WorldEditHook.EMPTY;
 
         Bukkit.getServer().getPluginManager().registerEvents(new PreSpawnSpawnerAdapter(), plugin);
         Bukkit.getServer().getPluginManager().registerEvents(new NewArmorEquipListener(), plugin);
+        Bukkit.getServer().getPluginManager().registerEvents(this.magicInventories, plugin);
     }
 
     @Override
