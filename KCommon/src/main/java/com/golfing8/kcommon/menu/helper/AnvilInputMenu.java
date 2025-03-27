@@ -8,7 +8,6 @@ import com.golfing8.kcommon.menu.Menu;
 import com.golfing8.kcommon.menu.MenuBuilder;
 import com.golfing8.kcommon.menu.MenuShapeType;
 import com.golfing8.kcommon.menu.PlayerMenuContainer;
-import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.event.PrepareResultEvent;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import lombok.Getter;
@@ -28,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 public class AnvilInputMenu extends PlayerMenuContainer implements Listener {
     @Getter
     private final CompletableFuture<@Nullable String> result;
-    private @Nullable String interimResult = null;
+    private @Nullable String interimResult = "";
     private String inputName;
 
     public AnvilInputMenu(Player player, String inputName) {
@@ -37,8 +36,10 @@ public class AnvilInputMenu extends PlayerMenuContainer implements Listener {
         this.result = new CompletableFuture<>();
         this.inputName = inputName == null ? "&aInput" : inputName;
         Bukkit.getPluginManager().registerEvents(this, KCommon.getInstance());
-        if (WineSpigot.isWineSpigot()) {
+        if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_13)) {
             // Register an event.
+            Bukkit.getServer().getPluginManager().registerEvent(PrepareAnvilEvent.class, this, EventPriority.HIGH, this::onAnvilRepairModern, KCommon.getInstance());
+        } else {
             Bukkit.getServer().getPluginManager().registerEvent(PrepareAnvilRepairEvent.class, this, EventPriority.HIGH, this::onAnvilRepairLegacy, KCommon.getInstance());
         }
     }
@@ -58,16 +59,22 @@ public class AnvilInputMenu extends PlayerMenuContainer implements Listener {
                 .postCloseRunnable((event) -> {
                     result.complete(interimResult);
                 });
-        builder.setAt(0, XMaterial.EMERALD.parseItem());
+        builder.setAt(0, new ItemStackBuilder().material(XMaterial.PAPER).name("").buildFromTemplate());
         builder.addAction(2, (event) -> {
-            if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_21))
-                interimResult = NMS.getTheNMS().getMagicInventories().getAnvilRepairName(event.getView());
-
-            Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
+            Bukkit.getScheduler().runTaskLater(KCommon.getInstance(), () -> {
                 getPlayer().closeInventory();
-            });
+            }, 1);
         });
         return builder.buildSimple();
+    }
+
+    public void onAnvilRepairModern(Listener listener, Event _event) {
+        if (!(_event instanceof PrepareAnvilEvent))
+            return;
+
+        PrepareAnvilEvent event = (PrepareAnvilEvent) _event;
+        if (event.getResult().hasItemMeta())
+            interimResult = event.getResult().getItemMeta().getDisplayName();
     }
 
     public void onAnvilRepairLegacy(Listener listener, Event _event) {

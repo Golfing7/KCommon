@@ -5,7 +5,6 @@ import com.golfing8.kcommon.nms.access.NMSMagicInventories;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.inventory.view.AnvilView;
 
 public class MagicInventories implements NMSMagicInventories, Listener {
 
@@ -15,13 +14,5 @@ public class MagicInventories implements NMSMagicInventories, Listener {
         kEvent.callEvent();
 
         event.setResult(kEvent.getResult());
-    }
-
-    @Override
-    public String getAnvilRepairName(InventoryView view) {
-        if (!(view instanceof AnvilView anvilView))
-            return null;
-
-        return anvilView.getRenameText();
     }
 }
