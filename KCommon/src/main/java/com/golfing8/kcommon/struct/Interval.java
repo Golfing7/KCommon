@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -12,7 +13,8 @@ import java.util.NoSuchElementException;
  * Represents an interval between X1 and X2.
  * If X1 is greater than X2, the iterator will iterate backwards.
  */
-public class Interval implements Iterable<Double>, CASerializable {
+public class Interval implements Iterable<Double> {
+    private static final DecimalFormat FORMAT = new DecimalFormat("#.##");
     public static final int STOP = 0;
     public static final int CAP = 1;
     public static final int OVERFLOW = 2;
@@ -22,9 +24,9 @@ public class Interval implements Iterable<Double>, CASerializable {
 
     //Package private so communication between iterator and class isn't synthesized.
     @Getter
-    final double interval;
+    double x1, x2;
     @Getter
-    final double x1, x2;
+    double interval;
 
     //We calculate this number upon construction of this object.
     transient final int intervalSize;
@@ -54,6 +56,14 @@ public class Interval implements Iterable<Double>, CASerializable {
     public double getIntervalSize()
     {
         return this.intervalSize;
+    }
+
+    public String toSerialString() {
+        if (interval != 1.0D) {
+            return FORMAT.format(x1) + ";" + FORMAT.format(interval) + ";" + FORMAT.format(x2);
+        } else {
+            return FORMAT.format(x1) + ";" + FORMAT.format(x2);
+        }
     }
 
     @Override
@@ -129,6 +139,20 @@ public class Interval implements Iterable<Double>, CASerializable {
             current += interval;
 
             return toReturn;
+        }
+    }
+
+    public static Interval fromString(String string) {
+        String[] split = string.split(";");
+        if (split.length >= 3) {
+            double x1 = Double.parseDouble(split[0]);
+            double step = Double.parseDouble(split[1]);
+            double x2 = Double.parseDouble(split[2]);
+            return new Interval(x1, x2, step);
+        } else {
+            double x1 = Double.parseDouble(split[0]);
+            double x2 = Double.parseDouble(split[1]);
+            return new Interval(x1, x2, 1.0D);
         }
     }
 }

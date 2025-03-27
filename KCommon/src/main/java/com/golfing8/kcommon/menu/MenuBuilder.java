@@ -1,6 +1,8 @@
 package com.golfing8.kcommon.menu;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.golfing8.kcommon.config.ConfigEntry;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.ClickRunnable;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
@@ -129,7 +131,12 @@ public final class MenuBuilder {
             ItemStackBuilder fillerItem = section.contains("filler-item") ?
                     new ItemStackBuilder(section.getConfigurationSection("filler-item")) :
                     DEFAULT_FILLER;
-            this.filler(fillerItem.buildFromTemplate());
+            if (section.contains("filler-shape")) {
+                MenuLayoutShape shape = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "filler-shape"), MenuLayoutShape.class);
+                this.drawShape(shape, fillerItem.buildFromTemplate());
+            } else {
+                this.filler(fillerItem.buildFromTemplate());
+            }
         }
 
         //Check for the special items.

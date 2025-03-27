@@ -327,5 +327,7 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAMenuBuilder());
         registerAdapter(new CAMoveLength());
         registerAdapter(new CADynamicEnum());
+        registerAdapter(new CAInterval());
+        registerAdapter(new CALayoutShape());
     }
 }

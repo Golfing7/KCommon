@@ -22,6 +22,10 @@ public class LayoutShapeRectangle implements MenuLayoutShape {
         this(MenuUtils.getCartCoordsFromSlot(lowSlot), MenuUtils.getCartCoordsFromSlot(highSlot));
     }
 
+    public LayoutShapeRectangle(List<MenuCoordinate> coordinates) {
+        this.inRange = new LinkedList<>(coordinates);
+    }
+
     @Override
     public List<MenuCoordinate> getInRange() {
         return inRange;
