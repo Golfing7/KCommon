@@ -341,7 +341,11 @@ public abstract class MenuAbstract implements Menu {
 
     @EventHandler
     public void onClick(InventoryClickEvent event){
-        if(!backingInventory.getViewers().contains(event.getWhoClicked()))return;
+        if (event.getWhoClicked().getOpenInventory().getTopInventory() == null)
+            return;
+
+        if (event.getWhoClicked().getOpenInventory().getTopInventory() != backingInventory)
+            return;
 
         if(!clickable)event.setCancelled(true);
 
