@@ -26,6 +26,7 @@ public class ConfirmMenu extends PlayerMenuContainer {
 
     @Getter
     private final CompletableFuture<ConfirmationType> result;
+    private boolean answering = false;
 
     public ConfirmMenu(Player player) {
         super(player);
@@ -39,19 +40,28 @@ public class ConfirmMenu extends PlayerMenuContainer {
                 .title("&aConfirm?")
                 .shapeType(MenuShapeType.HOPPER)
                 .postCloseRunnable((event) -> {
+                    if (answering)
+                        return;
+
                     if (!result.isDone())
                         result.complete(ConfirmationType.DIDNT_ANSWER);
                 });
 
         builder.setAt(0, new ItemStackBuilder().material(XMaterial.GREEN_STAINED_GLASS_PANE).name("&a✔").buildFromTemplate());
         builder.addAction(0, (event) -> {
-            result.complete(ConfirmationType.YES);
-            Bukkit.getScheduler().runTaskLater(KCommon.getInstance(), () -> getPlayer().closeInventory(), 1);
+            answering = true;
+            Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
+                getPlayer().closeInventory();
+                result.complete(ConfirmationType.YES);
+            });
         });
         builder.setAt(4, new ItemStackBuilder().material(XMaterial.RED_STAINED_GLASS_PANE).name("&c❌").buildFromTemplate());
         builder.addAction(4, (event) -> {
-            result.complete(ConfirmationType.NO);
-            Bukkit.getScheduler().runTaskLater(KCommon.getInstance(), () -> getPlayer().closeInventory(), 1);
+            answering = true;
+            Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
+                getPlayer().closeInventory();
+                result.complete(ConfirmationType.NO);
+            });
         });
         return builder.buildSimple();
     }
