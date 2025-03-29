@@ -16,6 +16,7 @@ public class PrepareResultEvent extends InventoryEvent {
 
     public PrepareResultEvent(InventoryView transaction, @Nullable ItemStack result) {
         super(transaction);
+        this.result = result;
     }
 
     public static HandlerList getHandlerList() {

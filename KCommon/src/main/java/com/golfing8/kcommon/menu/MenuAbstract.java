@@ -306,7 +306,11 @@ public abstract class MenuAbstract implements Menu {
     public List<Player> getViewers() {
         List<Player> toReturn = new ArrayList<>();
         this.backingInventory.getViewers().forEach(z -> {
-            if(z instanceof Player)toReturn.add((Player) z);
+            if(z instanceof Player) {
+                Player player = (Player) z;
+                if (player.getOpenInventory() != null && player.getOpenInventory().getTopInventory() == backingInventory)
+                    toReturn.add(player);
+            }
         });
         return toReturn;
     }
