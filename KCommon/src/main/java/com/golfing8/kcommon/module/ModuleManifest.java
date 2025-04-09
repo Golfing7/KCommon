@@ -32,7 +32,7 @@ public class ModuleManifest {
     }
 
     /**
-     * Checks if the module should be active.
+     * Sets the active status of the given module
      *
      * @param module the module.
      * @param active if the module is active.
