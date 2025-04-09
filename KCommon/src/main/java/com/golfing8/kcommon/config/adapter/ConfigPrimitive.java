@@ -229,9 +229,9 @@ public final class ConfigPrimitive {
         } else if (boxedType == Long.class) {
             return Long.parseLong(str);
         } else if (boxedType == Double.class) {
-            return Double.parseDouble(str);
+            return Double.parseDouble(str.replace(",", "."));
         } else if (boxedType == Float.class) {
-            return Float.parseFloat(str);
+            return Float.parseFloat(str.replace(",", "."));
         } else if (boxedType == Boolean.class) {
             return Boolean.parseBoolean(str);
         } else if (boxedType == String.class) {

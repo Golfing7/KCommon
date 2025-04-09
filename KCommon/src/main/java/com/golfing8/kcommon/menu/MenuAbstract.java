@@ -4,7 +4,7 @@ import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
-import com.golfing8.kcommon.menu.marker.NoClickHolder;
+import com.golfing8.kcommon.menu.marker.MenuClickHolder;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
@@ -21,6 +21,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -65,9 +66,9 @@ public abstract class MenuAbstract implements Menu {
                         List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders){
         this.menuShape = shape;
         if (shape.getType().isSizeMutable()) {
-            this.backingInventory = NMS.getTheNMS().createInventory(clickable ? new NoClickHolder() : null, shape.getSize(), MS.parseSingle(title, placeholders));
+            this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getSize(), MS.parseSingle(title, placeholders));
         } else {
-            this.backingInventory = NMS.getTheNMS().createInventory(clickable ? new NoClickHolder() : null, shape.getType().getType(), MS.parseSingle(title, placeholders));
+            this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getType().getType(), MS.parseSingle(title, placeholders));
         }
         this.guiItems = new ArrayList<>();
         this.canExpire = canExpire;
@@ -308,8 +309,17 @@ public abstract class MenuAbstract implements Menu {
         this.backingInventory.getViewers().forEach(z -> {
             if(z instanceof Player) {
                 Player player = (Player) z;
-                if (player.getOpenInventory() != null && player.getOpenInventory().getTopInventory() == backingInventory)
-                    toReturn.add(player);
+                if (player.getOpenInventory() == null)
+                    return;
+
+                InventoryHolder holder = player.getOpenInventory().getTopInventory().getHolder();
+                if (!(holder instanceof MenuClickHolder))
+                    return;
+
+                if (((MenuClickHolder) holder).getMenu() != this)
+                    return;
+
+                toReturn.add(player);
             }
         });
         return toReturn;
@@ -325,9 +335,9 @@ public abstract class MenuAbstract implements Menu {
             ItemStack[] contents = getContents();
 
             if (menuShape.getType().isSizeMutable()) {
-                this.backingInventory = NMS.getTheNMS().createInventory(clickable ? new NoClickHolder() : null, menuShape.getSize(), MS.parseSingle(title, placeholders));
+                this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), menuShape.getSize(), MS.parseSingle(title, placeholders));
             } else {
-                this.backingInventory = NMS.getTheNMS().createInventory(clickable ? new NoClickHolder() : null, menuShape.getType().getType(), MS.parseSingle(title, placeholders));
+                this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), menuShape.getType().getType(), MS.parseSingle(title, placeholders));
             }
 
             this.backingInventory.setContents(contents);
@@ -348,7 +358,12 @@ public abstract class MenuAbstract implements Menu {
         if (event.getWhoClicked().getOpenInventory().getTopInventory() == null)
             return;
 
-        if (event.getWhoClicked().getOpenInventory().getTopInventory() != backingInventory)
+        InventoryHolder holder = event.getWhoClicked().getOpenInventory().getTopInventory().getHolder();
+        if (!(holder instanceof MenuClickHolder))
+            return;
+
+        MenuClickHolder clickHolder = (MenuClickHolder) holder;
+        if (clickHolder.getMenu() != this)
             return;
 
         if(!clickable)event.setCancelled(true);
