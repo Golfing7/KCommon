@@ -837,7 +837,7 @@ public class StringUtil {
     }
     public static String toRoman(int number) {
         if (number == 0)
-            return "";
+            return "0";
         boolean negative = number < 0;
         if (negative)
             number = -number;
