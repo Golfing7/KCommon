@@ -41,7 +41,7 @@ dependencies {
     compileOnly("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
     compileOnly("com.github.cryptomorin:XSeries:11.3.0") //For XSeries
     compileOnly("org.mongodb:mongodb-driver-sync:5.0.1")
-    implementation("de.tr7zw:item-nbt-api:2.14.0") //For items.
+    implementation("de.tr7zw:item-nbt-api:2.14.1") //For items.
     implementation("me.lucko:jar-relocator:1.7")
 
     compileOnly(project(":NMS"))
