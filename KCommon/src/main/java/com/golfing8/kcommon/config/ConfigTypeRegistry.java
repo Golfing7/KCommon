@@ -1,16 +1,13 @@
 package com.golfing8.kcommon.config;
 
 import com.golfing8.kcommon.config.adapter.*;
+import com.golfing8.kcommon.config.adapter.xseries.*;
 import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.commented.MConfiguration;
-import com.golfing8.kcommon.config.commented.WrappedConfigurationSection;
-import com.golfing8.kcommon.menu.MenuUtils;
-import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -296,7 +293,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAList());
         registerAdapter(new CAMap());
         registerAdapter(new CAItemStackBuilder());
-        registerAdapter(new CAXMaterial());
         registerAdapter(new CAWeightedCollection());
         registerAdapter(new CALocation());
         registerAdapter(new CABlockVector());
@@ -329,5 +325,11 @@ public class ConfigTypeRegistry {
         registerAdapter(new CADynamicEnum());
         registerAdapter(new CAInterval());
         registerAdapter(new CALayoutShape());
+        registerAdapter(new CAXBiome());
+        registerAdapter(new CAXEnchantment());
+        registerAdapter(new CAXEntityType());
+        registerAdapter(new CAXMaterial());
+        registerAdapter(new CAXPotion());
+        registerAdapter(new CAXSound());
     }
 }
