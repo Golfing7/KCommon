@@ -26,6 +26,7 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.var;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -495,8 +496,9 @@ public final class ItemStackBuilder {
         } else if (value instanceof String) {
             nbtItem.setString(key, (String) value);
         } else if (value instanceof Map) {
+            var subCompound = nbtItem.getOrCreateCompound(key);
             ((Map) value).forEach((k, v) -> {
-                setValueInNBT(nbtItem, k.toString(), v);
+                setValueInNBT(subCompound, k.toString(), v);
             });
         } else if (value instanceof Boolean) {
             nbtItem.setBoolean(key, (Boolean) value);
