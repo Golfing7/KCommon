@@ -21,7 +21,7 @@ public class CAXSound implements ConfigAdapter<XSound> {
         if (entry.getPrimitive() == null)
             return null;
 
-        return XSound.matchXSound(entry.getPrimitive().toString()).orElse(null);
+        return XSound.of(entry.getPrimitive().toString()).orElse(null);
     }
 
     @Override

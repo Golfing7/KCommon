@@ -21,7 +21,7 @@ public class CAXEnchantment implements ConfigAdapter<XEnchantment> {
         if (entry.getPrimitive() == null)
             return null;
 
-        return XEnchantment.matchXEnchantment(entry.getPrimitive().toString()).orElse(null);
+        return XEnchantment.of(entry.getPrimitive().toString()).orElse(null);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class CAXBiome implements ConfigAdapter<XBiome> {
         if (entry.getPrimitive() == null)
             return null;
 
-        return XBiome.matchXBiome(entry.getPrimitive().toString()).orElse(null);
+        return XBiome.of(entry.getPrimitive().toString()).orElse(null);
     }
 
     @Override

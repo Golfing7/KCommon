@@ -21,7 +21,7 @@ public class CAXPotion implements ConfigAdapter<XPotion> {
         if (entry.getPrimitive() == null)
             return null;
 
-        return XPotion.matchXPotion(entry.getPrimitive().toString()).orElse(null);
+        return XPotion.of(entry.getPrimitive().toString()).orElse(null);
     }
 
     @Override
