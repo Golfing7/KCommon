@@ -37,12 +37,17 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
     @Getter @Setter
     private int maxPage;
 
+    /** How many elements should be expected to show per page. */
+    @Getter @Setter
+    private int elementsPerPage;
+
     public PagedMenuContainer(ConfigurationSection section, Player player) {
         super(player);
 
         this.parentSection = section;
         this.maxPage = section.getInt("max-page", 0);
         this.lastSize = section.getInt("size");
+        this.elementsPerPage = lastSize - 9;
     }
 
     @Override
@@ -53,8 +58,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
 
         this.lastSize = builder.getSize();
         adaptBuilder(builder);
-        this.menu = loadMenu(builder);
-        return menu;
+        return loadMenu(builder);
     }
 
     /**
@@ -66,13 +70,13 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
     protected abstract Menu loadMenu(MenuBuilder builder);
 
     /**
-     * Gets the maximum page that needs to be used for the given amount of elements.
+     * Gets the max number of elements per page given the amount of elements shown on the page.
      *
-     * @param elements the amount of elements.
-     * @return the max page.
+     * @param elements the elements.
+     * @return the max elements per page.
      */
     public int getMaxPage(int elements) {
-        return (int) Math.ceil(elements / (getLastSize() - 9F) - 1);
+        return (int) Math.ceil(elements / ((float) elementsPerPage) - 1);
     }
 
     /**
@@ -123,7 +127,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
         if (lastSize < 0)
             return -1;
 
-        return page * (lastSize - 9);
+        return page * elementsPerPage;
     }
 
     /**
@@ -135,7 +139,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
         if (lastSize < 0)
             return -1;
 
-        return (page + 1) * (lastSize - 9) - 1;
+        return (page + 1) * elementsPerPage - 1;
     }
 
     /**

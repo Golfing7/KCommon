@@ -11,8 +11,8 @@ public class LayoutShapeRectangle implements MenuLayoutShape {
     public LayoutShapeRectangle(MenuCoordinate low, MenuCoordinate high) {
         inRange = new LinkedList<>();
 
-        for (int x = low.getX(); x <= high.getX(); x++) {
-            for (int y = low.getY(); y <= high.getY(); y++) {
+        for (int y = low.getY(); y <= high.getY(); y++) {
+            for (int x = low.getX(); x <= high.getX(); x++) {
                 inRange.add(new MenuCoordinate(x, y));
             }
         }
