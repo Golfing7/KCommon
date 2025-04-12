@@ -1,11 +1,13 @@
 package com.golfing8.kcommon.command;
 
+import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.exc.CommandInstantiationException;
 import com.golfing8.kcommon.command.requirement.Requirement;
 import com.golfing8.kcommon.command.requirement.RequirementPlayer;
+import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
@@ -19,6 +21,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
@@ -102,12 +106,15 @@ public abstract class KCommand implements TabExecutor {
      * The plugin that registered this command.
      */
     @Getter
-    private final KPlugin plugin;
+    private final Plugin plugin;
     /**
      * The requirements for executing this command.
      */
     @Getter
     private final Set<Requirement> commandRequirements = new HashSet<>();
+    /** The source that this command uses for its lang */
+    @Getter
+    private final LangConfig langSource;
     /**
      * The annotation defining the structure of this command.
      */
@@ -150,7 +157,7 @@ public abstract class KCommand implements TabExecutor {
             throw new CommandInstantiationException(String.format("Cannot instantiate command '%s' with default constructor without Cmd annotation!", this.getClass().getName()));
 
         this.annotation = cmd;
-        this.plugin = (KPlugin) KPlugin.getProvidingPlugin(this.getClass());
+        this.plugin = JavaPlugin.getProvidingPlugin(this.getClass());
         this.commandPermission = cmd.permission();
         this.commandName = cmd.name();
         this.commandAliases = Arrays.asList(cmd.aliases());
@@ -160,14 +167,24 @@ public abstract class KCommand implements TabExecutor {
         if (cmd.forPlayers()) {
             this.commandRequirements.add(RequirementPlayer.getInstance());
         }
+        if (plugin instanceof KPlugin) {
+            this.langSource = ((KPlugin) plugin).getLangConfig();
+        } else {
+            this.langSource = KCommon.getInstance().getLangConfig();
+        }
     }
 
     public KCommand(String commandName, List<String> commandAliases, boolean forPlayers) {
         this.commandName = commandName;
         this.commandAliases = commandAliases;
-        this.plugin = (KPlugin) KPlugin.getProvidingPlugin(this.getClass());
+        this.plugin = JavaPlugin.getProvidingPlugin(this.getClass());
         if (forPlayers) {
             this.commandRequirements.add(RequirementPlayer.getInstance());
+        }
+        if (plugin instanceof KPlugin) {
+            this.langSource = ((KPlugin) plugin).getLangConfig();
+        } else {
+            this.langSource = KCommon.getInstance().getLangConfig();
         }
     }
 
@@ -245,9 +262,9 @@ public abstract class KCommand implements TabExecutor {
         String prefixInsertion = getCommandPermissionPrefix();
         String builtPrefix;
         if (StringUtil.isNotEmpty(prefixInsertion)) {
-            builtPrefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + "." + prefixInsertion + ".command.";
+            builtPrefix = JavaPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + "." + prefixInsertion + ".command.";
         } else {
-            builtPrefix = KPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + ".command.";
+            builtPrefix = JavaPlugin.getProvidingPlugin(this.getClass()).getName().toLowerCase() + ".command.";
         }
         return builtPrefix + buildCommandPermissionSuffix();
     }
@@ -298,7 +315,7 @@ public abstract class KCommand implements TabExecutor {
      * Registers this command to the bukkit command map.
      */
     public final void register() {
-        this.plugin.getCommandManager().registerNewCommand(this, true);
+        CommandManager.getInstance().registerNewCommand(plugin, this, true);
         this.onRegister();
         this.subRegister();
     }
@@ -307,7 +324,7 @@ public abstract class KCommand implements TabExecutor {
      * Unregisters this command from the bukkit command map.
      */
     public final void unregister() {
-        this.plugin.getCommandManager().unregisterCommand(this);
+        CommandManager.getInstance().unregisterCommand(this);
         this.onUnregister();
         this.subUnregister();
     }
@@ -598,7 +615,7 @@ public abstract class KCommand implements TabExecutor {
         }
 
         String builtArguments = this.commandArguments.isEmpty() ? "" : " " + argumentChain.toString().trim();
-        String message = getPlugin().getLangConfig().getMessage("command-help-format").getMessages().get(0);
+        String message = langSource.getMessage("command-help-format").getMessages().get(0);
         return MS.parseSingle(message,
                 "COMMAND", commandChain.toString().trim(),
                 "ARGUMENTS", builtArguments,
@@ -616,14 +633,14 @@ public abstract class KCommand implements TabExecutor {
             return;
         }
 
-        Message message = getPlugin().getLangConfig().getMessage("command-help");
+        Message message = langSource.getMessage("command-help");
         List<String> commandHelp = new ArrayList<>();
         String help = getDescriptiveCommandHelp(sender);
         if (help != null)
             commandHelp.add(help);
         commandHelp.addAll(getHelpMessages0(sender, lastArgument != null ? lastArgument.toLowerCase() : null));
         if (commandHelp.isEmpty()) {
-            commandHelp.add(getPlugin().getLangConfig().getMessage("command-help-none-found").getMessages().get(0));
+            commandHelp.add(langSource.getMessage("command-help-none-found").getMessages().get(0));
         }
         message.send(
                 sender,
@@ -682,8 +699,7 @@ public abstract class KCommand implements TabExecutor {
             return;
         }
 
-        getPlugin().sendConfigMessage(sender, "invalid-argument",
-                "POSITION", this.commandArguments.indexOf(argument), "ARGUMENT", argument.getName(), "TYPE", argument.getArgument().getDescription(), "ACTUAL", actual);
+        langSource.getMessage("invalid-argument").send(sender, "POSITION", this.commandArguments.indexOf(argument), "ARGUMENT", argument.getName(), "TYPE", argument.getArgument().getDescription(), "ACTUAL", actual);
     }
 
     /**
@@ -697,8 +713,7 @@ public abstract class KCommand implements TabExecutor {
             return;
         }
 
-        getPlugin().sendConfigMessage(sender, "missing-argument",
-                "POSITION", this.commandArguments.indexOf(argument), "ARGUMENT", argument.getName(), "TYPE", argument.getArgument().getDescription());
+        langSource.getMessage("missing-argument").send(sender, "POSITION", this.commandArguments.indexOf(argument), "ARGUMENT", argument.getName(), "TYPE", argument.getArgument().getDescription());
     }
 
     /**
@@ -710,7 +725,7 @@ public abstract class KCommand implements TabExecutor {
         if (this.visibility == CommandVisibility.PRIVATE || this.visibility == CommandVisibility.PROTECTED) {
             MS.pass(sender, SpigotConfig.unknownCommandMessage);
         } else {
-            getPlugin().sendConfigMessage(sender, "no-permission");
+            langSource.getMessage("no-permission").send(sender);
         }
     }
 

@@ -40,8 +40,6 @@ import java.util.*;
  */
 public abstract class KPlugin extends JavaPlugin implements LangConfigContainer {
     @Getter
-    private CommandManager commandManager;
-    @Getter
     private MenuManager menuManager;
     @Getter
     private LangConfig langConfig;
@@ -61,7 +59,6 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             this.saveDefaultConfig();
         } catch (IllegalArgumentException ignored) {} // Config doesn't exist
         this.libraryLoader = new LibraryLoader(this, getDataFolder().toPath().resolve("libraries"));
-        this.commandManager = new CommandManager(this);
         this.menuManager = new MenuManager(this);
         //Setup PAPI.
         this.placeholderAPIHook = new KPAPIHook(this);

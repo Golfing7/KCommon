@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.command;
 
+import com.golfing8.kcommon.KCommon;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -14,21 +16,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A class which is useful for accessing the bukkit command map reflectively.
  */
 public class CommandManager {
+    @Getter
+    private static final CommandManager instance = new CommandManager();
 
     /**
      * The plugin this command manager uses.
      */
-    private final Plugin plugin;
     private boolean needsSync;
 
-    public CommandManager(Plugin plugin){
-        this.plugin = plugin;
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+    private CommandManager(){
+        Bukkit.getScheduler().runTaskTimer(KCommon.getInstance(), () -> {
             if (needsSync) {
                 needsSync = false;
                 syncCommandsIfPossible();
@@ -39,11 +42,13 @@ public class CommandManager {
     /**
      * Registers a {@link KCommand} to the bukkit command map.
      *
+     * @param plugin the plugin to register it to.
      * @param command the command.
+     * @param sync if the command map should be flagged for resync.
      * @return the registered plugin command.
      */
-    public PluginCommand registerNewCommand(KCommand command, boolean sync){
-        PluginCommand pluginCommand = getCommand(command.getCommandName(), command.getCommandAliases());
+    public PluginCommand registerNewCommand(Plugin plugin, KCommand command, boolean sync){
+        PluginCommand pluginCommand = getCommand(plugin, command.getCommandName(), command.getCommandAliases());
 
         getCommandMap().register(plugin.getName(), pluginCommand);
 
@@ -74,7 +79,7 @@ public class CommandManager {
      * @param aliases the aliases for the command.
      * @return the plugin command.
      */
-    private PluginCommand getCommand(String name, List<String> aliases){
+    private PluginCommand getCommand(Plugin plugin, String name, List<String> aliases){
         PluginCommand pluginCommand = null;
         try{
             Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
