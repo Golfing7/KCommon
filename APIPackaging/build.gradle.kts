@@ -37,7 +37,9 @@ dependencies {
 
     implementation("net.kyori:adventure-platform-bukkit:4.3.3")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
-    implementation("com.github.cryptomorin:XSeries:13.2.0") //For XSeries
+    implementation("com.github.cryptomorin:XSeries:13.2.0") {
+        isTransitive = false;
+    } //For XSeries
     implementation("org.mongodb:mongodb-driver-sync:5.0.1")
 }
 

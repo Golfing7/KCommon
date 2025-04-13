@@ -57,7 +57,7 @@ public abstract class KCommand implements TabExecutor {
         /**
          * The auto-complete function. Can be null.
          */
-        private @Nullable Function<CommandSender, Object> autoComplete = null;
+        private @Nullable Function<CommandSender, @Nullable Object> autoComplete = null;
         /**
          * If players do not have this required permission extension, they will not be able
          * to override the auto complete function.
@@ -75,7 +75,7 @@ public abstract class KCommand implements TabExecutor {
          */
         private @Nullable Boolean autoFillPlayersOnly;
 
-        public BuiltCommandArgument(String name, CommandArgument<?> argument, @Nullable Function<CommandSender, Object> autoComplete) {
+        public BuiltCommandArgument(String name, CommandArgument<?> argument, @Nullable Function<CommandSender, @Nullable Object> autoComplete) {
             this.name = name;
             this.argument = argument;
             this.autoComplete = autoComplete;
@@ -365,7 +365,7 @@ public abstract class KCommand implements TabExecutor {
      * @param argument the argument to add.
      * @param autofill the autofill function.
      */
-    protected final BuiltCommandArgument addArgument(String name, CommandArgument<?> argument, Function<CommandSender, Object> autofill) {
+    protected final BuiltCommandArgument addArgument(String name, CommandArgument<?> argument, @Nullable Function<CommandSender, @Nullable Object> autofill) {
         BuiltCommandArgument arg = new BuiltCommandArgument(name, argument, autofill);
         this.commandArguments.add(arg);
         return arg;

@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -132,5 +133,27 @@ public class CommandContext {
      */
     public <T> T next() {
         return get(this.argumentIndex++);
+    }
+
+    /**
+     * Joins the remaining arguments to a string delimited by spaces.
+     *
+     * @return the joined strings. If no arguments remain, an empty string.
+     */
+    public String joinRemainingToString() {
+        return joinRemainingToString(" ");
+    }
+
+    /**
+     * Joins the remaining arguments to a string delimited by the given string.
+     *
+     * @param delimiter the delimiter
+     * @return the joined strings. If no arguments remain, an empty string.
+     */
+    public String joinRemainingToString(@NotNull String delimiter) {
+        if (this.argumentIndex >= this.arguments.size())
+            return "";
+
+        return String.join(delimiter, this.arguments.subList(this.argumentIndex, this.arguments.size()));
     }
 }
