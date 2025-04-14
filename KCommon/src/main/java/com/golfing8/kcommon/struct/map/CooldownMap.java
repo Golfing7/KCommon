@@ -13,9 +13,9 @@ import java.util.*;
 /**
  * Stores cooldown information for unique IDs.
  */
-public class CooldownMap {
+public class CooldownMap<T> {
     /** The map we store cooldowns in */
-    private final Map<UUID, Long> backingMap;
+    private final Map<T, Long> backingMap;
 
     /**
      * Creates a new cooldown map with no expiry task.
@@ -36,41 +36,41 @@ public class CooldownMap {
     }
 
     /**
-     * Checks if the given UUID is on a cooldown.
+     * Checks if the given the type is on a cooldown.
      *
-     * @param uuid the uuid.
+     * @param id the id.
      * @return if it's on a cooldown.
      */
-    public boolean isOnCooldown(@NotNull UUID uuid) {
-        if (!backingMap.containsKey(uuid))
+    public boolean isOnCooldown(@NotNull T id) {
+        if (!backingMap.containsKey(id))
             return false;
 
-        if (backingMap.get(uuid) <= System.currentTimeMillis()) {
-            backingMap.remove(uuid);
+        if (backingMap.get(id) <= System.currentTimeMillis()) {
+            backingMap.remove(id);
             return false;
         }
         return true;
     }
 
     /**
-     * Clears the cooldown on the given UUID.
+     * Clears the cooldown on the given id.
      *
-     * @param uuid the uuid.
+     * @param id the id.
      * @return if the uuid was on a cooldown.
      */
-    public boolean clearCooldown(@NotNull UUID uuid) {
-        Long cooldownTime = backingMap.remove(uuid);
+    public boolean clearCooldown(@NotNull T id) {
+        Long cooldownTime = backingMap.remove(id);
         return cooldownTime != null && cooldownTime > System.currentTimeMillis();
     }
 
     /**
-     * Gets the length, in milliseconds, of the cooldown remaining for the uuid.
+     * Gets the length, in milliseconds, of the cooldown remaining for the id.
      *
-     * @param uuid the uuid.
+     * @param id the id.
      * @return the cooldown remaining, or 0 if no cooldown is active.
      */
-    public long getCooldownRemaining(@NotNull UUID uuid) {
-        Long remainingTime = backingMap.get(uuid);
+    public long getCooldownRemaining(@NotNull T id) {
+        Long remainingTime = backingMap.get(id);
         if (remainingTime == null)
             return 0;
 
@@ -78,31 +78,49 @@ public class CooldownMap {
     }
 
     /**
-     * Sets the cooldown on the given UUID, overriding any pre-existing cooldown.
+     * Sets the cooldown on the given id, overriding any pre-existing cooldown.
      *
-     * @param uuid the UUID.
+     * @param id the id.
      * @param durationMillis the duration of the cooldown.
      */
-    public void setCooldown(@NotNull UUID uuid, long durationMillis) {
+    public void setCooldown(@NotNull T id, long durationMillis) {
         Preconditions.checkArgument(durationMillis >= 0, "Duration must be non-negative");
 
-        backingMap.put(uuid, System.currentTimeMillis() + durationMillis);
+        backingMap.put(id, System.currentTimeMillis() + durationMillis);
     }
 
     /**
-     * Tries to set the cooldown on the given UUID.
-     * If the UUID is already on cooldown, the method returns true and nothing changes.
+     * Tries to set the cooldown on the given id.
+     * If the id is already on cooldown, the method returns true and nothing changes.
      *
-     * @param uuid the uuid to put on cooldown
+     * @param id the id to put on cooldown
      * @param durationMillis the duration of the cooldown, in millis
      * @return if the player was on cooldown
+     * @deprecated return value is inconsistent with expected behavior. {@link #checkAndSetCooldown(T, long)}
      */
-    public boolean trySetCooldown(@NotNull UUID uuid, long durationMillis) {
-        if (isOnCooldown(uuid))
+    @Deprecated
+    public boolean trySetCooldown(@NotNull T id, long durationMillis) {
+        if (isOnCooldown(id))
             return true;
 
-        setCooldown(uuid, durationMillis);
+        setCooldown(id, durationMillis);
         return false;
+    }
+
+    /**
+     * Checks if the user is on cooldown and sets them on cooldown if they aren't.
+     * Supersedes {@link #trySetCooldown(T, long)}
+     *
+     * @param id the id.
+     * @param durationMillis the duration of their cooldown.
+     * @return true if they were set on cooldown, false if they were already on cooldown.
+     */
+    public boolean checkAndSetCooldown(@NotNull T id, long durationMillis) {
+        if (isOnCooldown(id))
+            return false;
+
+        setCooldown(id, durationMillis);
+        return true;
     }
 
     /**
@@ -120,15 +138,15 @@ public class CooldownMap {
      */
     private static class ExpiryTask extends BukkitRunnable {
         /** The cooldown map this task is linked to */
-        private final WeakReference<CooldownMap> link;
+        private final WeakReference<CooldownMap<?>> link;
 
-        public ExpiryTask(CooldownMap link) {
+        public ExpiryTask(CooldownMap<?> link) {
             this.link = new WeakReference<>(link);
         }
 
         @Override
         public void run() {
-            CooldownMap instance = link.get();
+            CooldownMap<?> instance = link.get();
             // If instance is null, it has been garbage collected. Don't do anything else with it!
             if (instance == null) {
                 cancel();
