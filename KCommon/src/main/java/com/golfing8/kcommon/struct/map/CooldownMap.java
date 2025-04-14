@@ -42,6 +42,7 @@ public class CooldownMap<T> {
      * @return if it's on a cooldown.
      */
     public boolean isOnCooldown(@NotNull T id) {
+        Preconditions.checkNotNull(id, "ID cannot be null");
         if (!backingMap.containsKey(id))
             return false;
 
@@ -59,6 +60,7 @@ public class CooldownMap<T> {
      * @return if the uuid was on a cooldown.
      */
     public boolean clearCooldown(@NotNull T id) {
+        Preconditions.checkNotNull(id, "ID cannot be null");
         Long cooldownTime = backingMap.remove(id);
         return cooldownTime != null && cooldownTime > System.currentTimeMillis();
     }
@@ -70,6 +72,7 @@ public class CooldownMap<T> {
      * @return the cooldown remaining, or 0 if no cooldown is active.
      */
     public long getCooldownRemaining(@NotNull T id) {
+        Preconditions.checkNotNull(id, "ID cannot be null");
         Long remainingTime = backingMap.get(id);
         if (remainingTime == null)
             return 0;
@@ -84,6 +87,7 @@ public class CooldownMap<T> {
      * @param durationMillis the duration of the cooldown.
      */
     public void setCooldown(@NotNull T id, long durationMillis) {
+        Preconditions.checkNotNull(id, "ID cannot be null");
         Preconditions.checkArgument(durationMillis >= 0, "Duration must be non-negative");
 
         backingMap.put(id, System.currentTimeMillis() + durationMillis);

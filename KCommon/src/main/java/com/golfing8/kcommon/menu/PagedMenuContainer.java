@@ -1,15 +1,26 @@
 package com.golfing8.kcommon.menu;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.golfing8.kcommon.config.ConfigEntry;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
+import com.golfing8.kcommon.menu.shape.MenuLayoutShape;
+import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * A menu container that supports multiple pages of display.
@@ -17,28 +28,30 @@ import java.util.Collections;
  * This is achieved by making several pages of display for a menu.
  * </p>
  */
-public abstract class PagedMenuContainer extends PlayerMenuContainer {
+@Getter
+public abstract class PagedMenuContainer<T> extends PlayerMenuContainer {
     private static final ItemStackBuilder DEFAULT_PAGE = new ItemStackBuilder()
             .material(XMaterial.OAK_SIGN)
             .name("&a{DIRECTION} Page");
 
     /** The parent config section containing the information of the paged menu */
-    @Getter
     private final ConfigurationSection parentSection;
+    /** The shape designated where we will store the entries for a page. */
+    @Setter
+    private @Nullable MenuLayoutShape elementSection;
+    /** Sets ths source from where elements are pulled. */
+    private @Nullable Function<Range, List<T>> elementSource;
+    /** A supplier for the max number of elements that this menu has. */
+    private @Nullable Supplier<Integer> elementCountSupplier;
     /** The last known size of the menu */
-    @Getter
     private int lastSize;
-
-    /** The page that is currently being displayed */
-    @Getter
+    /** The page index that is currently being displayed */
     private int page;
-
     /** The maximum page that can be set. By default, this is loaded from the config, but it is encouraged to override this value. */
-    @Getter @Setter
+    @Setter
     private int maxPage;
-
     /** How many elements should be expected to show per page. */
-    @Getter @Setter
+    @Setter
     private int elementsPerPage;
 
     public PagedMenuContainer(ConfigurationSection section, Player player) {
@@ -47,7 +60,12 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
         this.parentSection = section;
         this.maxPage = section.getInt("max-page", 0);
         this.lastSize = section.getInt("size");
-        this.elementsPerPage = lastSize - 9;
+        this.elementSection = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "element-section-shape"), MenuLayoutShape.class);
+        if (this.elementSection != null) {
+            this.elementsPerPage = this.elementSection.getInRange().size();
+        } else {
+            this.elementsPerPage = lastSize - 9;
+        }
     }
 
     @Override
@@ -110,6 +128,11 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
         if (this.page == page)
             return;
 
+        // Recalculate the max page if applicable.
+        if (this.elementCountSupplier != null) {
+            setMaxPageByElements(this.elementCountSupplier.get());
+            page = Math.min(page, maxPage);
+        }
         boolean reopen = getPlayer().getOpenInventory().getTopInventory() == menu.getGUI();
         this.page = page;
         this.menu = loadMenu();
@@ -119,10 +142,26 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
     }
 
     /**
+     * Gets a range of all indices of elements on the current page.
+     * Note that this range will respect {@link #elementCountSupplier}
+     *
+     * @return the range of indices, or null if menu has not been fully set up.
+     */
+    protected @Nullable Range getCurrentElementRange() {
+        if (elementsPerPage <= 0 || elementCountSupplier == null)
+            return null;
+
+        int elementCount = elementCountSupplier.get();
+        return new Range(page * elementsPerPage, Math.min((page + 1) * elementsPerPage - 1, elementCount - 1));
+    }
+
+    /**
      * Gets the minimum slot view from the current page.
      *
      * @return the minimum slot view.
+     * @deprecated access is too open and name is confusing
      */
+    @Deprecated
     public int getMinimumSlotView() {
         if (lastSize < 0)
             return -1;
@@ -134,12 +173,49 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
      * Gets the maximum slot view from the current page.
      *
      * @return the maximum slot view.
+     * @deprecated access is too open and name is confusing
      */
+    @Deprecated
     public int getMaximumSlotView() {
         if (lastSize < 0)
             return -1;
 
         return (page + 1) * elementsPerPage - 1;
+    }
+
+    /**
+     * Sets the source of elements.
+     *
+     * @param elementSource the element source.
+     * @param elementCount a supplier for the total number of elements.
+     */
+    protected void setElementSource(Function<Range, List<T>> elementSource, Supplier<Integer> elementCount) {
+        this.elementSource = elementSource;
+        this.elementCountSupplier = elementCount;
+        this.setMaxPageByElements(elementCount.get());
+    }
+
+    /**
+     * Applies the given bi-consumer to every element on the current page of the menu.
+     */
+    protected void forEachElementOnPage(@NotNull BiConsumer<MenuCoordinate, T> action) {
+        Preconditions.checkNotNull(action, "Action cannot be null!");
+        Preconditions.checkState(elementSource != null, "Element source has not been set!");
+        Preconditions.checkState(elementCountSupplier != null, "Element count cannot be null!");
+        Preconditions.checkState(elementSection != null, "Element section has not been set!");
+
+        Range elementInterval = getCurrentElementRange();
+        if (elementInterval == null)
+            throw new IllegalStateException("Cannot loop over each element on when elementsPerPage has not been set!");
+
+        // Get the coordinates and load the elements.
+        List<MenuCoordinate> inRange = elementSection.getInRange();
+        List<T> elements = elementSource.apply(elementInterval);
+        int elementIndex = 0;
+        for (int i = (int) elementInterval.getMin(); i <= elementInterval.getMax(); i++) {
+            MenuCoordinate coordinate = inRange.get(elementIndex);
+            action.accept(coordinate, elements.get(elementIndex++));
+        }
     }
 
     /**

@@ -3,11 +3,13 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.InvalidConfigException;
 import com.golfing8.kcommon.menu.shape.LayoutShapeOutline;
+import com.golfing8.kcommon.menu.shape.LayoutShapePoints;
 import com.golfing8.kcommon.menu.shape.LayoutShapeRectangle;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.menu.shape.MenuLayoutShape;
 import com.golfing8.kcommon.struct.Interval;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.google.gson.reflect.TypeToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +46,9 @@ public class CALayoutShape implements ConfigAdapter<MenuLayoutShape> {
             MenuCoordinate slotLow = ConfigTypeRegistry.getFromType(entry.getSubValue("low-slot"), MenuCoordinate.class);
             MenuCoordinate slotHigh = ConfigTypeRegistry.getFromType(entry.getSubValue("high-slot"), MenuCoordinate.class);
             return new LayoutShapeOutline(slotLow, slotHigh);
+        } else if (layoutType.equalsIgnoreCase("POINTS")) {
+            List<MenuCoordinate> menuCoordinates = ConfigTypeRegistry.getFromType(entry.getSubValue("points"), FieldType.extractFrom(new TypeToken<List<MenuCoordinate>>() {}));
+            return new LayoutShapePoints(menuCoordinates);
         } else {
             throw new InvalidConfigException("Unsupported Layout Type: " + layoutType);
         }
@@ -52,21 +57,22 @@ public class CALayoutShape implements ConfigAdapter<MenuLayoutShape> {
     @Override
     public ConfigPrimitive toPrimitive(@NotNull MenuLayoutShape object) {
         Map<String, Object> data = new HashMap<>();
-        int minimumSlot = Integer.MAX_VALUE;
-        int maximumSlot = Integer.MIN_VALUE;
-        for (MenuCoordinate coordinate : object.getInRange()) {
-            if (coordinate.toSlot() < minimumSlot)
-                minimumSlot = coordinate.toSlot();
-            if (coordinate.toSlot() > maximumSlot)
-                maximumSlot = coordinate.toSlot();
-        }
-        data.put("low-slot", minimumSlot);
-        data.put("high-slot", maximumSlot);
-        if (object instanceof LayoutShapeRectangle) {
-            data.put("type", "RECTANGLE");
+        if (object instanceof LayoutShapeRectangle || object instanceof LayoutShapeOutline) {
+            int minimumSlot = Integer.MAX_VALUE;
+            int maximumSlot = Integer.MIN_VALUE;
+            for (MenuCoordinate coordinate : object.getInRange()) {
+                if (coordinate.toSlot() < minimumSlot)
+                    minimumSlot = coordinate.toSlot();
+                if (coordinate.toSlot() > maximumSlot)
+                    maximumSlot = coordinate.toSlot();
+            }
+            data.put("low-slot", minimumSlot);
+            data.put("high-slot", maximumSlot);
+            data.put("type", object instanceof LayoutShapeRectangle ? "RECTANGLE" : "OUTLINE");
             return ConfigPrimitive.ofMap(data);
-        } else if (object instanceof LayoutShapeOutline) {
-            data.put("type", "OUTLINE");
+        } else if (object instanceof LayoutShapePoints) {
+            data.put("type", "POINTS");
+            data.put("points", ConfigTypeRegistry.toPrimitive(object.getInRange()).unwrap());
             return ConfigPrimitive.ofMap(data);
         } else {
             throw new InvalidConfigException("Unsupported Layout Shape " + object.getClass().getName());
