@@ -2,6 +2,8 @@ package com.golfing8.kcommon.nms.v1_8.access;
 
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.Hand;
@@ -19,7 +21,6 @@ import net.minecraft.server.v1_8_R3.AttributeModifier;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftMetaSkull;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -178,16 +179,33 @@ public class MagicItemsV1_8 implements NMSMagicItems {
         setAttributeModifiers(stack, newModifiers);
     }
 
+    private Class<?> craftMetaSkullClass;
+    private FieldHandle<GameProfile> gameProfileFieldHandle;
+    @SuppressWarnings("unchecked")
+    private void setupMetaSkullAccess() {
+        if (craftMetaSkullClass != null)
+            return;
+
+        try {
+            craftMetaSkullClass = Class.forName("org.bukkit.craftbukkit.v1_8_R3.inventory.CraftMetaSkull");
+            gameProfileFieldHandle = (FieldHandle<GameProfile>) FieldHandles.getHandle("profile", craftMetaSkullClass);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to find CraftMetaSkull class", e);
+        }
+    }
+
     @Override
     public void setSkullOwningPlayer(SkullMeta meta, OfflinePlayer offlinePlayer) {
-        CraftMetaSkull metaSkull = (CraftMetaSkull) meta;
-        metaSkull.profile = new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName());
+        setupMetaSkullAccess();
+
+        gameProfileFieldHandle.set(meta, new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName()));
     }
 
     @Override
     public void setSkullTexture(SkullMeta meta, String base64Texture) {
-        CraftMetaSkull metaSkull = (CraftMetaSkull) meta;
-        metaSkull.profile = NMSMagicItems.makeProfile(base64Texture);
+        setupMetaSkullAccess();
+
+        gameProfileFieldHandle.set(meta, NMSMagicItems.makeProfile(base64Texture));
     }
 
     @Override
