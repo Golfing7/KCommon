@@ -100,7 +100,7 @@ public class CooldownMap<T> {
      * @param id the id to put on cooldown
      * @param durationMillis the duration of the cooldown, in millis
      * @return if the player was on cooldown
-     * @deprecated return value is inconsistent with expected behavior. {@link #checkAndSetCooldown(T, long)}
+     * @deprecated return value is inconsistent with expected behavior. {@link #checkAndSetCooldown(Object, long)}
      */
     @Deprecated
     public boolean trySetCooldown(@NotNull T id, long durationMillis) {
@@ -113,7 +113,7 @@ public class CooldownMap<T> {
 
     /**
      * Checks if the user is on cooldown and sets them on cooldown if they aren't.
-     * Supersedes {@link #trySetCooldown(T, long)}
+     * Supersedes {@link #trySetCooldown(Object, long)}
      *
      * @param id the id.
      * @param durationMillis the duration of their cooldown.
