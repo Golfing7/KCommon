@@ -34,9 +34,9 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
     /** The shape designated where we will store the entries for a page. */
     private @NotNull MenuLayoutShape elementSection;
     /** Sets ths source from where elements are pulled. */
-    private @NotNull Function<Range, List<T>> elementSource;
+    private @Nullable Function<Range, List<T>> elementSource;
     /** A supplier for the max number of elements that this menu has. */
-    private @NotNull Supplier<Integer> elementCountSupplier;
+    private @Nullable Supplier<Integer> elementCountSupplier;
 
     public SuppliedPagedMenuContainer(ConfigurationSection section, Player player, @NotNull Function<Range, List<T>> elementSource, @NotNull Supplier<Integer> elementCountSupplier) {
         super(section, player);
@@ -52,10 +52,33 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
         }
     }
 
-    public SuppliedPagedMenuContainer(ConfigurationSection section, Player player, @NotNull Function<Range, List<T>> elementSource) {
+    protected SuppliedPagedMenuContainer(ConfigurationSection section, Player player, @NotNull Function<Range, List<T>> elementSource) {
         this(section, player, elementSource, null);
 
         this.elementCountSupplier = this::getLastSize;
+    }
+
+    /**
+     * Implementing classes using this constructor MUST use the setters for elementSource and elementCountSupeplier.
+     *
+     * @param section the section to load from
+     * @param player the player.
+     */
+    protected SuppliedPagedMenuContainer(ConfigurationSection section, Player player) {
+        this(section, player, null);
+    }
+
+    public void setElementCountSupplier(@NotNull Supplier<Integer> elementCountSupplier) {
+        Preconditions.checkNotNull(elementCountSupplier, "elementCountSupplier cannot be null!");
+
+        this.elementCountSupplier = elementCountSupplier;
+        this.setMaxPageByElements(this.elementCountSupplier.get());
+    }
+
+    public void setElementSource(@NotNull Function<Range, List<T>> elementSource) {
+        Preconditions.checkNotNull(elementSource, "elementSource cannot be null!");
+
+        this.elementSource = elementSource;
     }
 
     /**
@@ -72,7 +95,9 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
         setElementsPerPage(elementSection.getInRange().size());
 
         // Since elements per page can change, max page can also change.
-        setMaxPageByElements(elementCountSupplier.get());
+        if (elementCountSupplier != null) {
+            setMaxPageByElements(elementCountSupplier.get());
+        }
     }
 
     /**
@@ -81,6 +106,8 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
      * @param page the page.
      */
     public void setPage(int page) {
+        Preconditions.checkState(this.elementCountSupplier != null, "elementCountSupplier must not be null!");
+
         // Recalculate the max page if applicable.
         setMaxPageByElements(this.elementCountSupplier.get());
         page = Math.min(page, getMaxPage());
@@ -97,6 +124,7 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
         if (getElementsPerPage() <= 0)
             return null;
 
+        Preconditions.checkState(this.elementCountSupplier != null, "elementCountSupplier must not be null!");
         int elementCount = elementCountSupplier.get();
         return new Range(getPage() * getElementsPerPage(), Math.min((getPage() + 1) * getElementsPerPage() - 1, elementCount - 1));
     }
@@ -108,6 +136,8 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
      */
     protected void forEachElementOnPage(@NotNull BiConsumer<MenuCoordinate, T> action) {
         Preconditions.checkNotNull(action, "Action cannot be null!");
+        Preconditions.checkState(this.elementCountSupplier != null,  "elementCountSupplier must not be null!");
+        Preconditions.checkState(this.elementSource != null,  "elementSource must not be null!");
 
         Range elementInterval = getCurrentElementRange();
         if (elementInterval == null)
