@@ -421,7 +421,7 @@ public final class ItemStackBuilder {
             NMS.getTheNMS().getMagicItems().applyLore(meta, secondRun);
         }
 
-        if (meta instanceof PotionMeta) {
+        if (meta instanceof PotionMeta && potionData != null) {
             PotionMeta potionMeta = (PotionMeta) meta;
             NMS.getTheNMS().getMagicItems().setBaseEffect(potionMeta, potionData);
         }
