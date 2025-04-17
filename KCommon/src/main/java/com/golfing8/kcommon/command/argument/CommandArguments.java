@@ -34,7 +34,7 @@ public final class CommandArguments {
      */
     private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("[\\w-]+");
 
-    public static final CommandArgument<String> ANYTHING = new CommandArgument<>("Anything", (ctx) -> Collections.emptyList(), (context) -> true, (s) -> s);
+    public static final CommandArgument<String> ANYTHING = new CommandArgument<>("Anything", (ctx) -> Collections.emptyList(), (context) -> true, ArgumentContext::getArgument);
 
     /** A command argument for all offline players */
     public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER = new CommandArgument<>("An offline player", (context) -> {
@@ -42,7 +42,7 @@ public final class CommandArguments {
     }, (context) -> {
         OfflinePlayer player = Bukkit.getOfflinePlayer(context.getArgument());
         return player != null && player.getName().equalsIgnoreCase(context.getArgument());
-    }, Bukkit::getOfflinePlayer);
+    }, ctx -> Bukkit.getOfflinePlayer(ctx.getArgument()));
 
     /** A command argument for all offline players that have played before */
     public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER_PLAYED_BEFORE = new CommandArgument<>("An offline player", (context) -> {
@@ -50,7 +50,7 @@ public final class CommandArguments {
     }, (context) -> {
         OfflinePlayer ifCached = NMS.getTheNMS().getOfflinePlayerIfCached(context.getArgument());
         return ifCached != null && ifCached.getName().equalsIgnoreCase(context.getArgument());
-    }, Bukkit::getOfflinePlayer);
+    }, ctx -> Bukkit.getOfflinePlayer(ctx.getArgument()));
 
     /** Used for parsing raw booleans. The formatting of the inputs will be true/false */
     public static final BooleanCommandArgument BOOLEAN = new BooleanCommandArgument(MapUtil.of("true", true, "false", false));
@@ -70,14 +70,14 @@ public final class CommandArguments {
         //The double check is necessary as Bukkit.getPlayer()
         //returns the player with a name that starts with the string.
         return player != null && player.getName().equalsIgnoreCase(context.getArgument());
-    }, Bukkit::getPlayer);
+    }, ctx -> Bukkit.getPlayer(ctx.getArgument()));
 
     /**
      * A command argument for alphanumeric strings. (A-Za-z0-9_)
      */
     public static final CommandArgument<String> ALPHANUMERIC_STRING = new CommandArgument<>("An alphanumeric string", (context) -> {
         return Collections.emptyList();
-    }, (context) -> ALPHANUMERIC_PATTERN.matcher(context.getArgument()).matches(), arg -> arg);
+    }, (context) -> ALPHANUMERIC_PATTERN.matcher(context.getArgument()).matches(), ArgumentContext::getArgument);
 
     /**
      * A command argument to auto-complete non-negative numbers.
@@ -91,7 +91,7 @@ public final class CommandArguments {
         }catch(NumberFormatException exc) {
             return false;
         }
-    }, Double::parseDouble);
+    }, ctx -> Double.parseDouble(ctx.getArgument()));
 
     /**
      * A command argument to auto-complete non-negative longs.
@@ -105,7 +105,7 @@ public final class CommandArguments {
         }catch(NumberFormatException exc) {
             return false;
         }
-    }, Long::parseLong);
+    }, ctx -> Long.parseLong(ctx.getArgument()));
 
     /**
      * A command argument to auto-complete doubles.
@@ -119,7 +119,7 @@ public final class CommandArguments {
         }catch(NumberFormatException exc) {
             return false;
         }
-    }, Double::parseDouble);
+    }, ctx -> Double.parseDouble(ctx.getArgument()));
 
     /**
      * A command argument to auto-complete non-negative integers.
@@ -133,7 +133,7 @@ public final class CommandArguments {
         }catch(NumberFormatException exc) {
             return false;
         }
-    }, Integer::parseInt);
+    }, ctx -> Integer.parseInt(ctx.getArgument()));
 
     /**
      * A command argument to auto-complete positive integers.
@@ -146,7 +146,7 @@ public final class CommandArguments {
         }catch(NumberFormatException exc) {
             return false;
         }
-    }, Integer::parseInt);
+    }, ctx -> Integer.parseInt(ctx.getArgument()));
 
     /**
      * A command argument to auto-complete time lengths.
@@ -155,7 +155,7 @@ public final class CommandArguments {
         return Arrays.asList("1d", "1d,1h", "5m,1s");
     }, (context) -> {
         return TimeLength.parseTime(context.getArgument()) != null;
-    }, TimeLength::parseTime);
+    }, ctx -> TimeLength.parseTime(ctx.getArgument()));
 
     /**
      * A command argument for all modules.
@@ -174,9 +174,9 @@ public final class CommandArguments {
             }
         }
         return Modules.getModule(context.getArgument()) != null;
-    }, (argument) -> {
-        if (argument.contains(":")) {
-            String[] split = argument.split(":");
+    }, (ctx) -> {
+        if (ctx.getArgument().contains(":")) {
+            String[] split = ctx.getArgument().split(":");
             Plugin plugin = Bukkit.getPluginManager().getPlugin(split[0]);
             if (plugin != null) {
                 return Modules.getModule(new KNamespacedKey(plugin, split[1]));
@@ -184,7 +184,7 @@ public final class CommandArguments {
                 return Modules.getModule(new KNamespacedKey(split[0], split[1]));
             }
         }
-        return Modules.getModule(argument);
+        return Modules.getModule(ctx.getArgument());
     });
 
     /**
@@ -194,7 +194,7 @@ public final class CommandArguments {
         return Arrays.stream(Bukkit.getServer().getPluginManager().getPlugins()).map(Plugin::getName).collect(Collectors.toList());
     }, (context) -> {
         return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
-    }, Bukkit.getServer().getPluginManager()::getPlugin);
+    }, ctx -> Bukkit.getServer().getPluginManager().getPlugin(ctx.getArgument()));
 
     /**
      * A command argument for plugins that use this library.
@@ -203,7 +203,7 @@ public final class CommandArguments {
         return Arrays.stream(Bukkit.getServer().getPluginManager().getPlugins()).filter(pl -> pl instanceof KPlugin).map(Plugin::getName).collect(Collectors.toList());
     }, (context) -> {
         return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
-    }, str -> (KPlugin) Bukkit.getServer().getPluginManager().getPlugin(str));
+    }, ctx -> (KPlugin) Bukkit.getServer().getPluginManager().getPlugin(ctx.getArgument()));
 
     /** A command argument for parsing java UUIDs. */
     public static final CommandArgument<UUID> UUID = new CommandArgument<>("uuid", (context) -> Collections.emptyList(), (context) -> {
@@ -213,13 +213,13 @@ public final class CommandArguments {
         } catch (IllegalArgumentException ignored) {
             return false;
         }
-    }, java.util.UUID::fromString);
+    }, ctx -> java.util.UUID.fromString(ctx.getArgument()));
 
-    public static final CommandArgument<ConfigPath> CONFIG_PATH = new CommandArgument<>("config path", (context) -> Collections.emptyList(), (context) -> true, ConfigPath::parse);
+    public static final CommandArgument<ConfigPath> CONFIG_PATH = new CommandArgument<>("config path", (context) -> Collections.emptyList(), (context) -> true, ctx -> ConfigPath.parse(ctx.getArgument()));
 
     public static final CommandArgument<World> WORLD = new CommandArgument<>("world", (context) -> {
         return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
     }, (context) -> {
         return Bukkit.getWorld(context.getArgument()) != null;
-    }, Bukkit::getWorld);
+    }, ctx -> Bukkit.getWorld(ctx.getArgument()));
 }

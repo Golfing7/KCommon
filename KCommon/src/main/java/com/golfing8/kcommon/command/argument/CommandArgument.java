@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
  * By convention, the field {@link #predicate} should return true if and only if {@link #getter} will properly supply an object.
  * </p>
  */
-@AllArgsConstructor
 @Data
 public class CommandArgument<A> {
     /**
@@ -31,8 +30,8 @@ public class CommandArgument<A> {
      * The predicate to verify an argument.
      */
     private final Predicate<ArgumentContext> predicate;
-    /** A getter for the argument. Takes in the string argument and converts it to whatever type was requested. */
-    private final Function<String, A> getter;
+    /** A getter for the argument. Takes in the argument context and converts it to whatever type was requested. */
+    private final Function<ArgumentContext, A> getter;
 
     /**
      * Creates a command argument with all valid types being from the given enum.
@@ -49,7 +48,7 @@ public class CommandArgument<A> {
         //Generate the argument.
         return new CommandArgument<>("A type of " + StringUtil.capitalize(enumm.getSimpleName()), argumentContext -> allStrings.keySet(),
                 argumentContext -> allStrings.containsKey(argumentContext.getArgument().toUpperCase()),
-                argument -> (T) allStrings.get(argument.toUpperCase()));
+                argument -> (T) allStrings.get(argument.getArgument().toUpperCase()));
     }
 
     public static <T> CommandArgument<T> fromMap(String typeName, Map<String, T> map) {
@@ -60,11 +59,11 @@ public class CommandArgument<A> {
         return fromCollection(typeName, map.values(), map::get, reverseMap::get);
     }
 
-    public static <T> CommandArgument<T> fromCollection(String typeName, Collection<T> coll, Function<String, T> fromString) {
+    public static <T> CommandArgument<T> fromCollection(String typeName, Collection<T> coll, Function<ArgumentContext, T> fromString) {
         return fromCollection(typeName, coll, fromString, Objects::toString);
     }
 
-    public static <T> CommandArgument<T> fromCollection(String typeName, Collection<T> coll, Function<String, T> fromString, Function<T, String> toString) {
+    public static <T> CommandArgument<T> fromCollection(String typeName, Collection<T> coll, Function<ArgumentContext, T> fromString, Function<T, String> toString) {
         Set<String> completions = coll.stream().map(toString).collect(Collectors.toSet());
         return new CommandArgument<>("A type of " + typeName,
                 argumentContext -> completions,

@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.command;
 
+import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -122,7 +123,7 @@ public class CommandContext {
     public <T> T get(int index) {
         CommandArgument<?> arg = this.command.getCommandArguments().get(index).getArgument();
         // This is a safe cast as prior to creating this CommandContext object, all arguments were verified.
-        return (T) arg.getGetter().apply(this.arguments.get(index));
+        return (T) arg.getGetter().apply(new ArgumentContext(sender, command, label, arguments.get(index)));
     }
 
     /**
