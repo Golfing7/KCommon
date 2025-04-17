@@ -32,42 +32,41 @@ import java.util.function.Supplier;
 @Getter @Setter
 public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
     /** The shape designated where we will store the entries for a page. */
-    private @NotNull MenuLayoutShape elementSection;
+    private @Nullable MenuLayoutShape elementSection;
     /** Sets ths source from where elements are pulled. */
     private @Nullable Function<Range, List<T>> elementSource;
     /** A supplier for the max number of elements that this menu has. */
     private @Nullable Supplier<Integer> elementCountSupplier;
 
-    public SuppliedPagedMenuContainer(ConfigurationSection section, Player player, @NotNull Function<Range, List<T>> elementSource, @NotNull Supplier<Integer> elementCountSupplier) {
+    protected SuppliedPagedMenuContainer(ConfigurationSection section, Player player) {
         super(section, player);
-
-        this.elementSection = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "element-section-shape"), MenuLayoutShape.class);
-        this.elementCountSupplier = elementCountSupplier;
-        this.elementSource = elementSource;
-        if (this.elementSection != null) {
-            setElementsPerPage(this.elementSection.getInRange().size());
-        } else {
-            this.elementSection = new LayoutShapeRectangle(0, getLastSize() - 10);
-            setElementsPerPage(getLastSize() - 9);
-        }
     }
 
-    protected SuppliedPagedMenuContainer(ConfigurationSection section, Player player, @NotNull Function<Range, List<T>> elementSource) {
-        this(section, player, elementSource, null);
-
-        this.elementCountSupplier = this::getLastSize;
+    protected SuppliedPagedMenuContainer(Player player) {
+        super(player);
     }
 
     /**
-     * Implementing classes using this constructor MUST use the setters for elementSource and elementCountSupeplier.
+     * Sets the parent section and overrides the element section if applicable.
      *
-     * @param section the section to load from
-     * @param player the player.
+     * @param section the config section.
      */
-    protected SuppliedPagedMenuContainer(ConfigurationSection section, Player player) {
-        this(section, player, null);
+    @Override
+    public void setParentSection(@NotNull ConfigurationSection section) {
+        super.setParentSection(section);
+
+        MenuLayoutShape elementSection = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "element-section-shape"), MenuLayoutShape.class);
+        if (elementSection != null) {
+            this.elementSection = elementSection;
+            setElementsPerPage(elementSection.getInRange().size());
+        }
     }
 
+    /**
+     * Sets the supplier for element count.
+     *
+     * @param elementCountSupplier the element count supplier.
+     */
     public void setElementCountSupplier(@NotNull Supplier<Integer> elementCountSupplier) {
         Preconditions.checkNotNull(elementCountSupplier, "elementCountSupplier cannot be null!");
 
@@ -75,6 +74,11 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
         this.setMaxPageByElements(this.elementCountSupplier.get());
     }
 
+    /**
+     * sets the element source.
+     *
+     * @param elementSource the element source.
+     */
     public void setElementSource(@NotNull Function<Range, List<T>> elementSource) {
         Preconditions.checkNotNull(elementSource, "elementSource cannot be null!");
 
@@ -138,6 +142,7 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
         Preconditions.checkNotNull(action, "Action cannot be null!");
         Preconditions.checkState(this.elementCountSupplier != null,  "elementCountSupplier must not be null!");
         Preconditions.checkState(this.elementSource != null,  "elementSource must not be null!");
+        Preconditions.checkState(this.elementSection != null,  "elementSection must not be null!");
 
         Range elementInterval = getCurrentElementRange();
         if (elementInterval == null)

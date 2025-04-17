@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 
@@ -24,7 +25,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
             .name("&a{DIRECTION} Page");
 
     /** The parent config section containing the information of the paged menu */
-    private final ConfigurationSection parentSection;
+    private ConfigurationSection parentSection;
     /** The last known size of the menu */
     private int lastSize;
     /** The page that is currently being displayed */
@@ -39,6 +40,20 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
     public PagedMenuContainer(ConfigurationSection section, Player player) {
         super(player);
 
+        setParentSection(section);
+    }
+
+    /**
+     * If this constructor is used, note that interaction with this menu should NOT occur until
+     * {@link #setParentSection(ConfigurationSection)} is properly called.
+     *
+     * @param player the player.
+     */
+    protected PagedMenuContainer(Player player) {
+        super(player);
+    }
+
+    public void setParentSection(@NotNull ConfigurationSection section) {
         this.parentSection = section;
         this.maxPage = section.getInt("max-page", 0);
         this.lastSize = section.getInt("size");
