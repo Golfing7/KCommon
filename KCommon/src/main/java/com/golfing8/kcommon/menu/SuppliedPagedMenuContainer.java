@@ -59,6 +59,9 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
         if (elementSection != null) {
             this.elementSection = elementSection;
             setElementsPerPage(elementSection.getInRange().size());
+        } else if (this.elementSection == null) {
+            this.elementSection = new LayoutShapeRectangle(0, getLastSize() - 10);
+            setElementsPerPage(getLastSize() - 9);
         }
     }
 
