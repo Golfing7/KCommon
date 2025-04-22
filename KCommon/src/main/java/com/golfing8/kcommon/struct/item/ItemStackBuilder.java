@@ -142,8 +142,8 @@ public final class ItemStackBuilder {
         this.itemDurability = itemStack.getDurability();
         ItemMeta itemMeta = itemStack.getItemMeta();
         this.unbreakable = NMS.getTheNMS().getMagicItems().isUnbreakable(itemMeta);
-        this.itemName = itemStack.getItemMeta().getDisplayName();
-        this.itemLore = itemMeta.getLore();
+        this.itemName = itemMeta.hasDisplayName() ? itemMeta.getDisplayName() : null;
+        this.itemLore = itemMeta.hasLore() ? itemMeta.getLore() : new ArrayList<>();
         Map<Enchantment, Integer> enchants = itemMeta.getEnchants();
         for (Map.Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
             this.enchant(XEnchantment.matchXEnchantment(enchant.getKey()), enchant.getValue());
@@ -305,6 +305,9 @@ public final class ItemStackBuilder {
     }
 
     public ItemStackBuilder insertLore(int index, String... lore) {
+        if (this.itemLore == null) {
+            this.itemLore = new ArrayList<>();
+        }
         for (int i = 0; i < lore.length; i++) {
             this.itemLore.add(index + i, lore[i]);
         }
@@ -312,11 +315,17 @@ public final class ItemStackBuilder {
     }
 
     public ItemStackBuilder addLore(String... lore) {
+        if (this.itemLore == null) {
+            this.itemLore = new ArrayList<>();
+        }
         this.itemLore.addAll(Arrays.asList(lore));
         return this;
     }
 
     public ItemStackBuilder addLore(Collection<String> lore) {
+        if (this.itemLore == null) {
+            this.itemLore = new ArrayList<>();
+        }
         this.itemLore.addAll(lore);
         return this;
     }
