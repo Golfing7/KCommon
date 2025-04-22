@@ -148,6 +148,10 @@ public abstract class KCommand implements TabExecutor {
     @Getter
     private long lastExecutionTime;
 
+    /** If this command should accept extra arguments not defined specifically */
+    @Getter @Setter
+    private boolean acceptExtraArguments = false;
+
     /**
      * A constructor to initialize all fields with the {}
      */
@@ -403,6 +407,10 @@ public abstract class KCommand implements TabExecutor {
 
             //Check if we should just immediately add the argument.
             if(this.commandArguments.size() <= i) {
+                if (!acceptExtraArguments) {
+                    handleHelpMessage(sender, stringArgument);
+                    return null;
+                }
                 builtArguments.add(stringArgument);
                 continue;
             }
@@ -684,7 +692,7 @@ public abstract class KCommand implements TabExecutor {
 
         return commandName.startsWith(argument) ||
                 // Levenshtein is calculated with a greater cost for replace/swap as we *really* only want to match prefixes/suffixes.
-                StringUtil.levenshteinDistance(argument, commandName, 1, 1, 2, 2) < argument.length() * 1.5;
+                StringUtil.levenshteinDistance(argument, commandName, 1, 1, 2, 2) < commandName.length() * 1.5;
     }
 
     /**
