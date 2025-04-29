@@ -47,17 +47,26 @@ public class ChatInputHelper implements Listener {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
+        if (event.getPlayer() != player)
+            return;
+
         complete(null);
     }
 
     // If the player enters a command instead of input, don't capture it and just let them go.
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
+        if (event.getPlayer() != player)
+            return;
+
         complete(null);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onAsyncChat(AsyncPlayerChatEvent event) {
+        if (event.getPlayer() != player)
+            return;
+
         String message = event.getMessage();
         event.setCancelled(true);
         complete(message);
