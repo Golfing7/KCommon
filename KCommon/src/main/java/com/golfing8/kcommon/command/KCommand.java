@@ -858,7 +858,8 @@ public abstract class KCommand implements TabExecutor {
             return Collections.emptyList();
 
         //Get the raw completions.
-        List<String> builtArguments = buildArguments(sender, label, args, false, false);
+        String[] previousArgs = Arrays.copyOf(args, args.length - 1);
+        List<String> builtArguments = buildArguments(sender, label, previousArgs, false, false);
         List<String> completions = new ArrayList<>();
         String stringArgument = args[args.length - 1];
         if (builtArguments != null) {
