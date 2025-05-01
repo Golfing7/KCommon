@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -123,7 +124,7 @@ public class CommandContext {
     public <T> T get(int index) {
         CommandArgument<?> arg = this.command.getCommandArguments().get(index).getArgument();
         // This is a safe cast as prior to creating this CommandContext object, all arguments were verified.
-        return (T) arg.getGetter().apply(new ArgumentContext(sender, command, label, arguments.get(index)));
+        return (T) arg.getGetter().apply(new ArgumentContext(sender, command, label, arguments.get(index), Collections.unmodifiableList(arguments), index));
     }
 
     /**

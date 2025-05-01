@@ -401,7 +401,25 @@ public abstract class KCommand implements TabExecutor {
             return null;
         }
 
+        List<String> builtArguments = buildArguments(sender, label, args, true, verbose);
+        if (builtArguments == null)
+            return null;
+
+        return new CommandContext(sender, label, builtArguments, this);
+    }
+
+    /**
+     * Builds the arguments for this command, up to the end of the argument array provided.
+     *
+     * @param sender the sender.
+     * @param label the label.
+     * @param args the args.
+     * @param verbose verbose mode
+     * @return the built arguments
+     */
+    private List<String> buildArguments(CommandSender sender, String label, String[] args, boolean autoFill, boolean verbose) {
         List<String> builtArguments = new ArrayList<>();
+        List<String> allArguments = new ArrayList<>(Arrays.asList(args));
         for (int i = 0; i < args.length; i++) {
             String stringArgument = args[i];
 
@@ -432,7 +450,7 @@ public abstract class KCommand implements TabExecutor {
             CommandArgument<?> commandArgument = builtCommandArgument.getArgument();
 
             //Create the argument context and test it.
-            ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument);
+            ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(allArguments), i);
             if(!commandArgument.getPredicate().test(context)) {
                 // Handle the argument as invalid.
                 if (verbose) {
@@ -441,9 +459,13 @@ public abstract class KCommand implements TabExecutor {
                 return null;
             }
             builtArguments.add(stringArgument);
+            allArguments.set(i, stringArgument);
         }
 
         //Try to fill in the 'autofill' arguments.
+        if (!autoFill)
+            return builtArguments;
+
         for (int i = builtArguments.size(); i < this.commandArguments.size(); i++) {
             BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
             Function<CommandSender, Object> autofill = builtCommandArgument.getAutoComplete();
@@ -469,7 +491,7 @@ public abstract class KCommand implements TabExecutor {
             //Create the argument context and test it.
             builtArguments.add(Objects.toString(autofill.apply(sender), null));
         }
-        return new CommandContext(sender, label, builtArguments, this);
+        return builtArguments;
     }
 
     /**
@@ -822,6 +844,10 @@ public abstract class KCommand implements TabExecutor {
             if (!command.labelMatches(args[0]))
                 continue;
 
+            // Does the player have permission to see the command?
+            if (!command.canSee(sender))
+                continue;
+
             String[] newArguments = new String[args.length - 1];
             System.arraycopy(args, 1, newArguments, 0, newArguments.length);
             return command.gatherTabCompletions(sender, args[0], newArguments);
@@ -832,17 +858,23 @@ public abstract class KCommand implements TabExecutor {
             return Collections.emptyList();
 
         //Get the raw completions.
-        String stringArgument = args[args.length - 1];
+        List<String> builtArguments = buildArguments(sender, label, args, false, false);
         List<String> completions = new ArrayList<>();
-        if(this.commandArguments.size() > args.length - 1) {
-            CommandArgument<?> argument = this.commandArguments.get(args.length - 1).getArgument();
-            ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument);
-            completions.addAll(argument.getCompletions().apply(context));
+        String stringArgument = args[args.length - 1];
+        if (builtArguments != null) {
+            if(this.commandArguments.size() > args.length - 1) {
+                CommandArgument<?> argument = this.commandArguments.get(args.length - 1).getArgument();
+                ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(builtArguments), args.length - 1);
+                completions.addAll(argument.getCompletions().apply(context));
+            }
         }
 
         //Then go through the subcommands and try to add those as well.
         String argToLower = stringArgument.toLowerCase();
         for(KCommand command : this.getSubcommands()) {
+            if (!command.canSee(sender))
+                continue;
+
             //Add the main label.
             if(command.getCommandName().toLowerCase().startsWith(argToLower))
                 completions.add(command.getCommandName());
