@@ -235,7 +235,15 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
                     instance = constructor.newInstance();
                 } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
                          InvocationTargetException e) {
-                    throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), e);
+                    // Check for the 'INSTANCE' field which Kotlin objects use.
+                    try {
+                        Field field = mClass.getDeclaredField("INSTANCE");
+                        instance = (Module) field.get(null);
+                    } catch (NoSuchFieldException ignored) {
+                        throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), e);
+                    } catch (Throwable ex) {
+                        throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), ex);
+                    }
                 }
             }
 
