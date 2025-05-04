@@ -82,6 +82,16 @@ public abstract class MenuAbstract implements Menu {
     }
 
     @Override
+    public void setMultiLinePlaceholders(List<MultiLinePlaceholder> multiLinePlaceholders) {
+        this.multiLinePlaceholders = new ArrayList<>(multiLinePlaceholders);
+    }
+
+    @Override
+    public void setPlaceholders(List<Placeholder> placeholders) {
+        this.placeholders = new ArrayList<>(placeholders);
+    }
+
+    @Override
     public MenuShape getMenuShape() {
         return menuShape;
     }

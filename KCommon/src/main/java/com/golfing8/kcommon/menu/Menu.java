@@ -2,6 +2,8 @@ package com.golfing8.kcommon.menu;
 
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
+import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
+import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -70,6 +72,14 @@ public interface Menu extends Listener {
     default ItemStack setItemAt(int x, int y, ItemStack set) {
         return setItemAt(getSlotFromCartCoords(getMenuShape().getType(), x, y), set);
     }
+
+    List<Placeholder> getPlaceholders();
+
+    void setPlaceholders(List<Placeholder> placeholders);
+
+    List<MultiLinePlaceholder> getMultiLinePlaceholders();
+
+    void setMultiLinePlaceholders(List<MultiLinePlaceholder> placeholders);
 
     /**
      * Sets the top click action of the menu.

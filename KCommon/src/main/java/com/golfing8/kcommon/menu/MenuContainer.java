@@ -48,6 +48,8 @@ public abstract class MenuContainer {
         menu.setContents(newMenu.getContents());
         menu.setClickActions(newMenu.getClickActions());
         menu.setSpecialItems(newMenu.getSpecialItems());
+        menu.setPlaceholders(newMenu.getPlaceholders());
+        menu.setMultiLinePlaceholders(newMenu.getMultiLinePlaceholders());
         menu.refreshSpecialItems();
         menu.updateViewers();
     }
