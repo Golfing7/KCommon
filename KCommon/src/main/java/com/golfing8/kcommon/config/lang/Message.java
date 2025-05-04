@@ -19,6 +19,7 @@ import lombok.Setter;
 import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -83,8 +84,8 @@ public class Message {
         }else if(message instanceof List) {
             this.messages = new ArrayList<>();
             ((List<?>) message).forEach(object -> this.messages.add(object.toString()));
-        }else if(message instanceof MemorySection) { //In this case the player might be defining a title too.
-            MemorySection section = (MemorySection) message;
+        }else if(message instanceof ConfigurationSection) { //In this case the player might be defining a title too.
+            ConfigurationSection section = (ConfigurationSection) message;
             //Check for the title
             this.title = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "title"),
                     new FieldType(Title.class));
