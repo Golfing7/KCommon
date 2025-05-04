@@ -426,7 +426,8 @@ public abstract class KCommand implements TabExecutor {
             //Check if we should just immediately add the argument.
             if(this.commandArguments.size() <= i) {
                 if (!acceptExtraArguments) {
-                    handleHelpMessage(sender, stringArgument);
+                    if (verbose)
+                        handleHelpMessage(sender, stringArgument);
                     return null;
                 }
                 builtArguments.add(stringArgument);
@@ -438,7 +439,8 @@ public abstract class KCommand implements TabExecutor {
                 if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
                     boolean player = sender instanceof Player;
                     if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
-                        handleMissingArgument(sender, builtCommandArgument);
+                        if (verbose)
+                            handleMissingArgument(sender, builtCommandArgument);
                         continue;
                     }
                 }
@@ -483,7 +485,8 @@ public abstract class KCommand implements TabExecutor {
             if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
                 boolean player = sender instanceof Player;
                 if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
-                    handleMissingArgument(sender, builtCommandArgument);
+                    if (verbose)
+                        handleMissingArgument(sender, builtCommandArgument);
                     continue;
                 }
             }

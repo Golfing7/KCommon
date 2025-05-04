@@ -60,6 +60,22 @@ public class Range {
         return ThreadLocalRandom.current().nextDouble(min, max + EPSILON);
     }
 
+    public String toString() {
+        if (this.max == this.min)
+            return String.valueOf(this.min);
+
+        return this.min + "-" + this.max;
+    }
+
+    public String toIntString() {
+        long min = (long) this.min;
+        long max = (long) this.max;
+        if (min == max)
+            return String.valueOf(min);
+
+        return min + "-" + max;
+    }
+
     /**
      * Generates a range from a given string. The format should follow 'min|max'. Note that negative numbers are not
      * currently supported.
