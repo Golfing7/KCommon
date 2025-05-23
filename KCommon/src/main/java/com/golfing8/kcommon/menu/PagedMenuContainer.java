@@ -49,7 +49,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
      *
      * @param player the player.
      */
-    protected PagedMenuContainer(Player player) {
+    public PagedMenuContainer(Player player) {
         super(player);
     }
 

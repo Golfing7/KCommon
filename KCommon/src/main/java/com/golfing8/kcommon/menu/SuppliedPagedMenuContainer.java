@@ -38,11 +38,16 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
     /** A supplier for the max number of elements that this menu has. */
     private @Nullable Supplier<Integer> elementCountSupplier;
 
-    protected SuppliedPagedMenuContainer(ConfigurationSection section, Player player) {
+    public SuppliedPagedMenuContainer(ConfigurationSection section, Player player) {
         super(section, player);
     }
 
-    protected SuppliedPagedMenuContainer(Player player) {
+    /**
+     * If this constructor is used, {@link #setParentSection(ConfigurationSection)} must be called.
+     *
+     * @param player the player.
+     */
+    public SuppliedPagedMenuContainer(Player player) {
         super(player);
     }
 
