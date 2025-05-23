@@ -60,6 +60,10 @@ public final class ItemStackBuilder {
      */
     private int customModelData = 0;
     /**
+     * The model used for the item. 1.21.4+.
+     */
+    private @Nullable String itemModel;
+    /**
      * The amount of items in the stack.
      */
     private int amount = 1;
@@ -384,6 +388,11 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder itemModel(@Nullable String itemModel) {
+        this.itemModel = itemModel;
+        return this;
+    }
+
     /**
      * Builds an item stack from the given template.
      *
@@ -412,6 +421,7 @@ public final class ItemStackBuilder {
         NMS.getTheNMS().getMagicItems().setAttributeModifiers(newCopy, attributeModifierMap);
 
         ItemMeta meta = newCopy.getItemMeta();
+        NMS.getTheNMS().getMagicItems().setItemModel(meta, itemModel);
 
         if(this.itemName != null) {
             String itemName = this.itemName;

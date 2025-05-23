@@ -209,6 +209,11 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     }
 
     @Override
+    public void setItemModel(ItemMeta meta, @Nullable String key) {
+        throw new UnsupportedOperationException("1.8 does not support item models.");
+    }
+
+    @Override
     public void setBaseEffect(PotionMeta meta, PotionData data) {
         throw new UnsupportedOperationException("1.8 does not support potion data types."); // TODO Maybe try to find a way?
     }

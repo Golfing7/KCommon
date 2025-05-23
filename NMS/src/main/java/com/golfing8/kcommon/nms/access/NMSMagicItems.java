@@ -43,6 +43,14 @@ public interface NMSMagicItems {
     void setSkullTexture(SkullMeta meta, String base64Texture);
 
     /**
+     * Sets the item model for the given item meta.
+     *
+     * @param meta the meta
+     * @param key the key
+     */
+    void setItemModel(ItemMeta meta, @Nullable String key);
+
+    /**
      * Applies the name to the item and tries to use mini message if available.
      *
      * @param meta the meta.

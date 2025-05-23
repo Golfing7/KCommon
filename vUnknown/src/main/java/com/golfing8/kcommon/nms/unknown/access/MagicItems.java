@@ -16,6 +16,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -152,6 +153,15 @@ public class MagicItems implements NMSMagicItems {
         PlayerProfile bukkitProfile = Bukkit.createProfile(mojProfile.getId(), mojProfile.getName());
         bukkitProfile.setProperty(new ProfileProperty("textures", base64Texture));
         meta.setPlayerProfile(bukkitProfile);
+    }
+
+    @Override
+    public void setItemModel(ItemMeta meta, @Nullable String key) {
+        if (key == null) {
+            meta.setItemModel(null);
+        } else {
+            meta.setItemModel(NamespacedKey.fromString(key));
+        }
     }
 
     @Override

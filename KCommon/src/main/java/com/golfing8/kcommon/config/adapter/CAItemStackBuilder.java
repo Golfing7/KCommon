@@ -108,6 +108,10 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("nbt-data", builder.getExtraData());
         if (builder.getPotionData() != null)
             objects.put("potion-data", ConfigTypeRegistry.toPrimitive(builder.getPotionData()).unwrap());
+        if (builder.getCustomModelData() != 0)
+            objects.put("custom-model-data", builder.getCustomModelData());
+        if (builder.getItemModel() != null)
+            objects.put("item-model", builder.getItemModel());
         if (builder.isGlowing())
             objects.put("glowing", true);
         if (builder.getSkullB64() != null)
