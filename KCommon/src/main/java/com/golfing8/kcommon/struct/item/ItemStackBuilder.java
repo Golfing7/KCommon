@@ -17,6 +17,7 @@ import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.golfing8.kcommon.util.ItemUtil;
 import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -495,18 +496,14 @@ public final class ItemStackBuilder {
         //Add the nbt item and extra data.
         if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_21)) {
             NBT.modifyComponents(newCopy, (nbt) -> {
-                for (Map.Entry<String, Object> entry : this.components.entrySet()) {
-                    setValueInNBT(nbt, entry.getKey(), entry.getValue());
-                }
+                ItemUtil.setInNBT(nbt, this.components);
             });
         }
         NBT.modify(newCopy, (nbt) -> {
             if (this.itemID != null) {
                 nbt.setString(ITEMSTACK_ID, this.itemID);
             }
-            for(Map.Entry<String, Object> entry : this.extraData.entrySet()) {
-                setValueInNBT(nbt, entry.getKey(), entry.getValue());
-            }
+            ItemUtil.setInNBT(nbt, this.extraData);
         });
 
         cachedBuild = newCopy;
@@ -520,32 +517,6 @@ public final class ItemStackBuilder {
      */
     public ItemStack buildFromTemplate() {
         return this.buildFromTemplate(null);
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private void setValueInNBT(ReadWriteNBT nbtItem, String key, Object value) {
-        if (value instanceof Integer) {
-            nbtItem.setInteger(key, (Integer) value);
-        } else if (value instanceof Float) {
-            nbtItem.setFloat(key, (Float) value);
-        } else if (value instanceof Double) {
-            nbtItem.setDouble(key, (Double) value);
-        } else if (value instanceof Byte) {
-            nbtItem.setByte(key, (Byte) value);
-        } else if (value instanceof Short) {
-            nbtItem.setShort(key, (Short) value);
-        } else if (value instanceof Long) {
-            nbtItem.setLong(key, (Long) value);
-        } else if (value instanceof String) {
-            nbtItem.setString(key, (String) value);
-        } else if (value instanceof Map) {
-            var subCompound = nbtItem.getOrCreateCompound(key);
-            ((Map) value).forEach((k, v) -> {
-                setValueInNBT(subCompound, k.toString(), v);
-            });
-        } else if (value instanceof Boolean) {
-            nbtItem.setBoolean(key, (Boolean) value);
-        }
     }
 
     /**

@@ -6,7 +6,9 @@ import com.golfing8.kcommon.nms.item.NMSItem;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.experimental.UtilityClass;
+import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utilities for {@link ItemStack} objects.
@@ -93,5 +96,37 @@ public final class ItemUtil {
      */
     public static boolean isAirOrNull(ItemStack check){
         return check == null || check.getType() == XMaterial.AIR.parseMaterial() || check.getAmount() <= 0;
+    }
+
+    public static void setInNBT(ReadWriteNBT nbt, Map<String, Object> data) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            setValueInNBT(nbt, entry.getKey(), entry.getValue());
+        }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static void setValueInNBT(ReadWriteNBT nbtItem, String key, Object value) {
+        if (value instanceof Integer) {
+            nbtItem.setInteger(key, (Integer) value);
+        } else if (value instanceof Float) {
+            nbtItem.setFloat(key, (Float) value);
+        } else if (value instanceof Double) {
+            nbtItem.setDouble(key, (Double) value);
+        } else if (value instanceof Byte) {
+            nbtItem.setByte(key, (Byte) value);
+        } else if (value instanceof Short) {
+            nbtItem.setShort(key, (Short) value);
+        } else if (value instanceof Long) {
+            nbtItem.setLong(key, (Long) value);
+        } else if (value instanceof String) {
+            nbtItem.setString(key, (String) value);
+        } else if (value instanceof Map) {
+            var subCompound = nbtItem.getOrCreateCompound(key);
+            ((Map) value).forEach((k, v) -> {
+                setValueInNBT(subCompound, k.toString(), v);
+            });
+        } else if (value instanceof Boolean) {
+            nbtItem.setBoolean(key, (Boolean) value);
+        }
     }
 }
