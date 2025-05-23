@@ -6,6 +6,7 @@ import com.golfing8.kcommon.nms.item.NMSItem;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import de.tr7zw.changeme.nbtapi.NBTType;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.experimental.UtilityClass;
 import lombok.var;
@@ -98,8 +99,58 @@ public final class ItemUtil {
         return check == null || check.getType() == XMaterial.AIR.parseMaterial() || check.getAmount() <= 0;
     }
 
+    public static void removeInNBT(ReadWriteNBT nbt, Map<String, Object> data) {
+        for (var entry : data.entrySet()) {
+            nbt.removeKey(entry.getKey());
+        }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static void removeValueInNBT(ReadWriteNBT nbt, String key, Object value) {
+        if (value instanceof Integer && nbt.hasTag(key, NBTType.NBTTagInt)) {
+            int nbtValue = (Integer) value;
+            if (nbtValue == nbt.getInteger(key))
+                nbt.removeKey(key);
+        } else if (value instanceof Float && nbt.hasTag(key, NBTType.NBTTagFloat)) {
+            float nbtValue = (Float) value;
+            if (nbtValue == nbt.getFloat(key))
+                nbt.removeKey(key);
+        } else if (value instanceof Double && nbt.hasTag(key, NBTType.NBTTagDouble)) {
+            double nbtValue = (Double) value;
+            if (nbtValue == nbt.getDouble(key))
+                nbt.removeKey(key);
+        } else if (value instanceof Byte && nbt.hasTag(key, NBTType.NBTTagByte)) {
+            byte nbtValue = (Byte) value;
+            if (nbtValue == nbt.getByte(key))
+                nbt.removeKey(key);
+        } else if (value instanceof Short && nbt.hasTag(key, NBTType.NBTTagShort)) {
+            short nbtValue = (Short) value;
+            if (nbtValue == nbt.getShort(key))
+                nbt.removeKey(key);
+        } else if (value instanceof Long && nbt.hasTag(key, NBTType.NBTTagLong)) {
+            long nbtValue = (Long) value;
+            if (nbtValue == nbt.getLong(key))
+                nbt.removeKey(key);
+        } else if (value instanceof String && nbt.hasTag(key, NBTType.NBTTagString)) {
+            String nbtValue = (String) value;
+            if (nbtValue.equals(nbt.getString(key)))
+                nbt.removeKey(key);
+        } else if (value instanceof Map && nbt.hasTag(key, NBTType.NBTTagCompound)) {
+            var subCompound = nbt.getCompound(key);
+            ((Map) value).forEach((k, v) -> {
+                removeValueInNBT(subCompound, k.toString(), v);
+            });
+            if (subCompound.getKeys().isEmpty())
+                nbt.removeKey(key);
+        } else if (value instanceof Boolean && nbt.hasTag(key, NBTType.NBTTagByte)) {
+            boolean nbtValue = (Boolean) value;
+            if (nbtValue == nbt.getBoolean(key))
+                nbt.removeKey(key);
+        }
+    }
+
     public static void setInNBT(ReadWriteNBT nbt, Map<String, Object> data) {
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
+        for (var entry : data.entrySet()) {
             setValueInNBT(nbt, entry.getKey(), entry.getValue());
         }
     }
