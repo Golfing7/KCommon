@@ -3,7 +3,9 @@ package com.golfing8.kcommon.struct.item;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.deanveloper.skullcreator.SkullCreator;
+import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMS;
+import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
@@ -117,6 +119,10 @@ public final class ItemStackBuilder {
      */
     private Map<String, Object> extraData = new HashMap<>();
     /**
+     * Overrides for the item's components
+     */
+    private Map<String, Object> components = new HashMap<>();
+    /**
      * The skull's base 64 texture. Only applied if this item builder builds a player head.
      */
     private String skullB64;
@@ -160,6 +166,7 @@ public final class ItemStackBuilder {
         this.itemType = toCopy.itemType;
         this.amount = toCopy.amount;
         this.customModelData = toCopy.customModelData;
+        this.itemModel = toCopy.itemModel;
         this.cachedBuild = toCopy.cachedBuild;
         this.variableAmount = toCopy.variableAmount;
         this.itemDurability = toCopy.itemDurability;
@@ -172,6 +179,7 @@ public final class ItemStackBuilder {
         this.multiLinePlaceholders = new ArrayList<>(toCopy.multiLinePlaceholders);
         this.skullB64 = toCopy.skullB64;
         this.extraData = new HashMap<>(toCopy.extraData);
+        this.components = new HashMap<>(toCopy.components);
         this.potionData = toCopy.potionData;
         this.glowing = toCopy.glowing;
     }
@@ -196,11 +204,15 @@ public final class ItemStackBuilder {
         this.itemDurability = section.contains("durability") ? (short) section.getInt("durability") : this.itemType.getData();
         this.unbreakable = section.getBoolean("unbreakable", false);
         this.customModelData = section.getInt("custom-model-data", 0);
+        this.itemModel = section.getString("item-model");
         this.itemName = section.getString("name", null);
         this.itemLore = section.contains("lore") ? section.getStringList("lore") : null;
         this.amount = Math.max(section.getInt("amount", 1), 1);
         if (section.contains("nbt-data")) {
             this.extraData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "nbt-data"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {}));
+        }
+        if (section.contains("components")) {
+            this.components = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "components"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {}));
         }
         if (section.contains("variable-amount")) {
             this.variableAmount = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "variable-amount"), Range.class);
@@ -388,6 +400,11 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder components(Map<String, Object> data) {
+        this.components = data == null ? Collections.emptyMap() : new HashMap<>(data);
+        return this;
+    }
+
     public ItemStackBuilder itemModel(@Nullable String itemModel) {
         this.itemModel = itemModel;
         return this;
@@ -476,6 +493,13 @@ public final class ItemStackBuilder {
         newCopy.setItemMeta(meta);
 
         //Add the nbt item and extra data.
+        if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_21)) {
+            NBT.modifyComponents(newCopy, (nbt) -> {
+                for (Map.Entry<String, Object> entry : this.components.entrySet()) {
+                    setValueInNBT(nbt, entry.getKey(), entry.getValue());
+                }
+            });
+        }
         NBT.modify(newCopy, (nbt) -> {
             if (this.itemID != null) {
                 nbt.setString(ITEMSTACK_ID, this.itemID);

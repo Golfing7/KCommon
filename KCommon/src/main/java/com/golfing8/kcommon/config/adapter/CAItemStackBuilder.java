@@ -49,12 +49,16 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             builder.unbreakable((boolean) primitiveValue.get("unbreakable"));
         if (primitiveValue.containsKey("custom-model-data"))
             builder.customModelData((int) primitiveValue.get("custom-model-data"));
+        if (primitiveValue.containsKey("item-model"))
+            builder.itemModel((String) primitiveValue.get("item-model"));
         if (primitiveValue.containsKey("name"))
             builder.name(primitiveValue.get("name").toString());
         if (primitiveValue.containsKey("lore"))
             builder.lore((List<String>) primitiveValue.get("lore"));
         if (primitiveValue.containsKey("nbt-data"))
             builder.extraData((Map<String, Object>) primitiveValue.get("nbt-data"));
+        if (primitiveValue.containsKey("components"))
+            builder.components((Map<String, Object>) primitiveValue.get("nbt-data"));
         if (primitiveValue.containsKey("potion-data"))
             builder.potionData(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue.get("potion-data")), new FieldType(PotionData.class)));
         if (primitiveValue.containsKey("glowing"))
@@ -104,8 +108,10 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("name", builder.getItemName());
         if (builder.getItemLore() != null && !builder.getItemLore().isEmpty())
             objects.put("lore", builder.getItemLore());
-        if (builder.getExtraData() != null && builder.getExtraData().size() > 0)
+        if (builder.getExtraData() != null && !builder.getExtraData().isEmpty())
             objects.put("nbt-data", builder.getExtraData());
+        if (builder.getComponents() != null && !builder.getComponents().isEmpty())
+            objects.put("components", builder.getComponents());
         if (builder.getPotionData() != null)
             objects.put("potion-data", ConfigTypeRegistry.toPrimitive(builder.getPotionData()).unwrap());
         if (builder.getCustomModelData() != 0)

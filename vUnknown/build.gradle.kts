@@ -11,6 +11,11 @@ repositories {
     maven {
         url = uri("https://maven.enginehub.org/repo/")
     }
+
+    maven {
+        name = "papermc"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
 }
 
 dependencies {
@@ -21,9 +26,13 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 
     compileOnly(project(":NMS"))
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4")
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.15")
     compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4") {
+        exclude("org.spigotmc")
+    }
+    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.15") {
+        exclude("org.spigotmc")
+    }
     compileOnly("com.mojang:authlib:1.5.25")
 }
 
