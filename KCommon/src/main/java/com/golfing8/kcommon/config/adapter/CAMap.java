@@ -52,10 +52,14 @@ public class CAMap implements ConfigAdapter<Map> {
         for (Map.Entry<String, Object> mapEntry : primitive.entrySet()) {
             Object adaptedKey = keyAdapter != null ?
                     keyAdapter.toPOJO(ConfigPrimitive.ofTrusted(mapEntry.getKey()), keyFieldType) :
-                    ConfigPrimitive.coerceStringToBoxed(mapEntry.getKey(), keyFieldType.getType());
+                    ConfigPrimitive.coerceObjectToBoxed(mapEntry.getKey(), keyFieldType.getType());
 
             if (valueAdapter == null) {
-                values.put(adaptedKey, ConfigPrimitive.coerceStringToBoxed(mapEntry.getValue().toString(), valueFieldType.getType()));
+                if (ConfigPrimitive.isYamlPrimitive(valueFieldType.getType())) {
+                    values.put(adaptedKey, ConfigPrimitive.coerceObjectToBoxed(mapEntry.getValue().toString(), valueFieldType.getType()));
+                } else {
+                    values.put(adaptedKey, mapEntry.getValue());
+                }
             } else {
                 try {
                     values.put(adaptedKey, valueAdapter.toPOJO(entry.getSubValue(mapEntry.getKey()), valueFieldType));

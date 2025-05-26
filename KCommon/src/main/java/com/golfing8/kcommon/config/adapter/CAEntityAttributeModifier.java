@@ -27,7 +27,7 @@ public class CAEntityAttributeModifier implements ConfigAdapter<EntityAttributeM
         EntityAttributeModifier.Operation operation = EntityAttributeModifier.Operation.ADD_NUMBER;
         if (objects.containsKey("operation"))
             operation = EntityAttributeModifier.Operation.valueOf(objects.get("operation").toString());
-        double amount = (double) ConfigPrimitive.coerceStringToBoxed(objects.get("amount").toString(), Double.class);
+        double amount = (double) ConfigPrimitive.coerceObjectToBoxed(objects.get("amount"), Double.class);
         String name = DEFAULT_SERIALIZED_NAME;
         if (objects.containsKey("name"))
             name = objects.get("name").toString();

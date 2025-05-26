@@ -213,30 +213,53 @@ public final class ConfigPrimitive {
     }
 
     /**
+     * Checks if the given type is a primitive type.
+     *
+     * @param type the type.
+     * @return true if its a primitive type.
+     */
+    public static boolean isYamlPrimitive(Class<?> type) {
+        if (type == Integer.class) {
+            return true;
+        } else if (type == Short.class) {
+            return true;
+        } else if (type == Byte.class) {
+            return true;
+        } else if (type == Long.class) {
+            return true;
+        } else if (type == Double.class) {
+            return true;
+        } else if (type == Float.class) {
+            return true;
+        } else if (type == Boolean.class) {
+            return true;
+        } else return type == String.class;
+    }
+
+    /**
      * Tries to coerce a string back into its java box object.
      *
-     * @param str the string.
+     * @param val the string.
      * @param boxedType the boxed type of object
      * @return the boxed object.
      */
-    public static Object coerceStringToBoxed(String str, Class<?> boxedType) {
+    public static Object coerceObjectToBoxed(Object val, Class<?> boxedType) {
         if (boxedType == Integer.class) {
-            return Integer.parseInt(str);
+            return Integer.parseInt(val.toString());
         } else if (boxedType == Short.class) {
-            return Short.parseShort(str);
+            return Short.parseShort(val.toString());
         } else if (boxedType == Byte.class) {
-            return Byte.parseByte(str);
+            return Byte.parseByte(val.toString());
         } else if (boxedType == Long.class) {
-            return Long.parseLong(str);
+            return Long.parseLong(val.toString());
         } else if (boxedType == Double.class) {
-            return Double.parseDouble(str.replace(",", "."));
+            return Double.parseDouble(val.toString().replace(",", "."));
         } else if (boxedType == Float.class) {
-            return Float.parseFloat(str.replace(",", "."));
+            return Float.parseFloat(val.toString().replace(",", "."));
         } else if (boxedType == Boolean.class) {
-            return Boolean.parseBoolean(str);
-        } else if (boxedType == String.class) {
-            return str;
+            return Boolean.parseBoolean(val.toString());
+        } else {
+            return val;
         }
-        throw new IllegalArgumentException(String.format("Class type %s not recognized", boxedType.getName()));
     }
 }
