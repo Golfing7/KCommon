@@ -377,6 +377,11 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder placeholders(Collection<Placeholder> placeholders) {
+        this.placeholders = new ArrayList<>(placeholders);
+        return this;
+    }
+
     public ItemStackBuilder addPlaceholders(Placeholder... placeholders) {
         if (this.placeholders == null) {
             this.placeholders = Lists.newArrayList(placeholders);
@@ -386,8 +391,22 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder addPlaceholders(Collection<Placeholder> placeholders) {
+        if (this.placeholders == null) {
+            this.placeholders = Lists.newArrayList(placeholders);
+        } else {
+            this.placeholders.addAll(placeholders);
+        }
+        return this;
+    }
+
     public ItemStackBuilder multiLinePlaceholders(MultiLinePlaceholder... placeholders) {
         this.multiLinePlaceholders = Lists.newArrayList(placeholders);
+        return this;
+    }
+
+    public ItemStackBuilder multiLinePlaceholders(Collection<MultiLinePlaceholder> placeholders) {
+        this.multiLinePlaceholders = new ArrayList<>(placeholders);
         return this;
     }
 
@@ -439,7 +458,9 @@ public final class ItemStackBuilder {
         NMS.getTheNMS().getMagicItems().setAttributeModifiers(newCopy, attributeModifierMap);
 
         ItemMeta meta = newCopy.getItemMeta();
-        NMS.getTheNMS().getMagicItems().setItemModel(meta, itemModel);
+        if (itemModel != null) {
+            NMS.getTheNMS().getMagicItems().setItemModel(meta, itemModel);
+        }
 
         if(this.itemName != null) {
             String itemName = this.itemName;
