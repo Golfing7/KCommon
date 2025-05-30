@@ -969,7 +969,7 @@ public abstract class KCommand implements TabExecutor {
                 if (stringArgument.equals(CommandFlag.SHORT_FLAG_PREFIX)) {
                     completions.addAll(shortNameMappedCommandFlags.entrySet().stream()
                             .filter(k -> previousFlags == null || !previousFlags.containsKey(k.getValue()))
-                            .map(k -> CommandFlag.SHORT_FLAG_PREFIX + k).collect(Collectors.toList()));
+                            .map(k -> CommandFlag.SHORT_FLAG_PREFIX + k.getKey()).collect(Collectors.toList()));
                 }
             }
         }
