@@ -5,6 +5,7 @@ import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.exc.CommandInstantiationException;
+import com.golfing8.kcommon.command.flag.CommandFlag;
 import com.golfing8.kcommon.command.requirement.Requirement;
 import com.golfing8.kcommon.command.requirement.RequirementPlayer;
 import com.golfing8.kcommon.config.lang.LangConfig;
@@ -12,9 +13,12 @@ import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
+import com.golfing8.kcommon.util.MapUtil;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.*;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -97,6 +100,10 @@ public abstract class KCommand implements TabExecutor {
      */
     @Getter
     private final List<BuiltCommandArgument> commandArguments = new ArrayList<>();
+    /** Contains the long name mapped command flags. */
+    private final Map<String, CommandFlag> longNameMappedCommandFlags = new HashMap<>();
+    /** Contains the short name mapped command flags. */
+    private final Map<Character, CommandFlag> shortNameMappedCommandFlags = new HashMap<>();
     /**
      * The sub commands of this command.
      */
@@ -376,6 +383,17 @@ public abstract class KCommand implements TabExecutor {
     }
 
     /**
+     * Adds a command flag
+     *
+     * @param flag the command flag
+     */
+    protected final void addFlag(@NotNull CommandFlag flag) {
+        if (flag.getShortName() != null)
+            shortNameMappedCommandFlags.put(flag.getShortName(), flag);
+        longNameMappedCommandFlags.put(flag.getFullName(), flag);
+    }
+
+    /**
      * Adds the given command requirement to this command.
      *
      * @param requirement the requirement.
@@ -405,7 +423,63 @@ public abstract class KCommand implements TabExecutor {
         if (builtArguments == null)
             return null;
 
-        return new CommandContext(sender, label, builtArguments, this);
+        Map<CommandFlag, TriState> flagStates = args.length > builtArguments.size() ? buildFlagStates(Arrays.copyOfRange(args, builtArguments.size(), args.length)) : Collections.emptyMap();
+        if (flagStates == null)
+            return null;
+
+        return new CommandContext(sender, label, builtArguments, this, flagStates);
+    }
+
+    /**
+     * Builds the flag states with the given arguments.
+     *
+     * @return the arguments.
+     */
+    private @Nullable Map<CommandFlag, TriState> buildFlagStates(String[] potentialFlagArguments) {
+        if (this.longNameMappedCommandFlags.isEmpty())
+            return Collections.emptyMap();
+
+        Map<CommandFlag, TriState> flagStates = Maps.newHashMap();
+        for (String arg : potentialFlagArguments) {
+            var argumentFlags = matchArgumentForFlags(arg);
+            if (argumentFlags == null) {
+                return null;
+            }
+        }
+        return flagStates;
+    }
+
+    /**
+     * Matches a single argument against command flags.
+     * If the argument doesn't match one of the arguments, null is returned to signify failure.
+     *
+     * @param argument the argument
+     * @return the arguments
+     */
+    private @Nullable Map<CommandFlag, TriState> matchArgumentForFlags(String argument) {
+        // Match against long flag first.
+        if (argument.startsWith(CommandFlag.LONG_FLAG_PREFIX)) {
+            String longFlag = argument.substring(CommandFlag.LONG_FLAG_PREFIX.length());
+            CommandFlag found = this.longNameMappedCommandFlags.get(longFlag);
+            if (found == null)
+                return null;
+
+            return MapUtil.of(found, TriState.TRUE);
+        } else if (argument.startsWith(CommandFlag.SHORT_FLAG_PREFIX)) {
+            String shortFlags = argument.substring(CommandFlag.SHORT_FLAG_PREFIX.length());
+            Map<CommandFlag, TriState> flagStates = new HashMap<>();
+            for (char c : shortFlags.toCharArray()) {
+                CommandFlag found = this.shortNameMappedCommandFlags.get(c);
+                if (found == null) {
+                    return null;
+                }
+
+                flagStates.put(found, TriState.TRUE);
+            }
+            return flagStates;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -425,6 +499,11 @@ public abstract class KCommand implements TabExecutor {
 
             //Check if we should just immediately add the argument.
             if(this.commandArguments.size() <= i) {
+                // Try matching it against a flag.
+                var flagStates = matchArgumentForFlags(stringArgument);
+                if (flagStates != null)
+                    continue;
+
                 if (!acceptExtraArguments) {
                     if (verbose)
                         handleHelpMessage(sender, stringArgument);

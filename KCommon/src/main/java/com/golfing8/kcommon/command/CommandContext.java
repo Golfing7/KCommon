@@ -2,8 +2,11 @@ package com.golfing8.kcommon.command;
 
 import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
+import com.golfing8.kcommon.command.flag.CommandFlag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.var;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -12,12 +15,13 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Context for a running command. Contains things like the sender, arguments, etc.
  */
-@RequiredArgsConstructor
 public class CommandContext {
     /**
      * The sender for this command.
@@ -40,11 +44,68 @@ public class CommandContext {
     @Getter
     private final KCommand command;
 
+    /** Maps states of flags */
+    private final Map<CommandFlag, TriState> flagStates;
+    /** Maps long name flag states */
+    private final Map<String, TriState> longNameFlagStates;
+    /** Maps short name flag states. */
+    private final Map<Character, TriState> shortNameFlagStates;
+
+    public CommandContext(CommandSender sender, String label, List<String> arguments, KCommand command) {
+        this(sender, label, arguments, command, Collections.emptyMap());
+    }
+
+    public CommandContext(CommandSender sender, String label, List<String> arguments, KCommand command, Map<CommandFlag, TriState> flagStates) {
+        this.sender = sender;
+        this.label = label;
+        this.arguments = arguments;
+        this.command = command;
+
+        this.flagStates = flagStates;
+        this.longNameFlagStates = new HashMap<>();
+        this.shortNameFlagStates = new HashMap<>();
+        for (var entry : flagStates.entrySet()) {
+            if (entry.getKey().getShortName() != null)
+                this.shortNameFlagStates.put(entry.getKey().getShortName(), entry.getValue());
+            this.longNameFlagStates.put(entry.getKey().getFullName(), entry.getValue());
+        }
+    }
+
     /**
      * The next available index of an argument.
      * May meet or exceed {@code arguments.size()}, in which case no argument is available.
      */
     private int argumentIndex = 0;
+
+    /**
+     * Gets the flag state of the given flag.
+     *
+     * @param shortName the flag's short name
+     * @return the state of the flag
+     */
+    public TriState getFlagState(char shortName) {
+        return this.shortNameFlagStates.getOrDefault(shortName, TriState.NOT_SET);
+    }
+
+    /**
+     * Gets the flag state of the given flag.
+     *
+     * @param longName the long name of the flag
+     * @return the state of the flag
+     */
+    public TriState getFlagState(String longName) {
+        return this.longNameFlagStates.getOrDefault(longName, TriState.NOT_SET);
+    }
+
+    /**
+     * Gets the flag state of the given flag.
+     *
+     * @param flag the flag
+     * @return the state of the flag
+     */
+    public TriState getFlagState(CommandFlag flag) {
+        return this.flagStates.getOrDefault(flag, TriState.NOT_SET);
+    }
 
     /**
      * Gets the sender as a player, or returns null if the sender is not a player.
