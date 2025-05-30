@@ -423,7 +423,7 @@ public abstract class KCommand implements TabExecutor {
         if (builtArguments == null)
             return null;
 
-        Map<CommandFlag, TriState> flagStates = args.length > builtArguments.size() ? buildFlagStates(Arrays.copyOfRange(args, builtArguments.size(), args.length)) : Collections.emptyMap();
+        Map<CommandFlag, TriState> flagStates = args.length > builtArguments.size() ? buildFlagStates(Arrays.copyOfRange(args, builtArguments.size(), args.length), false) : Collections.emptyMap();
         if (flagStates == null)
             return null;
 
@@ -435,16 +435,19 @@ public abstract class KCommand implements TabExecutor {
      *
      * @return the arguments.
      */
-    private @Nullable Map<CommandFlag, TriState> buildFlagStates(String[] potentialFlagArguments) {
+    private @Nullable Map<CommandFlag, TriState> buildFlagStates(String[] potentialFlagArguments, boolean tolerant) {
         if (this.longNameMappedCommandFlags.isEmpty())
             return Collections.emptyMap();
 
         Map<CommandFlag, TriState> flagStates = Maps.newHashMap();
         for (String arg : potentialFlagArguments) {
-            var argumentFlags = matchArgumentForFlags(arg);
+            var argumentFlags = matchArgumentForFlags(arg, tolerant);
             if (argumentFlags == null) {
+                if (tolerant)
+                    continue;
                 return null;
             }
+            flagStates.putAll(argumentFlags);
         }
         return flagStates;
     }
@@ -456,13 +459,13 @@ public abstract class KCommand implements TabExecutor {
      * @param argument the argument
      * @return the arguments
      */
-    private @Nullable Map<CommandFlag, TriState> matchArgumentForFlags(String argument) {
+    private @Nullable Map<CommandFlag, TriState> matchArgumentForFlags(String argument, boolean tolerant) {
         // Match against long flag first.
         if (argument.startsWith(CommandFlag.LONG_FLAG_PREFIX)) {
             String longFlag = argument.substring(CommandFlag.LONG_FLAG_PREFIX.length());
             CommandFlag found = this.longNameMappedCommandFlags.get(longFlag);
             if (found == null)
-                return null;
+                return tolerant ? Collections.emptyMap() : null;
 
             return MapUtil.of(found, TriState.TRUE);
         } else if (argument.startsWith(CommandFlag.SHORT_FLAG_PREFIX)) {
@@ -471,6 +474,8 @@ public abstract class KCommand implements TabExecutor {
             for (char c : shortFlags.toCharArray()) {
                 CommandFlag found = this.shortNameMappedCommandFlags.get(c);
                 if (found == null) {
+                    if (tolerant)
+                        continue;
                     return null;
                 }
 
@@ -500,7 +505,7 @@ public abstract class KCommand implements TabExecutor {
             //Check if we should just immediately add the argument.
             if(this.commandArguments.size() <= i) {
                 // Try matching it against a flag.
-                var flagStates = matchArgumentForFlags(stringArgument);
+                var flagStates = matchArgumentForFlags(stringArgument, false);
                 if (flagStates != null)
                     continue;
 
@@ -950,22 +955,41 @@ public abstract class KCommand implements TabExecutor {
                 ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(builtArguments), args.length - 1);
                 completions.addAll(argument.getCompletions().apply(context));
             }
+
+            if (builtArguments.size() >= this.commandArguments.size()) {
+                Map<CommandFlag, TriState> previousFlags = buildFlagStates(previousArgs, true);
+                // Show flags if the player has begun entering them.
+                if (stringArgument.startsWith(String.valueOf(CommandFlag.LONG_FLAG_PREFIX.charAt(0)))) {
+                    completions.addAll(longNameMappedCommandFlags.entrySet().stream()
+                            .filter(k -> previousFlags == null || !previousFlags.containsKey(k.getValue()))
+                            .map(k -> CommandFlag.LONG_FLAG_PREFIX + k.getKey()).collect(Collectors.toList()));
+                }
+
+                // If the argument is specifically the short flag prefix, populate with the flags.
+                if (stringArgument.equals(CommandFlag.SHORT_FLAG_PREFIX)) {
+                    completions.addAll(shortNameMappedCommandFlags.entrySet().stream()
+                            .filter(k -> previousFlags == null || !previousFlags.containsKey(k.getValue()))
+                            .map(k -> CommandFlag.SHORT_FLAG_PREFIX + k).collect(Collectors.toList()));
+                }
+            }
         }
 
-        //Then go through the subcommands and try to add those as well.
-        String argToLower = stringArgument.toLowerCase();
-        for(KCommand command : this.getSubcommands()) {
-            if (!command.canSee(sender))
-                continue;
+        // Then go through the subcommands and try to add those as well.
+        if (args.length == 1) {
+            String argToLower = stringArgument.toLowerCase();
+            for(KCommand command : this.getSubcommands()) {
+                if (!command.canSee(sender))
+                    continue;
 
-            //Add the main label.
-            if(command.getCommandName().toLowerCase().startsWith(argToLower))
-                completions.add(command.getCommandName());
+                //Add the main label.
+                if(command.getCommandName().toLowerCase().startsWith(argToLower))
+                    completions.add(command.getCommandName());
 
-            //Add all aliases.
-            for(String alias : command.getCommandAliases()) {
-                if(alias.toLowerCase().startsWith(argToLower))
-                    completions.add(alias);
+                //Add all aliases.
+                for(String alias : command.getCommandAliases()) {
+                    if(alias.toLowerCase().startsWith(argToLower))
+                        completions.add(alias);
+                }
             }
         }
 

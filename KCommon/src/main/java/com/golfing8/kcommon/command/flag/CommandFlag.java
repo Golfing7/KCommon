@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @Getter @AllArgsConstructor
 public class CommandFlag {
+    /** The short flag prefix. */
     public static final String SHORT_FLAG_PREFIX = "-";
     public static final String LONG_FLAG_PREFIX = "--";
 
