@@ -93,6 +93,10 @@ public class TimeLength implements Comparable<TimeLength> {
         return getAsString(false);
     }
 
+    public static TimeLength from(long duration, TimeUnit unit) {
+        return new TimeLength(unit.toMillis(duration) / 50L);
+    }
+
     /**
      * The string of input to parse into a TimeUnit. Returns null if the string wasn't parse-able.
      *
