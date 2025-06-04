@@ -10,6 +10,7 @@ import com.golfing8.kcommon.command.requirement.Requirement;
 import com.golfing8.kcommon.command.requirement.RequirementPlayer;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.Message;
+import com.golfing8.kcommon.struct.permission.PermissionContext;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 /**
  * An abstract KCommon command. Can be registered without a module and should be used for plugin-wide commands.
  */
-public abstract class KCommand implements TabExecutor {
+public abstract class KCommand implements TabExecutor, PermissionContext {
     private static final Pattern HELP_PATTERN = Pattern.compile(
             "(help|\\?)",
             Pattern.CASE_INSENSITIVE
@@ -293,6 +294,11 @@ public abstract class KCommand implements TabExecutor {
             return;
 
         this.commandPermission = getGeneratedCommandPermission();
+    }
+
+    @Override
+    public @Nullable String getPermissionPrefix() {
+        return this.commandPermission;
     }
 
     /**
@@ -639,12 +645,11 @@ public abstract class KCommand implements TabExecutor {
      * @param sender the sender.
      * @param extension the extension.
      * @return if they have the permission extension.
+     * @deprecated use {@link #hasPermission(CommandSender, String)}
      */
+    @Deprecated
     public boolean checkPermissionExtension(CommandSender sender, String extension) {
-        if (StringUtil.isEmpty(this.commandPermission)) // If the command has no permission, there's nothing we can do here.
-            throw new IllegalStateException("Cannot check permission extension with null permission.");
-
-        return sender.hasPermission(this.commandPermission + "." + extension);
+        return hasPermission(sender, extension);
     }
 
     /**
@@ -665,7 +670,7 @@ public abstract class KCommand implements TabExecutor {
         if (argument.requiredPermissionExtension == null)
             return true;
 
-        return checkPermissionExtension(sender, argument.requiredPermissionExtension);
+        return hasPermission(sender, argument.requiredPermissionExtension);
     }
 
     /**

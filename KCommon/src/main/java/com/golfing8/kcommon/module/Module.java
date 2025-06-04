@@ -11,6 +11,7 @@ import com.golfing8.kcommon.data.DataManagerContainer;
 import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
+import com.golfing8.kcommon.struct.permission.PermissionContext;
 import com.golfing8.kcommon.util.FileUtil;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
@@ -22,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -38,7 +40,7 @@ import java.util.stream.Stream;
  * Represents an abstract module with functionality on the server. These modules are the basis of functionality
  * for the KCommon suite of plugins. All 'Features' should be implemented through an extension of this class.
  */
-public abstract class Module implements Listener, LangConfigContainer, PlaceholderProvider {
+public abstract class Module implements Listener, LangConfigContainer, PlaceholderProvider, PermissionContext {
     /**
      * Gets a module instance associated with the given type for the call.
      *
@@ -77,6 +79,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /** The logger used for this module */
     @Getter
     private final Logger logger;
+    /** The permission prefix */
+    @Getter
+    private final String permissionPrefix;
 
     /**
      * If this module is enabled or not. This is simply the module's current state.
@@ -167,6 +172,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.subModules = new HashSet<>();
         this.configs = new ConcurrentHashMap<>();
         this.logger = new ModuleLogger(this);
+        this.permissionPrefix = plugin.getName() + "." + this.moduleName;
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
@@ -198,6 +204,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.subModules = new HashSet<>();
         this.configs = new HashMap<>();
         this.logger = new ModuleLogger(this);
+        this.permissionPrefix = plugin.getName() + "." + this.moduleName;
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
