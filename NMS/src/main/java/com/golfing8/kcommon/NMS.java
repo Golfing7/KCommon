@@ -37,6 +37,9 @@ public final class NMS {
             put(new NMSVersion(20, 1), "v1_20_R2");
             put(new NMSVersion(20, 3), "v1_20_R3");
             put(new NMSVersion(20, 5), "v1_20_R4");
+
+            put(new NMSVersion(21, 0), "v1_21");
+            put(new NMSVersion(21, 5), "v1_21_R4");
         }
     };
     @Getter
