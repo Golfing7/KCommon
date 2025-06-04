@@ -49,10 +49,14 @@ public class KCommon extends KPlugin {
      */
     @Getter
     private @Nullable MongoConnector connector;
+    /** The main thread of Bukkit */
+    @Getter
+    private Thread mainThread;
 
     @Override
     public void onPreEnableInner() {
         this.serverVersion = NMSVersion.loadVersion();
+        this.mainThread = Thread.currentThread();
 
         libraryLoader.addRelocation("de,tr7zw,changeme,nbtapi", "de,tr7zw,kcommon,nbtapi");
         libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
