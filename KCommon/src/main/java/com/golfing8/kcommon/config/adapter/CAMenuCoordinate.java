@@ -1,7 +1,5 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
-import com.golfing8.kcommon.menu.MenuUtils;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;

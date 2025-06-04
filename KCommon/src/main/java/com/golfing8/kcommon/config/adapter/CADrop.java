@@ -1,7 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.config.InvalidConfigException;
+import com.golfing8.kcommon.config.exc.InvalidConfigException;
 import com.golfing8.kcommon.struct.drop.CommandDrop;
 import com.golfing8.kcommon.struct.drop.Drop;
 import com.golfing8.kcommon.struct.drop.ItemDrop;

@@ -1,6 +1,6 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.golfing8.kcommon.config.InvalidConfigException;
+import com.golfing8.kcommon.config.exc.InvalidConfigException;
 import com.golfing8.kcommon.struct.particle.Particle;
 import com.golfing8.kcommon.struct.particle.ParticleType;
 import com.golfing8.kcommon.struct.reflection.FieldType;

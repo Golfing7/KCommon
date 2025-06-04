@@ -1,4 +1,4 @@
-package com.golfing8.kcommon.config.commented;
+package com.golfing8.kcommon.config.exc;
 
 /**
  * Thrown when a value cannot be set in a config.

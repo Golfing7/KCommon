@@ -3,6 +3,8 @@ package com.golfing8.kcommon.config.commented;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.config.exc.ConfigException;
+import com.golfing8.kcommon.menu.MenuBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,13 +14,12 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +31,7 @@ import java.util.*;
  * Other QOL features are included as well such as alphabetic saving.
  * </p>
  */
-public class Configuration extends YamlConfiguration implements Config {
+public class Configuration extends YamlConfiguration implements KConfig {
     /** The path to the config file */
     private final Path configPath;
     /** The config file we're wrapping */
@@ -70,11 +71,25 @@ public class Configuration extends YamlConfiguration implements Config {
 
     @Override
     public void ensureExists(String path) {
-        if (this.source == null || this.contains(path) || !this.source.contains(path))
-            return;
+        if (!this.contains(path)) {
+            if (this.source == null || !this.source.contains(path))
+                throw new ConfigException(this, "Config entry at path " + path + " doesn't exist!");
 
-        this.set(path, this.source.get(path));
-        this.save();
+            this.set(path, this.source.get(path));
+            this.save();
+        }
+    }
+
+    @Override
+    public boolean tryLoadFromSource(String path) {
+        if (!this.contains(path)) {
+            if (this.source == null || !this.source.contains(path))
+                return false;
+
+            this.set(path, this.source.get(path));
+            this.save();
+        }
+        return true;
     }
 
     /**
@@ -232,7 +247,7 @@ public class Configuration extends YamlConfiguration implements Config {
     }
 
     @Override
-    public ConfigurationSection getConfigurationSection(String path) {
+    public WrappedConfigurationSection getConfigurationSection(String path) {
         return new WrappedConfigurationSection(wrapped.getConfigurationSection(path), this);
     }
 
