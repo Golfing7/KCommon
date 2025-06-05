@@ -108,14 +108,22 @@ public class CommandContext {
     }
 
     /**
+     * Checks if the sender of this context is a player.
+     *
+     * @return true if the sender is a player.
+     */
+    public boolean isSenderPlayer() {
+        return sender instanceof Player;
+    }
+
+    /**
      * Gets the sender as a player, or returns null if the sender is not a player.
      *
      * @return the sender as a player.
      */
-    @Nullable
     public Player getPlayer() {
         if(!(sender instanceof Player))
-            return null;
+            throw new ClassCastException("Sender is not a player");
 
         return (Player) sender;
     }
