@@ -29,6 +29,9 @@ public interface PermissionContext {
         if (StringUtil.isEmpty(prefix))
             return sender.hasPermission(permission);
 
+        if (StringUtil.isEmpty(permission)) {
+            return sender.hasPermission(prefix);
+        }
         return sender.hasPermission(prefix + "." + permission);
     }
 }
