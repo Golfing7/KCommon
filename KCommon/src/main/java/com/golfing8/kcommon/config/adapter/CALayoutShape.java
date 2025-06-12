@@ -1,19 +1,17 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.config.InvalidConfigException;
+import com.golfing8.kcommon.config.exc.InvalidConfigException;
 import com.golfing8.kcommon.menu.shape.LayoutShapeOutline;
 import com.golfing8.kcommon.menu.shape.LayoutShapePoints;
 import com.golfing8.kcommon.menu.shape.LayoutShapeRectangle;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.menu.shape.MenuLayoutShape;
-import com.golfing8.kcommon.struct.Interval;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.gson.reflect.TypeToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

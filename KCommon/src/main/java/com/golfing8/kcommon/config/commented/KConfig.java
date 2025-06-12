@@ -4,7 +4,6 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 
 /**
  * A bukkit {@link Configuration} that supports comments.
@@ -12,14 +11,7 @@ import java.util.Collection;
  * Along with comments, other convenience methods have been added.
  * </p>
  */
-public interface Config extends org.bukkit.configuration.Configuration, CommentableConfigurationSection {
-
-    /**
-     * Ensures the given path exists.
-     *
-     * @param path the path.
-     */
-    void ensureExists(String path);
+public interface KConfig extends org.bukkit.configuration.Configuration, KConfigurationSection {
 
     /**
      * Gets the source config that this config should mirror.
@@ -34,6 +26,11 @@ public interface Config extends org.bukkit.configuration.Configuration, Commenta
      * @param config the source config.
      */
     void setSource(YamlConfiguration config);
+
+    /**
+     * Saves the contents of this config to the file.
+     */
+    void save();
 
     /**
      * Gets the value at the path with the given type.

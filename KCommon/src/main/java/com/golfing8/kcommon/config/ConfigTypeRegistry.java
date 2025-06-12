@@ -332,5 +332,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAXPotion());
         registerAdapter(new CAXSound());
         registerAdapter(new CAOptional());
+        registerAdapter(new CATimeLength());
     }
 }

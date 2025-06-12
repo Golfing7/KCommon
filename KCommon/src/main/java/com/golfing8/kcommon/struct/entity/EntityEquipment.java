@@ -6,6 +6,7 @@ import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
+import com.golfing8.kcommon.util.RandomUtil;
 import lombok.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,6 +18,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Wraps a living entity's equipment (armor/weapon)
@@ -50,27 +52,27 @@ public class EntityEquipment implements CASerializable {
      */
     public void apply(LivingEntity entity) {
         org.bukkit.inventory.EntityEquipment equipment = entity.getEquipment();
-        if (helmet != null) {
+        if (helmet != null && RandomUtil.testChance(helmet.chanceToEquip)) {
             equipment.setHelmet(helmet.buildBukkitStack(entity));
             equipment.setHelmetDropChance(-(float) helmet.getChanceToDrop() / 100);
         }
-        if (chestplate != null) {
+        if (chestplate != null && RandomUtil.testChance(chestplate.chanceToEquip)) {
             equipment.setChestplate(chestplate.buildBukkitStack(entity));
             equipment.setChestplateDropChance(-(float) chestplate.getChanceToDrop() / 100);
         }
-        if (leggings != null) {
+        if (leggings != null && RandomUtil.testChance(leggings.chanceToEquip)) {
             equipment.setLeggings(leggings.buildBukkitStack(entity));
             equipment.setLeggingsDropChance(-(float) leggings.getChanceToDrop() / 100);
         }
-        if (boots != null) {
+        if (boots != null && RandomUtil.testChance(boots.chanceToEquip)) {
             equipment.setBoots(boots.buildBukkitStack(entity));
             equipment.setBootsDropChance(-(float) boots.getChanceToDrop() / 100);
         }
-        if (hand != null) {
+        if (hand != null && RandomUtil.testChance(hand.chanceToEquip)) {
             equipment.setItemInHand(hand.buildBukkitStack(entity));
             equipment.setItemInHandDropChance(-(float) hand.getChanceToDrop() / 100);
         }
-        if (offHand != null) {
+        if (offHand != null && RandomUtil.testChance(offHand.chanceToEquip)) {
             NMS.getTheNMS().getMagicEntities().setItemInOffHand(entity, offHand.buildBukkitStack(entity));
             NMS.getTheNMS().getMagicEntities().setItemInOffHandDropChance(entity, -(float) offHand.getChanceToDrop() / 100);
         }
@@ -99,6 +101,7 @@ public class EntityEquipment implements CASerializable {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class EntityEquipmentPiece implements CASerializable {
         private ItemStackBuilder piece;
+        private double chanceToEquip = 100.0D;
         private double chanceToDrop;
 
         public ItemStack buildBukkitStack(LivingEntity context) {

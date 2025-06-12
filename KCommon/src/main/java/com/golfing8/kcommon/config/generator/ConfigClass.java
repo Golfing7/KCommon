@@ -1,13 +1,11 @@
 package com.golfing8.kcommon.config.generator;
 
-import com.golfing8.kcommon.config.commented.CommentableConfigurationSection;
-import com.golfing8.kcommon.config.commented.Config;
+import com.golfing8.kcommon.config.commented.KConfigurationSection;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -149,8 +147,8 @@ public abstract class ConfigClass {
     public final boolean loadValues(ConfigurationSection source) {
         String path = buildPath();
         boolean modified = false;
-        if (source instanceof CommentableConfigurationSection && this.confAnnotation != null) {
-            ((CommentableConfigurationSection) source).setComments(path, this.confAnnotation.value());
+        if (source instanceof KConfigurationSection && this.confAnnotation != null) {
+            ((KConfigurationSection) source).setComments(path, this.confAnnotation.value());
         }
 
         for (ConfigValueHandle handle : this.fieldHandleMap.values()) {

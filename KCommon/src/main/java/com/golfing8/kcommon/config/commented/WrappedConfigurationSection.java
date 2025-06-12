@@ -2,25 +2,22 @@ package com.golfing8.kcommon.config.commented;
 
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.golfing8.kcommon.config.exc.ConfigException;
+import com.golfing8.kcommon.menu.MenuBuilder;
 import lombok.AllArgsConstructor;
 import org.bukkit.Color;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
-public class WrappedConfigurationSection implements CommentableConfigurationSection {
+public class WrappedConfigurationSection implements KConfigurationSection {
     private final ConfigurationSection wrapped;
     private final com.golfing8.kcommon.config.commented.Configuration originalConfig;
 
@@ -119,7 +116,7 @@ public class WrappedConfigurationSection implements CommentableConfigurationSect
     }
 
     @Override
-    public ConfigurationSection getConfigurationSection(String path) {
+    public WrappedConfigurationSection getConfigurationSection(String path) {
         return new WrappedConfigurationSection(wrapped.getConfigurationSection(path), originalConfig);
     }
 
@@ -311,9 +308,36 @@ public class WrappedConfigurationSection implements CommentableConfigurationSect
 
     @Override
     public void setComments(String path, String... comments) {
-        if (getRoot() instanceof CommentableConfigurationSection) {
-            ((CommentableConfigurationSection) getRoot()).setComments(getCurrentPath() + "." + path, comments);
+        if (getRoot() instanceof KConfigurationSection) {
+            ((KConfigurationSection) getRoot()).setComments(getCurrentPath() + "." + path, comments);
         }
+    }
+
+    @Override
+    public void ensureExists(String path) {
+        if (!this.contains(path)) {
+            if (this.wrapped == null || !this.wrapped.contains(path))
+                throw new ConfigException(this, "Config entry at path " + getCurrentPath() + "." + path + " doesn't exist!");
+
+            this.set(path, this.wrapped.get(path));
+            if (this.wrapped instanceof KConfig) {
+                ((KConfig) this.wrapped).save();
+            }
+        }
+    }
+
+    @Override
+    public boolean tryLoadFromSource(String path) {
+        if (!this.contains(path)) {
+            if (this.wrapped == null || !this.wrapped.contains(path))
+                return false;
+
+            this.set(path, this.wrapped.get(path));
+            if (this.wrapped instanceof KConfig) {
+                ((KConfig) this.wrapped).save();
+            }
+        }
+        return true;
     }
 
     @Override

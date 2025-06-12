@@ -8,8 +8,7 @@ import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.config.ImproperlyConfiguredValueException;
-import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import com.golfing8.kcommon.config.exc.ImproperlyConfiguredValueException;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.PotionData;
@@ -20,22 +19,17 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.ItemUtil;
 import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
-import com.sun.org.apache.bcel.internal.generic.ObjectType;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.var;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -377,6 +371,11 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder placeholders(Collection<Placeholder> placeholders) {
+        this.placeholders = new ArrayList<>(placeholders);
+        return this;
+    }
+
     public ItemStackBuilder addPlaceholders(Placeholder... placeholders) {
         if (this.placeholders == null) {
             this.placeholders = Lists.newArrayList(placeholders);
@@ -386,8 +385,22 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder addPlaceholders(Collection<Placeholder> placeholders) {
+        if (this.placeholders == null) {
+            this.placeholders = Lists.newArrayList(placeholders);
+        } else {
+            this.placeholders.addAll(placeholders);
+        }
+        return this;
+    }
+
     public ItemStackBuilder multiLinePlaceholders(MultiLinePlaceholder... placeholders) {
         this.multiLinePlaceholders = Lists.newArrayList(placeholders);
+        return this;
+    }
+
+    public ItemStackBuilder multiLinePlaceholders(Collection<MultiLinePlaceholder> placeholders) {
+        this.multiLinePlaceholders = new ArrayList<>(placeholders);
         return this;
     }
 
@@ -439,7 +452,9 @@ public final class ItemStackBuilder {
         NMS.getTheNMS().getMagicItems().setAttributeModifiers(newCopy, attributeModifierMap);
 
         ItemMeta meta = newCopy.getItemMeta();
-        NMS.getTheNMS().getMagicItems().setItemModel(meta, itemModel);
+        if (itemModel != null) {
+            NMS.getTheNMS().getMagicItems().setItemModel(meta, itemModel);
+        }
 
         if(this.itemName != null) {
             String itemName = this.itemName;
@@ -488,7 +503,7 @@ public final class ItemStackBuilder {
 
         if (this.glowing) {
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            meta.addEnchant(XEnchantment.UNBREAKING.getEnchant(), 0, true);
+            meta.addEnchant(XEnchantment.UNBREAKING.get(), 1, true);
         }
 
         newCopy.setItemMeta(meta);

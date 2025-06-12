@@ -5,16 +5,21 @@ import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.exc.CommandInstantiationException;
+import com.golfing8.kcommon.command.flag.CommandFlag;
 import com.golfing8.kcommon.command.requirement.Requirement;
 import com.golfing8.kcommon.command.requirement.RequirementPlayer;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.Message;
+import com.golfing8.kcommon.struct.permission.PermissionContext;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.MS;
+import com.golfing8.kcommon.util.MapUtil;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.*;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,7 +33,6 @@ import org.jetbrains.annotations.Nullable;
 import org.spigotmc.SpigotConfig;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -36,7 +40,7 @@ import java.util.stream.Collectors;
 /**
  * An abstract KCommon command. Can be registered without a module and should be used for plugin-wide commands.
  */
-public abstract class KCommand implements TabExecutor {
+public abstract class KCommand implements TabExecutor, PermissionContext {
     private static final Pattern HELP_PATTERN = Pattern.compile(
             "(help|\\?)",
             Pattern.CASE_INSENSITIVE
@@ -97,6 +101,10 @@ public abstract class KCommand implements TabExecutor {
      */
     @Getter
     private final List<BuiltCommandArgument> commandArguments = new ArrayList<>();
+    /** Contains the long name mapped command flags. */
+    private final Map<String, CommandFlag> longNameMappedCommandFlags = new HashMap<>();
+    /** Contains the short name mapped command flags. */
+    private final Map<Character, CommandFlag> shortNameMappedCommandFlags = new HashMap<>();
     /**
      * The sub commands of this command.
      */
@@ -288,6 +296,11 @@ public abstract class KCommand implements TabExecutor {
         this.commandPermission = getGeneratedCommandPermission();
     }
 
+    @Override
+    public @Nullable String getPermissionPrefix() {
+        return this.commandPermission;
+    }
+
     /**
      * Recursive method for calling sub commands' onRegister methods.
      */
@@ -376,6 +389,17 @@ public abstract class KCommand implements TabExecutor {
     }
 
     /**
+     * Adds a command flag
+     *
+     * @param flag the command flag
+     */
+    protected final void addFlag(@NotNull CommandFlag flag) {
+        if (flag.getShortName() != null)
+            shortNameMappedCommandFlags.put(flag.getShortName(), flag);
+        longNameMappedCommandFlags.put(flag.getFullName(), flag);
+    }
+
+    /**
      * Adds the given command requirement to this command.
      *
      * @param requirement the requirement.
@@ -405,7 +429,68 @@ public abstract class KCommand implements TabExecutor {
         if (builtArguments == null)
             return null;
 
-        return new CommandContext(sender, label, builtArguments, this);
+        Map<CommandFlag, TriState> flagStates = args.length > builtArguments.size() ? buildFlagStates(Arrays.copyOfRange(args, builtArguments.size(), args.length), false) : Collections.emptyMap();
+        if (flagStates == null)
+            return null;
+
+        return new CommandContext(sender, label, builtArguments, this, flagStates);
+    }
+
+    /**
+     * Builds the flag states with the given arguments.
+     *
+     * @return the arguments.
+     */
+    private @Nullable Map<CommandFlag, TriState> buildFlagStates(String[] potentialFlagArguments, boolean tolerant) {
+        if (this.longNameMappedCommandFlags.isEmpty())
+            return Collections.emptyMap();
+
+        Map<CommandFlag, TriState> flagStates = Maps.newHashMap();
+        for (String arg : potentialFlagArguments) {
+            var argumentFlags = matchArgumentForFlags(arg, tolerant);
+            if (argumentFlags == null) {
+                if (tolerant)
+                    continue;
+                return null;
+            }
+            flagStates.putAll(argumentFlags);
+        }
+        return flagStates;
+    }
+
+    /**
+     * Matches a single argument against command flags.
+     * If the argument doesn't match one of the arguments, null is returned to signify failure.
+     *
+     * @param argument the argument
+     * @return the arguments
+     */
+    private @Nullable Map<CommandFlag, TriState> matchArgumentForFlags(String argument, boolean tolerant) {
+        // Match against long flag first.
+        if (argument.startsWith(CommandFlag.LONG_FLAG_PREFIX)) {
+            String longFlag = argument.substring(CommandFlag.LONG_FLAG_PREFIX.length());
+            CommandFlag found = this.longNameMappedCommandFlags.get(longFlag);
+            if (found == null)
+                return tolerant ? Collections.emptyMap() : null;
+
+            return MapUtil.of(found, TriState.TRUE);
+        } else if (argument.startsWith(CommandFlag.SHORT_FLAG_PREFIX)) {
+            String shortFlags = argument.substring(CommandFlag.SHORT_FLAG_PREFIX.length());
+            Map<CommandFlag, TriState> flagStates = new HashMap<>();
+            for (char c : shortFlags.toCharArray()) {
+                CommandFlag found = this.shortNameMappedCommandFlags.get(c);
+                if (found == null) {
+                    if (tolerant)
+                        continue;
+                    return null;
+                }
+
+                flagStates.put(found, TriState.TRUE);
+            }
+            return flagStates;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -425,6 +510,11 @@ public abstract class KCommand implements TabExecutor {
 
             //Check if we should just immediately add the argument.
             if(this.commandArguments.size() <= i) {
+                // Try matching it against a flag.
+                var flagStates = matchArgumentForFlags(stringArgument, false);
+                if (flagStates != null)
+                    continue;
+
                 if (!acceptExtraArguments) {
                     if (verbose)
                         handleHelpMessage(sender, stringArgument);
@@ -555,12 +645,11 @@ public abstract class KCommand implements TabExecutor {
      * @param sender the sender.
      * @param extension the extension.
      * @return if they have the permission extension.
+     * @deprecated use {@link #hasPermission(CommandSender, String)}
      */
+    @Deprecated
     public boolean checkPermissionExtension(CommandSender sender, String extension) {
-        if (StringUtil.isEmpty(this.commandPermission)) // If the command has no permission, there's nothing we can do here.
-            throw new IllegalStateException("Cannot check permission extension with null permission.");
-
-        return sender.hasPermission(this.commandPermission + "." + extension);
+        return hasPermission(sender, extension);
     }
 
     /**
@@ -581,7 +670,7 @@ public abstract class KCommand implements TabExecutor {
         if (argument.requiredPermissionExtension == null)
             return true;
 
-        return checkPermissionExtension(sender, argument.requiredPermissionExtension);
+        return hasPermission(sender, argument.requiredPermissionExtension);
     }
 
     /**
@@ -871,22 +960,41 @@ public abstract class KCommand implements TabExecutor {
                 ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(builtArguments), args.length - 1);
                 completions.addAll(argument.getCompletions().apply(context));
             }
+
+            if (builtArguments.size() >= this.commandArguments.size()) {
+                Map<CommandFlag, TriState> previousFlags = buildFlagStates(previousArgs, true);
+                // Show flags if the player has begun entering them.
+                if (stringArgument.startsWith(String.valueOf(CommandFlag.LONG_FLAG_PREFIX.charAt(0)))) {
+                    completions.addAll(longNameMappedCommandFlags.entrySet().stream()
+                            .filter(k -> previousFlags == null || !previousFlags.containsKey(k.getValue()))
+                            .map(k -> CommandFlag.LONG_FLAG_PREFIX + k.getKey()).collect(Collectors.toList()));
+                }
+
+                // If the argument is specifically the short flag prefix, populate with the flags.
+                if (stringArgument.equals(CommandFlag.SHORT_FLAG_PREFIX)) {
+                    completions.addAll(shortNameMappedCommandFlags.entrySet().stream()
+                            .filter(k -> previousFlags == null || !previousFlags.containsKey(k.getValue()))
+                            .map(k -> CommandFlag.SHORT_FLAG_PREFIX + k.getKey()).collect(Collectors.toList()));
+                }
+            }
         }
 
-        //Then go through the subcommands and try to add those as well.
-        String argToLower = stringArgument.toLowerCase();
-        for(KCommand command : this.getSubcommands()) {
-            if (!command.canSee(sender))
-                continue;
+        // Then go through the subcommands and try to add those as well.
+        if (args.length == 1) {
+            String argToLower = stringArgument.toLowerCase();
+            for(KCommand command : this.getSubcommands()) {
+                if (!command.canSee(sender))
+                    continue;
 
-            //Add the main label.
-            if(command.getCommandName().toLowerCase().startsWith(argToLower))
-                completions.add(command.getCommandName());
+                //Add the main label.
+                if(command.getCommandName().toLowerCase().startsWith(argToLower))
+                    completions.add(command.getCommandName());
 
-            //Add all aliases.
-            for(String alias : command.getCommandAliases()) {
-                if(alias.toLowerCase().startsWith(argToLower))
-                    completions.add(alias);
+                //Add all aliases.
+                for(String alias : command.getCommandAliases()) {
+                    if(alias.toLowerCase().startsWith(argToLower))
+                        completions.add(alias);
+                }
             }
         }
 

@@ -1,7 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.config.InvalidConfigException;
+import com.golfing8.kcommon.config.exc.InvalidConfigException;
 import com.golfing8.kcommon.menu.MenuUtils;
 import com.golfing8.kcommon.menu.movement.MoveLength;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
