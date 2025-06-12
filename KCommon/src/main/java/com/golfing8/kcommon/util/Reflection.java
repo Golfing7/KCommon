@@ -4,15 +4,16 @@ import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import lombok.SneakyThrows;
 import lombok.var;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -241,5 +242,61 @@ public final class Reflection {
             classes.addAll(getAllNestedClasses(clazz));
         }
         return classes;
+    }
+
+    /**
+     * Gets a method handle for the given information.
+     *
+     * @param clazz the class
+     * @param name the name
+     * @param parameterTypes the types
+     * @return the method handle, or null if not found.
+     */
+    public static @Nullable MethodHandle findMethodHandle(Class<?> clazz, String name, Class<?>... parameterTypes) {
+        try {
+            Method method = clazz.getDeclaredMethod(name, parameterTypes);
+            method.setAccessible(true);
+
+            return MethodHandles.lookup().unreflect(method);
+        } catch (NoSuchMethodException | IllegalAccessException exc) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets a constructor handle for the given information.
+     *
+     * @param clazz the class
+     * @param parameterTypes the types
+     * @return the constructor handle, or null if not found.
+     */
+    public static @Nullable MethodHandle findConstructor(Class<?> clazz, Class<?>... parameterTypes) {
+        try {
+            Constructor<?> constructor = clazz.getDeclaredConstructor(parameterTypes);
+            constructor.setAccessible(true);
+
+            return MethodHandles.lookup().unreflectConstructor(constructor);
+        } catch (NoSuchMethodException | IllegalAccessException exc) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets the class for the given name, or an empty optional
+     *
+     * @param name the name
+     * @return the optional
+     */
+    public static Optional<Class<?>> forNameOptional(String name) {
+        try {
+            return Optional.of(Class.forName(name));
+        } catch (ClassNotFoundException exc) {
+            return Optional.empty();
+        }
+    }
+
+    @SneakyThrows @SuppressWarnings("unchecked")
+    public static <T> T invokeQuietly(MethodHandle methodHandle, Object... arguments) {
+        return (T) methodHandle.invokeWithArguments(arguments);
     }
 }
