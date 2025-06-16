@@ -30,6 +30,10 @@ public class CASchedule implements ConfigAdapter<Schedule> {
             if (str.startsWith("@")) {
                 str = str.replace("@", "");
                 anticipatedTimes.add(TimeLength.parseTime(str));
+            } else if (str.startsWith("#")) {
+                str = str.replace("#", "");
+                Timestamp timestamp = Timestamp.parse(str);
+                allTimestamps.addAll(Timestamp.everyHour(timestamp.getHour(), timestamp.getSecond()));
             } else {
                 allTimestamps.add(Timestamp.parse(str));
             }

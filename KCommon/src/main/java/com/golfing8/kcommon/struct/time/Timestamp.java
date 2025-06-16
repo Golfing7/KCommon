@@ -7,6 +7,9 @@ import lombok.*;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -238,6 +241,21 @@ public final class Timestamp implements Cloneable {
      */
     public static Timestamp ofIntraDay(int hour, int minute, int second) {
         return new Timestamp(UNUSED, UNUSED, UNUSED, UNUSED, UNUSED, hour, minute, second);
+    }
+
+    /**
+     * Creates a collection of timestamps for the given minutes/seconds in every hour of the day.
+     *
+     * @param minute the minute
+     * @param second the second
+     * @return the collection of timestamps
+     */
+    public static Collection<Timestamp> everyHour(int minute, int second) {
+        List<Timestamp> timestamps = new ArrayList<>();
+        for (int i = 0; i < 24; i++) {
+            timestamps.add(Timestamp.ofIntraDay(i, minute, second));
+        }
+        return timestamps;
     }
 
     @Override
