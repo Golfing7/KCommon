@@ -1,9 +1,11 @@
 package com.golfing8.kcommon.data.serializer;
 
+import com.golfing8.kcommon.data.serializer.type.CooldownMapAdapterFactory;
 import com.golfing8.kcommon.data.serializer.type.ItemStackAdapterFactory;
 import com.golfing8.kcommon.data.serializer.type.LocationAdapterFactory;
 import com.golfing8.kcommon.data.serializer.type.WorldAdapterFactory;
 import com.golfing8.kcommon.struct.Pair;
+import com.golfing8.kcommon.struct.map.CooldownMap;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -109,6 +111,7 @@ public final class DataSerializer {
         builder.registerTypeAdapterFactory(LocationAdapterFactory.INSTANCE);
         builder.registerTypeAdapterFactory(WorldAdapterFactory.INSTANCE);
         builder.registerTypeHierarchyAdapter(ItemStack.class, ItemStackAdapterFactory.INSTANCE);
+        builder.registerTypeHierarchyAdapter(CooldownMap.class, CooldownMapAdapterFactory.INSTANCE);
 
         return LOADED_GSON = builder.create();
     }

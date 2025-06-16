@@ -58,7 +58,7 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
         if (primitiveValue.containsKey("nbt-data"))
             builder.extraData((Map<String, Object>) primitiveValue.get("nbt-data"));
         if (primitiveValue.containsKey("components"))
-            builder.components((Map<String, Object>) primitiveValue.get("nbt-data"));
+            builder.components((Map<String, Object>) primitiveValue.get("components"));
         if (primitiveValue.containsKey("potion-data"))
             builder.potionData(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue.get("potion-data")), new FieldType(PotionData.class)));
         if (primitiveValue.containsKey("glowing"))

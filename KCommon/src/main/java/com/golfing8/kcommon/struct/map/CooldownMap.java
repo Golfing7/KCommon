@@ -25,6 +25,15 @@ public class CooldownMap<T> {
     }
 
     /**
+     * Creates a new cooldown map with the given data
+     *
+     * @param backingMap the data
+     */
+    public CooldownMap(Map<T, Long> backingMap) {
+        this.backingMap = new HashMap<>(backingMap);
+    }
+
+    /**
      * Creates a new cooldown map with an expiry task registered to the given plugin.
      *
      * @param plugin the plugin.
@@ -134,6 +143,15 @@ public class CooldownMap<T> {
         this.backingMap.entrySet().removeIf(next -> System.currentTimeMillis() >= next.getValue());
     }
 
+    /**
+     * Gets the cooldowns in this map
+     *
+     * @return the cooldowns
+     */
+    public Map<T, Long> getCooldowns() {
+        this.purgeStaleCooldowns();
+        return Collections.unmodifiableMap(this.backingMap);
+    }
 
     /**
      * This must be kept as a nested static class to allow the CooldownMap instance
