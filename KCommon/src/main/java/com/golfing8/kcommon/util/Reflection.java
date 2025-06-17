@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -292,6 +293,27 @@ public final class Reflection {
             return Optional.of(Class.forName(name));
         } catch (ClassNotFoundException exc) {
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Instantiates an instance of the given class or returns the value by the supplier.
+     *
+     * @param clazz the class type
+     * @param supplier the supplier
+     * @return the value
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T instantiateOrGet(Class<?> clazz, Supplier<T> supplier) {
+        try {
+            Constructor<?> constructor = clazz.getDeclaredConstructor();
+            constructor.setAccessible(true);
+
+            return (T) clazz.newInstance();
+        } catch (NoSuchMethodException e) {
+            return supplier.get();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to instantiate " + clazz, e);
         }
     }
 

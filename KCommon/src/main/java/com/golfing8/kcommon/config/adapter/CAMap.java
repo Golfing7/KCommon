@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.map.RangeMap;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.golfing8.kcommon.util.Reflection;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,16 +31,8 @@ public class CAMap implements ConfigAdapter<Map> {
             return Collections.emptyMap();
 
         // Check if we can reflectively find the type of map that was being used.
-        Map values;
-        if (!type.getType().isInterface() && (type.getType().getModifiers() & Modifier.ABSTRACT) == 0) {
-            try {
-                values = (Map) type.getType().newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(String.format("Failed to instantiate map with type %s", type.getType().getName()), e);
-            }
-        } else {
-            values = new LinkedHashMap();
-        }
+        Map values = Reflection.instantiateOrGet(type.getType(), LinkedHashMap::new);
+
         // The keys are assumed to be strings.
         Type keyType = type.getGenericTypes().get(0);
         Type valueType = type.getGenericTypes().get(1);

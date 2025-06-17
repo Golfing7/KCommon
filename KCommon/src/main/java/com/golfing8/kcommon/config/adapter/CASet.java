@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.golfing8.kcommon.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -24,10 +25,16 @@ public class CASet implements ConfigAdapter<Set> {
 
         Type actualType = type.getGenericTypes().get(0);
         ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(actualType);
-        Set toReturn = new HashSet();
+        Set toReturn = Reflection.instantiateOrGet(type.getType(), HashSet::new);
         if (adapter != null) {
-            for (Object val : (List) entry.getPrimitive()) {
-                toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(val), new FieldType(actualType)));
+            // Perform useful macros.
+            List primitive = entry.unwrap();
+            if (actualType instanceof Class && ((Class) actualType).isEnum() && !primitive.isEmpty() && primitive.get(0).toString().equals("@universe")) {
+                toReturn.addAll(Arrays.asList(((Class) actualType).getEnumConstants()));
+            } else {
+                for (Object val : primitive) {
+                    toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(val), new FieldType(actualType)));
+                }
             }
             return toReturn;
         }

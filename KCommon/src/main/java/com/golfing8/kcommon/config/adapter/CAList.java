@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.golfing8.kcommon.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -26,15 +27,16 @@ public class CAList implements ConfigAdapter<List> {
 
         Type actualType = type.getGenericTypes().get(0);
         ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(actualType);
-        List primitive = (List) entry.unwrap();
+        List toReturn = Reflection.instantiateOrGet(type.getType(), ArrayList::new);
+        List primitive = entry.unwrap();
         if (adapter != null) {
-            List toReturn = new ArrayList();
             for (Object val : primitive) {
                 toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(val), new FieldType(actualType)));
             }
-            return toReturn;
+        } else {
+            toReturn.addAll(primitive);
         }
-        return primitive;
+        return toReturn;
     }
 
     @Override
