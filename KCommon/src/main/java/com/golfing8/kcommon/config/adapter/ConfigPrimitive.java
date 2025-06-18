@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.var;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -108,7 +109,14 @@ public final class ConfigPrimitive {
         return source == null || !source.getCurrentPath().isEmpty() ? key : source.getCurrentPath() + "." + key;
     }
 
+    @Contract("null -> fail")
     public static ConfigPrimitive of(Object value) {
+        Preconditions.checkNotNull(value, "value cannot be null");
+        // We should still handle sections.
+        if (value instanceof ConfigurationSection) {
+            return ofSection((ConfigurationSection) value);
+        }
+
         if (value instanceof Number ||
                 value instanceof String ||
                 value instanceof Map ||
@@ -120,19 +128,11 @@ public final class ConfigPrimitive {
         }
     }
 
-    public static ConfigPrimitive ofNullable(Object value) {
+    public static ConfigPrimitive ofNullable(@Nullable Object value) {
         if (value == null)
             return NULL;
 
-        if (value instanceof Number ||
-                value instanceof String ||
-                value instanceof Map ||
-                value instanceof List ||
-                value instanceof Boolean) {
-            return new ConfigPrimitive(value);
-        } else {
-            throw new IllegalArgumentException(String.format("Value was not a primitive! Was %s", value.getClass()));
-        }
+        return of(value);
     }
 
     public static ConfigPrimitive ofNull() {

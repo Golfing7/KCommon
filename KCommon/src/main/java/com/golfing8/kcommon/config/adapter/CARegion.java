@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.config.exc.ImproperlyConfiguredValueException;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
 import com.golfing8.kcommon.struct.region.RectangleRegion;
@@ -45,6 +46,8 @@ public class CARegion implements ConfigAdapter<Region> {
                             ((Number) map.get("max-z")).doubleValue(),
                             world
                     );
+                default:
+                    throw new ImproperlyConfiguredValueException(entry.getSource(), "region-type", "a region type");
             }
         }
         return null;
@@ -67,6 +70,8 @@ public class CARegion implements ConfigAdapter<Region> {
             section.put("max-x", region.getMaximumXValue());
             section.put("max-z", region.getMaximumZValue());
             section.put("region-type", "RECTANGLE");
+        } else {
+            throw new IllegalArgumentException("Region type " + region.getClass().getName() + " is not recognized.");
         }
         if (region.getWorld() != null) {
             section.put("world", region.getWorld().getName());

@@ -46,11 +46,11 @@ public class CALocation implements ConfigAdapter<Location> {
 
         Map<String, Object> map = entry.unwrap();
         String sWorld = (String) map.get("world");
-        double x = (double) map.getOrDefault("x", DEF_COORD);
-        double y = (double) map.getOrDefault("y", DEF_COORD);
-        double z = (double) map.getOrDefault("z", DEF_COORD);
-        float yaw = (float) map.getOrDefault("yaw", DEF_YAW);
-        float pitch = (float) map.getOrDefault("pitch", DEF_YAW);
+        double x = (double) ConfigPrimitive.coerceObjectToBoxed(map.getOrDefault("x", DEF_COORD), Double.class);
+        double y = (double) ConfigPrimitive.coerceObjectToBoxed(map.getOrDefault("y", DEF_COORD), Double.class);
+        double z = (double) ConfigPrimitive.coerceObjectToBoxed(map.getOrDefault("z", DEF_COORD), Double.class);
+        float yaw = (float) ConfigPrimitive.coerceObjectToBoxed(map.getOrDefault("yaw", DEF_COORD), Float.class);
+        float pitch = (float) ConfigPrimitive.coerceObjectToBoxed(map.getOrDefault("pitch", DEF_COORD), Float.class);
         return new Location(Bukkit.getWorld(sWorld), x, y, z, yaw, pitch);
     }
 
