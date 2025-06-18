@@ -348,28 +348,17 @@ public class Message {
      * @param placeholders the placeholders.
      */
     public void send(CommandSender sender, Placeholder... placeholders) {
-        if (getMessages() != null) {
-            if (paged) {
-                toPagedMessage(Arrays.asList(placeholders), Collections.emptyList()).displayTo(sender);
-            } else {
-                MS.parseAll(getMessages(), placeholders)
-                        .forEach(string -> MS.pass(sender, string));
-            }
-        }
+        this.send(sender, Arrays.asList(placeholders));
+    }
 
-        if (getTitle() != null && sender instanceof Player) {
-            MS.sendTitle((Player) sender, getTitle(), placeholders);
-        }
-
-        if (getActionBar() != null && sender instanceof Player) {
-            NMS.getTheNMS().sendActionBar((Player) sender, MS.parseSingle(actionBar, placeholders));
-        }
-
-        if (getSounds() != null && sender instanceof Player) {
-            getSounds().forEach(sound -> {
-                sound.send((Player) sender);
-            });
-        }
+    /**
+     * Sends this message to the given player with the placeholders.
+     *
+     * @param sender the sender.
+     * @param placeholders the placeholders.
+     */
+    public void send(CommandSender sender, Collection<Placeholder> placeholders) {
+        this.send(sender, placeholders, Collections.emptyList());
     }
 
     /**
