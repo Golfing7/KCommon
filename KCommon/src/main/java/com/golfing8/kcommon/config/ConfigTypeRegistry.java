@@ -24,11 +24,6 @@ import java.util.function.Function;
  */
 public class ConfigTypeRegistry {
     private static final String DELEGATE_PREFIX = "!delegate!";
-    /** A map containing special functions for translating certain things in configs. */
-    private static final Map<Class<?>, Function<ConfigurationSection, ?>> CONFIG_TO_VALUE = new HashMap<>();
-
-    /** A map containing a type to value transformer */
-    private static final Map<Class<?>, BiConsumer<ConfigurationSection, ?>> VALUE_TO_CONFIG = new HashMap<>();
     /** The config adapters registered */
     private static final Map<Class<?>, ConfigAdapter<?>> CONFIG_ADAPTERS = new HashMap<>();
     /** A cache of class -> adapter. This contains subclasses of the adapter's implemented type. */
@@ -86,32 +81,6 @@ public class ConfigTypeRegistry {
     }
 
     /**
-     * Unregisters the given class' config adapter.
-     *
-     * @param clazz the class.
-     */
-    public static void unregisterAdapter(Class<?> clazz) {
-        VALUE_TO_CONFIG.remove(clazz);
-        CONFIG_TO_VALUE.remove(clazz);
-    }
-
-    /**
-     * Registers an adapter for the given class type.
-     *
-     * @param clazz the class type.
-     * @param toValue the config to value function.
-     * @param toConfig the consumer for setting in the config.
-     * @param <T> the type of the class
-     */
-    public static <T> void registerAdapter(Class<T> clazz, Function<ConfigurationSection, T> toValue, BiConsumer<ConfigurationSection, T> toConfig) {
-        Preconditions.checkNotNull(toValue);
-        Preconditions.checkNotNull(toConfig);
-
-        VALUE_TO_CONFIG.put(clazz, toConfig);
-        CONFIG_TO_VALUE.put(clazz, toValue);
-    }
-
-    /**
      * Registers the adapter for the config.
      *
      * @param adapter the adapter.
@@ -121,23 +90,6 @@ public class ConfigTypeRegistry {
 
         CONFIG_ADAPTERS.put(adapter.getAdaptType(), adapter);
         ADAPTER_LOOKUP.clear();
-    }
-
-    /**
-     * Interprets the given section as the given class type.
-     *
-     * @param section the section to get from.
-     * @return the value
-     * @param <T> the type of value
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> T interpretSection(ConfigurationSection section, Class<T> type) {
-        Function<ConfigurationSection, ?> function = CONFIG_TO_VALUE.get(type);
-        if (function == null) {
-            return null;
-        }
-
-        return (T) function.apply(section);
     }
 
     /**
