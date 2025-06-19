@@ -56,7 +56,7 @@ public class CommandArgument<A> {
         for (var entry : map.entrySet()) {
             reverseMap.put(entry.getValue(), entry.getKey());
         }
-        return fromCollection(typeName, map.values(), map::get, reverseMap::get);
+        return fromCollection(typeName, map.values(), ctx -> map.get(ctx.getArgument()), reverseMap::get);
     }
 
     public static <T> CommandArgument<T> fromCollection(String typeName, Collection<T> coll, Function<ArgumentContext, T> fromString) {

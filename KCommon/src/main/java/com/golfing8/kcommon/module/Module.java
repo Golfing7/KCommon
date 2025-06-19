@@ -605,6 +605,14 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         getPlugin().getServer().getPluginManager().registerEvents(subModule, getPlugin());
         Set<String> configNames = subModule.getConfigNames();
 
+        // Make sure all the expected configs are available.
+        for (String configName : configNames) {
+            if (this.configs.containsKey(configName))
+                continue;
+
+            getConfig(configName);
+        }
+
         // Load the config.
         for (MConfiguration configuration : this.configs.values()) {
             if (!configNames.contains(configuration.getFileNameNoExtension()))
