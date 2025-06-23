@@ -10,6 +10,7 @@ import com.golfing8.kcommon.command.requirement.Requirement;
 import com.golfing8.kcommon.command.requirement.RequirementPlayer;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.Message;
+import com.golfing8.kcommon.struct.helper.function.Numbers;
 import com.golfing8.kcommon.struct.permission.PermissionContext;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
@@ -421,7 +422,8 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     @Nullable
     private CommandContext buildContext(CommandSender sender, String label, String[] args, boolean verbose) {
         if (args.length > 0 && HELP_PATTERN.matcher(args[0]).matches()) {
-            handleHelpMessage(sender, null);
+            var parsedInt = Numbers.parseInteger(args[args.length - 1]);
+            handleHelpMessage(sender, null, parsedInt.orElse(1));
             return null;
         }
 
@@ -744,13 +746,17 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
                 "DESCRIPTION", getDescription() == null ? "No description" : getDescription());
     }
 
+    private void handleHelpMessage(CommandSender sender, String lastArgument) {
+        this.handleHelpMessage(sender, lastArgument, 1);
+    }
+
     /**
      * Handles a user that is requesting a help message for this command.
      *
      * @param sender the sender.
      * @param lastArgument the last argument provided in the command.
      */
-    private void handleHelpMessage(CommandSender sender, String lastArgument) {
+    private void handleHelpMessage(CommandSender sender, String lastArgument, int page) {
         if (!canSee(sender)) {
             return;
         }
@@ -764,11 +770,18 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         if (commandHelp.isEmpty()) {
             commandHelp.add(langSource.getMessage("command-help-none-found").getMessages().get(0));
         }
-        message.send(
-                sender,
-                Placeholder.compileCurly("COMMAND", this.getFullCommandChain()),
-                Collections.singleton(MultiLinePlaceholder.percent("COMMAND_HELP", commandHelp))
-        );
+        if (message.isPaged()) {
+            message.toPagedMessage(
+                    Placeholder.compileCurly("COMMAND", this.getFullCommandChain()),
+                    Collections.singleton(MultiLinePlaceholder.percent("COMMAND_HELP", commandHelp))
+            ).displayTo(sender, page);
+        } else {
+            message.send(
+                    sender,
+                    Placeholder.compileCurly("COMMAND", this.getFullCommandChain()),
+                    Collections.singleton(MultiLinePlaceholder.percent("COMMAND_HELP", commandHelp))
+            );
+        }
     }
 
     /**
