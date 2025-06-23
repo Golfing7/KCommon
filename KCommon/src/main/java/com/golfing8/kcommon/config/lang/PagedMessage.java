@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.lang;
 
 import com.golfing8.kcommon.command.impl.KPagerCommand;
 import com.golfing8.kcommon.util.MS;
+import com.golfing8.kcommon.util.MathUtil;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.bukkit.command.CommandSender;
@@ -59,9 +60,10 @@ public final class PagedMessage {
      * Displays the given page to the given sender.
      *
      * @param sender the sender.
+     * @param page the page, coerced into range
      */
     public void displayTo(CommandSender sender, int page) {
-        checkPage(page);
+        page = MathUtil.clamp(page, 1, totalPages);
 
         sendHeader(sender, page);
         MS.parseAll(this.pagedMessages.get(page - 1)).forEach(msg -> MS.pass(sender, msg));
@@ -69,12 +71,6 @@ public final class PagedMessage {
 
         // Add or refresh this message.
         KPagerCommand.getInstance().addMessage(this);
-    }
-
-    private void checkPage(int page) {
-        if (page < 1 || page > this.totalPages) {
-            throw new IllegalArgumentException(String.format("Page %d is out of range of total pages", page));
-        }
     }
 
     /**
