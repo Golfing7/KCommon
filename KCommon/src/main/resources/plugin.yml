@@ -9,3 +9,4 @@ depend:
 softdepend:
   - HolographicDisplays
   - DecentHolograms
+  - ItemsAdder

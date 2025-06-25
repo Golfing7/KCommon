@@ -20,6 +20,11 @@ repositories {
         name = "JitPack"
         url = uri("https://jitpack.io")
     }
+
+    maven {
+        name = "matteodev"
+        url = uri("https://maven.devs.beer/")
+    }
 }
 
 tasks {
@@ -51,6 +56,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") //Vault
+    compileOnly("dev.lone:api-itemsadder:4.0.10")
 }
 
 tasks.getByName<Test>("test") {

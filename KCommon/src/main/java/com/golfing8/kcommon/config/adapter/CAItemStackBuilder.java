@@ -40,7 +40,7 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
 
         ItemStackBuilder builder = new ItemStackBuilder();
         Map<String, Object> primitiveValue = (Map<String, Object>) entry.unwrap();
-        builder.material(XMaterial.matchXMaterial(primitiveValue.get("type").toString()).orElse(null));
+        builder.itemType(primitiveValue.get("type").toString());
         if (primitiveValue.containsKey("amount"))
             builder.amount((int) primitiveValue.get("amount"));
         if (primitiveValue.containsKey("durability"))
@@ -94,11 +94,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull ItemStackBuilder builder) {
-        if (builder == null)
-            return ConfigPrimitive.ofNull();
-
         Map<String, Object> objects = new HashMap<>();
-        objects.put("type", builder.getItemType().name());
+        objects.put("type", builder.getItemTypeString());
         objects.put("amount", builder.getAmount());
         if (builder.getItemDurability() != 0)
             objects.put("durability", builder.getItemDurability());

@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import dev.lone.itemsadder.api.CustomStack;
 import lombok.AccessLevel;
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -51,7 +52,14 @@ public final class ItemStackBuilder {
     /**
      * The type of the item stack.
      */
-    private XMaterial itemType;
+    private String itemType;
+    public XMaterial getItemType() {
+        return XMaterial.matchXMaterial(itemType).orElse(null);
+    }
+    public String getItemTypeString() {
+        return this.itemType;
+    }
+
     /**
      * Used on newer item stacks to apply a custom model data.
      */
@@ -142,7 +150,7 @@ public final class ItemStackBuilder {
      * @param itemStack the item stack.
      */
     public ItemStackBuilder(ItemStack itemStack) {
-        this.itemType = XMaterial.matchXMaterial(itemStack.getType());
+        this.itemType = XMaterial.matchXMaterial(itemStack.getType()).name();
         this.amount = itemStack.getAmount();
         this.itemDurability = itemStack.getDurability();
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -186,17 +194,15 @@ public final class ItemStackBuilder {
      */
     public ItemStackBuilder(ConfigurationSection section) {
         Optional<XMaterial> optionalType = XMaterial.matchXMaterial(section.getString("type"));
-        if(!optionalType.isPresent()) {
-            throw new ImproperlyConfiguredValueException(section, "type");
-        }
 
-        this.itemType = optionalType.get();
+        this.itemType = optionalType.map(XMaterial::name).orElseGet(() -> section.getString("type"));
+
         this.placeholders = new ArrayList<>();
         this.multiLinePlaceholders = new ArrayList<>();
         this.itemID = section.getString("item-id");
         this.glowing = section.getBoolean("glowing");
         this.skullB64 = section.getString("skull-texture");
-        this.itemDurability = section.contains("durability") ? (short) section.getInt("durability") : this.itemType.getData();
+        this.itemDurability = section.contains("durability") ? (short) section.getInt("durability") : optionalType.isPresent() ? optionalType.get().getData() : 0;
         this.unbreakable = section.getBoolean("unbreakable", false);
         this.customModelData = section.getInt("custom-model-data", 0);
         this.itemModel = section.getString("item-model");
@@ -261,8 +267,13 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder itemType(String materialOrItemReference) {
+        this.itemType = materialOrItemReference;
+        return this;
+    }
+
     public ItemStackBuilder material(XMaterial material) {
-        this.itemType = material;
+        this.itemType = material.name();
         return this;
     }
 
@@ -431,22 +442,37 @@ public final class ItemStackBuilder {
      * @return the item stack built from the template.
      */
     public ItemStack buildFromTemplate(@Nullable Player placeholderTarget) {
-        ItemStack newCopy;
+        ItemStack newCopy = null;
         Placeholder[] placeholderArr = placeholders.toArray(new Placeholder[0]);
-        if (itemType == XMaterial.PLAYER_HEAD) {
-            if (skullB64 != null) {
-                newCopy = SkullCreator.itemWithBase64(XMaterial.PLAYER_HEAD.parseItem(), MS.parseSingle(skullB64, placeholderArr));
-            } else if (skullOwner != null) {
-                newCopy = SkullCreator.itemFromUuid(skullOwner);
-            } else {
-                newCopy = itemType.parseItem();
-            }
-        } else {
-            newCopy = itemType.parseItem();
-            if (itemDurability > 0) {
-                newCopy.setDurability(itemDurability);
+        // Try against ItemsAdder first
+        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
+            CustomStack customStack = CustomStack.getInstance(this.itemType);
+            if (customStack != null) {
+                newCopy = customStack.getItemStack();
             }
         }
+
+        if (newCopy == null) {
+            XMaterial matchedItemType = XMaterial.matchXMaterial(this.itemType).orElseThrow(() -> new IllegalArgumentException("Material type " + this.itemType + " does not exist!"));
+            if (matchedItemType == XMaterial.PLAYER_HEAD) {
+                if (skullB64 != null) {
+                    newCopy = SkullCreator.itemWithBase64(XMaterial.PLAYER_HEAD.parseItem(), MS.parseSingle(skullB64, placeholderArr));
+                } else if (skullOwner != null) {
+                    newCopy = SkullCreator.itemFromUuid(skullOwner);
+                } else {
+                    newCopy = matchedItemType.parseItem();
+                }
+            } else {
+                newCopy = matchedItemType.parseItem();
+                if (itemDurability > 0) {
+                    newCopy.setDurability(itemDurability);
+                }
+            }
+        }
+
+        if (newCopy == null)
+            throw new IllegalArgumentException("Item type " + this.itemType + " does not exist!");
+
         newCopy.setAmount(newAmount());
 
         NMS.getTheNMS().getMagicItems().setAttributeModifiers(newCopy, attributeModifierMap);
