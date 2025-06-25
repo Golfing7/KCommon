@@ -128,7 +128,17 @@ public class RectangleRegion implements Region {
 
     @Override
     public RectangleRegion grow(double toGrow) {
-        return new RectangleRegion(this.minX - toGrow, this.maxX + toGrow, this.minZ - toGrow, this.maxZ + toGrow);
+        return new RectangleRegion(this.minX - toGrow, this.maxX + toGrow, this.minZ - toGrow, this.maxZ + toGrow, world);
+    }
+
+    @Override
+    public Region shift(Vector offset) {
+        return new RectangleRegion(minX + offset.getX(), maxX + offset.getX(), minZ + offset.getZ(), maxZ + offset.getZ(), world);
+    }
+
+    @Override
+    public Region withWorld(World world) {
+        return new RectangleRegion(minX, maxX, minZ, maxZ, world);
     }
 
     @Override

@@ -160,7 +160,17 @@ public class CuboidRegion implements Region {
 
     @Override
     public Region grow(double toGrow) {
-        return new CuboidRegion(minX - toGrow, maxX + toGrow, minY - toGrow, maxY + toGrow, minZ - toGrow, maxZ + toGrow);
+        return new CuboidRegion(minX - toGrow, maxX + toGrow, minY - toGrow, maxY + toGrow, minZ - toGrow, maxZ + toGrow, world);
+    }
+
+    @Override
+    public Region shift(Vector offset) {
+        return new CuboidRegion(minX + offset.getX(), maxX + offset.getX(), minY + offset.getY(), maxY + offset.getY(), minZ + offset.getZ(), maxZ + offset.getZ(), world);
+    }
+
+    @Override
+    public Region withWorld(World world) {
+        return new CuboidRegion(minX, maxX, minY, maxY, minZ, maxZ, world);
     }
 
     @Override

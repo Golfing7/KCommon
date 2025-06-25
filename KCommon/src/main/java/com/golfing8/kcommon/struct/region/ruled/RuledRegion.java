@@ -4,6 +4,7 @@ import com.golfing8.kcommon.struct.region.Region;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -116,6 +117,16 @@ public class RuledRegion implements Region {
     @Override
     public Region grow(double toGrow) {
         return new RuledRegion(this.enforcer, this.backingRegion.grow(toGrow));
+    }
+
+    @Override
+    public Region shift(Vector offset) {
+        return new RuledRegion(this.enforcer, this.backingRegion.shift(offset));
+    }
+
+    @Override
+    public Region withWorld(World world) {
+        return new RuledRegion(this.enforcer, this.backingRegion.withWorld(world));
     }
 
     @Override

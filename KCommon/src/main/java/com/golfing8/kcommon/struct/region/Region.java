@@ -89,6 +89,22 @@ public interface Region extends Iterable<BlockVector> {
     Region grow(double toGrow);
 
     /**
+     * Shifts the region by the given offset.
+     *
+     * @param offset the offset
+     * @return the cloned region.
+     */
+    Region shift(Vector offset);
+
+    /**
+     * Creates a clone region with the given world
+     *
+     * @param world the world
+     * @return the cloned region
+     */
+    Region withWorld(World world);
+
+    /**
      * Checks if the given vector is within this region.
      *
      * @param vector the vector position.
