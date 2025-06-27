@@ -143,6 +143,7 @@ public abstract class ConfigClass {
      */
     public final void initConfig() {
         this.resolveChildren();
+        this.resolveFields(this.configInstance);
         for (ConfigClassSource source : this.extraSources) {
             this.resolveFields(source);
         }

@@ -479,6 +479,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         //First, load the language config.
         Path langPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "lang.yml");
         this.langConfig = new LangConfig(langPath);
+        this.langConfig.load();
 
         // Load extra lang sources.
         if (this.moduleInfo != null) {
@@ -487,7 +488,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             }
         }
 
-        this.langConfig.load();
         this.loadLangConstants(this.langConfig);
     }
 
