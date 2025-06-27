@@ -135,7 +135,7 @@ public abstract class ConfigClass {
         if (!this.extraSources.add(instance))
             return;
 
-        this.resolveFields(instance);
+        this.resolveFields(instance.getClass(), instance);
     }
 
     /**
@@ -143,9 +143,9 @@ public abstract class ConfigClass {
      */
     public final void initConfig() {
         this.resolveChildren();
-        this.resolveFields(this.configInstance);
+        this.resolveFields(this.self, this.configInstance);
         for (ConfigClassSource source : this.extraSources) {
-            this.resolveFields(source);
+            this.resolveFields(source.getClass(), source);
         }
 
         children.values().forEach(ConfigClass::initConfig);
@@ -194,8 +194,8 @@ public abstract class ConfigClass {
     /**
      * Resolves the fields of this instance.
      */
-    private void resolveFields(Object instance) {
-        Field[] fields = instance.getClass().getDeclaredFields();
+    private void resolveFields(Class<?> clazz, Object instance) {
+        Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             int modifiers = field.getModifiers();
             if ((modifiers & (Modifier.TRANSIENT | Modifier.FINAL)) != 0)
@@ -212,13 +212,13 @@ public abstract class ConfigClass {
             field.setAccessible(true);
 
             //Generate and insert the field.
-            FieldHandle<?> generatedHandle = FieldHandles.getHandle(field.getName(), instance.getClass());
+            FieldHandle<?> generatedHandle = FieldHandles.getHandle(field.getName(), clazz);
             this.fieldHandleMap.put(field, new ConfigValueHandle(generatedHandle, field.getAnnotation(Conf.class), instance));
         }
 
-        Class<?> parent = instance.getClass().getSuperclass();
+        Class<?> parent = clazz.getSuperclass();
         if (parent != ConfigClass.class && ConfigClass.class.isAssignableFrom(parent) && !children.containsKey(parent)) {
-            resolveFields(parent);
+            resolveFields(parent, instance);
         }
     }
 
