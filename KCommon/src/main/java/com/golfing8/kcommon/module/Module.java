@@ -4,9 +4,11 @@ import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.MCommand;
 import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.commented.MConfiguration;
+import com.golfing8.kcommon.config.generator.ConfigClassSource;
 import com.golfing8.kcommon.config.generator.ConfigClassWrapper;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
+import com.golfing8.kcommon.config.lang.LangConfigEnum;
 import com.golfing8.kcommon.data.DataManagerContainer;
 import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
@@ -82,6 +84,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /** The permission prefix */
     @Getter
     private final String permissionPrefix;
+    /** The module info annotation on this class */
+    @Getter
+    private final @Nullable ModuleInfo moduleInfo;
 
     /**
      * If this module is enabled or not. This is simply the module's current state.
@@ -173,6 +178,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.configs = new ConcurrentHashMap<>();
         this.logger = new ModuleLogger(this);
         this.permissionPrefix = plugin.getName() + "." + this.moduleName;
+        this.moduleInfo = null;
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
@@ -205,6 +211,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.configs = new HashMap<>();
         this.logger = new ModuleLogger(this);
         this.permissionPrefix = plugin.getName() + "." + this.moduleName;
+        this.moduleInfo = info;
 
         // Try to register this module to the registry.
         if(Modules.moduleExists(this.getNamespacedKey())) {
@@ -320,7 +327,12 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         //Save the lang config.
         this.langConfig.save();
 
-        this.onDisable();
+        try {
+            this.onDisable();
+        } catch (Throwable thr) {
+            getLogger().log(Level.SEVERE, "Module failed to disable!", thr);
+            return;
+        }
         // If this module supports data managers, shut them down.
         if (this instanceof DataManagerContainer) {
             ((DataManagerContainer) this).shutdownDataManagers();
@@ -366,6 +378,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
     /**
      * Loads a config group from the given name.
+     * <p>
+     *     Returns a list of configurations under the directory /{@code groupName}/ in the plugin's data folder.
+     * </p>
      *
      * @return the config group.
      */
@@ -395,6 +410,14 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         // Get the config wrapper ready for loading
         this.configWrapper = new ConfigClassWrapper(null, this.getClass(), this);
+
+        // Load extra sources.
+        if (this.moduleInfo != null) {
+            for (Class<? extends ConfigClassSource> source : this.moduleInfo.configSources()) {
+                this.configWrapper.addSource(source);
+            }
+        }
+
         this.configWrapper.setConfigMappingEnabled(true);
         this.configWrapper.setRequireAnnotation(true);
         this.configWrapper.initConfig();
@@ -456,6 +479,14 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         //First, load the language config.
         Path langPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "lang.yml");
         this.langConfig = new LangConfig(langPath);
+
+        // Load extra lang sources.
+        if (this.moduleInfo != null) {
+            for (Class<? extends LangConfigEnum> source : this.moduleInfo.langSources()) {
+                this.loadLangEnum(source);
+            }
+        }
+
         this.langConfig.load();
         this.loadLangConstants(this.langConfig);
     }
@@ -556,7 +587,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * @param runnable the runnable.
      * @return the task.
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked", "unused"})
     public synchronized ModuleTask addTask(Runnable runnable) {
         ModuleTask mTask = new ModuleTask(this, runnable);
         this.moduleTasks.add(mTask);
@@ -594,7 +625,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      *
      * @param subModule the module.
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes", "unchecked", "unused"})
     public final void addSubModule(SubModule<?> subModule) {
         // Already registered.
         if (this.subModules.contains(subModule))
@@ -696,7 +727,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * these values will not override existing settings in the config.
      *
      * @param config the language config to add the constants to.
-     * @deprecated register constants in {@link #onEnable()}
+     * @deprecated register constants in {@link #onEnable()}, use @LangConf, or use LangConfigEnum
      */
     @Deprecated
     protected void loadLangConstants(LangConfig config) {/*Intentionally empty*/}

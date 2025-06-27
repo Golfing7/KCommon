@@ -1,5 +1,9 @@
 package com.golfing8.kcommon.module;
 
+import com.golfing8.kcommon.config.generator.ConfigClassSource;
+import com.golfing8.kcommon.config.lang.LangConfigEnum;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -12,6 +16,7 @@ public @interface ModuleInfo {
      * The name of the module.
      * @return the name of the module.
      */
+    @NotNull
     String name();
 
     /**
@@ -20,6 +25,7 @@ public @interface ModuleInfo {
      *
      * @return the dependencies of this module.
      */
+    @NotNull
     String[] moduleDependencies() default {};
 
     /**
@@ -28,6 +34,7 @@ public @interface ModuleInfo {
      *
      * @return the module's plugin dependencies.
      */
+    @NotNull
     String[] pluginDependencies() default {};
 
     /**
@@ -55,4 +62,20 @@ public @interface ModuleInfo {
      * @return the maximum minor version.
      */
     int maximumMinorVersion() default -1;
+
+    /**
+     * Config sources to load
+     *
+     * @return the config sources
+     */
+    @NotNull
+    Class<? extends ConfigClassSource>[] configSources() default {};
+
+    /**
+     * The lang config sources to load
+     *
+     * @return the lang sources
+     */
+    @NotNull
+    Class<? extends LangConfigEnum>[] langSources() default {};
 }

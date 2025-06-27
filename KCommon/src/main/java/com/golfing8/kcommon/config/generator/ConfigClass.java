@@ -13,11 +13,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Acts as a parent class to all class style configs. Every non-transient field in a config class will
@@ -27,9 +23,6 @@ import java.util.Set;
  * </p>
  */
 public abstract class ConfigClass {
-    /** Used to store instances of configs globally for easy access. */
-    private static final Map<Class<?>, ConfigClass> CONFIG_CLASS_MAP = new HashMap<>();
-
     /**
      * Maps a field to its handle.
      */
@@ -42,6 +35,8 @@ public abstract class ConfigClass {
      * The class backing this config.
      */
     private final Class<?> self;
+    /** All source classes to load */
+    private final Set<ConfigClassSource> extraSources = Collections.newSetFromMap(new IdentityHashMap<>());
     /** The backing instance of this config */
     @Getter
     private final Object configInstance;
@@ -122,18 +117,35 @@ public abstract class ConfigClass {
     /**
      * Unregisters this config class.
      */
-    public void unregister() {
-        CONFIG_CLASS_MAP.remove(this.getClass());
+    public void unregister() {}
+
+    /**
+     * Adds a source to this config class where values will be loaded from
+     *
+     * @param source the source
+     */
+    public final void addSource(Class<? extends ConfigClassSource> source) {
+        ConfigClassSource instance;
+        try {
+            instance = source.getDeclaredConstructor().newInstance();
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed to instantiate config source from class " + source.getName(), e);
+        }
+
+        if (!this.extraSources.add(instance))
+            return;
+
+        this.resolveFields(instance);
     }
 
     /**
      * Sets up the structure of the config class.
      */
     public final void initConfig() {
-        CONFIG_CLASS_MAP.put(this.getClass(), this);
-
         this.resolveChildren();
-        this.resolveFields(self);
+        for (ConfigClassSource source : this.extraSources) {
+            this.resolveFields(source);
+        }
 
         children.values().forEach(ConfigClass::initConfig);
     }
@@ -181,8 +193,8 @@ public abstract class ConfigClass {
     /**
      * Resolves the fields of this instance.
      */
-    private void resolveFields(Class<?> clazz) {
-        Field[] fields = clazz.getDeclaredFields();
+    private void resolveFields(Object instance) {
+        Field[] fields = instance.getClass().getDeclaredFields();
         for (Field field : fields) {
             int modifiers = field.getModifiers();
             if ((modifiers & (Modifier.TRANSIENT | Modifier.FINAL)) != 0)
@@ -199,11 +211,11 @@ public abstract class ConfigClass {
             field.setAccessible(true);
 
             //Generate and insert the field.
-            FieldHandle<?> generatedHandle = FieldHandles.getHandle(field.getName(), clazz);
-            this.fieldHandleMap.put(field, new ConfigValueHandle(generatedHandle, field.getAnnotation(Conf.class), configInstance));
+            FieldHandle<?> generatedHandle = FieldHandles.getHandle(field.getName(), instance.getClass());
+            this.fieldHandleMap.put(field, new ConfigValueHandle(generatedHandle, field.getAnnotation(Conf.class), instance));
         }
 
-        Class<?> parent = clazz.getSuperclass();
+        Class<?> parent = instance.getClass().getSuperclass();
         if (parent != ConfigClass.class && ConfigClass.class.isAssignableFrom(parent) && !children.containsKey(parent)) {
             resolveFields(parent);
         }

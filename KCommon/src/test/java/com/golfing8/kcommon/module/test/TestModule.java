@@ -1,10 +1,16 @@
 package com.golfing8.kcommon.module.test;
 
+import com.golfing8.kcommon.config.generator.ConfigClassSource;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.ModuleInfo;
 
+class TestSource implements ConfigClassSource {
+
+}
+
 @ModuleInfo(
-        name = "test"
+        name = "test",
+        configSources = TestSource.class
 )
 public class TestModule extends Module {
     @Override

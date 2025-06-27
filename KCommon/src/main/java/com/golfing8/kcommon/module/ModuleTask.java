@@ -60,8 +60,8 @@ public class ModuleTask<T extends Module> {
         if (!this.started)
             return;
 
-        this.bukkitTask.cancel();
         this.module.removeTask(this);
+        this.bukkitTask.cancel();
     }
 
     /**
