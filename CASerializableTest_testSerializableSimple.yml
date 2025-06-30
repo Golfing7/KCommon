@@ -1,0 +1,10 @@
+# Some thing as a comment
+item1: 0
+# Some thing as a comment
+item2: 0
+# AAAA
+item4: 523
+# Some thing as a comment
+conf-item:
+  thing2: 6
+  thing1: 5

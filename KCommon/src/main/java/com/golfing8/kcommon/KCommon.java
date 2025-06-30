@@ -58,6 +58,8 @@ public class KCommon extends KPlugin {
         this.serverVersion = NMSVersion.loadVersion();
         this.mainThread = Thread.currentThread();
 
+        Bukkit.world
+
         libraryLoader.addRelocation("de,tr7zw,changeme,nbtapi", "de,tr7zw,kcommon,nbtapi");
         libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
 

@@ -39,6 +39,21 @@ public class World implements NMSWorld {
     }
 
     @Override
+    public void refreshChestState(Player player, Position position) {
+        Location location = position.toLocation(world);
+
+        // We need to flip the state to get it to animate.
+        Chest chest = (Chest) world.getBlockAt(location).getState();
+        if (chest.isOpen()) {
+            chest.close();
+            chest.open();
+        } else {
+            chest.open();
+            chest.close();
+        }
+    }
+
+    @Override
     public void animateChest(Position position, boolean opening) {
         Location location = position.toLocation(world);
         Chest chest = (Chest) location.getBlock().getState();
@@ -77,7 +92,7 @@ public class World implements NMSWorld {
 
     @Override
     public Position findTargetedBlock(Player player, double range) {
-        return new Position(player.getTargetBlock((int) range));
+        return new Position(player.getTargetBlock(null, (int) range));
     }
 
     @Override
