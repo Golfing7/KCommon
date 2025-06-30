@@ -108,7 +108,7 @@ public class ComponentUtils {
             return str;
 
         str = str.substring(8);
-        String asLegacy = LegacyComponentSerializer.legacySection().serialize(MiniMessage.miniMessage().deserialize(str));
+        String asLegacy = LegacyComponentSerializer.legacySection().serialize(miniMessage.deserialize(str));
 
         int messagePxSize = 0;
         boolean isBold = false;
