@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.lang;
 
+import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
@@ -282,7 +283,7 @@ public class Message {
                 }
             } else {
                 List<String> parsed = MS.parseAllMulti(MS.parseAll(this.getMessages(), placeholders == null ? Collections.emptyList() : placeholders), multiLinePlaceholders == null ? Collections.emptyList() : multiLinePlaceholders);
-                parsed.forEach(Bukkit::broadcastMessage);
+                parsed.forEach(line -> NMS.getTheNMS().broadcastComponent(ComponentUtils.toComponent(line)));
             }
         }
 

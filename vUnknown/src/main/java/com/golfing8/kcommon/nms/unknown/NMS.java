@@ -71,6 +71,11 @@ public class NMS implements NMSAccess {
     }
 
     @Override
+    public void broadcastComponent(Component component) {
+        Bukkit.broadcast(component);
+    }
+
+    @Override
     public Inventory createInventory(InventoryHolder holder, int size, String title) {
         return Bukkit.createInventory(holder, size, ComponentUtils.toComponent(title));
     }

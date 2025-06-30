@@ -22,6 +22,7 @@ import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import com.golfing8.kcommon.nms.v1_8.event.PreSpawnSpawnerAdapter;
 import lombok.Getter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -87,6 +88,12 @@ public class NMS implements NMSAccess {
     @Override
     public void sendMiniMessage(CommandSender player, String string) {
         audiences.sender(player).sendMessage(ComponentUtils.toComponent(string));
+    }
+
+    @Override
+    public void broadcastComponent(Component component) {
+        audiences.players().sendMessage(component);
+        audiences.console().sendMessage(component);
     }
 
     @Override

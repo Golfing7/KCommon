@@ -6,6 +6,7 @@ import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.packets.NMSPacket;
 import com.golfing8.kcommon.nms.server.NMSServer;
 import com.golfing8.kcommon.nms.world.NMSWorld;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -55,6 +56,13 @@ public interface NMSAccess {
      * @param string the formatted message.
      */
     void sendMiniMessage(CommandSender sender, String string);
+
+    /**
+     * Broadcasts a component.
+     *
+     * @param component the component to broadcast
+     */
+    void broadcastComponent(Component component);
 
     /**
      * Creates an inventory and attempts to use mini message for the title.
