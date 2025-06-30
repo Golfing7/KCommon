@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.17"
 }
 
 group = "com.golfing8"
@@ -33,7 +34,7 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-core:7.2.15") {
         exclude("org.spigotmc")
     }
-    compileOnly("com.mojang:authlib:1.5.25")
+    paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
 }
 
 java {

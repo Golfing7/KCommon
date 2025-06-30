@@ -73,6 +73,7 @@ public class Message {
      *
      * @param message the message to load from.
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public Message(@Nullable Object message) {
         this();
         if (message == null) {

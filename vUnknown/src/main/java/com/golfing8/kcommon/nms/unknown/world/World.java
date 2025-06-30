@@ -5,11 +5,16 @@ import com.golfing8.kcommon.nms.struct.Position;
 import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.unknown.chunks.ChunkProvider;
 import com.golfing8.kcommon.nms.world.NMSWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Chest;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftChest;
 import org.bukkit.entity.Player;
 
 public class World implements NMSWorld {
@@ -43,14 +48,9 @@ public class World implements NMSWorld {
         Location location = position.toLocation(world);
 
         // We need to flip the state to get it to animate.
-        Chest chest = (Chest) world.getBlockAt(location).getState();
-        if (chest.isOpen()) {
-            chest.close();
-            chest.open();
-        } else {
-            chest.open();
-            chest.close();
-        }
+        ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
+        ChestBlockEntity chest = ((CraftChest) world.getBlockAt(location).getState()).getBlockEntity();
+        chest.openersCounter.openerAPICountChanged(level, new BlockPos(position.getX(), position.getY(), position.getZ()), chest.getBlockState(), 0, chest.openersCounter.getOpenerCount());
     }
 
     @Override

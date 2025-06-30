@@ -34,6 +34,14 @@ tasks {
         finalizedBy(shadowJar)
     }
 
+    jar {
+        manifest {
+            attributes(
+                "paperweight-mappings-namespace" to "mojang"
+            )
+        }
+    }
+
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
         relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")
