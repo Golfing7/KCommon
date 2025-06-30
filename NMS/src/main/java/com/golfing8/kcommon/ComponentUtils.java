@@ -107,6 +107,7 @@ public class ComponentUtils {
         if (!str.startsWith("center::"))
             return str;
 
+        str = str.substring(8);
         String asLegacy = LegacyComponentSerializer.legacySection().serialize(MiniMessage.miniMessage().deserialize(str));
 
         int messagePxSize = 0;
