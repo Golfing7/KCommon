@@ -3,7 +3,10 @@ package com.golfing8.kcommon;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.bukkit.ChatColor;
+import org.bukkit.map.MinecraftFont;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ public class ComponentUtils {
     private static final Pattern SECTION_RGB_6 = Pattern.compile("\u00A7#([\\da-fA-F]{6})");
     private static final Pattern SECTION_RGB_SPIGOT = Pattern.compile("\u00A7x(\u00A7[\\da-fA-F]){6}");
     private static final Map<String, String> legacyColorMap = new HashMap<>();
+    private static final int CENTER_PX = 154;
 
     static {
         legacyColorMap.put("0", "<reset><black>");
@@ -71,6 +75,7 @@ public class ComponentUtils {
         str = replaceColors(str, '&');
         str = replaceColors(str, '\u00A7');
         str = StringEscapeUtils.unescapeJava(str);
+        str = maybeCenter(str);
         return str;
     }
 
@@ -90,6 +95,44 @@ public class ComponentUtils {
         }
 
         return components;
+    }
+
+    /**
+     * Centers the string if it needs to be.
+     *
+     * @param str the string
+     * @return the new string
+     */
+    public static String maybeCenter(String str) {
+        if (!str.startsWith("center::"))
+            return str;
+
+        String asLegacy = LegacyComponentSerializer.legacySection().serialize(MiniMessage.miniMessage().deserialize(str));
+
+        int messagePxSize = 0;
+        boolean isBold = false;
+        boolean previousColorChar = false;
+
+        for (char c : asLegacy.toCharArray()) {
+            if (c == ChatColor.COLOR_CHAR) {
+                isBold = false;
+                previousColorChar = true;
+            } else if (previousColorChar) {
+                if (c == 'l' || c == 'L') isBold = true;
+                previousColorChar = false;
+            } else {
+                messagePxSize += MinecraftFont.Font.getChar(c).getWidth();
+
+                if (isBold) messagePxSize += 1;
+                messagePxSize++;
+            }
+        }
+        int paddingSpaces = (CENTER_PX - (messagePxSize / 2)) / 4;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < paddingSpaces; i++) {
+            builder.append(" ");
+        }
+        return builder + str;
     }
 
     /**

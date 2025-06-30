@@ -176,9 +176,6 @@ public final class MS {
                 return s;
             }
         });
-
-        //Center message
-        TRANSFORMERS.add(s -> s.startsWith("center::") ? StringUtil.centerMessage(s.substring(8)) : s);
     }
 
     /**
