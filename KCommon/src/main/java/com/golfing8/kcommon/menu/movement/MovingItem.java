@@ -8,6 +8,7 @@ import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.struct.ResettableNumber;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class MovingItem {
     private int currentStep;
     private ItemStack previousStack;
     private boolean removeOnFinish;
+    @Getter @Setter
+    private boolean frozen;
 
     @Getter
     private List<ClickAction> clickActions;
@@ -124,6 +127,9 @@ public class MovingItem {
     }
 
     public void move() {
+        if (frozen)
+            return;
+
         if (!justReset && !justOpened && ++currentStep >= finalStep) {
             return;
         }

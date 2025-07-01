@@ -4,6 +4,7 @@ import com.golfing8.kcommon.menu.Menu;
 import com.golfing8.kcommon.struct.ResettableNumber;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.inventory.ItemStack;
 
 public class MorphingItem {
@@ -19,6 +20,8 @@ public class MorphingItem {
     private final SoundWrapper soundWrapper;
     private int currentSpot;
     private boolean removeOnFinish;
+    @Getter @Setter
+    private boolean frozen;
 
     //Internal field used for rollover
     private boolean justReset;
@@ -84,6 +87,9 @@ public class MorphingItem {
     }
 
     public void morph() {
+        if (frozen)
+            return;
+
         if (!justReset && ++currentSpot >= progressionLength) {
             return;
         }
