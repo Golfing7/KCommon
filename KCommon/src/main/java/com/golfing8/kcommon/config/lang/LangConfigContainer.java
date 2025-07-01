@@ -84,11 +84,7 @@ public interface LangConfigContainer {
             message = getLangConfig().getMessage(formatted);
             getLangConfig().save();
         }
-        MS.parseAll(message.getMessages(), placeholders)
-                .forEach(string -> MS.pass(sender, string));
-        if(message.getTitle() != null && sender instanceof Player) {
-            MS.sendTitle((Player) sender, message.getTitle());
-        }
+        message.send(sender, placeholders);
     }
 
     /**
@@ -107,14 +103,7 @@ public interface LangConfigContainer {
         Message message = getLangConfig().getMessage(formatted);
         Preconditions.checkNotNull(message, String.format("Tried to send message with key %s from config %s but it does not exist!", formatted, this.getLangConfig().getConfigPath()));
 
-        message.send(sender, placeholders);
-        MS.parseAllMulti(MS.parseAll(message.getMessages(), placeholders == null ? Collections.emptyList() : placeholders),
-                        multiLinePlaceholders == null ? Collections.emptyList() : multiLinePlaceholders)
-                .forEach(string -> MS.pass(sender, string));
-        //Then we need to parse all the titles.
-        if(message.getTitle() != null && sender instanceof Player) {
-            MS.sendTitle((Player) sender, message.getTitle());
-        }
+        message.send(sender, placeholders, multiLinePlaceholders);
     }
 
     /**

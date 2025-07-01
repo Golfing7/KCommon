@@ -55,23 +55,31 @@ public class World implements NMSWorld {
 
     @Override
     public void animateChest(Position position, boolean opening) {
-        Location location = position.toLocation(world);
-        Chest chest = (Chest) location.getBlock().getState();
-        chest.open();
+        if (opening) {
+            forceChestOpen(position);
+        } else {
+            forceChestClose(position);
+        }
     }
 
     @Override
     public void forceChestOpen(Position position) {
         Location location = position.toLocation(world);
-        Chest chest = (Chest) location.getBlock().getState();
-        chest.open();
+
+        ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
+        ChestBlockEntity chest = ((CraftChest) location.getBlock().getState()).getBlockEntity();
+        chest.openersCounter.openerAPICountChanged(level, new BlockPos(position.getX(), position.getY(), position.getZ()), chest.getBlockState(), 0, chest.openersCounter.getOpenerCount() + 1);
+        chest.openersCounter.opened = true;
     }
 
     @Override
     public void forceChestClose(Position position) {
         Location location = position.toLocation(world);
-        Chest chest = (Chest) location.getBlock().getState();
-        chest.close();
+
+        ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
+        ChestBlockEntity chest = ((CraftChest) location.getBlock().getState()).getBlockEntity();
+        chest.openersCounter.openerAPICountChanged(level, new BlockPos(position.getX(), position.getY(), position.getZ()), chest.getBlockState(), 0, 0);
+        chest.openersCounter.opened = false;
     }
 
     @Override
