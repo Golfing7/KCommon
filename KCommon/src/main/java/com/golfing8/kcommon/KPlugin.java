@@ -116,7 +116,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.placeholderAPIHook.unregister();
 
         //Once more save the lang config.
-        this.langConfig.save();
+        if (this.langConfig != null) {
+            this.langConfig.save();
+        }
         saveModuleManifest();
     }
 
@@ -144,6 +146,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
     }
 
     private void saveModuleManifest() {
+        if (this.manifest == null)
+            return;
+
         try {
             BufferedWriter writer = Files.newBufferedWriter(getDataFolder().toPath().resolve("module-manifest.json"));
             DataSerializer.getGSONBase().toJson(this.manifest, writer);
