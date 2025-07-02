@@ -7,6 +7,8 @@ import com.golfing8.kcommon.nms.unknown.chunks.ChunkProvider;
 import com.golfing8.kcommon.nms.world.NMSWorld;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -16,6 +18,8 @@ import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftChest;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 public class World implements NMSWorld {
     private final org.bukkit.World world;
@@ -43,14 +47,20 @@ public class World implements NMSWorld {
         throw new UnsupportedOperationException();
     }
 
+    private Optional<ChestBlockEntity> getChest(BlockPos pos) {
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        BlockEntity block = level.getBlockEntity(pos);
+        return block instanceof ChestBlockEntity chest ? Optional.of(chest) : Optional.empty();
+    }
+
     @Override
     public void refreshChestState(Player player, Position position) {
-        Location location = position.toLocation(world);
-
         // We need to flip the state to get it to animate.
-        ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
-        ChestBlockEntity chest = ((CraftChest) world.getBlockAt(location).getState()).getBlockEntity();
-        chest.openersCounter.openerAPICountChanged(level, new BlockPos(position.getX(), position.getY(), position.getZ()), chest.getBlockState(), 0, chest.openersCounter.getOpenerCount());
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
+        getChest(blockPos).ifPresent(chest -> {
+            chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, chest.openersCounter.getOpenerCount());
+        });
     }
 
     @Override
@@ -64,22 +74,22 @@ public class World implements NMSWorld {
 
     @Override
     public void forceChestOpen(Position position) {
-        Location location = position.toLocation(world);
-
-        ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
-        ChestBlockEntity chest = ((CraftChest) location.getBlock().getState()).getBlockEntity();
-        chest.openersCounter.openerAPICountChanged(level, new BlockPos(position.getX(), position.getY(), position.getZ()), chest.getBlockState(), 0, chest.openersCounter.getOpenerCount() + 1);
-        chest.openersCounter.opened = true;
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
+        getChest(blockPos).ifPresent(chest -> {
+            chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, chest.openersCounter.getOpenerCount() + 1);
+            chest.openersCounter.opened = true;
+        });
     }
 
     @Override
     public void forceChestClose(Position position) {
-        Location location = position.toLocation(world);
-
-        ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
-        ChestBlockEntity chest = ((CraftChest) location.getBlock().getState()).getBlockEntity();
-        chest.openersCounter.openerAPICountChanged(level, new BlockPos(position.getX(), position.getY(), position.getZ()), chest.getBlockState(), 0, 0);
-        chest.openersCounter.opened = false;
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
+        getChest(blockPos).ifPresent(chest -> {
+            chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, 0);
+            chest.openersCounter.opened = false;
+        });
     }
 
     @Override
