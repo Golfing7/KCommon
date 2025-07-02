@@ -86,7 +86,7 @@ public final class MenuBuilder {
         this.clickable = other.clickable;
         this.title = other.title;
         this.clickActions = new HashMap<>(other.clickActions);
-        this.shapeCreation = new ArrayList<>(shapeCreation);
+        this.shapeCreation = new ArrayList<>(other.shapeCreation);
         this.specificItems = new HashMap<>(other.specificItems);
         this.bottomClickEvent = other.bottomClickEvent;
         this.topClickEvent = other.topClickEvent;
@@ -101,6 +101,7 @@ public final class MenuBuilder {
         this.closeRunnable = other.closeRunnable;
         this.postCloseRunnable = other.postCloseRunnable;
         this.tickRunnable = other.tickRunnable;
+        this.placeholderTarget = other.placeholderTarget;
     }
 
     /**
