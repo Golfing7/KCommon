@@ -7,12 +7,16 @@ import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.google.common.collect.Sets;
+import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -28,7 +32,11 @@ public class SimpleGUIItem {
      * The menu coordinate to place the item at.
      */
     @Getter
-    private final MenuCoordinate slot;
+    private final Set<MenuCoordinate> slots;
+    @Deprecated
+    public MenuCoordinate getSlot() {
+        return slots.iterator().next();
+    }
     /**
      * A supplier of the special placeholders.
      */
@@ -42,7 +50,7 @@ public class SimpleGUIItem {
 
     public SimpleGUIItem(ItemStackBuilder item, MenuCoordinate slot) {
         this.item = item;
-        this.slot = slot;
+        this.slots = Sets.newHashSet(slot);
     }
 
     public SimpleGUIItem(ConfigurationSection section) {
@@ -51,6 +59,10 @@ public class SimpleGUIItem {
         } else {
             this.item = new ItemStackBuilder(section);
         }
-        this.slot = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slot"), MenuCoordinate.class);
+        if (section.contains("slots")) {
+            this.slots = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slots"), FieldType.extractFrom(new TypeToken<Set<MenuCoordinate>>() {}));
+        } else {
+            this.slots = Sets.newHashSet(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slot"), MenuCoordinate.class));
+        }
     }
 }
