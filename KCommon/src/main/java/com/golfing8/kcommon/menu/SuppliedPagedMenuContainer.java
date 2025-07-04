@@ -148,9 +148,7 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
      */
     protected void forEachElementOnPage(@NotNull BiConsumer<MenuCoordinate, T> action) {
         Preconditions.checkNotNull(action, "Action cannot be null!");
-        Preconditions.checkState(this.elementCountSupplier != null,  "elementCountSupplier must not be null!");
-        Preconditions.checkState(this.elementSource != null,  "elementSource must not be null!");
-        Preconditions.checkState(this.elementSection != null,  "elementSection must not be null!");
+        assertSetup();
 
         Range elementInterval = getCurrentElementRange();
         if (elementInterval == null)
@@ -164,5 +162,38 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
             MenuCoordinate coordinate = inRange.get(elementIndex);
             action.accept(coordinate, elements.get(elementIndex++));
         }
+    }
+
+    /**
+     * Applies the given element consumer to every element on the current page of the menu.
+     *
+     * @param action the action to perform on the coordinates.
+     */
+    protected void forEachElementOnPageWithIndex(@NotNull ElementConsumer<T> action) {
+        Preconditions.checkNotNull(action, "Action cannot be null!");
+        assertSetup();
+
+        Range elementInterval = getCurrentElementRange();
+        if (elementInterval == null)
+            throw new IllegalStateException("Cannot loop over each element on when elementsPerPage has not been set!");
+
+        // Get the coordinates and load the elements.
+        List<MenuCoordinate> inRange = elementSection.getInRange();
+        List<T> elements = elementSource.apply(elementInterval);
+        int elementIndex = 0;
+        for (int i = (int) elementInterval.getMin(); i <= elementInterval.getMax(); i++) {
+            MenuCoordinate coordinate = inRange.get(elementIndex);
+            action.accept(coordinate, elementIndex, elements.get(elementIndex++));
+        }
+    }
+
+    private void assertSetup() {
+        Preconditions.checkState(this.elementCountSupplier != null,  "elementCountSupplier must not be null!");
+        Preconditions.checkState(this.elementSource != null,  "elementSource must not be null!");
+        Preconditions.checkState(this.elementSection != null,  "elementSection must not be null!");
+    }
+
+    public interface ElementConsumer<T> {
+        void accept(MenuCoordinate coordinate, int slot, T element);
     }
 }
