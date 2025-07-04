@@ -43,6 +43,24 @@ public class Range {
     }
 
     /**
+     * Gets the minimum as an integer, rounded down.
+     *
+     * @return the floor of the minimum
+     */
+    public int getMinFloor() {
+        return (int) Math.floor(this.min);
+    }
+
+    /**
+     * Gets the maximum as an integer, rounded down.
+     *
+     * @return the floor of the maximum
+     */
+    public int getMaxFloor() {
+        return (int) Math.floor(this.max);
+    }
+
+    /**
      * Gets a random integer within this range, inclusive.
      *
      * @return the random number.
