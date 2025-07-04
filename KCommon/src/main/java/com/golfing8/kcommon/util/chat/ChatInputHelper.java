@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.util.chat;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.struct.helper.promise.Promise;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,13 +23,16 @@ import java.util.concurrent.CompletableFuture;
 @Getter
 public class ChatInputHelper implements Listener {
     /** The future of input. Completed with null if the player times out or disconnects */
+    @Getter(onMethod_ = @Deprecated)
     private final CompletableFuture<@Nullable String> result;
+    private final Promise<@Nullable String> resultPromise;
     private final Player player;
     private final @Nullable BukkitTask timeoutTask;
 
     public ChatInputHelper(Player player, int timeoutTicks) {
         this.player = player;
-        this.result = new CompletableFuture<>();
+        this.resultPromise = Promise.empty();
+        this.result = this.resultPromise.toCompletableFuture();
 
         // Register
         Bukkit.getPluginManager().registerEvents(this, KCommon.getInstance());
@@ -73,10 +77,10 @@ public class ChatInputHelper implements Listener {
     }
 
     private void complete(@Nullable String input) {
-        if (result.isDone())
+        if (resultPromise.isDone())
             return;
 
-        result.complete(input);
+        resultPromise.supply(input);
         Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
             HandlerList.unregisterAll(this);
         });
