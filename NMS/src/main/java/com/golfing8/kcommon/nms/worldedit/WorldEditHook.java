@@ -32,9 +32,13 @@ public interface WorldEditHook {
     Selection getSelection(Player player);
 
     @Data
-    public static class Selection {
+    final class Selection {
         private final @Nullable Location pos1;
         private final @Nullable Location pos2;
+
+        public boolean isComplete() {
+            return pos1 != null && pos2 != null;
+        }
     }
 
     WorldEditHook EMPTY = new WorldEditHook() {
