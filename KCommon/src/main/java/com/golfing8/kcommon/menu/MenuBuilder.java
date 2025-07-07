@@ -338,7 +338,7 @@ public final class MenuBuilder {
         return this;
     }
 
-    public MenuSimple buildSimple() {
+    private void applyToMenu(MenuAbstract menu) {
         ItemStack[] contents = new ItemStack[size];
 
         for (Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>> shapeListPair : shapeCreation) {
@@ -357,17 +357,16 @@ public final class MenuBuilder {
             }
         }
 
-        MenuSimple menuSimple = new MenuSimple(this.title, new MenuShape(menuShapeType, size), clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
-        menuSimple.setContents(contents);
-        menuSimple.setTopClickAction(topClickEvent);
-        menuSimple.setTickRunnable(this.tickRunnable);
-        menuSimple.onClose(this.closeRunnable);
-        menuSimple.onPostClose(this.postCloseRunnable);
-        menuSimple.setBottomClickAction(bottomClickEvent);
+        menu.setContents(contents);
+        menu.setTopClickAction(topClickEvent);
+        menu.setTickRunnable(this.tickRunnable);
+        menu.onClose(this.closeRunnable);
+        menu.onPostClose(this.postCloseRunnable);
+        menu.setBottomClickAction(bottomClickEvent);
 
         otherGUIItems.forEach((key, item) -> {
             item.getSlots().forEach(coordinate -> {
-                menuSimple.setItemAt(coordinate.getX(), coordinate.getY(), item.getItem().buildFromTemplate(placeholderTarget));
+                menu.setItemAt(coordinate.getX(), coordinate.getY(), item.getItem().buildFromTemplate(placeholderTarget));
             });
         });
 
@@ -395,80 +394,23 @@ public final class MenuBuilder {
                 this.setAt(slot,
                         guiItem.getItem().buildFromTemplate(placeholderTarget));
             });
-            menuSimple.addSpecialItem(guiItem);
+            menu.addSpecialItem(guiItem);
         }
 
         for (Map.Entry<Integer, ItemStack> items : specificItems.entrySet()) {
-            menuSimple.setItemAt(items.getKey(), items.getValue());
+            menu.setItemAt(items.getKey(), items.getValue());
         }
+    }
 
+    public MenuSimple buildSimple() {
+        MenuSimple menuSimple = new MenuSimple(this.title, new MenuShape(menuShapeType, size), clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
+        applyToMenu(menuSimple);
         return menuSimple;
     }
 
     public MenuDynamic buildDynamic() {
-        ItemStack[] contents = new ItemStack[size];
-
-        for (Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>> shapeListPair : shapeCreation) {
-            for (MenuCoordinate coordinate : shapeListPair.getA().getInRange()) {
-                int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, coordinate.getX(), coordinate.getY());
-
-                ItemStack found = null;
-                while (found == null) {
-                    ChancedReference<ItemStack> itemStackChancedReference = shapeListPair.getB().get(ThreadLocalRandom.current().nextInt(shapeListPair.getB().size()));
-                    if (itemStackChancedReference.chance()) {
-                        found = itemStackChancedReference.getReference();
-                    }
-                }
-
-                contents[slot] = found;
-            }
-        }
-
         MenuDynamic menuDynamic = new MenuDynamic(this.title, new MenuShape(menuShapeType, size), clickable, canExpire, clickActions, this.globalPlaceholders, this.globalMultiLinePlaceholders);
-        menuDynamic.setContents(contents);
-        menuDynamic.setTickRunnable(this.tickRunnable);
-        menuDynamic.onClose(this.closeRunnable);
-        menuDynamic.onPostClose(this.postCloseRunnable);
-        menuDynamic.setTopClickAction(topClickEvent);
-        menuDynamic.setBottomClickAction(bottomClickEvent);
-
-        otherGUIItems.forEach((key, item) -> {
-            item.getSlots().forEach(coordinate -> {
-                menuDynamic.setItemAt(coordinate.getX(), coordinate.getY(), item.getItem().buildFromTemplate(placeholderTarget));
-            });
-        });
-
-        //Attempt to create the special bindings.
-        for(Map.Entry<String, ClickAction> specialBinding : this.specialBindings.entrySet()) {
-            String key = specialBinding.getKey();
-            SimpleGUIItem guiItem = this.specialGUIItems.get(key);
-            if(guiItem == null)
-                continue;
-
-            //Calculate the slots and add the actions and item.
-            Supplier<Collection<Placeholder>> placeholders =
-                    this.specialPlaceholders.getOrDefault(key, Collections::emptyList);
-            Supplier<Collection<MultiLinePlaceholder>> mPlaceholders =
-                    this.specialMPlaceholders.getOrDefault(key, Collections::emptyList);
-            guiItem.setSpecialPlaceholders(placeholders);
-            guiItem.setSpecialMPlaceholders(mPlaceholders);
-            guiItem.getItem().placeholders(placeholders.get().toArray(new Placeholder[0]));
-            guiItem.getItem().multiLinePlaceholders(mPlaceholders.get().toArray(new MultiLinePlaceholder[0]));
-
-            //Add the item to the GUI.
-            guiItem.getSlots().forEach(coordinate -> {
-                int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, coordinate.getX(), coordinate.getY());
-                this.addAction(slot, specialBinding.getValue());
-                this.setAt(slot,
-                        guiItem.getItem().buildFromTemplate(placeholderTarget));
-            });
-            menuDynamic.addSpecialItem(guiItem);
-        }
-
-        for (Map.Entry<Integer, ItemStack> items : specificItems.entrySet()) {
-            menuDynamic.setItemAt(items.getKey(), items.getValue());
-        }
-
+        applyToMenu(menuDynamic);
         return menuDynamic;
     }
 }
