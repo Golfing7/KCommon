@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.util;
 
+import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.NMSVersion;
@@ -8,6 +9,7 @@ import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.title.Title;
 import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -332,6 +334,18 @@ public final class MS {
             finished.add(string);
         }
         return finished;
+    }
+
+    /**
+     * Converts the message to a component.
+     *
+     * @param message the message
+     * @param placeholders the placeholders
+     * @return the component
+     */
+    public static Component toComponent(String message, Object... placeholders) {
+        List<String> messages = p(message, placeholders);
+        return ComponentUtils.toFlatComponent(messages);
     }
 
     /**

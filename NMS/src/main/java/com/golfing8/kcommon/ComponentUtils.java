@@ -80,6 +80,23 @@ public class ComponentUtils {
     }
 
     /**
+     * Converts a {@link List} into a single {@link Component}
+     *
+     * @param lines        the list with strings to convert
+     * @return the component
+     */
+    public static Component toFlatComponent(List<@NotNull String> lines) {
+        if (lines.isEmpty())
+            return Component.empty();
+
+        Component parentComponent = toComponent(lines.get(0));
+        for (String line : lines.subList(1, lines.size())) {
+            parentComponent = parentComponent.appendNewline().append(toComponent(line));
+        }
+        return parentComponent;
+    }
+
+    /**
      * Converts a {@link List} into a {@link Component}
      *
      * @param lines        the list with strings to convert
