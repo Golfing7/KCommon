@@ -2,8 +2,11 @@ package com.golfing8.kcommon.nms.unknown.worldedit;
 
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -11,8 +14,13 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,5 +59,22 @@ public class WorldEdit implements WorldEditHook {
         } catch (IOException | WorldEditException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public @NotNull Selection getSelection(Player player) {
+        WorldEditPlugin worldEditPlugin = WorldEditPlugin.getPlugin(WorldEditPlugin.class);
+        BukkitPlayer bukkitPlayer = worldEditPlugin.wrapPlayer(player);
+        LocalSession session = worldEdit.getSessionManager().get(bukkitPlayer);
+        RegionSelector selector = session.getRegionSelector(new BukkitWorld(player.getWorld()));
+        if (!(selector instanceof CuboidRegionSelector cuboidSelector))
+            return new Selection(null, null);
+
+        CuboidRegion region = cuboidSelector.getIncompleteRegion();
+        Location pos1 = region.getPos1() != null ?
+                new Location(player.getWorld(), region.getPos1().getBlockX(), region.getPos1().getBlockY(), region.getPos1().getBlockZ()) : null;
+        Location pos2 = region.getPos2() != null ?
+                new Location(player.getWorld(), region.getPos2().getBlockX(), region.getPos2().getBlockY(), region.getPos2().getBlockZ()) : null;
+        return new Selection(pos1, pos2);
     }
 }
