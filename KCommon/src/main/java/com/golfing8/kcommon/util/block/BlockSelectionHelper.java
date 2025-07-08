@@ -2,6 +2,7 @@ package com.golfing8.kcommon.util.block;
 
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -14,6 +15,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Captures block selection for a player.
+ */
+@Getter
 public class BlockSelectionHelper implements Listener {
     private final Promise<@Nullable Location> resultPromise;
     private final Player player;
