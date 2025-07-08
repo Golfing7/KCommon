@@ -148,6 +148,18 @@ public class RectangleRegion implements Region {
     }
 
     @Override
+    public boolean overlapsWith(Region region) {
+        if (this.getWorld() != null && region.getWorld() != this.getWorld())
+            return false;
+
+        // Check low end of Y
+        if (this.minX > region.getMaximumXValue() || this.maxX < region.getMinimumXValue())
+            return false;
+
+        return (this.minZ <= region.getMaximumZValue()) && (this.maxZ >= region.getMinimumZValue());
+    }
+
+    @Override
     public Vector getRandomPosition() {
         double x = ThreadLocalRandom.current().nextDouble(this.minX, this.maxX + 1e-6);
         double z = ThreadLocalRandom.current().nextDouble(this.minZ, this.maxZ + 1e-6);

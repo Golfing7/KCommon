@@ -113,6 +113,15 @@ public interface Region extends Iterable<BlockVector> {
     boolean isPositionWithin(Vector vector);
 
     /**
+     * Checks if there is any overlap with the other region.
+     * Correct behavior should only be guaranteed for similar types of regions.
+     *
+     * @param region the region
+     * @return true if there is any overlap
+     */
+    boolean overlapsWith(Region region);
+
+    /**
      * Gets a random position within this region.
      *
      * @return the random position.

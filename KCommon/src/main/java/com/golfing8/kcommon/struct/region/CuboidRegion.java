@@ -159,6 +159,21 @@ public class CuboidRegion implements Region {
     }
 
     @Override
+    public boolean overlapsWith(Region region) {
+        if (this.getWorld() != null && region.getWorld() != this.getWorld())
+            return false;
+
+        // Check low end of Y
+        if (this.minX > region.getMaximumXValue() || this.maxX < region.getMinimumXValue())
+            return false;
+
+        if (this.minY > region.getMaximumYValue() || this.maxY < region.getMinimumYValue())
+            return false;
+
+        return (this.minZ <= region.getMaximumZValue()) && (this.maxZ >= region.getMinimumZValue());
+    }
+
+    @Override
     public Region grow(double toGrow) {
         return new CuboidRegion(minX - toGrow, maxX + toGrow, minY - toGrow, maxY + toGrow, minZ - toGrow, maxZ + toGrow, world);
     }

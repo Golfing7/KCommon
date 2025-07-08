@@ -1,5 +1,8 @@
 package com.golfing8.kcommon.util;
 
+import com.golfing8.kcommon.struct.region.CuboidRegion;
+import com.golfing8.kcommon.struct.region.Region;
+import com.google.common.base.Preconditions;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Location;
 
@@ -38,5 +41,20 @@ public class LocationUtil {
                 }
             }
         }
+    }
+
+    /**
+     * Performs the given action once for every block position within the given positions
+     *
+     * @param pos1 the first position
+     * @param pos2 the second position
+     * @param action the action to perform
+     */
+    public void forEachLocationInRange(Location pos1, Location pos2, Consumer<Location> action) {
+        Preconditions.checkArgument(pos1.getWorld() == pos2.getWorld(), "Worlds do not equal");
+
+        // Piggyback off of cuboid region
+        Region region = new CuboidRegion(pos1, pos2);
+        region.forEach(vec -> action.accept(vec.toLocation(pos1.getWorld())));
     }
 }

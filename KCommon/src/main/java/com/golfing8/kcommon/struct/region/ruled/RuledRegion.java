@@ -135,6 +135,11 @@ public class RuledRegion implements Region {
     }
 
     @Override
+    public boolean overlapsWith(Region region) {
+        return backingRegion.overlapsWith(region);
+    }
+
+    @Override
     public Vector getRandomPosition() {
         return backingRegion.getRandomPosition();
     }
