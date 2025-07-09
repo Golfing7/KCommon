@@ -152,6 +152,8 @@ public interface NMSMagicItems {
         setUnbreakable(itemStack.getItemMeta(), value);
     }
 
+    void setUnstackable(ItemStack itemStack, boolean value);
+
     static GameProfile makeProfile(String b64) {
         // random uuid based on the b64 string
         UUID id = new UUID(

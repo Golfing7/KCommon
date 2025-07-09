@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.var;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -293,7 +294,7 @@ public class Message {
             }
 
             if (getActionBar() != null) {
-                NMS.getTheNMS().sendActionBar(player, MS.parseSingle(actionBar, placeholders));
+                ComponentUtils.bukkitAudiences.player(player).sendActionBar(MS.toComponent(actionBar, placeholders));
             }
 
             if (getSounds() != null) {
@@ -333,7 +334,7 @@ public class Message {
         }
 
         if (getActionBar() != null && sender instanceof Player) {
-            NMS.getTheNMS().sendActionBar((Player) sender, MS.parseSingle(actionBar, placeholders));
+            ComponentUtils.bukkitAudiences.player((Player) sender).sendActionBar(MS.toComponent(actionBar, placeholders));
         }
 
         if (getSounds() != null && sender instanceof Player) {
@@ -387,7 +388,7 @@ public class Message {
         }
 
         if (getActionBar() != null && sender instanceof Player) {
-            NMS.getTheNMS().sendActionBar((Player) sender, MS.parseSingle(actionBar, placeholders));
+            ComponentUtils.bukkitAudiences.player((Player) sender).sendActionBar(MS.toComponent(actionBar, placeholders));
         }
 
         if (getSounds() != null && sender instanceof Player) {

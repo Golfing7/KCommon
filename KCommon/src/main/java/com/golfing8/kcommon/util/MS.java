@@ -9,13 +9,18 @@ import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.title.Title;
 import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.TitlePart;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -356,12 +361,14 @@ public final class MS {
      * @param placeholders the placeholders.
      */
     public static void sendTitle(Player player, Title title, Object... placeholders) {
-        NMS.getTheNMS().sendTitle(player,
-                MS.parseSingle(title.getTitle(), placeholders),
-                MS.parseSingle(title.getSubtitle(), placeholders),
-                title.getIn(),
-                title.getStay(),
-                title.getOut());
+        Audience audience = ComponentUtils.bukkitAudiences.player(player);
+        audience.sendTitlePart(TitlePart.TITLE, toComponent(title.getTitle(), placeholders));
+        audience.sendTitlePart(TitlePart.SUBTITLE, toComponent(title.getSubtitle(), placeholders));
+        audience.sendTitlePart(TitlePart.TIMES, net.kyori.adventure.title.Title.Times.times(
+                Duration.of(title.getIn() * 50L, ChronoUnit.MILLIS),
+                Duration.of(title.getStay() * 50L, ChronoUnit.MILLIS),
+                Duration.of(title.getOut() * 50L, ChronoUnit.MILLIS)
+        ));
     }
 
     /**
@@ -372,12 +379,7 @@ public final class MS {
      * @param placeholders the placeholders.
      */
     public static void sendTitle(Player player, Title title, Placeholder... placeholders) {
-        NMS.getTheNMS().sendTitle(player,
-                MS.parseSingle(title.getTitle(), placeholders),
-                MS.parseSingle(title.getSubtitle(), placeholders),
-                title.getIn(),
-                title.getStay(),
-                title.getOut());
+        sendTitle(player, title, (Object[]) placeholders);
     }
 
     /**
@@ -389,12 +391,7 @@ public final class MS {
      */
     public static void sendTitle(Player player, Title title, Collection<Object> placeholders) {
         Object[] objects = placeholders == null ? null : placeholders.toArray(new Object[0]);
-        NMS.getTheNMS().sendTitle(player,
-                MS.parseSingle(title.getTitle(), objects),
-                MS.parseSingle(title.getSubtitle(), objects),
-                title.getIn(),
-                title.getStay(),
-                title.getOut());
+        sendTitle(player, title, objects);
     }
 
     public static void pass(CommandSender sender, String message, Object... placeholders){

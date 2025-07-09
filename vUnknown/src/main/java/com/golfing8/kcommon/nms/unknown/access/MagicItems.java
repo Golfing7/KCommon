@@ -202,4 +202,9 @@ public class MagicItems implements NMSMagicItems {
     public NMSItemStack wrapItemStack(ItemStack itemStack) {
         return new com.golfing8.kcommon.nms.unknown.item.ItemStack(itemStack);
     }
+
+    @Override
+    public void setUnstackable(ItemStack itemStack, boolean value) {
+        itemStack.getItemMeta().setMaxStackSize(value ? 1 : null);
+    }
 }

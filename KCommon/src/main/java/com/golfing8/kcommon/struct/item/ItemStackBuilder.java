@@ -552,9 +552,8 @@ public final class ItemStackBuilder {
                 nbt.setString(ITEMSTACK_ID, this.itemID);
             }
             ItemUtil.setInNBT(nbt, this.extraData);
-            if (unstackable)
-                nbt.setString("unstackable", UUID.randomUUID().toString());
         });
+        NMS.getTheNMS().getMagicItems().setUnstackable(newCopy, this.unstackable);
 
         cachedBuild = newCopy;
         return newCopy;

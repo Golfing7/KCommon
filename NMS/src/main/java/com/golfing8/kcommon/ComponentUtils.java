@@ -1,10 +1,12 @@
 package com.golfing8.kcommon;
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.map.MinecraftFont;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +30,7 @@ public class ComponentUtils {
     private static final Pattern SECTION_RGB_SPIGOT = Pattern.compile("\u00A7x(\u00A7[\\da-fA-F]){6}");
     private static final Map<String, String> legacyColorMap = new HashMap<>();
     private static final int CENTER_PX = 154;
+    public static final BukkitAudiences bukkitAudiences = BukkitAudiences.create(Bukkit.getPluginManager().getPlugin("KCommon"));
 
     static {
         legacyColorMap.put("0", "<reset><black>");

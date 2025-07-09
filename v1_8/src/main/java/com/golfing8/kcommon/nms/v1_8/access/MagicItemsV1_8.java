@@ -249,6 +249,17 @@ public class MagicItemsV1_8 implements NMSMagicItems {
         return new ItemStackV1_8(CraftItemStack.asNMSCopy(itemStack));
     }
 
+    @Override
+    public void setUnstackable(ItemStack itemStack, boolean value) {
+        NBT.modify(itemStack, (nbt) -> {
+            if (value) {
+                nbt.setString("unstackable", UUID.randomUUID().toString());
+            } else {
+                nbt.removeKey("unstackable");
+            }
+        });
+    }
+
     public static EntityType translateNMSTypes(String nmsType){
         switch(nmsType.toLowerCase()){
             case "pigzombie":
