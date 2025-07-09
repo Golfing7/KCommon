@@ -88,6 +88,9 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             ConfigPrimitive subValue = entry.getSubValue("attribute-modifiers");
             builder.attributeModifierMap(ConfigTypeRegistry.getFromType(subValue, FieldType.extractFrom(new TypeToken<Map<EntityAttribute, Set<EntityAttributeModifier>>>() {})));
         }
+        if (primitiveValue.containsKey("unstackable")) {
+            builder.unstackable((boolean) primitiveValue.get("unstackable"));
+        }
 
         return builder;
     }
@@ -134,6 +137,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("flags", builder.getItemFlags().stream().map(ItemFlag::name).collect(Collectors.toList()));
         if (!builder.getAttributeModifierMap().isEmpty())
             objects.put("attribute-modifiers", ConfigTypeRegistry.toPrimitive(builder.getAttributeModifierMap()).unwrap());
+        if (builder.isUnstackable())
+            objects.put("unstackable", true);
         return ConfigPrimitive.ofMap(objects);
     }
 }

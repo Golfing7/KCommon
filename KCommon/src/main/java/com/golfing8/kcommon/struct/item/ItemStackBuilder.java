@@ -133,6 +133,8 @@ public final class ItemStackBuilder {
      * The UUID of the owner of the skull. Only applied if this item builder builds a player head.
      */
     private UUID skullOwner;
+    /** If this item is unstackable. */
+    private boolean unstackable;
     /**
      * The last built itemstack for this builder.
      */
@@ -294,6 +296,11 @@ public final class ItemStackBuilder {
 
     public ItemStackBuilder glowing(boolean glowing) {
         this.glowing = glowing;
+        return this;
+    }
+
+    public ItemStackBuilder unstackable(boolean unstackable) {
+        this.unstackable = unstackable;
         return this;
     }
 
@@ -545,6 +552,8 @@ public final class ItemStackBuilder {
                 nbt.setString(ITEMSTACK_ID, this.itemID);
             }
             ItemUtil.setInNBT(nbt, this.extraData);
+            if (unstackable)
+                nbt.setString("unstackable", UUID.randomUUID().toString());
         });
 
         cachedBuild = newCopy;
