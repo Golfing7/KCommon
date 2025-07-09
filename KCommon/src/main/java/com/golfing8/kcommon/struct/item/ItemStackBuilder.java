@@ -211,6 +211,7 @@ public final class ItemStackBuilder {
         this.itemName = section.getString("name", null);
         this.itemLore = section.contains("lore") ? section.getStringList("lore") : null;
         this.amount = Math.max(section.getInt("amount", 1), 1);
+        this.unstackable = section.getBoolean("unstackable", false);
         if (section.contains("nbt-data")) {
             this.extraData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "nbt-data"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {}));
         }

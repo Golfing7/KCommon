@@ -205,6 +205,8 @@ public class MagicItems implements NMSMagicItems {
 
     @Override
     public void setUnstackable(ItemStack itemStack, boolean value) {
-        itemStack.getItemMeta().setMaxStackSize(value ? 1 : null);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setMaxStackSize(value ? 1 : null);
+        itemStack.setItemMeta(itemMeta);
     }
 }
