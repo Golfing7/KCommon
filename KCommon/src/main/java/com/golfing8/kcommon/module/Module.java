@@ -94,6 +94,10 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /** The terminable for this life cycle of the module. */
     @Getter
     private final CompositeTerminable terminable = CompositeTerminable.create();
+    @Override
+    public @NotNull <T extends AutoCloseable> T bind(@NotNull T terminable) {
+        return this.terminable.bind(terminable);
+    }
 
     /**
      * If this module is enabled or not. This is simply the module's current state.
