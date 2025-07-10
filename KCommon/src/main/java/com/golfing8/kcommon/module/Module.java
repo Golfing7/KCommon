@@ -13,6 +13,10 @@ import com.golfing8.kcommon.data.DataManagerContainer;
 import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
+import com.golfing8.kcommon.struct.helper.terminable.Terminable;
+import com.golfing8.kcommon.struct.helper.terminable.TerminableConsumer;
+import com.golfing8.kcommon.struct.helper.terminable.composite.CompositeClosingException;
+import com.golfing8.kcommon.struct.helper.terminable.composite.CompositeTerminable;
 import com.golfing8.kcommon.struct.permission.PermissionContext;
 import com.golfing8.kcommon.util.FileUtil;
 import lombok.Getter;
@@ -42,7 +46,7 @@ import java.util.stream.Stream;
  * Represents an abstract module with functionality on the server. These modules are the basis of functionality
  * for the KCommon suite of plugins. All 'Features' should be implemented through an extension of this class.
  */
-public abstract class Module implements Listener, LangConfigContainer, PlaceholderProvider, PermissionContext {
+public abstract class Module implements Listener, LangConfigContainer, PlaceholderProvider, PermissionContext, TerminableConsumer {
     /**
      * Gets a module instance associated with the given type for the call.
      *
@@ -87,6 +91,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /** The module info annotation on this class */
     @Getter
     private final @Nullable ModuleInfo moduleInfo;
+    /** The terminable for this life cycle of the module. */
+    @Getter
+    private final CompositeTerminable terminable = CompositeTerminable.create();
 
     /**
      * If this module is enabled or not. This is simply the module's current state.
@@ -327,6 +334,11 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         //Save the lang config.
         this.langConfig.save();
 
+        try {
+            this.terminable.close();
+        } catch (CompositeClosingException exc) {
+            getLogger().log(Level.SEVERE, "Failed to close terminable!", exc);
+        }
         try {
             this.onDisable();
         } catch (Throwable thr) {
