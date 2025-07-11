@@ -15,13 +15,16 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Used to capture chat input for use.
  */
 @Getter
 public class ChatInputHelper implements Listener {
+    private static final Map<Player, ChatInputHelper> HELPERS = new ConcurrentHashMap<>();
     /** The future of input. Completed with null if the player times out or disconnects */
     @Getter(onMethod_ = @Deprecated)
     private final CompletableFuture<@Nullable String> result;
@@ -42,6 +45,10 @@ public class ChatInputHelper implements Listener {
             }, timeoutTicks);
         } else {
             this.timeoutTask = null;
+        }
+        ChatInputHelper old = HELPERS.put(player, this);
+        if (old != null) {
+            old.complete(null);
         }
     }
 
@@ -80,6 +87,7 @@ public class ChatInputHelper implements Listener {
         if (resultPromise.isDone())
             return;
 
+        HELPERS.remove(getPlayer(), this);
         resultPromise.supply(input);
         Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
             HandlerList.unregisterAll(this);
