@@ -6,6 +6,7 @@ import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.struct.title.Title;
 import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
@@ -30,8 +31,6 @@ import java.util.regex.Pattern;
  */
 @UtilityClass
 public final class MS {
-    private static final String SPLIT_STRING_SEQUENCE = " \\\\n ";
-
     private static final List<Function<String, String>> TRANSFORMERS = Lists.newArrayList();
 
     static {
@@ -196,7 +195,7 @@ public final class MS {
         if (message == null)
             return null;
 
-        for(Placeholder placeholder : placeholders) {
+        for (Placeholder placeholder : placeholders) {
             message = message.replace(placeholder.getLabel(), placeholder.getValue());
         }
 
@@ -321,7 +320,7 @@ public final class MS {
     }
 
     public static List<String> p(String message, Object... placeholders){
-        String[] split = split(message);
+        String[] split = { message };
 
         List<String> finished = Lists.newArrayList();
 
@@ -398,9 +397,5 @@ public final class MS {
         List<String> messages = p(message, placeholders);
 
         messages.forEach(m -> NMS.getTheNMS().sendMiniMessage(sender, m));
-    }
-
-    private static String[] split(String message){
-        return message == null ? new String[0] : message.split(SPLIT_STRING_SEQUENCE);
     }
 }
