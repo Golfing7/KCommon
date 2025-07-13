@@ -53,7 +53,7 @@ public class KMenuCommand extends KCommand {
             }
             KCommon.getInstance().getLangConfig().getMessage("kmenu-command.menus-list-command").send(context.getSender(),
                     Collections.emptyList(),
-                    Collections.singleton(MultiLinePlaceholder.percent("MENU_DATA", menuLines)));
+                    Collections.singleton(MultiLinePlaceholder.percentTrusted("MENU_DATA", menuLines)));
             return;
         }
 

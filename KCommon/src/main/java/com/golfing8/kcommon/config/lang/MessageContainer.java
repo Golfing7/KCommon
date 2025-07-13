@@ -5,13 +5,16 @@ import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.struct.title.Title;
 import com.golfing8.kcommon.util.MS;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,10 +36,6 @@ public interface MessageContainer {
         return new PagedMessage(cloneAndParse(placeholders));
     }
 
-    default PagedMessage toPagedMessage(Collection<Placeholder> placeholders, Collection<MultiLinePlaceholder> multiLinePlaceholders) {
-        return new PagedMessage(cloneAndParse(placeholders, multiLinePlaceholders));
-    }
-
     /**
      * Clones and parses the given placeholders into this message.
      *
@@ -44,91 +43,64 @@ public interface MessageContainer {
      * @return the cloned message with the replaced placeholders.
      */
     default Message cloneAndParse(Object... placeholders) {
-        List<Placeholder> compiled = Placeholder.compileCurly(placeholders);
-        return cloneAndParse(compiled, Collections.emptyList());
-    }
-
-    /**
-     * Clones and parses the given placeholders into this message.
-     *
-     * @param placeholders the placeholders.
-     * @param multiLinePlaceholders the multi-line placeholders.
-     * @return the cloned message with the replaced placeholders.
-     */
-    default Message cloneAndParse(Collection<Placeholder> placeholders, Collection<MultiLinePlaceholder> multiLinePlaceholders) {
+        PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
         List<String> newMessages = null;
-        if (messages != null) {
-            newMessages = MS.parseAllMulti(MS.parseAll(messages, placeholders), multiLinePlaceholders);
+        if (getMessage().getMessages() != null) {
+            newMessages = MS.parseAll(getMessage().getMessages(), container);
         }
 
         Title newTitle = null;
-        if (title != null) {
+        if (getMessage().getTitle() != null) {
             newTitle = new Title(
-                    MS.parseSingle(title.getTitle(), placeholders),
-                    MS.parseSingle(title.getSubtitle(), placeholders),
-                    title.getIn(),
-                    title.getStay(),
-                    title.getOut()
+                    MS.parseSingle(getMessage().getTitle().getTitle(), container),
+                    MS.parseSingle(getMessage().getTitle().getSubtitle(), container),
+                    getMessage().getTitle().getIn(),
+                    getMessage().getTitle().getStay(),
+                    getMessage().getTitle().getOut()
             );
         }
 
         String newActionBar = null;
-        if (actionBar != null) {
-            newActionBar = MS.parseSingle(actionBar, placeholders);
+        if (getMessage().getActionBar() != null) {
+            newActionBar = MS.parseSingle(getMessage().getActionBar(), container);
         }
 
         List<SoundWrapper> newSounds = null;
-        if (sounds != null) {
-            newSounds = sounds.stream().map(SoundWrapper::new).collect(Collectors.toList());
+        if (getMessage().getSounds() != null) {
+            newSounds = getMessage().getSounds().stream().map(SoundWrapper::new).collect(Collectors.toList());
         }
-        return new Message(newMessages, newSounds, newTitle, newActionBar, paged, pageHeight, MS.parseSingle(pageHeader, placeholders), MS.parseSingle(pageFooter, placeholders));
-    }
-
-    default void broadcast() {
-        broadcast(null, null);
+        return new Message(newMessages, newSounds, newTitle, newActionBar, getMessage().isPaged(), getMessage().getPageHeight(), MS.parseSingle(getMessage().getPageHeader(), placeholders), MS.parseSingle(getMessage().getPageFooter(), placeholders));
     }
 
     default void broadcast(Object... placeholders) {
-        this.broadcast(Placeholder.compileCurly(placeholders), null);
-    }
-
-    default void broadcast(@Nullable Collection<Placeholder> placeholders,
-                          @Nullable Collection<MultiLinePlaceholder> multiLinePlaceholders) {
-        if (this.getMessages() != null) {
-            if (paged) {
+        PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
+        if (getMessage().getMessages() != null) {
+            if (getMessage().isPaged()) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    send(player, placeholders, multiLinePlaceholders);
+                    send(player, container);
                 }
             } else {
-                List<String> parsed = MS.parseAllMulti(MS.parseAll(this.getMessages(), placeholders == null ? Collections.emptyList() : placeholders), multiLinePlaceholders == null ? Collections.emptyList() : multiLinePlaceholders);
-                parsed.forEach(line -> NMS.getTheNMS().broadcastComponent(ComponentUtils.toComponent(line)));
+                Component component = MS.toComponent(getMessage().getMessages(), container);
+                ComponentUtils.bukkitAudiences.all().sendMessage(component);
             }
         }
 
+
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (getTitle() != null) {
-                MS.sendTitle(player, getTitle(), placeholders);
+            if (getMessage().getTitle() != null) {
+                MS.sendTitle(player, getMessage().getTitle(), container);
             }
 
-            if (getActionBar() != null) {
-                ComponentUtils.bukkitAudiences.player(player).sendActionBar(MS.toComponent(actionBar, placeholders));
+            if (getMessage().getActionBar() != null) {
+                MS.sendActionBar(player, getMessage().getActionBar(), container);
             }
 
-            if (getSounds() != null) {
-                getSounds().forEach(sound -> {
+            if (getMessage().getSounds() != null) {
+                getMessage().getSounds().forEach(sound -> {
                     sound.send(player);
                 });
             }
         }
-    }
-
-    /**
-     * An overload for the sake of making Kotlin easier to interop.
-     *
-     * @param sender the sender.
-     */
-    default void send(CommandSender sender) {
-        this.send(sender, new Object[0]);
     }
 
     /**
@@ -138,78 +110,27 @@ public interface MessageContainer {
      * @param placeholders the placeholders.
      */
     default void send(CommandSender sender, Object... placeholders) {
-        if (getMessages() != null) {
-            if (paged) {
-                toPagedMessage(placeholders).displayTo(sender);
+        PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
+        if (getMessage().getMessages() != null) {
+            if (getMessage().isPaged()) {
+                toPagedMessage(container).displayTo(sender, 1, placeholders);
             } else {
-                getMessages().forEach(string -> MS.pass(sender, string, placeholders));
+                MS.pass(sender, getMessage().getMessages(), container);
             }
         }
 
-        if (getTitle() != null && sender instanceof Player) {
-            MS.sendTitle((Player) sender, getTitle(), placeholders);
+        if (getMessage().getTitle() != null && sender instanceof Player) {
+            MS.sendTitle((Player) sender, getMessage().getTitle(), container);
         }
 
-        if (getActionBar() != null && sender instanceof Player) {
-            ComponentUtils.bukkitAudiences.player((Player) sender).sendActionBar(MS.toComponent(actionBar, placeholders));
+        if (getMessage().getActionBar() != null && sender instanceof Player) {
+            MS.sendActionBar((Player) sender, getMessage().getActionBar(), container);
         }
 
-        if (getSounds() != null && sender instanceof Player) {
-            getSounds().forEach(sound -> {
+        if (getMessage().getSounds() != null && sender instanceof Player) {
+            getMessage().getSounds().forEach(sound -> {
                 sound.send((Player) sender);
             });
-        }
-    }
-
-    /**
-     * Sends this message to the given player with the placeholders.
-     *
-     * @param sender the sender.
-     * @param placeholders the placeholders.
-     */
-    default void send(CommandSender sender, Placeholder... placeholders) {
-        this.send(sender, Arrays.asList(placeholders));
-    }
-
-    /**
-     * Sends this message to the given player with the placeholders.
-     *
-     * @param sender the sender.
-     * @param placeholders the placeholders.
-     */
-    default void send(CommandSender sender, Collection<Placeholder> placeholders) {
-        this.send(sender, placeholders, Collections.emptyList());
-    }
-
-    /**
-     * Sends this message to the given player with the placeholders.
-     *
-     * @param sender the sender.
-     * @param placeholders the placeholders.
-     */
-    default void send(CommandSender sender,
-                     @Nullable Collection<Placeholder> placeholders,
-                     @Nullable Collection<MultiLinePlaceholder> multiLinePlaceholders) {
-        if (getMessages() != null) {
-            if (paged) {
-                toPagedMessage(placeholders, multiLinePlaceholders).displayTo(sender);
-            } else {
-                MS.parseAllMulti(MS.parseAll(getMessages(), placeholders == null ? Collections.emptyList() : placeholders),
-                                multiLinePlaceholders == null ? Collections.emptyList() : multiLinePlaceholders)
-                        .forEach(string -> MS.pass(sender, string));
-            }
-        }
-
-        if (getTitle() != null && sender instanceof Player) {
-            MS.sendTitle((Player) sender, getTitle(), placeholders);
-        }
-
-        if (getActionBar() != null && sender instanceof Player) {
-            ComponentUtils.bukkitAudiences.player((Player) sender).sendActionBar(MS.toComponent(actionBar, placeholders));
-        }
-
-        if (getSounds() != null && sender instanceof Player) {
-            getSounds().forEach(sound -> sound.send((Player) sender));
         }
     }
 }

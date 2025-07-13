@@ -772,14 +772,14 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         }
         if (message.isPaged()) {
             message.toPagedMessage(
-                    Placeholder.compileCurly("COMMAND", this.getFullCommandChain()),
-                    Collections.singleton(MultiLinePlaceholder.percent("COMMAND_HELP", commandHelp))
+                    Placeholder.compileCurlyTrusted("COMMAND", this.getFullCommandChain()),
+                    Collections.singleton(MultiLinePlaceholder.percentTrusted("COMMAND_HELP", commandHelp))
             ).displayTo(sender, page);
         } else {
             message.send(
                     sender,
-                    Placeholder.compileCurly("COMMAND", this.getFullCommandChain()),
-                    Collections.singleton(MultiLinePlaceholder.percent("COMMAND_HELP", commandHelp))
+                    Placeholder.compileCurlyTrusted("COMMAND", this.getFullCommandChain()),
+                    Collections.singleton(MultiLinePlaceholder.percentTrusted("COMMAND_HELP", commandHelp))
             );
         }
     }

@@ -85,7 +85,7 @@ public final class ItemUtil {
         }
 
         List<String> lore = NMS.getTheNMS().getMagicItems().getMMLore(meta);
-        NMS.getTheNMS().getMagicItems().applyLore(meta, MS.parseAllMulti(lore, placeholders));
+        NMS.getTheNMS().getMagicItems().applyLore(meta, MS.parseAll(lore, placeholders));
         itemStack.setItemMeta(meta);
     }
 

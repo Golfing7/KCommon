@@ -16,6 +16,8 @@ import net.kyori.adventure.title.TitlePart;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -25,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Contains message utilities used for properly parsing things
@@ -184,46 +187,12 @@ public final class MS {
         });
     }
 
-    /**
-     * Parses a single message and returns it
-     *
-     * @param message the message to parse
-     * @param placeholders the placeholders to apply.
-     * @return the parsed message.
-     */
-    public static String parseSingle(String message, Placeholder... placeholders) {
-        if (message == null)
-            return null;
-
-        for (Placeholder placeholder : placeholders) {
-            message = message.replace(placeholder.getLabel(), placeholder.getValue());
-        }
-
+    @Contract(pure = true)
+    public static @NotNull String applyTransformers(@NotNull String str) {
         for(Function<String, String> func : TRANSFORMERS){
-            message = func.apply(message);
+            str = func.apply(str);
         }
-        return message;
-    }
-
-    /**
-     * Parses a single message and returns it
-     *
-     * @param message the message to parse
-     * @param placeholders the placeholders to apply.
-     * @return the parsed message.
-     */
-    public static String parseSingle(String message, Collection<Placeholder> placeholders) {
-        if(message == null)
-            return null;
-
-        for(Placeholder placeholder : placeholders) {
-            message = message.replace(placeholder.getLabel(), placeholder.getValue());
-        }
-
-        for(Function<String, String> func : TRANSFORMERS){
-            message = func.apply(message);
-        }
-        return message;
+        return str;
     }
 
     /**
@@ -234,110 +203,24 @@ public final class MS {
      * @return the built list
      */
     public static List<String> parseAll(List<String> messages, Object... placeholders) {
-        return parseAll(messages, Placeholder.compileCurly(placeholders));
+        return PlaceholderContainer.compileTrusted(placeholders).applyTrusted(messages).stream().map(MS::applyTransformers).collect(Collectors.toList());
     }
 
     /**
-     * Parses all the messages by calling parseSingle for every message.
+     * Parses a single string.
      *
-     * @param messages the messages to parse
-     * @param placeholders the placeholders to use
-     * @return the built list
+     * @param message the message
+     * @param placeholders the placeholders
+     * @return the parsed string.
      */
-    public static List<String> parseAll(List<String> messages, Placeholder... placeholders) {
-        return parseAll(messages, Arrays.asList(placeholders));
-    }
-
-    /**
-     * Parses all the messages by calling parseSingle for every message.
-     *
-     * @param messages the messages to parse
-     * @param placeholders the placeholders to use
-     * @return the built list
-     */
-    public static List<String> parseAll(List<String> messages, Collection<Placeholder> placeholders) {
-        List<String> toReturn = new ArrayList<>();
-        messages.forEach(string -> toReturn.add(parseSingle(string, placeholders)));
-        return toReturn;
-    }
-
-    /**
-     * Parses all the messages in the given list and returns the built list of strings
-     *
-     * @param messages the messages to parse
-     * @param placeholders the multi-line placeholders to apply
-     * @return the built list
-     */
-    public static List<String> parseAllMulti(List<String> messages, Collection<MultiLinePlaceholder> placeholders) {
-        List<String> toReturn = new ArrayList<>(messages);
-
-        //Loop over all the messages and parse them one at a time
-        for (int i = 0; i < toReturn.size(); i++) {
-            String line = toReturn.get(i);
-            for(MultiLinePlaceholder placeholder : placeholders) {
-                if(!line.contains(placeholder.getLabel()))
-                    continue;
-
-                //Get the replacements and check if its empty
-                List<String> replacement = placeholder.getReplacement();
-                if(replacement.isEmpty()) {
-                    toReturn.remove(i--);
-                    break;
-                }
-
-                //Then start replacing them.
-                toReturn.set(i, line.replace(placeholder.getLabel(), Objects.toString(replacement.get(0))));
-                for (int j = 1; j < replacement.size(); j++) {
-                    toReturn.add(i + j, line.replace(placeholder.getLabel(), Objects.toString(replacement.get(j))));
-                }
-                break;
-            }
-        }
-        return toReturn;
-    }
-
-    /**
-     * Parses all the messages in the given list and returns the built list of strings
-     *
-     * @param messages the messages to parse
-     * @param placeholders the multi-line placeholders to apply
-     * @return the built list
-     */
-    public static List<String> parseAllMulti(List<String> messages, MultiLinePlaceholder... placeholders) {
-        return parseAllMulti(messages, Arrays.asList(placeholders));
-    }
-
     public static String parseSingle(String message, Object... placeholders){
         if(message == null)
             return null;
 
-        message = Placeholders.parseFully(message, placeholders);
-
-        for(Function<String, String> func : TRANSFORMERS){
-            message = func.apply(message);
-        }
+        PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
+        message = container.applyTrusted(Collections.singletonList(message)).get(0);
+        message = applyTransformers(message);
         return message;
-    }
-
-    public static List<String> p(String message, Object... placeholders){
-        String[] split = { message };
-
-        List<String> finished = Lists.newArrayList();
-
-        mainString: for(String string : split){
-            string = Placeholders.parseFully(string, placeholders);
-
-            for(Function<String, String> func : TRANSFORMERS){
-                String apply = func.apply(string);
-                if(apply == null)
-                    continue mainString;
-
-                string = apply;
-            }
-
-            finished.add(string);
-        }
-        return finished;
     }
 
     /**
@@ -348,8 +231,28 @@ public final class MS {
      * @return the component
      */
     public static Component toComponent(String message, Object... placeholders) {
-        List<String> messages = p(message, placeholders);
-        return ComponentUtils.toFlatComponent(messages);
+        if (StringUtil.isEmpty(message))
+            return Component.empty();
+
+        return toComponent(Collections.singletonList(message), placeholders);
+    }
+
+    /**
+     * Converts the message to a component.
+     *
+     * @param message the message
+     * @param placeholders the placeholders
+     * @return the component
+     */
+    public static Component toComponent(List<String> message, Object... placeholders) {
+        if (message == null || message.isEmpty())
+            return Component.empty();
+
+        PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
+        List<String> messages = parseAll(message, container);
+        Component flatComponent = ComponentUtils.toFlatComponent(messages);
+        flatComponent = container.applyUntrusted(flatComponent);
+        return flatComponent;
     }
 
     /**
@@ -371,31 +274,22 @@ public final class MS {
     }
 
     /**
-     * Sends a title to a player.
+     * Sends an action bar to a player.
      *
      * @param player the player.
-     * @param title the title to send.
+     * @param actionBar the action bar to send.
      * @param placeholders the placeholders.
      */
-    public static void sendTitle(Player player, Title title, Placeholder... placeholders) {
-        sendTitle(player, title, (Object[]) placeholders);
-    }
-
-    /**
-     * Sends a title to a player.
-     *
-     * @param player the player.
-     * @param title the title to send.
-     * @param placeholders the placeholders.
-     */
-    public static void sendTitle(Player player, Title title, Collection<Object> placeholders) {
-        Object[] objects = placeholders == null ? null : placeholders.toArray(new Object[0]);
-        sendTitle(player, title, objects);
+    public static void sendActionBar(Player player, String actionBar, Object... placeholders) {
+        Audience audience = ComponentUtils.bukkitAudiences.player(player);
+        audience.sendActionBar(toComponent(actionBar, placeholders));
     }
 
     public static void pass(CommandSender sender, String message, Object... placeholders){
-        List<String> messages = p(message, placeholders);
+        ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
+    }
 
-        messages.forEach(m -> NMS.getTheNMS().sendMiniMessage(sender, m));
+    public static void pass(CommandSender sender, List<String> message, Object... placeholders){
+        ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
     }
 }

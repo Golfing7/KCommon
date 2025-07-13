@@ -464,7 +464,7 @@ public final class ItemStackBuilder {
             XMaterial matchedItemType = XMaterial.matchXMaterial(this.itemType).orElseThrow(() -> new IllegalArgumentException("Material type " + this.itemType + " does not exist!"));
             if (matchedItemType == XMaterial.PLAYER_HEAD) {
                 if (skullB64 != null) {
-                    newCopy = SkullCreator.itemWithBase64(XMaterial.PLAYER_HEAD.parseItem(), MS.parseSingle(skullB64, placeholderArr));
+                    newCopy = SkullCreator.itemWithBase64(XMaterial.PLAYER_HEAD.parseItem(), MS.parseSingle(skullB64, (Object[]) placeholderArr));
                 } else if (skullOwner != null) {
                     newCopy = SkullCreator.itemFromUuid(skullOwner);
                 } else {
@@ -495,16 +495,15 @@ public final class ItemStackBuilder {
             if (placeholderTarget != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 itemName = PlaceholderAPI.setPlaceholders(placeholderTarget, itemName);
             }
-            NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(itemName, placeholderArr));
+            NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(itemName, (Object[]) placeholderArr));
         }
         if(this.itemLore != null && !this.itemLore.isEmpty()) {
             //Parse both single and multi placeholders.
-            List<String> firstRun = MS.parseAll(this.itemLore, placeholderArr);
-            List<String> secondRun = MS.parseAllMulti(firstRun, multiLinePlaceholders.toArray(new MultiLinePlaceholder[0]));
+            List<String> lore = MS.parseAll(this.itemLore, placeholderArr, multiLinePlaceholders);
             if (placeholderTarget != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-                secondRun = PlaceholderAPI.setPlaceholders(placeholderTarget, secondRun);
+                lore = PlaceholderAPI.setPlaceholders(placeholderTarget, lore);
             }
-            NMS.getTheNMS().getMagicItems().applyLore(meta, secondRun);
+            NMS.getTheNMS().getMagicItems().applyLore(meta, lore);
         }
 
         if (meta instanceof PotionMeta && potionData != null) {

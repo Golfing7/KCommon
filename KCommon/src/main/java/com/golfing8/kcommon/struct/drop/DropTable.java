@@ -248,10 +248,6 @@ public class DropTable implements CASerializable {
             if (drop.getDisplayName() != null)
                 displayNames.add(drop.getDisplayName());
         });
-        message.send(player, Lists.newArrayList(
-                Placeholder.curly("TOTAL_REWARDS", StringUtil.parseCommas(drops.size()))
-        ), Lists.newArrayList(
-                MultiLinePlaceholder.percent("REWARDS", displayNames)
-        ));
+        message.send(player, Placeholder.curlyTrusted("TOTAL_REWARDS", StringUtil.parseCommas(drops.size())), MultiLinePlaceholder.percentTrusted("REWARDS", displayNames));
     }
 }

@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config.lang;
 
 import com.golfing8.kcommon.command.impl.KPagerCommand;
+import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.MathUtil;
 import com.google.common.collect.Lists;
@@ -52,21 +53,17 @@ public final class PagedMessage {
         this(message.getMessages(), message.getPageHeight(), message.getPageHeader(), message.getPageFooter());
     }
 
-    public void displayTo(CommandSender sender) {
-        this.displayTo(sender, 1);
-    }
-
     /**
      * Displays the given page to the given sender.
      *
      * @param sender the sender.
      * @param page the page, coerced into range
      */
-    public void displayTo(CommandSender sender, int page) {
+    public void displayTo(CommandSender sender, int page, Object... placeholders) {
         page = MathUtil.clamp(page, 1, totalPages);
 
         sendHeader(sender, page);
-        MS.parseAll(this.pagedMessages.get(page - 1)).forEach(msg -> MS.pass(sender, msg));
+        MS.pass(sender, this.pagedMessages.get(page - 1), placeholders);
         MS.pass(sender, pageFooter);
 
         // Add or refresh this message.

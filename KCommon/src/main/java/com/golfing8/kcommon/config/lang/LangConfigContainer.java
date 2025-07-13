@@ -78,32 +78,13 @@ public interface LangConfigContainer {
     default void sendDefaultMessage(CommandSender sender, String key, Message defaultMsg, Placeholder... placeholders) {
         String formatted = formatPath(key);
         Message message = getLangConfig().getMessage(formatted);
-        if(message == null) {
+        if (message == null) {
             //Define the message.
             getLangConfig().addLanguageConstant(formatted, defaultMsg);
             message = getLangConfig().getMessage(formatted);
             getLangConfig().save();
         }
-        message.send(sender, placeholders);
-    }
-
-    /**
-     * Sends a message from the config message to the given command sender.
-     *
-     * @param sender the receiver of the message.
-     * @param key the key of the message.
-     * @param placeholders the placeholders to apply to the message
-     * @param multiLinePlaceholders the multi-line placeholders to apply.
-     */
-    default void sendConfigMessage(CommandSender sender,
-                                   String key,
-                                   @Nullable Collection<Placeholder> placeholders,
-                                   @Nullable Collection<MultiLinePlaceholder> multiLinePlaceholders) {
-        String formatted = formatPath(key);
-        Message message = getLangConfig().getMessage(formatted);
-        Preconditions.checkNotNull(message, String.format("Tried to send message with key %s from config %s but it does not exist!", formatted, this.getLangConfig().getConfigPath()));
-
-        message.send(sender, placeholders, multiLinePlaceholders);
+        message.send(sender, (Object[]) placeholders);
     }
 
     /**
@@ -117,7 +98,7 @@ public interface LangConfigContainer {
         String formatted = formatPath(key);
         Message message = getLangConfig().getMessage(formatted);
         Preconditions.checkNotNull(message, String.format("Tried to send message with key %s from config %s but it does not exist!", formatted, this.getLangConfig().getConfigPath()));
-        message.send(sender, placeholders);
+        message.send(sender, (Object[]) placeholders);
     }
 
     /**

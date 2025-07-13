@@ -27,26 +27,25 @@ import java.util.stream.Collectors;
  * Note that the line with the placeholder is deleted and replaced with the first line of the placeholder. This is true with messages as well.
  *
  */
+@Getter
 public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List<String>> {
     /**
      * The label of the placeholder, typically in %FORMAT%.
      */
-    @Getter
     private final String label;
     /**
      * The replacement list to replace the label with.
      */
-    @Getter
     private final List<String> replacement;
 
-    public MultiLinePlaceholder(String label, List<Object> replacement) {
+    public MultiLinePlaceholder(String label, List<? extends Object> replacement) {
         super(false);
 
         this.label = label;
         this.replacement = replacement.stream().map(Objects::toString).collect(Collectors.toList());
     }
 
-    public MultiLinePlaceholder(String label, List<Object> replacement, boolean trusted) {
+    public MultiLinePlaceholder(String label, List<? extends Object> replacement, boolean trusted) {
         super(trusted);
 
         this.label = label;
@@ -90,7 +89,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
      * @deprecated Use {@link #percentTrusted(String, List)}
      */
     @Deprecated
-    public static MultiLinePlaceholder percent(@NotNull String label, @NotNull List<Object> values) {
+    public static MultiLinePlaceholder percent(@NotNull String label, @NotNull List<?> values) {
         String trueLabel = "%" + label.toUpperCase() + "%";
         return new MultiLinePlaceholder(trueLabel, values);
     }
@@ -102,7 +101,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
      * @param values the values to replace the label with.
      * @return the created placeholder.
      */
-    public static MultiLinePlaceholder percentTrusted(@NotNull String label, @NotNull List<Object> values) {
+    public static MultiLinePlaceholder percentTrusted(@NotNull String label, @NotNull List<?> values) {
         return percentTrustedArg(label, values, true);
     }
 
@@ -113,7 +112,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
      * @param values the values to replace the label with.
      * @return the created placeholder.
      */
-    public static MultiLinePlaceholder percentUntrusted(@NotNull String label, @NotNull List<Object> values) {
+    public static MultiLinePlaceholder percentUntrusted(@NotNull String label, @NotNull List<?> values) {
         return percentTrustedArg(label, values, false);
     }
 
@@ -125,7 +124,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
      * @param trusted if the placeholder is trusted.
      * @return the created placeholder.
      */
-    public static MultiLinePlaceholder percentTrustedArg(@NotNull String label, @NotNull List<Object> values, boolean trusted) {
+    public static MultiLinePlaceholder percentTrustedArg(@NotNull String label, @NotNull List<?> values, boolean trusted) {
         String trueLabel = "%" + label.toUpperCase() + "%";
         return new MultiLinePlaceholder(trueLabel, values, trusted);
     }

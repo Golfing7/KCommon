@@ -422,8 +422,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Loads the main configuration for this module.
      */
     private void loadConfigs() {
-        migrateOldConfigs();
-
         // Get the config wrapper ready for loading
         this.configWrapper = new ConfigClassWrapper(null, this.getClass(), this);
 
@@ -505,32 +503,6 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         }
 
         this.loadLangConstants(this.langConfig);
-    }
-
-    /**
-     * Attempts to migrate old configs from their old location to the updated one.
-     * TODO Remove this after a while.
-     */
-    private void migrateOldConfigs() {
-        Path oldConfigPath = Paths.get(plugin.getDataFolder().getPath(), moduleName + ".yml");
-        Path newConfigPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "config.yml");
-        migrateConfig(oldConfigPath, newConfigPath);
-
-        Path oldLangPath = Paths.get(plugin.getDataFolder().getPath(), moduleName + "-lang.yml");
-        Path newLangPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "lang.yml");
-        migrateConfig(oldLangPath, newLangPath);
-    }
-
-    private void migrateConfig(Path oldPath, Path newPath) {
-        if (Files.notExists(oldPath) || Files.exists(newPath))
-            return;
-
-        try {
-            Files.createDirectories(newPath.getParent());
-            Files.move(oldPath, newPath);
-        } catch (IOException exc) {
-            throw new RuntimeException(String.format("Failed to migrate config from %s to %s!", oldPath, newPath), exc);
-        }
     }
 
     /**

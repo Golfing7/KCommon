@@ -26,25 +26,19 @@ public class PlaceholderContainer {
         this.multiLinePlaceholders = ImmutableList.copyOf(multiLinePlaceholders);
     }
 
-    /**
-     * Applies the trusted placeholders to the given messages.
-     *
-     * @param input the input.
-     * @return the messages.
-     */
-    public List<String> applyTrusted(List<String> input) {
+    private List<String> apply(List<String> input, boolean trusted) {
         List<String> toReturn = new ArrayList<>(input);
 
         // Loop over all the messages and parse them one at a time
         for (MultiLinePlaceholder placeholder : multiLinePlaceholders) {
-            if (!placeholder.isTrusted())
+            if (placeholder.isTrusted() != trusted)
                 continue;
 
             toReturn = placeholder.apply(toReturn);
         }
 
         for (Placeholder placeholder : placeholders) {
-            if (!placeholder.isTrusted())
+            if (placeholder.isTrusted() != trusted)
                 continue;
 
             for (int i = 0; i < toReturn.size(); i++) {
@@ -53,6 +47,26 @@ public class PlaceholderContainer {
         }
 
         return toReturn;
+    }
+
+    /**
+     * Applies the trusted placeholders to the given messages.
+     *
+     * @param input the input.
+     * @return the messages.
+     */
+    public List<String> applyTrusted(List<String> input) {
+        return apply(input, true);
+    }
+
+    /**
+     * Applies the untrusted placeholders to the given messages.
+     *
+     * @param input the input.
+     * @return the messages.
+     */
+    public List<String> applyUntrusted(List<String> input) {
+        return apply(input, false);
     }
 
     /**
@@ -115,6 +129,10 @@ public class PlaceholderContainer {
         Preconditions.checkNotNull(objects, "Arguments cannot be null");
         if (objects.length == 0) {
             return EMPTY;
+        }
+        // Don't clone the container if there's no need.
+        if (objects.length == 1 && objects[0] instanceof PlaceholderContainer) {
+            return (PlaceholderContainer) objects[0];
         }
 
         List<Placeholder> placeholders = new ArrayList<>();
