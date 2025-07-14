@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.commented;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
+import com.google.gson.reflect.TypeToken;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Optional;
@@ -89,6 +90,20 @@ public interface KConfigurationSection extends ConfigurationSection {
             return Optional.empty();
 
         return Optional.ofNullable(ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), type));
+    }
+
+    /**
+     * Gets or loads the value under the given path with the given type.
+     *
+     * @param path the path
+     * @param type the type
+     * @return the loaded value
+     */
+    default <T> Optional<T> getOrLoad(String path, TypeToken<T> type) {
+        if (!this.tryLoadFromSource(path))
+            return Optional.empty();
+
+        return Optional.ofNullable(ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), FieldType.extractFrom(type)));
     }
 
     /**
