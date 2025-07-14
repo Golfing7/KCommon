@@ -40,6 +40,8 @@ public class DropTable implements CASerializable {
         private String _key;
         private List<String> drops;
         private Range dropTargetRange;
+        /** The maximum 'tries' that this group does to add a drop. If less than or equal to 0, no maximum is enforced */
+        private int maxTries;
 
         /**
          * Gets a feasible drop target.
@@ -63,20 +65,20 @@ public class DropTable implements CASerializable {
     public DropTable(Map<String, Drop<?>> drops) {
         table = new HashMap<>(drops);
         groupings = new HashMap<>();
-        initDefaultGroup(null);
+        initDefaultGroup(null, 0);
     }
 
     public DropTable(Map<String, Drop<?>> drops, Range dropTargetRange) {
         table = new HashMap<>(drops);
         groupings = new HashMap<>();
-        initDefaultGroup(dropTargetRange);
+        initDefaultGroup(dropTargetRange, 0);
     }
 
     public DropTable(Map<String, Drop<?>> drops, Map<String, DropGroup> groups) {
         table = new HashMap<>(drops);
         groupings = new HashMap<>(groups);
         if (!groupings.containsKey(DEFAULT_GROUP))
-            initDefaultGroup(null);
+            initDefaultGroup(null, 0);
     }
 
     @Override
@@ -90,7 +92,11 @@ public class DropTable implements CASerializable {
             if (unwrapped.containsKey("drop-target-range")) {
                 dropTargetRange = ConfigTypeRegistry.getFromType(primitive.getSubValue("drop-target-range"), Range.class);
             }
-            initDefaultGroup(dropTargetRange);
+            int maxTries = 0;
+            if (unwrapped.containsKey("max-tries")) {
+                maxTries = Integer.parseInt(unwrapped.get("max-tries").toString());
+            }
+            initDefaultGroup(dropTargetRange, maxTries);
         }
 
     }
@@ -100,7 +106,7 @@ public class DropTable implements CASerializable {
      *
      * @param dropRange the drop range.
      */
-    private void initDefaultGroup(@Nullable Range dropRange) {
+    private void initDefaultGroup(@Nullable Range dropRange, int maxTries) {
         if (groupings.containsKey(DEFAULT_GROUP))
             return;
 
@@ -108,7 +114,7 @@ public class DropTable implements CASerializable {
         for (var entry : groupings.entrySet()) {
             entry.getValue().getDrops().forEach(allDrops::remove);
         }
-        groupings.put(DEFAULT_GROUP, new DropGroup(DEFAULT_GROUP, new ArrayList<>(allDrops), dropRange));
+        groupings.put(DEFAULT_GROUP, new DropGroup(DEFAULT_GROUP, new ArrayList<>(allDrops), dropRange, maxTries));
     }
 
     /**
