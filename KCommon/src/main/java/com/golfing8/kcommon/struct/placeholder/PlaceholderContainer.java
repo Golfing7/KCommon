@@ -92,7 +92,7 @@ public class PlaceholderContainer {
             }
             Component finalComponent = result;
             toReturn = toReturn.replaceText((builder) -> {
-                builder.match(placeholder.getLabel()).replacement(finalComponent);
+                builder.matchLiteral(placeholder.getLabel()).replacement(finalComponent);
             });
         }
 
@@ -101,7 +101,7 @@ public class PlaceholderContainer {
                 continue;
 
             toReturn = toReturn.replaceText((builder) -> {
-                builder.match(placeholder.getLabel()).replacement(placeholder.getValue());
+                builder.matchLiteral(placeholder.getLabel()).replacement(placeholder.getValue());
             });
         }
         return toReturn;
@@ -114,7 +114,7 @@ public class PlaceholderContainer {
      * @return the flattened placeholder container.
      */
     public static PlaceholderContainer compileTrusted(@NotNull Object @NotNull ... objects) {
-        return compile(false, objects);
+        return compile(true, objects);
     }
 
     /**
@@ -124,7 +124,7 @@ public class PlaceholderContainer {
      * @return the flattened placeholder container.
      */
     public static PlaceholderContainer compileUntrusted(@NotNull Object @NotNull ... objects) {
-        return compile(true, objects);
+        return compile(false, objects);
     }
 
     private static PlaceholderContainer compile(boolean trusted, @NotNull Object @NotNull ... objects) {
@@ -170,6 +170,7 @@ public class PlaceholderContainer {
                 } else {
                     placeholders.add(Placeholder.curlyTrustedArg(key, value, trusted));
                 }
+                index++;
             }
         }
     }
