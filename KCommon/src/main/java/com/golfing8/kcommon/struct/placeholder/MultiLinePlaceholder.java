@@ -36,14 +36,14 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
      */
     private final List<String> replacement;
 
-    public MultiLinePlaceholder(String label, List<? extends Object> replacement) {
+    public MultiLinePlaceholder(String label, List<?> replacement) {
         super(false);
 
         this.label = label;
         this.replacement = replacement.stream().map(Objects::toString).collect(Collectors.toList());
     }
 
-    public MultiLinePlaceholder(String label, List<? extends Object> replacement, boolean trusted) {
+    public MultiLinePlaceholder(String label, List<?> replacement, boolean trusted) {
         super(trusted);
 
         this.label = label;
@@ -89,7 +89,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
     @Deprecated
     public static MultiLinePlaceholder percent(@NotNull String label, @NotNull List<?> values) {
         String trueLabel = "%" + label.toUpperCase() + "%";
-        return new MultiLinePlaceholder(trueLabel, values);
+        return new MultiLinePlaceholder(trueLabel, values, true);
     }
 
     /**
