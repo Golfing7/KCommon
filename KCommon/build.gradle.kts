@@ -38,7 +38,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
     testRuntimeOnly("net.kyori:adventure-platform-bukkit:4.3.3")
-    testImplementation("io.papermc:paper-api:1.12.2")
     testImplementation(kotlin("test"))
     testImplementation(project(":NMS"))
     testImplementation("org.mongodb:mongodb-driver-sync:5.0.1")
