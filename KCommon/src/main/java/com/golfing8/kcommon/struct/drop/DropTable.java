@@ -134,13 +134,17 @@ public class DropTable implements CASerializable {
      */
     public List<Drop<?>> generateDrops(@NotNull DropContext context) {
         List<Drop<?>> drops = new ArrayList<>();
-        for (var groupEntry : groupings.entrySet()) {
+        group: for (var groupEntry : groupings.entrySet()) {
             List<String> dropKeys = new ArrayList<>(groupEntry.getValue().getDrops());
             int dropTarget = groupEntry.getValue().getDropTarget();
             int collectedDrops = 0;
+            int attempts = 0;
             do {
                 Collections.shuffle(dropKeys);
                 for (String dropKey : dropKeys) {
+                    if (attempts++ > groupEntry.getValue().getMaxTries() && groupEntry.getValue().getMaxTries() > 0)
+                        continue group;
+
                     Drop<?> drop = table.get(dropKey);
                     double totalBoost = Math.min(drop.getMaxBoost(), context.getSpecificBoosts().getOrDefault(dropKey, context.getBoost()));
                     if (!drop.testRandom(totalBoost))
