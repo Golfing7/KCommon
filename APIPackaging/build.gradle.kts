@@ -4,8 +4,10 @@ plugins {
     id("maven-publish")
 }
 
-group = "com.golfing8"
-version = "1.0"
+val artifactName = parent!!.name
+
+group = parent!!.group
+version = parent!!.version
 
 repositories {
     mavenCentral()
@@ -46,9 +48,9 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.golfing8"
-            artifactId = "KCommon"
-            version = "1.0"
+            groupId = project.group.toString()
+            artifactId = artifactName
+            version = project.version.toString()
 
             from(components["java"])
         }
