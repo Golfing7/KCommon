@@ -18,7 +18,7 @@ public class RollingAverage {
         }
     }
 
-    public void editHead(double edit){
+    public void editHead(double edit) {
         total += edit;
 
         samples[index] += edit;

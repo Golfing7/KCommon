@@ -20,20 +20,29 @@ public class ModuleTask<T extends Module> {
      * The runnable this task is responsible for.
      */
     private final Runnable registeredTask;
-    /** The runnable that has been passed in */
+    /**
+     * The runnable that has been passed in
+     */
     private final Runnable delegateTask;
-    /** The running bukkit task associated with this module task */
+    /**
+     * The running bukkit task associated with this module task
+     */
     private BukkitTask bukkitTask;
     /**
      * If this task has been started/ran.
      */
     @Getter
     private boolean started;
-    /** If this is a timer type of task */
+    /**
+     * If this is a timer type of task
+     */
     private boolean timerTask;
-    /** If this task has been run at least once */
+    /**
+     * If this task has been run at least once
+     */
     @Getter
     private boolean ran;
+
     protected ModuleTask(T module) {
         this.module = module;
         this.delegateTask = this::run;
@@ -54,7 +63,8 @@ public class ModuleTask<T extends Module> {
         }
     }
 
-    protected void run() {}
+    protected void run() {
+    }
 
     public synchronized void cancel() throws IllegalStateException {
         if (!this.started)
@@ -109,7 +119,7 @@ public class ModuleTask<T extends Module> {
     /**
      * Schedules this module to run on a timer.
      *
-     * @param tickDelay the initial delay.
+     * @param tickDelay  the initial delay.
      * @param tickPeriod the period delay.
      * @return self.
      */
@@ -121,7 +131,7 @@ public class ModuleTask<T extends Module> {
     /**
      * Schedules this module to run on a timer async.
      *
-     * @param tickDelay the initial delay.
+     * @param tickDelay  the initial delay.
      * @param tickPeriod the period delay.
      * @return self.
      */

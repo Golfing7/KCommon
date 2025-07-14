@@ -4,7 +4,6 @@ import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.exc.ConfigException;
-import com.golfing8.kcommon.menu.MenuBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,17 +30,26 @@ import java.util.*;
  * </p>
  */
 public class Configuration extends YamlConfiguration implements KConfig {
-    /** The path to the config file */
+    /**
+     * The path to the config file
+     */
     private final Path configPath;
-    /** The config file we're wrapping */
+    /**
+     * The config file we're wrapping
+     */
     @Getter
     private final YamlConfiguration wrapped;
-    /** The comments of each mapped value */
+    /**
+     * The comments of each mapped value
+     */
     @Getter
     private final Map<String, String[]> comments;
 
-    /** The source configuration that this configuration should mirror */
-    @Getter @Setter
+    /**
+     * The source configuration that this configuration should mirror
+     */
+    @Getter
+    @Setter
     private YamlConfiguration source;
 
     public Configuration(Path configPath) {

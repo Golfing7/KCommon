@@ -24,7 +24,7 @@ public class CASoundWrapper implements ConfigAdapter<SoundWrapper> {
             return null;
 
         Optional<XSound> xSoundOptional = XSound.matchXSound(items.get("sound").toString());
-        if(!xSoundOptional.isPresent())
+        if (!xSoundOptional.isPresent())
             throw new ImproperlyConfiguredValueException(entry.getSource(), "sound");
 
         double pitch = ((Number) items.getOrDefault("pitch", 1.0D)).doubleValue();

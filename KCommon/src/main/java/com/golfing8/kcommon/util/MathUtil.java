@@ -11,6 +11,7 @@ public final class MathUtil {
      * <p>
      * e.g. Rounding {@code 4.56}: 56% chance to round up, 44% chance to round down.
      * </p>
+     *
      * @param d the decimal
      * @return the rounded integer.
      */
@@ -30,8 +31,8 @@ public final class MathUtil {
      * Clamps the given value between the minimum and maximum provided.
      *
      * @param value the value.
-     * @param min the minimum
-     * @param max the maximum
+     * @param min   the minimum
+     * @param max   the maximum
      * @return the clamped value
      */
     public static int clamp(int value, int min, int max) {
@@ -42,8 +43,8 @@ public final class MathUtil {
      * Clamps the given value between the minimum and maximum provided.
      *
      * @param value the value.
-     * @param min the minimum
-     * @param max the maximum
+     * @param min   the minimum
+     * @param max   the maximum
      * @return the clamped value
      */
     public static long clamp(long value, long min, long max) {
@@ -54,8 +55,8 @@ public final class MathUtil {
      * Clamps the given value between the minimum and maximum provided.
      *
      * @param value the value.
-     * @param min the minimum
-     * @param max the maximum
+     * @param min   the minimum
+     * @param max   the maximum
      * @return the clamped value
      */
     public static double clamp(double value, double min, double max) {

@@ -2,7 +2,6 @@ package com.golfing8.kcommon.struct.drop;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -12,7 +11,8 @@ import java.util.List;
  */
 @Getter
 public class CommandDrop extends Drop<String> {
-    private List<String> commands;
+    private final List<String> commands;
+
     public CommandDrop(double chance, @Nullable String displayName, double maxBoost, List<String> commands) {
         super(chance, displayName, maxBoost);
         this.commands = commands;

@@ -18,12 +18,11 @@ public class CAPotionData implements ConfigAdapter<PotionData> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public PotionData toPOJO(ConfigPrimitive entry, FieldType type) {
         if (entry.getPrimitive() == null)
             return null;
 
-        Map<String, Object> values = (Map<String, Object>) entry.unwrap();
+        Map<String, Object> values = entry.unwrap();
         PotionType potionType = PotionType.valueOf(values.get("potion-type").toString().toUpperCase());
         boolean amplified = (boolean) values.getOrDefault("amplified", false);
         boolean extended = (boolean) values.getOrDefault("extended", false);
@@ -32,9 +31,6 @@ public class CAPotionData implements ConfigAdapter<PotionData> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull PotionData object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         Map<String, Object> serialized = new HashMap<>();
         serialized.put("potion-type", object.getPotionType().name());
         serialized.put("amplified", object.isAmplified());

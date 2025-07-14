@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;

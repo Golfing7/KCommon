@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.config.lang;
 
 import com.golfing8.kcommon.command.impl.KPagerCommand;
-import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.MathUtil;
 import com.google.common.collect.Lists;
@@ -28,7 +27,9 @@ public final class PagedMessage {
     private final String id = UUID.randomUUID().toString();
     private final List<String> parsedMessages;
     private final List<List<String>> pagedMessages;
-    /** The total amount of pages */
+    /**
+     * The total amount of pages
+     */
     private final int totalPages;
     private final int messagesPerPage;
 
@@ -57,7 +58,7 @@ public final class PagedMessage {
      * Displays the given page to the given sender.
      *
      * @param sender the sender.
-     * @param page the page, coerced into range
+     * @param page   the page, coerced into range
      */
     public void displayTo(CommandSender sender, int page, Object... placeholders) {
         page = MathUtil.clamp(page, 1, totalPages);
@@ -74,7 +75,7 @@ public final class PagedMessage {
      * Sends the header of the message to the sender.
      *
      * @param sender the sender.
-     * @param page the page of the header.
+     * @param page   the page of the header.
      */
     private void sendHeader(CommandSender sender, int page) {
         String nextButton = MS.parseSingle(page < totalPages ? PAGE_MOVEABLE_FORMAT : PAGE_IMMOVABLE_FORMAT,

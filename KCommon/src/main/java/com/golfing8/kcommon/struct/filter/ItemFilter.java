@@ -22,13 +22,21 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor
 public class ItemFilter implements Filter<ItemStack> {
-    /** Filters to apply to the material. */
+    /**
+     * Filters to apply to the material.
+     */
     private Set<StringFilter> materialFilters;
-    /** Filters to apply to the item name */
+    /**
+     * Filters to apply to the item name
+     */
     private Set<StringFilter> itemNameFilters;
-    /** The item lore filters to apply */
+    /**
+     * The item lore filters to apply
+     */
     private Set<StringFilter> itemLoreFilters;
-    /** If colors should be stripped on string comparisons */
+    /**
+     * If colors should be stripped on string comparisons
+     */
     private boolean stripColors;
 
     @Override

@@ -8,7 +8,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.BlockVector;
 
-import java.util.List;
 import java.util.Set;
 
 /**

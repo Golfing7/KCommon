@@ -2,9 +2,7 @@ package com.golfing8.kcommon.config.commented;
 
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.menu.MenuBuilder;
 import org.bukkit.configuration.ConfigurationSection;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -16,8 +14,8 @@ public interface KConfigurationSection extends ConfigurationSection {
     /**
      * Sets the value at the given path with the given comments.
      *
-     * @param path the path.
-     * @param value the value.
+     * @param path     the path.
+     * @param value    the value.
      * @param comments the comments.
      */
     void set(String path, Object value, String... comments);
@@ -25,7 +23,7 @@ public interface KConfigurationSection extends ConfigurationSection {
     /**
      * Sets the comments of the given path.
      *
-     * @param path the path to set.
+     * @param path     the path to set.
      * @param comments the comments to set, or null if they should be cleared.
      */
     void setComments(String path, String... comments);

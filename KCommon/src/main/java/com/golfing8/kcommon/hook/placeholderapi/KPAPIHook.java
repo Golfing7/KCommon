@@ -3,7 +3,6 @@ package com.golfing8.kcommon.hook.placeholderapi;
 import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.clip.placeholderapi.expansion.Relational;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -64,12 +63,12 @@ public class KPAPIHook extends PlaceholderExpansion implements Relational {
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        if(params.isEmpty())
+        if (params.isEmpty())
             return "Placeholder is empty";
 
         //Try looking for the provider.
         String[] parameterSplit = params.split("_");
-        if(parameterSplit.length == 0)
+        if (parameterSplit.length == 0)
             return "Placeholder is empty";
 
         //Create the new params array.
@@ -91,12 +90,12 @@ public class KPAPIHook extends PlaceholderExpansion implements Relational {
 
     @Override
     public String onPlaceholderRequest(Player player, Player player1, String params) {
-        if(params == null || params.isEmpty())
+        if (params == null || params.isEmpty())
             return "Placeholder is empty";
 
         //Try looking for the provider.
         String[] parameterSplit = params.split("_");
-        if(parameterSplit.length == 0)
+        if (parameterSplit.length == 0)
             return "Placeholder is empty";
 
         //Create the new params array.

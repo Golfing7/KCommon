@@ -7,7 +7,7 @@ import java.util.List;
 public class MoveLength {
     private final List<MenuCoordinate> coordinates;
 
-    public MoveLength(List<MenuCoordinate> coordinates){
+    public MoveLength(List<MenuCoordinate> coordinates) {
         this.coordinates = coordinates;
     }
 

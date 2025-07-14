@@ -4,7 +4,6 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class EntityUtil {
      * The consumer is applied from top down (highest passenger to the lowest vehicle).
      *
      * @param originalEntity the original entity.
-     * @param consumer the consumer
+     * @param consumer       the consumer
      */
     public static void applyToAllVehiclesAndPassengers(Entity originalEntity, Consumer<Entity> consumer) {
         applyToAllVehiclesAndPassengers(originalEntity, consumer, true);

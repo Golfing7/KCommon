@@ -6,9 +6,9 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.ClickRunnable;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
+import com.golfing8.kcommon.menu.shape.LayoutShapeRectangle;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.menu.shape.MenuLayoutShape;
-import com.golfing8.kcommon.menu.shape.LayoutShapeRectangle;
 import com.golfing8.kcommon.struct.ChancedReference;
 import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
@@ -40,11 +40,17 @@ public final class MenuBuilder {
     private Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
     private List<Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>>> shapeCreation = new ArrayList<>();
     private Map<Integer, ItemStack> specificItems = new HashMap<>();
-    /** The bottom click action, run when any slot in the bottom inventory is clicked. */
+    /**
+     * The bottom click action, run when any slot in the bottom inventory is clicked.
+     */
     private ClickAction bottomClickEvent = null;
-    /** The top click event is called when a player clicks the top menu. Regardless if there is a click action on the slot clicked */
+    /**
+     * The top click event is called when a player clicks the top menu. Regardless if there is a click action on the slot clicked
+     */
     private ClickAction topClickEvent = null;
-    /** A map containing all special GUI items, mapped from their keys. */
+    /**
+     * A map containing all special GUI items, mapped from their keys.
+     */
     @Getter
     private Map<String, SimpleGUIItem> specialGUIItems = new HashMap<>();
     /**
@@ -52,32 +58,51 @@ public final class MenuBuilder {
      * Will be applied to the same slot defined for the 'special gui items' or left out if they are not present.
      */
     private Map<String, ClickAction> specialBindings = new HashMap<>();
-    /** A map containing placeholders for each special item. */
+    /**
+     * A map containing placeholders for each special item.
+     */
     private Map<String, Supplier<Collection<Placeholder>>> specialPlaceholders = new HashMap<>();
-    /** A map containing multiline placeholders for each special item. */
+    /**
+     * A map containing multiline placeholders for each special item.
+     */
     private Map<String, Supplier<Collection<MultiLinePlaceholder>>> specialMPlaceholders = new HashMap<>();
-    /** The global placeholders to apply to EVERY string in this menu. */
+    /**
+     * The global placeholders to apply to EVERY string in this menu.
+     */
     @Getter
     private List<Placeholder> globalPlaceholders = new ArrayList<>();
-    /** The global multiline placeholders for this menu */
+    /**
+     * The global multiline placeholders for this menu
+     */
     @Getter
     private List<MultiLinePlaceholder> globalMultiLinePlaceholders = new ArrayList<>();
-    /** The other GUI items to apply in this menu. */
+    /**
+     * The other GUI items to apply in this menu.
+     */
     private Map<String, SimpleGUIItem> otherGUIItems = new HashMap<>();
-    /** The type of menu being built */
+    /**
+     * The type of menu being built
+     */
     @Getter
     private MenuShapeType menuShapeType = MenuShapeType.CHEST;
-    /** This will be run in the same tick the inventory has been closed */
+    /**
+     * This will be run in the same tick the inventory has been closed
+     */
     @Getter
     private CloseRunnable closeRunnable;
-    /** This will be run at the end of the tick the inventory has been closed. Useful for opening another menu */
+    /**
+     * This will be run at the end of the tick the inventory has been closed. Useful for opening another menu
+     */
     @Getter
     private CloseRunnable postCloseRunnable;
-    /** The tick runnable */
+    /**
+     * The tick runnable
+     */
     @Getter
     private Runnable tickRunnable;
 
-    private MenuBuilder() {}
+    private MenuBuilder() {
+    }
 
     public MenuBuilder(MenuBuilder other) {
         this.size = other.size;
@@ -126,7 +151,7 @@ public final class MenuBuilder {
         // Checks if either
         // 1: You've set 'use-filler-item' to true
         // 2: Have specified a filler-item and have not EXPLICITLY set use-filler-item
-        if(section.getBoolean("use-filler-item") ||
+        if (section.getBoolean("use-filler-item") ||
                 (section.contains("filler-item") && !section.contains("use-filler-item"))) {
             ItemStackBuilder fillerItem = section.contains("filler-item") ?
                     new ItemStackBuilder(section.getConfigurationSection("filler-item")) :
@@ -140,18 +165,18 @@ public final class MenuBuilder {
         }
 
         //Check for the special items.
-        if(section.contains("special-slots")) {
+        if (section.contains("special-slots")) {
             ConfigurationSection specialSection = section.getConfigurationSection("special-slots");
-            for(String specialKey : specialSection.getKeys(false)) {
+            for (String specialKey : specialSection.getKeys(false)) {
                 SimpleGUIItem guiItem = new SimpleGUIItem(specialSection.getConfigurationSection(specialKey));
                 this.specialGUIItems.put(specialKey, guiItem);
             }
         }
 
         //Check for other items.
-        if(section.contains("other-slots")) {
+        if (section.contains("other-slots")) {
             ConfigurationSection otherSection = section.getConfigurationSection("other-slots");
-            for(String otherKey : otherSection.getKeys(false)) {
+            for (String otherKey : otherSection.getKeys(false)) {
                 SimpleGUIItem guiItem = new SimpleGUIItem(otherSection.getConfigurationSection(otherKey));
                 this.otherGUIItems.put(otherKey, guiItem);
             }
@@ -173,7 +198,7 @@ public final class MenuBuilder {
     /**
      * Sets the special item with the given key.
      *
-     * @param key the key.
+     * @param key  the key.
      * @param item the item.
      */
     public void setSpecialItem(String key, SimpleGUIItem item) {
@@ -371,10 +396,10 @@ public final class MenuBuilder {
         });
 
         //Attempt to create the special bindings.
-        for(Map.Entry<String, ClickAction> specialBinding : this.specialBindings.entrySet()) {
+        for (Map.Entry<String, ClickAction> specialBinding : this.specialBindings.entrySet()) {
             String key = specialBinding.getKey();
             SimpleGUIItem guiItem = this.specialGUIItems.get(key);
-            if(guiItem == null)
+            if (guiItem == null)
                 continue;
 
             //Calculate the slots and add the actions and item.

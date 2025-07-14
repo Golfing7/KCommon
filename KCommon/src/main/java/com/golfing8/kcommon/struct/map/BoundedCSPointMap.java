@@ -1,8 +1,8 @@
 package com.golfing8.kcommon.struct.map;
 
+import com.golfing8.kcommon.nms.struct.Position;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
 import com.golfing8.kcommon.struct.region.Region;
-import com.golfing8.kcommon.nms.struct.Position;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -14,12 +14,13 @@ import java.util.Set;
 
 /**
  * A non-lazy bounded implementation of ChunkStylePointMap.
- *
+ * <p>
  * Unlike the Unbounded version, this works with an implementation of a 2d array.
  * This improves speeds, but is more costly in terms of memory usage.
+ *
  * @param <V>
  */
-public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
+public class BoundedCSPointMap<V> implements ChunkStylePointMap<V> {
     private final CuboidRegion region;
 
     private int maxXKeys, maxZKeys;
@@ -29,8 +30,7 @@ public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
 
     private int size = 0;
 
-    public BoundedCSPointMap(CuboidRegion region)
-    {
+    public BoundedCSPointMap(CuboidRegion region) {
         this.region = region;
 
         generateStorage(region);
@@ -79,7 +79,7 @@ public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
 
         Object add = ((HashChunkColumn) node.value).add(key, value);
 
-        if(add == null)
+        if (add == null)
             size++;
 
         return (V) add;
@@ -99,7 +99,7 @@ public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
 
         V value = (V) column.remove(p);
 
-        if(value != null)
+        if (value != null)
             size--;
 
         return value;
@@ -159,13 +159,11 @@ public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
         return (ChunkColumn<V>) getCol(position).value;
     }
 
-    static class MapEntry<V> implements Entry<Position, V>
-    {
+    static class MapEntry<V> implements Entry<Position, V> {
         Position key;
         V value;
 
-        MapEntry(Position key, V value)
-        {
+        MapEntry(Position key, V value) {
             this.key = key;
             this.value = value;
         }
@@ -186,27 +184,23 @@ public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
         }
     }
 
-    private Node getCol(Position point)
-    {
+    private Node getCol(Position point) {
         return storedValues[xKey(point)][zKey(point)];
     }
 
-    private void setCol(Position point, Node node)
-    {
+    private void setCol(Position point, Node node) {
         storedValues[xKey(point)][zKey(point)] = node;
     }
 
-    private int xKey(Position point)
-    {
+    private int xKey(Position point) {
         return (point.getX() - (int) Math.floor(region.getMinimumXValue())) >> 4;
     }
 
-    private int zKey(Position point)
-    {
+    private int zKey(Position point) {
         return (point.getZ() - (int) Math.floor(region.getMinimumZValue())) >> 4;
     }
 
-    private void checkValidRegion(Position point){
+    private void checkValidRegion(Position point) {
         Preconditions.checkArgument(point.getX() >= region.getMinimumXValue() &&
                 point.getY() >= region.getMinimumYValue() &&
                 point.getZ() >= region.getMinimumZValue() &&
@@ -215,8 +209,7 @@ public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
                 point.getZ() <= region.getMaximumZValue(), "Point does not lie within region!");
     }
 
-    private void generateStorage(Region region)
-    {
+    private void generateStorage(Region region) {
         maxXKeys = (Math.abs((int) Math.floor(region.getMinimumXValue()) - (int) Math.floor(region.getMaximumXValue())) >> 4) + 1;
         maxZKeys = (Math.abs((int) Math.floor(region.getMinimumZValue()) - (int) Math.floor(region.getMaximumZValue())) >> 4) + 1;
 
@@ -232,8 +225,7 @@ public class BoundedCSPointMap<V> implements ChunkStylePointMap<V>{
         }
     }
 
-    private long createLongHash(Position p)
-    {
+    private long createLongHash(Position p) {
         return ((long) (p.getX() >> 4) << 32) + (p.getZ() >> 4) - Integer.MIN_VALUE;
     }
 }

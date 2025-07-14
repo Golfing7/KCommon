@@ -14,9 +14,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -28,7 +26,9 @@ import java.util.function.Function;
  */
 @UtilityClass
 public final class DataSerializer {
-    /** The GSON this serializer uses */
+    /**
+     * The GSON this serializer uses
+     */
     private static Gson LOADED_GSON;
     /**
      * Transformers for serialization.
@@ -38,10 +38,10 @@ public final class DataSerializer {
     /**
      * Registers a transformer to the backing transformers map.
      *
-     * @param type the type to register.
-     * @param tojson its function for Object -> Json
+     * @param type     the type to register.
+     * @param tojson   its function for Object -> Json
      * @param fromjson its frunction for Json -> Object
-     * @param <T> the type.
+     * @param <T>      the type.
      */
     @SuppressWarnings("unchecked")
     private static <T> void registerTransformer(Class<T> type, Function<T, JsonObject> tojson, Function<JsonObject, T> fromjson) {
@@ -124,7 +124,7 @@ public final class DataSerializer {
      * @throws IllegalArgumentException if the object does not have support for serialization.
      */
     public static JsonObject serialize(Object obj) throws IllegalArgumentException {
-        if(!TRANSFORMERS.containsKey(obj.getClass())) {
+        if (!TRANSFORMERS.containsKey(obj.getClass())) {
             return getGSONBase().toJsonTree(obj).getAsJsonObject();
         }
 
@@ -134,14 +134,14 @@ public final class DataSerializer {
     /**
      * Deserializes the given json object as the given type.
      *
-     * @param clazz the class of the type.
+     * @param clazz  the class of the type.
      * @param object the json object.
      * @return the deserialized object.
      * @throws IllegalArgumentException if the object does not have support for serialization.
      */
     @SuppressWarnings("unchecked")
     public static <T> T deserialize(Class<T> clazz, JsonObject object) {
-        if(!TRANSFORMERS.containsKey(clazz)) {
+        if (!TRANSFORMERS.containsKey(clazz)) {
             return getGSONBase().fromJson(object, clazz);
         }
 

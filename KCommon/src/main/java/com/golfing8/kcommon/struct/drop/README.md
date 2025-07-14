@@ -1,19 +1,24 @@
 # KCommon Drop Tables
+
 The drop tables used in KCommon are my best effort at replicating Hypixel's drop table system for Skyblock.
 (If you haven't played Skyblock, don't worry, this guide still explains everything).
 
 ## Purpose
+
 The goal of drop tables is to provide a common way of giving drops (or rewards).
 These drop tables were designed to allow a single 'thing' to have a single drop table.
-(Think of this as one **entity** having one **drop table**). 
+(Think of this as one **entity** having one **drop table**).
 
 ## Capabilities
+
 KCommon's drop tables are capable of generating rewards based on:
+
 * Chance
 * Min/max overall
 * Min/max in a subset
 
 ## YAML Definition
+
 ```yaml
 loot-table:
   [drop-target-range: '2;4'] # This will apply globally to all drops 
@@ -53,8 +58,10 @@ loot-table:
 ## Important Notes
 
 ### Order of checking
+
 Let's say you have a drop table with three drops and at most it can drop one of them.
 i.e.
+
 ```yaml
 loot-table:
   drop-target-range: '0;1'
@@ -72,21 +79,28 @@ loot-table:
       item:
         type: EMERALD
 ```
-Since we can at most drop a single one of the rewards and all rewards have a 100% chance of dropping, KCommon randomizes the order drops are tested.
+
+Since we can at most drop a single one of the rewards and all rewards have a 100% chance of dropping, KCommon randomizes
+the order drops are tested.
 
 In effect, KCommon will check in a randomized order. In effect, it may check in the order of
+
 * `diamond`
 * `emerald`
 * `gold_ingot`
 
 or
+
 * `gold_ingot`
 * `diamond`
 * `emerald`
 
 ### Minimum drop targets
-With a minimum drop target, you can configure a drop table to always generate the minimum amount of rewards regardless of odds.
+
+With a minimum drop target, you can configure a drop table to always generate the minimum amount of rewards regardless
+of odds.
 Let's say you're working with the following table:
+
 ```yaml
 loot-table:
   drop-target-range: '3;5' # The maximum target is unimportant here
@@ -112,22 +126,29 @@ loot-table:
       item:
         type: DIAMOND_BLOCK
 ```
+
 When generating rewards, the drop table will repeatedly test odds on drops until it meets its minimum target.
 KCommon will generate a randomized list of all the drops, in this case let's say it was
+
 * `gold_ingot`
 * `emerald`
 * `iron_ingot`
 * `diamond_block`
 * `diamond`
 
-It will then go through that list and try to test the chances of all the drops. If it reaches its minimum target before the end of the list, it simply returns the drops that it found first.
+It will then go through that list and try to test the chances of all the drops. If it reaches its minimum target before
+the end of the list, it simply returns the drops that it found first.
 
-In the event the minimum target isn't met, we simply randomize the list again and repeat the search until we meet the requirement.
+In the event the minimum target isn't met, we simply randomize the list again and repeat the search until we meet the
+requirement.
 
-(Note that as of now if one pass of the list finds and adds the 'diamond' drop, another pass of the list may find the same drop)
+(Note that as of now if one pass of the list finds and adds the 'diamond' drop, another pass of the list may find the
+same drop)
 
 ### A note on Item Drops
+
 There are some other options that apply specifically to item drops. They are
+
 * `fancy` - Spawns a dropped item using a hologram which also displays the item's display name.
 * `player-locked` - Makes it so only the killer (receiver) can pick up the item drop. `fancy` must also be on.
 * `looting-enabled` - If players can use looting on the items
@@ -136,6 +157,7 @@ There are some other options that apply specifically to item drops. They are
 ## Example
 
 ### Dungeon Mob Loot
+
 ```yaml
 dungeon-loot-1:
   groupings:

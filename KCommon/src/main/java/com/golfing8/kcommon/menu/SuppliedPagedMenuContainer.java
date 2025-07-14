@@ -1,14 +1,11 @@
 package com.golfing8.kcommon.menu;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.menu.shape.LayoutShapeRectangle;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.menu.shape.MenuLayoutShape;
 import com.golfing8.kcommon.struct.Range;
-import com.golfing8.kcommon.struct.item.ItemStackBuilder;
-import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -29,13 +25,20 @@ import java.util.function.Supplier;
  * This is achieved by making several pages of display for a menu.
  * </p>
  */
-@Getter @Setter
+@Getter
+@Setter
 public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
-    /** The shape designated where we will store the entries for a page. */
+    /**
+     * The shape designated where we will store the entries for a page.
+     */
     private @Nullable MenuLayoutShape elementSection;
-    /** Sets ths source from where elements are pulled. */
+    /**
+     * Sets ths source from where elements are pulled.
+     */
     private @Nullable Function<Range, List<T>> elementSource;
-    /** A supplier for the max number of elements that this menu has. */
+    /**
+     * A supplier for the max number of elements that this menu has.
+     */
     private @Nullable Supplier<Integer> elementCountSupplier;
 
     public SuppliedPagedMenuContainer(ConfigurationSection section, Player player) {
@@ -188,9 +191,9 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
     }
 
     private void assertSetup() {
-        Preconditions.checkState(this.elementCountSupplier != null,  "elementCountSupplier must not be null!");
-        Preconditions.checkState(this.elementSource != null,  "elementSource must not be null!");
-        Preconditions.checkState(this.elementSection != null,  "elementSection must not be null!");
+        Preconditions.checkState(this.elementCountSupplier != null, "elementCountSupplier must not be null!");
+        Preconditions.checkState(this.elementSource != null, "elementSource must not be null!");
+        Preconditions.checkState(this.elementSection != null, "elementSection must not be null!");
     }
 
     public interface ElementConsumer<T> {

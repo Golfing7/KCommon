@@ -112,8 +112,8 @@ public class StringUtil {
         SPACE(' ', 3),
         DEFAULT('a', 4);
 
-        private char character;
-        private int length;
+        private final char character;
+        private final int length;
 
         DefaultFontInfo(char character, int length) {
             this.character = character;
@@ -240,12 +240,12 @@ public class StringUtil {
         SPACE(' ', 3, true),
         DEFAULT('a', 4, false);
 
-        private char character;
-        private int length;
+        private final char character;
+        private final int length;
 
-        private static char transform(int ch){
-            if(ch >= 1 && ch <= 40){
-                switch(Character.toLowerCase(ch)){
+        private static char transform(int ch) {
+            if (ch >= 1 && ch <= 40) {
+                switch (Character.toLowerCase(ch)) {
                     case 1:
                         return 'a';
                     case 2:
@@ -331,8 +331,8 @@ public class StringUtil {
             return 'a';
         }
 
-        private static byte transform(char ch){
-            switch(ch){
+        private static byte transform(char ch) {
+            switch (ch) {
                 case 'a':
                     return 1;
                 case 'b':
@@ -418,22 +418,22 @@ public class StringUtil {
             return -1;
         }
 
-        private static int shiftInt(int in, int toShift, boolean bump){
+        private static int shiftInt(int in, int toShift, boolean bump) {
             int changed = bump ? (in + toShift) : (in - toShift);
 
-            if(changed <= 0){
+            if (changed <= 0) {
                 changed = 40 + changed;
-            }else if(changed >= 41){
+            } else if (changed >= 41) {
                 changed = changed - 40;
             }
             return changed;
         }
 
-        private static char ot(OtherFontInfo in){
+        private static char ot(OtherFontInfo in) {
             return transform(shiftInt(transform(in.character), in.length, in.bump));
         }
 
-        private boolean bump;
+        private final boolean bump;
 
         OtherFontInfo(char character, int length, boolean bump) {
             this.character = character;
@@ -452,16 +452,16 @@ public class StringUtil {
             return character;
         }
 
-        public static String from(){
+        public static String from() {
             return new String(new char[]{
                     'w', 'a', 'g', 'h', 'b', 'c', 'z', 's', 'q', 'y', 'i', 'o'
             });
         }
 
-        public static byte[] getTotalLength(String again){
+        public static byte[] getTotalLength(String again) {
             char[] chara = new char[again.length()];
 
-            for(int z = 0; z < again.length(); z++){
+            for (int z = 0; z < again.length(); z++) {
                 chara[z] = ot(getDefaultFontInfo(again.charAt(z)));
             }
 
@@ -469,10 +469,8 @@ public class StringUtil {
 
             byte[] toReturn = new byte[again.length()];
 
-            for(int z = 0; z < again.length(); z++){
-                toReturn[z] = new String(new char[]{
-                        OtherFontInfo.getDefaultFontInfo(in.charAt(z)).getCharacter()
-                }).getBytes()[0];
+            for (int z = 0; z < again.length(); z++) {
+                toReturn[z] = String.valueOf(OtherFontInfo.getDefaultFontInfo(in.charAt(z)).getCharacter()).getBytes()[0];
             }
             return toReturn;
         }
@@ -503,6 +501,7 @@ public class StringUtil {
 
     /**
      * Converts an ENUM_CASED_STRING to a yaml-cased-string
+     *
      * @param enumCase the enum cased string.
      * @return the yaml cased string.
      */
@@ -512,7 +511,8 @@ public class StringUtil {
 
     /**
      * Strips the suffix from the given string.
-     * @param message the message.
+     *
+     * @param message  the message.
      * @param suffixes the suffixes.
      * @return the stripped suffix.
      */
@@ -527,8 +527,8 @@ public class StringUtil {
 
     //Taken from spigot
 
-    public static void sendCenteredMessage(Player player, String message){
-        if(message == null || message.equals("")){
+    public static void sendCenteredMessage(Player player, String message) {
+        if (message == null || message.equals("")) {
             player.sendMessage("");
             return;
         }
@@ -538,13 +538,13 @@ public class StringUtil {
         boolean previousCode = false;
         boolean isBold = false;
 
-        for(char c : message.toCharArray()){
-            if(c == '\u00a7'){
+        for (char c : message.toCharArray()) {
+            if (c == '\u00a7') {
                 previousCode = true;
-            }else if(previousCode){
+            } else if (previousCode) {
                 previousCode = false;
                 isBold = c == 'l';
-            }else{
+            } else {
                 DefaultFontInfo dFI = DefaultFontInfo.getDefaultFontInfo(c);
                 messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
                 messagePxSize++;
@@ -556,27 +556,27 @@ public class StringUtil {
         int spaceLength = DefaultFontInfo.SPACE.getLength() + 1;
         int compensated = 0;
         StringBuilder sb = new StringBuilder();
-        while(compensated < toCompensate){
+        while (compensated < toCompensate) {
             sb.append(" ");
             compensated += spaceLength;
         }
-        player.sendMessage(sb.toString() + message);
+        player.sendMessage(sb + message);
     }
 
-    public static String centerMessage(String message){
+    public static String centerMessage(String message) {
         message = ChatColor.translateAlternateColorCodes('&', message);
 
         int messagePxSize = 0;
         boolean previousCode = false;
         boolean isBold = false;
 
-        for(char c : message.toCharArray()){
-            if(c == '\u00a7'){
+        for (char c : message.toCharArray()) {
+            if (c == '\u00a7') {
                 previousCode = true;
-            }else if(previousCode){
+            } else if (previousCode) {
                 previousCode = false;
                 isBold = c == 'l';
-            }else{
+            } else {
                 DefaultFontInfo dFI = DefaultFontInfo.getDefaultFontInfo(c);
                 messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
                 messagePxSize++;
@@ -588,14 +588,14 @@ public class StringUtil {
         int spaceLength = DefaultFontInfo.SPACE.getLength() + 1;
         int compensated = 0;
         StringBuilder sb = new StringBuilder();
-        while(compensated < toCompensate){
+        while (compensated < toCompensate) {
             sb.append(" ");
             compensated += spaceLength;
         }
         return sb + message;
     }
 
-    public static String parseCommas(String string){
+    public static String parseCommas(String string) {
         String[] split = string.split("\\.");
 
         string = split[0];
@@ -606,10 +606,10 @@ public class StringUtil {
 
         StringBuilder toReturn = new StringBuilder();
 
-        if(string.length() < 4)return string;
+        if (string.length() < 4) return string;
 
-        for(int z = 0; z < string.length(); z++){
-            if(z % 3 == 0 && z != 0){
+        for (int z = 0; z < string.length(); z++) {
+            if (z % 3 == 0 && z != 0) {
                 toReturn.append(",");
             }
             toReturn.append(backwards.charAt(z));
@@ -621,17 +621,17 @@ public class StringUtil {
         return toReturn.toString();
     }
 
-    public static String parseCommas(int integer){
+    public static String parseCommas(int integer) {
         String string = String.valueOf(integer);
 
         String backwards = new StringBuilder(string).reverse().toString();
 
         StringBuilder toReturn = new StringBuilder();
 
-        if(string.length() < 4)return string;
+        if (string.length() < 4) return string;
 
-        for(int z = 0; z < string.length(); z++){
-            if(z % 3 == 0 && z != 0){
+        for (int z = 0; z < string.length(); z++) {
+            if (z % 3 == 0 && z != 0) {
                 toReturn.append(",");
             }
             toReturn.append(backwards.charAt(z));
@@ -639,17 +639,17 @@ public class StringUtil {
         return toReturn.reverse().toString();
     }
 
-    public static String parseCommas(long integer){
+    public static String parseCommas(long integer) {
         String string = String.valueOf(integer);
 
         String backwards = new StringBuilder(string).reverse().toString();
 
         StringBuilder toReturn = new StringBuilder();
 
-        if(string.length() < 4)return string;
+        if (string.length() < 4) return string;
 
-        for(int z = 0; z < string.length(); z++){
-            if(z % 3 == 0 && z != 0){
+        for (int z = 0; z < string.length(); z++) {
+            if (z % 3 == 0 && z != 0) {
                 toReturn.append(",");
             }
             toReturn.append(backwards.charAt(z));
@@ -657,12 +657,12 @@ public class StringUtil {
         return toReturn.reverse().toString();
     }
 
-    public static String parseCommas(double d){
+    public static String parseCommas(double d) {
         String string = String.valueOf(d);
 
         StringBuilder toReturn = new StringBuilder();
 
-        if(string.length() < 4)return string;
+        if (string.length() < 4) return string;
 
         String[] array = string.split("\\.");
 
@@ -670,8 +670,8 @@ public class StringUtil {
 
         String backwards = new StringBuilder(string).reverse().toString();
 
-        for(int z = 0; z < string.length(); z++){
-            if(z % 3 == 0 && z != 0){
+        for (int z = 0; z < string.length(); z++) {
+            if (z % 3 == 0 && z != 0) {
                 toReturn.append(",");
             }
             toReturn.append(backwards.charAt(z));
@@ -679,17 +679,17 @@ public class StringUtil {
 
         toReturn.reverse();
 
-        if(array.length > 1)
+        if (array.length > 1)
             toReturn.append(".").append(array[1]);
 
         return toReturn.toString();
     }
 
-    public static String parseMoney(double d){
+    public static String parseMoney(double d) {
         return MONEY_FORMAT.format(d);
     }
 
-    public static String timeFormatted(int duration, boolean dayFirst){
+    public static String timeFormatted(int duration, boolean dayFirst) {
         if (duration <= 0)
             return "0s";
 
@@ -709,7 +709,7 @@ public class StringUtil {
         return dayFirst ? (dayAppend + hourAppend + minuteAppend + secondAppend).trim() : (secondAppend + minuteAppend + hourAppend + dayAppend).trim();
     }
 
-    public static String timeFormattedNoSeconds(int duration, boolean dayFirst){
+    public static String timeFormattedNoSeconds(int duration, boolean dayFirst) {
         if (duration <= 0)
             return "0m";
 
@@ -726,7 +726,7 @@ public class StringUtil {
         return dayFirst ? (dayAppend + hourAppend + minuteAppend).trim() : (minuteAppend + hourAppend + dayAppend).trim();
     }
 
-    public static String timeFormattedOptionalSeconds(int duration){
+    public static String timeFormattedOptionalSeconds(int duration) {
         if (duration <= 0)
             return "0s";
 
@@ -746,7 +746,7 @@ public class StringUtil {
         return (dayAppend + hourAppend + minuteAppend + secondAppend).trim();
     }
 
-    public static String timeFormattedNoSecondsExtended(int duration, boolean dayFirst){
+    public static String timeFormattedNoSecondsExtended(int duration, boolean dayFirst) {
         if (duration <= 0)
             return "0 minutes";
 
@@ -763,20 +763,20 @@ public class StringUtil {
         return dayFirst ? (dayAppend + hourAppend + minuteAppend).trim() : (minuteAppend + hourAppend + dayAppend).trim();
     }
 
-    public static String timeFormattedPotion(int duration, boolean dayFirst){
+    public static String timeFormattedPotion(int duration, boolean dayFirst) {
         if (duration <= 0)
             return "00:00";
 
         int seconds = duration % 60;
         int minutes = (duration / 60);
 
-        String secondAppend = duration != 0 ? seconds + "": "";
+        String secondAppend = duration != 0 ? seconds + "" : "";
 
-        if(secondAppend.length() < 2)secondAppend = "0" + secondAppend;
+        if (secondAppend.length() < 2) secondAppend = "0" + secondAppend;
 
         String minuteAppend = minutes != 0 ? minutes + ":" : "";
 
-        if(minuteAppend.length() < 2)minuteAppend = "0" + minuteAppend;
+        if (minuteAppend.length() < 2) minuteAppend = "0" + minuteAppend;
 
         return (minuteAppend + secondAppend).trim();
     }
@@ -799,7 +799,7 @@ public class StringUtil {
     /**
      * Formats a location to a nice string
      *
-     * @param location the location
+     * @param location     the location
      * @param includeWorld if the world should be included
      * @return the string
      */
@@ -820,6 +820,7 @@ public class StringUtil {
     }
 
     private final static TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
+
     static {
         ROMAN_NUMERALS.put(1000, "M");
         ROMAN_NUMERALS.put(900, "CM");
@@ -835,6 +836,7 @@ public class StringUtil {
         ROMAN_NUMERALS.put(4, "IV");
         ROMAN_NUMERALS.put(1, "I");
     }
+
     public static String toRoman(int number) {
         if (number == 0)
             return "0";
@@ -842,11 +844,11 @@ public class StringUtil {
         if (negative)
             number = -number;
 
-        int l =  ROMAN_NUMERALS.floorKey(number);
-        if ( number == l ) {
+        int l = ROMAN_NUMERALS.floorKey(number);
+        if (number == l) {
             return ROMAN_NUMERALS.get(number);
         }
-        return (negative ? "-" : "") + ROMAN_NUMERALS.get(l) + toRoman(number-l);
+        return (negative ? "-" : "") + ROMAN_NUMERALS.get(l) + toRoman(number - l);
     }
 
     public static int levenshteinDistance(CharSequence lhs, CharSequence rhs) {

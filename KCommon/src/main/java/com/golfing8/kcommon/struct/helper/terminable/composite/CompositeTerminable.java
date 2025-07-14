@@ -101,8 +101,8 @@ public interface CompositeTerminable extends Terminable, TerminableConsumer {
      * {@link AutoCloseable#close() closed} twice.</p>
      *
      * @param autoCloseable the closable to bind
-     * @throws NullPointerException if the closable is null
      * @return this (for chaining)
+     * @throws NullPointerException if the closable is null
      */
     CompositeTerminable with(AutoCloseable autoCloseable);
 

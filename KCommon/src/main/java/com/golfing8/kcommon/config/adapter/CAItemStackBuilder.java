@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.cryptomorin.xseries.XEnchantment;
-import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
@@ -39,7 +38,7 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             return null;
 
         ItemStackBuilder builder = new ItemStackBuilder();
-        Map<String, Object> primitiveValue = (Map<String, Object>) entry.unwrap();
+        Map<String, Object> primitiveValue = entry.unwrap();
         builder.itemType(primitiveValue.get("type").toString());
         if (primitiveValue.containsKey("amount"))
             builder.amount((int) primitiveValue.get("amount"));
@@ -86,7 +85,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
         }
         if (primitiveValue.containsKey("attribute-modifiers")) {
             ConfigPrimitive subValue = entry.getSubValue("attribute-modifiers");
-            builder.attributeModifierMap(ConfigTypeRegistry.getFromType(subValue, FieldType.extractFrom(new TypeToken<Map<EntityAttribute, Set<EntityAttributeModifier>>>() {})));
+            builder.attributeModifierMap(ConfigTypeRegistry.getFromType(subValue, FieldType.extractFrom(new TypeToken<Map<EntityAttribute, Set<EntityAttributeModifier>>>() {
+            })));
         }
         if (primitiveValue.containsKey("unstackable")) {
             builder.unstackable((boolean) primitiveValue.get("unstackable"));

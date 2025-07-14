@@ -5,7 +5,6 @@ import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
 import com.golfing8.kcommon.menu.marker.MenuClickHolder;
-import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
@@ -25,15 +24,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class MenuAbstract implements Menu {
 
-    private Map<Integer, List<ClickAction>> actionMap;
+    private final Map<Integer, List<ClickAction>> actionMap;
 
     /**
      * The gui items to apply when the menu is 'updated'
@@ -43,9 +38,11 @@ public abstract class MenuAbstract implements Menu {
     private List<Placeholder> placeholders;
     @Getter
     private List<MultiLinePlaceholder> multiLinePlaceholders;
-    /** The menu's ID */
+    /**
+     * The menu's ID
+     */
     @Getter
-    private UUID menuID = UUID.randomUUID();
+    private final UUID menuID = UUID.randomUUID();
 
     private Inventory backingInventory;
     private String title;
@@ -53,7 +50,8 @@ public abstract class MenuAbstract implements Menu {
     private int size;
     private boolean clickable;
     private boolean valid;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Runnable tickRunnable;
 
     private boolean recreate;
@@ -61,10 +59,10 @@ public abstract class MenuAbstract implements Menu {
     private CloseRunnable onClose, postClose;
 
     private ClickAction bottomClickEvent, topClickEvent;
-    private MenuShape menuShape;
+    private final MenuShape menuShape;
 
     public MenuAbstract(String title, MenuShape shape, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
-                        List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders){
+                        List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders) {
         this.menuShape = shape;
         if (shape.getType().isSizeMutable()) {
             this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getSize(), MS.parseSingle(title, placeholders));
@@ -158,9 +156,9 @@ public abstract class MenuAbstract implements Menu {
 
     @Override
     public void addClickAction(int slot, ClickAction clickAction) {
-        if(actionMap.containsKey(slot)){
+        if (actionMap.containsKey(slot)) {
             actionMap.get(slot).add(clickAction);
-        }else{
+        } else {
             actionMap.put(slot, Lists.newArrayList(clickAction));
         }
     }
@@ -211,14 +209,14 @@ public abstract class MenuAbstract implements Menu {
 
     @Override
     public void refreshSpecialItems() {
-        for(SimpleGUIItem item : this.guiItems) {
+        for (SimpleGUIItem item : this.guiItems) {
             ItemStackBuilder builder = item.getItem();
 
             //Add both placeholders.
-            if(item.getSpecialMPlaceholders() != null)
+            if (item.getSpecialMPlaceholders() != null)
                 builder.multiLinePlaceholders(
                         item.getSpecialMPlaceholders().get().toArray(new MultiLinePlaceholder[0]));
-            if(item.getSpecialPlaceholders() != null)
+            if (item.getSpecialPlaceholders() != null)
                 builder.placeholders(item.getSpecialPlaceholders().get().toArray(new Placeholder[0]));
 
             item.getSlots().forEach(coordinate -> {
@@ -287,11 +285,11 @@ public abstract class MenuAbstract implements Menu {
             ItemUtil.applyMPlaceholders(itemStack, multiLinePlaceholders);
         }
 
-        if(contents.length != backingInventory.getSize()){
+        if (contents.length != backingInventory.getSize()) {
             ItemStack[] padded = new ItemStack[backingInventory.getSize()];
             System.arraycopy(contents, 0, padded, 0, padded.length);
             backingInventory.setContents(padded);
-        }else{
+        } else {
             backingInventory.setContents(contents);
         }
     }
@@ -320,7 +318,7 @@ public abstract class MenuAbstract implements Menu {
     public List<Player> getViewers() {
         List<Player> toReturn = new ArrayList<>();
         this.backingInventory.getViewers().forEach(z -> {
-            if(z instanceof Player) {
+            if (z instanceof Player) {
                 Player player = (Player) z;
                 if (player.getOpenInventory() == null)
                     return;
@@ -340,7 +338,7 @@ public abstract class MenuAbstract implements Menu {
 
     @Override
     public void updateViewers() {
-        if(recreate){
+        if (recreate) {
             List<Player> viewing = getViewers();
 
             viewing.forEach(Player::closeInventory);
@@ -356,7 +354,7 @@ public abstract class MenuAbstract implements Menu {
             this.backingInventory.setContents(contents);
 
             viewing.forEach(z -> z.openInventory(this.backingInventory));
-        }else{
+        } else {
             getViewers().forEach(Player::updateInventory);
         }
     }
@@ -367,7 +365,7 @@ public abstract class MenuAbstract implements Menu {
     }
 
     @EventHandler
-    public void onClick(InventoryClickEvent event){
+    public void onClick(InventoryClickEvent event) {
         if (event.getWhoClicked().getOpenInventory().getTopInventory() == null)
             return;
 
@@ -379,18 +377,18 @@ public abstract class MenuAbstract implements Menu {
         if (clickHolder.getMenu() != this)
             return;
 
-        if(!clickable)event.setCancelled(true);
+        if (!clickable) event.setCancelled(true);
 
         Inventory clickedInventory = event.getClickedInventory();
 
-        if(clickedInventory == null)return;
+        if (clickedInventory == null) return;
 
-        if(clickedInventory != event.getWhoClicked().getOpenInventory().getTopInventory()){
-            if(clickedInventory != event.getWhoClicked().getOpenInventory().getBottomInventory())
+        if (clickedInventory != event.getWhoClicked().getOpenInventory().getTopInventory()) {
+            if (clickedInventory != event.getWhoClicked().getOpenInventory().getBottomInventory())
                 return;
 
             //Run the bottom runnable.
-            if(this.bottomClickEvent != null) {
+            if (this.bottomClickEvent != null) {
                 this.bottomClickEvent.attemptClick(event);
             }
             return;
@@ -399,20 +397,20 @@ public abstract class MenuAbstract implements Menu {
         if (this.topClickEvent != null) {
             this.topClickEvent.attemptClick(event);
         }
-        if(actionMap.containsKey(event.getSlot())){
+        if (actionMap.containsKey(event.getSlot())) {
             actionMap.get(event.getSlot()).forEach(z -> z.attemptClick(event));
         }
     }
 
     @EventHandler
-    public void onClose(InventoryCloseEvent event){
+    public void onClose(InventoryCloseEvent event) {
         // Both checks are necessary as different Bukkit versions change how you can detect the inventory being closed.
         boolean wasInventory = event.getInventory() == getGUI() || getGUI().getViewers().contains(event.getPlayer());
-        if(onClose != null && wasInventory){
+        if (onClose != null && wasInventory) {
             onClose.run(event);
         }
 
-        if(postClose != null && wasInventory){
+        if (postClose != null && wasInventory) {
             Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> postClose.run(event));
         }
     }

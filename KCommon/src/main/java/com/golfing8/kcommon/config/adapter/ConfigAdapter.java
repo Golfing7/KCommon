@@ -28,7 +28,7 @@ public interface ConfigAdapter<T> {
      * Converts the primitive to a POJO.
      *
      * @param entry the entry.
-     * @param type the actual type of POJO we desire.
+     * @param type  the actual type of POJO we desire.
      * @return the POJO.
      */
     @Nullable T toPOJO(ConfigPrimitive entry, FieldType type);

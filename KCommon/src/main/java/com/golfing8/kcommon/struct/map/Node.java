@@ -8,8 +8,7 @@ class Node {
     Object value;
     Position key;
 
-    Node(Position key, Object value)
-    {
+    Node(Position key, Object value) {
         this.key = key;
         this.value = value;
     }

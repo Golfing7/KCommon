@@ -21,23 +21,41 @@ import java.util.concurrent.TimeUnit;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Timestamp implements Cloneable {
-    /** This value is used when a field isn't being used by this timestamp. */
+    /**
+     * This value is used when a field isn't being used by this timestamp.
+     */
     public static final int UNUSED = -1;
-    /** The year that takes place, or {@link #UNUSED} if not in use. */
+    /**
+     * The year that takes place, or {@link #UNUSED} if not in use.
+     */
     private int year;
-    /** The zero-based based month that takes place, or {@link #UNUSED} if not in use. */
+    /**
+     * The zero-based based month that takes place, or {@link #UNUSED} if not in use.
+     */
     private int month;
-    /** The zero-based day of week that takes place, or {@link #UNUSED} if not in use. */
+    /**
+     * The zero-based day of week that takes place, or {@link #UNUSED} if not in use.
+     */
     private int dayOfWeek;
-    /** The zero-based day of month that takes place, or {@link #UNUSED} if not in use. */
+    /**
+     * The zero-based day of month that takes place, or {@link #UNUSED} if not in use.
+     */
     private int dayOfMonth;
-    /** The zero-based day of year that takes place, or {@link #UNUSED} if not in use. */
+    /**
+     * The zero-based day of year that takes place, or {@link #UNUSED} if not in use.
+     */
     private int dayOfYear;
-    /** The hour that takes place, or {@link #UNUSED} if not in use. */
+    /**
+     * The hour that takes place, or {@link #UNUSED} if not in use.
+     */
     private int hour;
-    /** The minute that takes place, or {@link #UNUSED} if not in use. */
+    /**
+     * The minute that takes place, or {@link #UNUSED} if not in use.
+     */
     private int minute;
-    /** The second that takes place, or {@link #UNUSED} if not in use. */
+    /**
+     * The second that takes place, or {@link #UNUSED} if not in use.
+     */
     private int second;
 
     /**
@@ -234,7 +252,7 @@ public final class Timestamp implements Cloneable {
     /**
      * Creates a time stamp that represents some time during a day.
      *
-     * @param hour the hour.
+     * @param hour   the hour.
      * @param minute the minute.
      * @param second the second.
      * @return the generated time stamp.

@@ -16,7 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A class which is useful for accessing the bukkit command map reflectively.
@@ -30,7 +29,7 @@ public class CommandManager {
      */
     private boolean needsSync;
 
-    private CommandManager(){
+    private CommandManager() {
         Bukkit.getScheduler().runTaskTimer(KCommon.getInstance(), () -> {
             if (needsSync) {
                 needsSync = false;
@@ -42,12 +41,12 @@ public class CommandManager {
     /**
      * Registers a {@link KCommand} to the bukkit command map.
      *
-     * @param plugin the plugin to register it to.
+     * @param plugin  the plugin to register it to.
      * @param command the command.
-     * @param sync if the command map should be flagged for resync.
+     * @param sync    if the command map should be flagged for resync.
      * @return the registered plugin command.
      */
-    public PluginCommand registerNewCommand(Plugin plugin, KCommand command, boolean sync){
+    public PluginCommand registerNewCommand(Plugin plugin, KCommand command, boolean sync) {
         PluginCommand pluginCommand = getCommand(plugin, command.getCommandName(), command.getCommandAliases());
 
         getCommandMap().register(plugin.getName(), pluginCommand);
@@ -67,7 +66,7 @@ public class CommandManager {
      *
      * @param command the command to use.
      */
-    public void unregisterCommand(KCommand command){
+    public void unregisterCommand(KCommand command) {
         deregisterCommand(command.getCommandName(), command.getCommandAliases());
         needsSync = true;
     }
@@ -75,13 +74,13 @@ public class CommandManager {
     /**
      * Generates a {@link PluginCommand} instance for use in the command map.
      *
-     * @param name the name of the command.
+     * @param name    the name of the command.
      * @param aliases the aliases for the command.
      * @return the plugin command.
      */
-    private PluginCommand getCommand(Plugin plugin, String name, List<String> aliases){
+    private PluginCommand getCommand(Plugin plugin, String name, List<String> aliases) {
         PluginCommand pluginCommand = null;
-        try{
+        try {
             Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
 
             c.setAccessible(true);
@@ -89,7 +88,8 @@ public class CommandManager {
             pluginCommand = c.newInstance(name, plugin);
 
             pluginCommand.setAliases(aliases);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
             e.printStackTrace();
         }
         return pluginCommand;
@@ -132,11 +132,11 @@ public class CommandManager {
     /**
      * Unregisters the command from the name and aliases.
      *
-     * @param name the name of the command.
+     * @param name    the name of the command.
      * @param aliases the aliases of the command.
      */
     @SuppressWarnings("unchecked")
-    private void deregisterCommand(String name, List<String> aliases){
+    private void deregisterCommand(String name, List<String> aliases) {
         try {
             if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
                 Field f = SimplePluginManager.class.getDeclaredField("commandMap");

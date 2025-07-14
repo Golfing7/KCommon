@@ -7,7 +7,6 @@ import com.golfing8.kcommon.util.MathExpressions;
 import com.golfing8.kcommon.util.MathUtil;
 import com.golfing8.kcommon.util.PlayerUtil;
 import lombok.Getter;
-import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -23,14 +22,15 @@ import java.util.stream.Collectors;
  */
 @Getter
 public class ItemDrop extends Drop<ItemStack> {
-    private Map<String, ItemStackBuilder> items;
-    private boolean giveDirectly;
-    private boolean fancyDrop;
-    private boolean playerLocked;
-    private boolean boostQuantity;
-    private boolean lootingEnabled;
-    private boolean fortuneEnabled;
-    private String lootingFormula;
+    private final Map<String, ItemStackBuilder> items;
+    private final boolean giveDirectly;
+    private final boolean fancyDrop;
+    private final boolean playerLocked;
+    private final boolean boostQuantity;
+    private final boolean lootingEnabled;
+    private final boolean fortuneEnabled;
+    private final String lootingFormula;
+
     public ItemDrop(double chance,
                     @Nullable String displayName,
                     double maxBoost,
@@ -127,7 +127,7 @@ public class ItemDrop extends Drop<ItemStack> {
     /**
      * Drops the fancy item at the given location.
      *
-     * @param context the drop context.
+     * @param context  the drop context.
      * @param location the location to drop.
      * @return the fancy item drop.
      */

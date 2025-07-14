@@ -54,7 +54,7 @@ public class RangeMap<V> implements Map<Range, V> {
 
     @Override
     public boolean containsKey(Object key) {
-        if(key instanceof Number) {
+        if (key instanceof Number) {
             return this.getEntryPair(((Number) key).doubleValue()) != null;
         }
         return get(key) != null;
@@ -88,12 +88,12 @@ public class RangeMap<V> implements Map<Range, V> {
 
     public Pair<Range, V> getEntryPair(double dKey) {
         Entry<Double, Pair<Range, V>> floor = this.rangeMap.floorEntry(dKey);
-        if(floor == null) {
+        if (floor == null) {
             return null;
         }
 
         //Then check if the number is within its range.
-        if(!floor.getValue().getA().inRange(dKey)) {
+        if (!floor.getValue().getA().inRange(dKey)) {
             return null;
         }
 
@@ -103,7 +103,7 @@ public class RangeMap<V> implements Map<Range, V> {
 
     @Override
     public V get(Object key) {
-        if(key instanceof Number) {
+        if (key instanceof Number) {
             return this.get(((Number) key).doubleValue());
         }
         return this.originalMap.get(key);
@@ -130,7 +130,7 @@ public class RangeMap<V> implements Map<Range, V> {
      */
     public V remove(Number number) {
         Pair<Range, V> pair = this.getEntryPair(number.doubleValue());
-        if(pair == null)
+        if (pair == null)
             return null;
 
         //Remove the values.
@@ -141,12 +141,12 @@ public class RangeMap<V> implements Map<Range, V> {
 
     @Override
     public V remove(Object key) {
-        if(key instanceof Number) {
+        if (key instanceof Number) {
             return remove((Number) key);
         }
 
         //Non ranges not supported here.
-        if(!(key instanceof Range))
+        if (!(key instanceof Range))
             return null;
 
         //Remove the key and return the value.
@@ -193,10 +193,12 @@ public class RangeMap<V> implements Map<Range, V> {
      * A simple builder for range maps.
      */
     public static class Builder<T> {
-        private List<Pair<Range, T>> values = new ArrayList<>();
+        private final List<Pair<Range, T>> values = new ArrayList<>();
+
         public Builder<T> put(double key, T object) {
             return put(new Range(key), object);
         }
+
         public Builder<T> put(Range range, T object) {
             this.values.add(new Pair<>(range, object));
             return this;

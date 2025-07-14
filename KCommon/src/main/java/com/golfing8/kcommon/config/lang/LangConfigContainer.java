@@ -1,18 +1,16 @@
 package com.golfing8.kcommon.config.lang;
 
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
-import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
-import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.base.Preconditions;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a class that contains a language config and can allow sending of config messages.
@@ -40,7 +38,7 @@ public interface LangConfigContainer {
      */
     default String formatPath(String postfix) {
         String prefix = getPrefix();
-        if(prefix.endsWith("."))
+        if (prefix.endsWith("."))
             prefix = prefix.substring(0, prefix.length() - 1);
 
         return (prefix.isEmpty() ? prefix : prefix + ".") + postfix;
@@ -54,9 +52,9 @@ public interface LangConfigContainer {
      * It is provided for the sake of convenience.
      * </p>
      *
-     * @param sender the receiver of the message.
-     * @param key the key of the message.
-     * @param defaultMsg the default message.
+     * @param sender       the receiver of the message.
+     * @param key          the key of the message.
+     * @param defaultMsg   the default message.
      * @param placeholders the placeholders to apply to the message.
      */
     default void sendDefaultMessage(CommandSender sender, String key, String defaultMsg, Placeholder... placeholders) {
@@ -70,9 +68,9 @@ public interface LangConfigContainer {
      * It is provided for the sake of convenience.
      * </p>
      *
-     * @param sender the receiver of the message.
-     * @param key the key of the message.
-     * @param defaultMsg the default message.
+     * @param sender       the receiver of the message.
+     * @param key          the key of the message.
+     * @param defaultMsg   the default message.
      * @param placeholders the placeholders to apply to the message.
      */
     default void sendDefaultMessage(CommandSender sender, String key, Message defaultMsg, Placeholder... placeholders) {
@@ -90,8 +88,8 @@ public interface LangConfigContainer {
     /**
      * Sends a message from the config message to the given command sender.
      *
-     * @param sender the receiver of the message.
-     * @param key the key of the message.
+     * @param sender       the receiver of the message.
+     * @param key          the key of the message.
      * @param placeholders the placeholders to apply to the message
      */
     default void sendConfigMessage(CommandSender sender, String key, Placeholder... placeholders) {
@@ -104,8 +102,8 @@ public interface LangConfigContainer {
     /**
      * Sends a message from the config message to the given command sender.
      *
-     * @param sender the receiver of the message.
-     * @param key the key of the message.
+     * @param sender       the receiver of the message.
+     * @param key          the key of the message.
      * @param placeholders the placeholders to apply to the message
      */
     default void sendConfigMessage(CommandSender sender, String key, Object... placeholders) {
@@ -119,7 +117,7 @@ public interface LangConfigContainer {
     /**
      * Adds a language constant with the given key and the value.
      *
-     * @param key the key of the value.
+     * @param key   the key of the value.
      * @param value the actual value.
      */
     default void addLanguageConstant(String key, String... value) {
@@ -129,7 +127,7 @@ public interface LangConfigContainer {
     /**
      * Adds a language constant with the given key and the value.
      *
-     * @param key the key of the value.
+     * @param key   the key of the value.
      * @param value the actual value.
      * @return the message that is actually in the config.
      */
@@ -140,7 +138,7 @@ public interface LangConfigContainer {
     /**
      * Adds a language constant with the given key and the value.
      *
-     * @param key the key of the value.
+     * @param key   the key of the value.
      * @param value the actual value.
      * @return the message that is actually in the config.
      */
@@ -165,7 +163,7 @@ public interface LangConfigContainer {
                 continue;
 
             if (Message.class != field.getType())
-                throw new RuntimeException(String.format("Field MUST be of Message type! Was %s", field.getType().toString()));
+                throw new RuntimeException(String.format("Field MUST be of Message type! Was %s", field.getType()));
 
             LangConf conf = field.getAnnotation(LangConf.class);
             FieldHandle<?> handle = new FieldHandle<>(field);

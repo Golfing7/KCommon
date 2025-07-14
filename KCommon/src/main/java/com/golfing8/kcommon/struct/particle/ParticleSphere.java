@@ -13,11 +13,12 @@ import java.util.List;
 /**
  * Represents a sphere of X radius.
  */
-public class ParticleSphere extends ParticleCircle{
+public class ParticleSphere extends ParticleCircle {
     private final List<WaveEffect> effectList = Lists.newArrayList();
     private final int stepModifier = 24;
 
-    public ParticleSphere() {}
+    public ParticleSphere() {
+    }
 
     protected ParticleSphere(ConfigurationSection section) {
         super(section);
@@ -30,12 +31,10 @@ public class ParticleSphere extends ParticleCircle{
 
     @Override
     public void spawnAt(Collection<Player> players, Location location) {
-        for(int index = 0; index < effectList.size(); index++)
-        {
+        for (int index = 0; index < effectList.size(); index++) {
             WaveEffect effect = effectList.get(index);
 
-            if(effect.tick++ == effect.maxTick)
-            {
+            if (effect.tick++ == effect.maxTick) {
                 effectList.remove(index--);
             }
         }
@@ -52,8 +51,7 @@ public class ParticleSphere extends ParticleCircle{
         //Which, in turn, keeps us from getting cos values of 0, breaking the top and bottom of our sphere.
         double stepDivisor = (steps / 2D) + 0.2D;
 
-        for(int yStep = -halfSteps; yStep <= halfSteps; yStep++)
-        {
+        for (int yStep = -halfSteps; yStep <= halfSteps; yStep++) {
             double ratioOffset = (double) yStep / stepDivisor;
 
             //We get the arcsin of the step. Starting at -pi/2. (Meaning X has an offset radius of 0)
@@ -67,8 +65,7 @@ public class ParticleSphere extends ParticleCircle{
             //Get our "sub circle's" iteration count.
             int subStep = (int) (xRadius * (stepModifier / getParticleSize()));
 
-            for(int xStep = 0; xStep < subStep; xStep++)
-            {
+            for (int xStep = 0; xStep < subStep; xStep++) {
                 //Get our angle offset.
                 double angle = 360.0F * ((float) (xStep + 1) / (float) subStep);
 
@@ -103,8 +100,7 @@ public class ParticleSphere extends ParticleCircle{
         spawnParticle(players, location.clone().add(bottom));
     }
 
-    public void startWaveEffectAt(Vector vector, Color waveColor, double angleWidth)
-    {
+    public void startWaveEffectAt(Vector vector, Color waveColor, double angleWidth) {
         vector = vector.clone();
 
         //We normalize the vector to make sure we're on the dot for radius.
@@ -118,8 +114,7 @@ public class ParticleSphere extends ParticleCircle{
         this.effectList.add(effect);
     }
 
-    public void startWaveEffectAt(Vector vector, Color waveColor, double angleWidth, double radiusSpeed)
-    {
+    public void startWaveEffectAt(Vector vector, Color waveColor, double angleWidth, double radiusSpeed) {
         vector = vector.clone();
 
         //We normalize the vector to make sure we're on the dot for radius.
@@ -138,7 +133,7 @@ public class ParticleSphere extends ParticleCircle{
     /**
      * Wrapper class used for wave effects.
      */
-     class WaveEffect {
+    class WaveEffect {
         //The "tick" of the wave we're on.
         int tick;
 
@@ -152,8 +147,7 @@ public class ParticleSphere extends ParticleCircle{
 
         final Vector startingPoint;
 
-        WaveEffect(Color waveColor, Vector startingPoint, double angleWidth)
-        {
+        WaveEffect(Color waveColor, Vector startingPoint, double angleWidth) {
             this.waveColor = waveColor;
             this.startingPoint = startingPoint;
             this.angleWidth = angleWidth;
@@ -161,20 +155,20 @@ public class ParticleSphere extends ParticleCircle{
 
         /**
          * This gets the "perfect amount of distance" from our starting point.
+         *
          * @return the perfect distance from our starting point.
          */
-        double getCurrentAngleOfRotation()
-        {
+        double getCurrentAngleOfRotation() {
             //The reason for - 90.0F is to make the SIN on a -1 to 1 angle.
             return ((double) tick / maxTick) * 180.0F;
         }
 
         /**
          * Gets the level of mesh to apply to the particle at its given distance.
+         *
          * @return the amount of mesh to apply to our color.
          */
-        double getMeshLevel(Vector offset)
-        {
+        double getMeshLevel(Vector offset) {
             double dotProduct = offset.dot(startingPoint);
 
             double angle = Math.toDegrees(Math.acos(dotProduct / (startingPoint.length() * offset.length())));
@@ -186,7 +180,7 @@ public class ParticleSphere extends ParticleCircle{
             double angleRadius = angleWidth / 2;
 
             //If we're outside, entirely, of the width, return 0!
-            if(dAngle > angleRadius)
+            if (dAngle > angleRadius)
                 return 0.0D;
 
 

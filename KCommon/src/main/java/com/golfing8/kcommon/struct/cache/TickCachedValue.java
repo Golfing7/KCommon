@@ -9,10 +9,14 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class TickCachedValue<T> implements CachedValue<T> {
-    /** The time, in ticks, it takes for a value to expire. */
+    /**
+     * The time, in ticks, it takes for a value to expire.
+     */
     @Getter
     private final long tickExpiryTime;
-    /** The tick time-stamp of the last time the value was updated. */
+    /**
+     * The tick time-stamp of the last time the value was updated.
+     */
     private long lastTickSet = Long.MIN_VALUE; // Minimum value so we always update it
     private T value;
 

@@ -37,6 +37,7 @@ public abstract class Either<L, R> {
 
     public static class Left<L, R> extends Either<L, R> {
         private final L left;
+
         public Left(L left) {
             this.left = left;
         }
@@ -59,6 +60,7 @@ public abstract class Either<L, R> {
 
     public static class Right<L, R> extends Either<L, R> {
         private final R right;
+
         public Right(R right) {
             this.right = right;
         }

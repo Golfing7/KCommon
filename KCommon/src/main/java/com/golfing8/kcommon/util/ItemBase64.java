@@ -26,11 +26,10 @@ public class ItemBase64 {
         String content = toBase64(playerInventory);
         String armor = itemStackArrayToBase64(playerInventory.getArmorContents());
 
-        return new String[] { content, armor };
+        return new String[]{content, armor};
     }
 
     /**
-     *
      * A method to serialize an {@link ItemStack} array to Base64 String.
      * <p>
      * Based off of {@link #toBase64(Inventory)}.
@@ -110,11 +109,10 @@ public class ItemBase64 {
     }
 
     /**
-     *
      * A method to get an {@link Inventory} from an encoded, Base64, string.
      *
      * <p>
-     *
+     * <p>
      * Special thanks to Comphenix in the Bukkit forums or also known
      * as aadnk on GitHub.
      * </p>

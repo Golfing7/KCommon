@@ -6,11 +6,14 @@ import java.util.Objects;
 
 /**
  * An implementation of the {@link Pointer} interface with a final value.
+ *
  * @param <T>
  */
 @RequiredArgsConstructor
 public class FinalPointer<T> implements Pointer<T> {
-    /** The value of this pointer */
+    /**
+     * The value of this pointer
+     */
     private final T value;
 
     /**

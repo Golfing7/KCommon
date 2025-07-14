@@ -7,11 +7,7 @@ import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A class to manage the instances of the {@link Module} class. This is used in place of the
@@ -27,7 +23,9 @@ public final class Modules {
      * similar names.
      */
     private static final Map<KNamespacedKey, Module> MODULE_MAP = new HashMap<>();
-    /** A clone of the above map, but uses ONLY the name of the module. (Can cause problems if two plugins register the same module) */
+    /**
+     * A clone of the above map, but uses ONLY the name of the module. (Can cause problems if two plugins register the same module)
+     */
     private static final Map<String, List<Module>> SMODULE_MAP = new HashMap<>();
     /**
      * Stores the module's class to its instance.
@@ -89,7 +87,7 @@ public final class Modules {
      * Gets the given module with the class type.
      *
      * @param moduleClass the class of the module to get
-     * @param <T> the type of module
+     * @param <T>         the type of module
      */
     @SuppressWarnings("unchecked")
     public static <T extends Module> T getModule(@Nonnull Class<T> moduleClass) {
@@ -107,7 +105,7 @@ public final class Modules {
     static boolean registerModule(@Nonnull Module module) {
         Preconditions.checkNotNull(module);
         KNamespacedKey namespacedKey = module.getNamespacedKey();
-        if(MODULE_MAP.containsKey(namespacedKey))
+        if (MODULE_MAP.containsKey(namespacedKey))
             return false;
 
         MODULE_MAP.put(namespacedKey, module);

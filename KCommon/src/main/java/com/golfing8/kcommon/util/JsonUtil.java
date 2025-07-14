@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.util;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Array;
@@ -16,9 +15,9 @@ public class JsonUtil {
      * Tries to read the json element as the given class type.
      *
      * @param element the json element.
-     * @param clazz the class type.
+     * @param clazz   the class type.
+     * @param <T>     the type
      * @return the found object.
-     * @param <T> the type
      */
     @SuppressWarnings("unchecked")
     public static <T> T readByType(JsonElement element, Class<T> clazz) {

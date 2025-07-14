@@ -19,6 +19,7 @@ public abstract class MCommand<T extends Module> extends KCommand implements Lan
      */
     @Getter
     private final T module;
+
     public MCommand(T module, String commandName, List<String> commandAliases, boolean forPlayers) {
         super(commandName, commandAliases, forPlayers);
 
@@ -61,7 +62,7 @@ public abstract class MCommand<T extends Module> extends KCommand implements Lan
 
         //Generate the command prefix.
         KCommand parent = getParent();
-        while(parent != null) {
+        while (parent != null) {
             builder.append(parent.getCommandName()).append("-");
             parent = parent.getParent();
         }

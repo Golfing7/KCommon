@@ -11,6 +11,7 @@ import java.util.Set;
 
 /**
  * Stores values in a hash-like pattern in a vertical column.
+ *
  * @param <V>
  */
 public class HashChunkColumn<V> implements ChunkColumn<V> {
@@ -26,8 +27,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
 
     private int size;
 
-    public HashChunkColumn()
-    {
+    public HashChunkColumn() {
         buckets = CHUNK_SECTIONS;
 
         storedObjects = new Node[buckets][];
@@ -56,12 +56,11 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
 
         Node exact = at[exactLocation];
 
-        if(exact == null || exact.value == null)
-        {
+        if (exact == null || exact.value == null) {
             Node newNode = new Node(p, v);
 
             newNode.previous = tail;
-            if(tail != null)
+            if (tail != null)
                 tail.next = newNode;
             else
                 head = newNode;
@@ -96,19 +95,19 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
         Node exact = at[exactLocation];
 
         //No value anyway!
-        if(exact == null || exact.value == null)
+        if (exact == null || exact.value == null)
             return null;
 
         V toReturn = (V) exact.value;
 
-        if(exact.next != null)
+        if (exact.next != null)
             exact.next.previous = exact.previous;
-        if(exact.previous != null)
+        if (exact.previous != null)
             exact.previous.next = exact.next;
 
-        if(exact == head)
+        if (exact == head)
             head = exact.next;
-        if(exact == tail)
+        if (exact == tail)
             tail = exact.previous;
 
         at[exactLocation] = null;
@@ -138,8 +137,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
 
         Node head = this.head;
 
-        while(head != null)
-        {
+        while (head != null) {
             entries.add(new UnboundedCSPointMap.MapEntry(head.key, head.value));
 
             head = head.next;
@@ -159,15 +157,14 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
 
         this.head = this.tail = null;
 
-        while(head != null){
+        while (head != null) {
             head.value = null;
 
             head = head.next;
         }
     }
 
-    private Node getAtExactLocation(Position p)
-    {
+    private Node getAtExactLocation(Position p) {
         int hashKey = getHashKey(p);
 
         Node[] at = storedObjects[hashKey];
@@ -177,8 +174,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
         return at[exactLocation];
     }
 
-    private int getExactLocationKey(Position p)
-    {
+    private int getExactLocationKey(Position p) {
         int x = p.getX() & 15;
         int y = (p.getY() + 64) & 15;
         int z = p.getZ() & 15;
@@ -186,22 +182,19 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
         return x << 8 | y << 4 | z;
     }
 
-    private int getHashKey(Position p)
-    {
+    private int getHashKey(Position p) {
         int y = (p.getY() + 64) >> RIGHT_BIT_SHIFT;
 
-        if(y >= buckets || y < 0)
+        if (y >= buckets || y < 0)
             throw new IllegalArgumentException("Point must be defined in y 1-256! Was " + p.getY());
 
         return y;
     }
 
-    static class NodeIterator<V> implements Iterator<V>
-    {
+    static class NodeIterator<V> implements Iterator<V> {
         private Node current;
 
-        NodeIterator(Node current)
-        {
+        NodeIterator(Node current) {
             this.current = current;
         }
 
@@ -212,7 +205,7 @@ public class HashChunkColumn<V> implements ChunkColumn<V> {
 
         @Override
         public V next() {
-            if(!hasNext())
+            if (!hasNext())
                 throw new NoSuchElementException();
 
             V value = (V) current.value;

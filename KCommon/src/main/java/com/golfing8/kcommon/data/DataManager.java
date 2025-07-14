@@ -56,13 +56,14 @@ public interface DataManager<T extends DataSerializable> {
      * @param key the key
      * @return the object
      */
-    @Nullable T getObject(@Nonnull String key);
+    @Nullable
+    T getObject(@Nonnull String key);
 
     /**
      * Gets all objects that have field values equal to the provided parameters.
      *
-     * @param field the first field to get an object with.
-     * @param value the value of the first field.
+     * @param field     the first field to get an object with.
+     * @param value     the value of the first field.
      * @param keyValues more field/value pairs.
      * @return all objects that have those values.
      */
@@ -100,7 +101,9 @@ public interface DataManager<T extends DataSerializable> {
      * @param obj the object to delete
      * @return true if deleted, false if the object wasn't found
      */
-    default boolean delete(@Nonnull T obj){return this.delete(obj.getKey());}
+    default boolean delete(@Nonnull T obj) {
+        return this.delete(obj.getKey());
+    }
 
     /**
      * Deletes an object with the given key

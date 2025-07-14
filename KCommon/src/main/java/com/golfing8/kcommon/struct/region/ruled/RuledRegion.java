@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BlockVector;
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A region that contains certain rules that are enforced.
@@ -31,13 +29,19 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 public class RuledRegion implements Region {
-    /** The enforcing plugin is used to start tasks/create listeners */
+    /**
+     * The enforcing plugin is used to start tasks/create listeners
+     */
     @Getter
     private final Plugin enforcer;
-    /** The region backing this ruled region. */
+    /**
+     * The region backing this ruled region.
+     */
     private final Region backingRegion;
-    /** The rules of this region. */
-    private List<RegionRule> rules = new ArrayList<>();
+    /**
+     * The rules of this region.
+     */
+    private final List<RegionRule> rules = new ArrayList<>();
 
     /**
      * Starts all rules attached to this region.

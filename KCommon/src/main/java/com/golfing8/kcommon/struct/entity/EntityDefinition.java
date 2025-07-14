@@ -13,11 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;
@@ -41,35 +37,61 @@ public class EntityDefinition implements CASerializable {
     public static final String ENTITY_LINK_KEY = "k_entity_link";
 
     private String _key;
-    /** The entity type/data that defines the entity */
+    /**
+     * The entity type/data that defines the entity
+     */
     @Builder.Default
     private EntityData entityType = EntityData.fromType(EntityType.PIG);
-    /** The display name of this entity */
+    /**
+     * The display name of this entity
+     */
     private @Nullable String name;
-    /** Any bukkit attributes that will be applied to this entity */
+    /**
+     * Any bukkit attributes that will be applied to this entity
+     */
     private @Nullable Map<EntityAttribute, Double> attributes;
-    /** Any effects that will be applied to the entity when they spawn */
+    /**
+     * Any effects that will be applied to the entity when they spawn
+     */
     private @Nullable List<PotionEffect> potionEffects;
-    /** Used to set the max health of the entity. If set to a positive number, this will override the MAX_HEALTH under {@link #attributes} */
+    /**
+     * Used to set the max health of the entity. If set to a positive number, this will override the MAX_HEALTH under {@link #attributes}
+     */
     @Builder.Default
     private double maxHealth = -1;
-    /** The amount of health the entity spawns with */
+    /**
+     * The amount of health the entity spawns with
+     */
     @Builder.Default
     private double spawnHealth = -1;
-    /** The equipment to apply to the entity */
+    /**
+     * The equipment to apply to the entity
+     */
     private @Nullable EntityEquipment equipment;
-    /** The vehicle this entity can ride */
+    /**
+     * The vehicle this entity can ride
+     */
     private @Nullable EntityDefinition vehicle;
-    /** The passenger of this entity */
+    /**
+     * The passenger of this entity
+     */
     private @Nullable EntityDefinition passenger;
-    /** If the entity should be the adult version */
+    /**
+     * If the entity should be the adult version
+     */
     @Builder.Default
     private boolean adult = true;
-    /** If normal spawn randomization should occur */
+    /**
+     * If normal spawn randomization should occur
+     */
     private boolean randomizeData;
-    /** If this entity will be linked to its vehicle and passenger in health and death time */
+    /**
+     * If this entity will be linked to its vehicle and passenger in health and death time
+     */
     private boolean linked;
-    /** A drop table that MUST BE HANDLED BY THE USER. Simply spawning this entity WILL NOT override drops */
+    /**
+     * A drop table that MUST BE HANDLED BY THE USER. Simply spawning this entity WILL NOT override drops
+     */
     private @Nullable DropTable dropTable;
 
     /**

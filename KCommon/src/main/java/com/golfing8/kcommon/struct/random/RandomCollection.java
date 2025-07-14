@@ -6,8 +6,10 @@ import java.util.*;
 
 public class RandomCollection<E> {
 
-    @Expose private final NavigableMap<Double, E> map;
-    @Expose private double total;
+    @Expose
+    private final NavigableMap<Double, E> map;
+    @Expose
+    private double total;
 
     public RandomCollection() {
         this.map = new TreeMap<>();

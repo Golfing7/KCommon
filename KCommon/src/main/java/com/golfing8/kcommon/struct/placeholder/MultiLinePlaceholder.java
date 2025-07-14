@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.struct.placeholder;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
  * - "2" <br>
  * - "3" <br>
  * Note that the line with the placeholder is deleted and replaced with the first line of the placeholder. This is true with messages as well.
- *
  */
 @Getter
 public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List<String>> {
@@ -65,7 +63,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
 
             // Get the replacements and check if its empty
             List<String> replacement = this.getReplacement();
-            if(replacement.isEmpty()) {
+            if (replacement.isEmpty()) {
                 toReturn.remove(i--);
                 continue;
             }
@@ -83,7 +81,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
     /**
      * Generates a placeholder with the default naming convention and a list of string values.
      *
-     * @param label the label, will be converted to uppercase and surrounded in '%'s
+     * @param label  the label, will be converted to uppercase and surrounded in '%'s
      * @param values the values to replace the label with.
      * @return the created placeholder.
      * @deprecated Use {@link #percentTrusted(String, List)}
@@ -97,7 +95,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
     /**
      * Generates a placeholder with the default naming convention and a list of string values.
      *
-     * @param label the label, will be converted to uppercase and surrounded in '%'s
+     * @param label  the label, will be converted to uppercase and surrounded in '%'s
      * @param values the values to replace the label with.
      * @return the created placeholder.
      */
@@ -108,7 +106,7 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
     /**
      * Generates a placeholder with the default naming convention and a list of string values.
      *
-     * @param label the label, will be converted to uppercase and surrounded in '%'s
+     * @param label  the label, will be converted to uppercase and surrounded in '%'s
      * @param values the values to replace the label with.
      * @return the created placeholder.
      */
@@ -119,8 +117,8 @@ public class MultiLinePlaceholder extends PlaceholderAbstract<List<String>, List
     /**
      * Generates a placeholder with the default naming convention and a list of string values.
      *
-     * @param label the label, will be converted to uppercase and surrounded in '%'s
-     * @param values the values to replace the label with.
+     * @param label   the label, will be converted to uppercase and surrounded in '%'s
+     * @param values  the values to replace the label with.
      * @param trusted if the placeholder is trusted.
      * @return the created placeholder.
      */

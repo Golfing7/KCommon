@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class LayoutShapePoints implements MenuLayoutShape {
     private final List<MenuCoordinate> coordinates;
+
     public LayoutShapePoints(List<MenuCoordinate> coordinates) {
         this.coordinates = new ArrayList<>(coordinates);
     }

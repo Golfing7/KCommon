@@ -1,7 +1,5 @@
 package com.golfing8.kcommon.data;
 
-import com.google.gson.JsonObject;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +10,9 @@ import java.util.UUID;
  * An abstract data serializable class that is backed by a player.
  */
 public abstract class SenderSerializable extends AbstractSerializable {
-    /** The player's UUID. */
+    /**
+     * The player's UUID.
+     */
     private transient UUID playerUUID;
 
     @Override

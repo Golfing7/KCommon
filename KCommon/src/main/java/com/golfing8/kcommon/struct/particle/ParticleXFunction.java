@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.function.Function;
 
 /**

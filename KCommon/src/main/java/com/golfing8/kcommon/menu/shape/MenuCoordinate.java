@@ -2,7 +2,6 @@ package com.golfing8.kcommon.menu.shape;
 
 import com.golfing8.kcommon.menu.MenuUtils;
 import lombok.Data;
-import lombok.Setter;
 
 @Data
 public class MenuCoordinate {

@@ -27,7 +27,6 @@ package com.golfing8.kcommon.struct.helper.scheduler;
 
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.struct.helper.exception.HelperExceptions;
-
 import org.bukkit.Bukkit;
 
 import java.util.concurrent.Executor;
@@ -76,6 +75,7 @@ public final class HelperExecutors {
         return HelperExceptions.wrapSchedulerTask(runnable);
     }
 
-    private HelperExecutors() {}
+    private HelperExecutors() {
+    }
 
 }

@@ -16,25 +16,27 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * Represents common things for configurations across the plugin.
  */
 public class ConfigTypeRegistry {
     private static final String DELEGATE_PREFIX = "!delegate!";
-    /** The config adapters registered */
+    /**
+     * The config adapters registered
+     */
     private static final Map<Class<?>, ConfigAdapter<?>> CONFIG_ADAPTERS = new HashMap<>();
-    /** A cache of class -> adapter. This contains subclasses of the adapter's implemented type. */
+    /**
+     * A cache of class -> adapter. This contains subclasses of the adapter's implemented type.
+     */
     private static final Map<Class<?>, ConfigAdapter<?>> ADAPTER_LOOKUP = new HashMap<>();
 
     /**
      * Tries to find an adapter for the given type.
      *
      * @param actualType the actual type.
+     * @param <T>        the class type.
      * @return the adapter.
-     * @param <T> the class type.
      */
     @SuppressWarnings("unchecked")
     public static <T> ConfigAdapter<? super T> findAdapter(Class<T> actualType) {
@@ -97,8 +99,8 @@ public class ConfigTypeRegistry {
      *
      * @param entry the config entry.
      * @param clazz the class type.
+     * @param <T>   the type of value
      * @return the value
-     * @param <T> the type of value
      */
     public static <T> T getFromType(ConfigEntry entry, Class<T> clazz) {
         return getFromType(entry, new FieldType(clazz));
@@ -109,8 +111,8 @@ public class ConfigTypeRegistry {
      *
      * @param entry the config entry.
      * @param field the field type.
+     * @param <T>   the type of value
      * @return the value
-     * @param <T> the type of value
      */
     public static <T> T getFromType(ConfigEntry entry, Field field) {
         return getFromType(entry, new FieldType(field));
@@ -121,8 +123,8 @@ public class ConfigTypeRegistry {
      *
      * @param entry the config entry.
      * @param field the field type.
+     * @param <T>   the type of value
      * @return the value
-     * @param <T> the type of value
      */
     @SuppressWarnings({"unchecked"})
     public static <T> T getFromType(ConfigEntry entry, FieldType field) {
@@ -148,8 +150,8 @@ public class ConfigTypeRegistry {
      *
      * @param entry the config entry.
      * @param clazz the field type.
+     * @param <T>   the type of value
      * @return the value
-     * @param <T> the type of value
      */
     public static <T> T getFromType(ConfigPrimitive entry, Class<T> clazz) {
         return getFromType(entry, new FieldType(clazz));
@@ -160,8 +162,8 @@ public class ConfigTypeRegistry {
      *
      * @param entry the config entry.
      * @param field the field type.
+     * @param <T>   the type of value
      * @return the value
-     * @param <T> the type of value
      */
     @SuppressWarnings({"unchecked"})
     public static <T> T getFromType(ConfigPrimitive entry, FieldType field) {
@@ -204,8 +206,8 @@ public class ConfigTypeRegistry {
      * Sets the value at the given configuration section.
      *
      * @param section the section.
-     * @param path the path of the value.
-     * @param value the value.
+     * @param path    the path of the value.
+     * @param value   the value.
      */
     public static void setInConfig(ConfigurationSection section, String path, Object value) {
         // Special cases for config sections
@@ -219,11 +221,11 @@ public class ConfigTypeRegistry {
     /**
      * Loads the value from the given config delegate.
      *
-     * @param context the context section.
-     * @param path the path given for delegation.
+     * @param context   the context section.
+     * @param path      the path given for delegation.
      * @param fieldType the field type.
+     * @param <T>       the type.
      * @return the loaded value, or null if it's not in a config.
-     * @param <T> the type.
      */
     private static <T> @Nullable T loadFromDelegate(ConfigurationSection context, String path, FieldType fieldType) {
         Configuration root = context.getRoot() instanceof Configuration ? (Configuration) context.getRoot() : null;

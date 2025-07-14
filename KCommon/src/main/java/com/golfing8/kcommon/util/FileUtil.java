@@ -8,12 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
-import java.util.zip.ZipInputStream;
 
 @UtilityClass
 public final class FileUtil {
@@ -21,9 +18,9 @@ public final class FileUtil {
     /**
      * Copies all the jar elements from the jar to the given destination path.
      *
-     * @param pathToJar the path to the jar file.
+     * @param pathToJar    the path to the jar file.
      * @param jarDirectory the jar directory to pull elements from.
-     * @param destination the destination directory.
+     * @param destination  the destination directory.
      * @throws IOException if any IO shenanigans occur.
      */
     public static void copyJarElements(Path pathToJar, String jarDirectory, Path destination) throws IOException {

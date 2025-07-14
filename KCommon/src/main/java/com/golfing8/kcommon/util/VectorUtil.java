@@ -12,7 +12,7 @@ public class VectorUtil {
      * Matrix</a>.
      *
      * @param angle the angle to rotate the vector about. This angle is passed
-     * in radians
+     *              in radians
      * @return the same vector
      */
 
@@ -34,7 +34,7 @@ public class VectorUtil {
      * Matrix</a>.
      *
      * @param angle the angle to rotate the vector about. This angle is passed
-     * in radians
+     *              in radians
      * @return the same vector
      */
 
@@ -56,7 +56,7 @@ public class VectorUtil {
      * Matrix</a>.
      *
      * @param angle the angle to rotate the vector about. This angle is passed
-     * in radians
+     *              in radians
      * @return the same vector
      */
 

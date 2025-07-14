@@ -8,7 +8,10 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.title.Title;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class CAMessage implements ConfigAdapter<Message> {
     @Override

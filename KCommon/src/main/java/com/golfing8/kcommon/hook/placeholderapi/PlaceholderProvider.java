@@ -16,6 +16,7 @@ public interface PlaceholderProvider {
     interface PlaceholderFunction {
         String get(OfflinePlayer player, String[] args);
     }
+
     interface RelPlaceholderFunction {
         String get(OfflinePlayer player, Player other, String[] args);
     }
@@ -30,11 +31,14 @@ public interface PlaceholderProvider {
 
     /**
      * Gets all registered placeholders
+     *
      * @return the placeholders
      */
     Map<KPlaceholderDefinition, PlaceholderFunction> getPlaceholders();
+
     /**
      * Gets all registered relational placeholders
+     *
      * @return the placeholders
      */
     Map<KPlaceholderDefinition, RelPlaceholderFunction> getRelationalPlaceholders();
@@ -43,7 +47,7 @@ public interface PlaceholderProvider {
      * Registers a new simple placeholder for this provider.
      *
      * @param definition the definition of the placeholder.
-     * @param function its provider function.
+     * @param function   its provider function.
      */
     void addPlaceholder(KPlaceholderDefinition definition, PlaceholderFunction function);
 
@@ -51,7 +55,7 @@ public interface PlaceholderProvider {
      * Registers a relational placeholder for this provider.
      *
      * @param definition the definition of the placeholder.
-     * @param function its provider function.
+     * @param function   its provider function.
      */
     void addRelPlaceholder(KPlaceholderDefinition definition, RelPlaceholderFunction function);
 
@@ -59,7 +63,7 @@ public interface PlaceholderProvider {
      * Called when a placeholder needs to be parsed. Takes the player as a context and the parameters and converts
      * it into a parsed placeholder.
      *
-     * @param player the player the placeholder is parsing on.
+     * @param player     the player the placeholder is parsing on.
      * @param parameters the parameters for the placeholder.
      * @return the parsed placeholder, or null if the default unimplemented placeholder should be returned.
      */
@@ -89,8 +93,8 @@ public interface PlaceholderProvider {
      * Called when a relational placeholder needs parsed. Takes both players as context and the parameters
      * and converts it into a parsed placeholder.
      *
-     * @param p1 the first player.
-     * @param p2 the second player.
+     * @param p1         the first player.
+     * @param p2         the second player.
      * @param parameters the parameters for the placeholder.
      * @return the parsed placeholder, or null if the default unimplemented placeholder should be returned.
      */

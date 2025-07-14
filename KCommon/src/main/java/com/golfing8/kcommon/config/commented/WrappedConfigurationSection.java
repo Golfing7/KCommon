@@ -1,19 +1,15 @@
 package com.golfing8.kcommon.config.commented;
 
-import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.exc.ConfigException;
-import com.golfing8.kcommon.menu.MenuBuilder;
 import lombok.AllArgsConstructor;
 import org.bukkit.Color;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor

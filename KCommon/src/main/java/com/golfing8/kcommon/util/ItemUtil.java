@@ -2,7 +2,6 @@ package com.golfing8.kcommon.util;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.NMS;
-import com.golfing8.kcommon.nms.item.NMSItem;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
@@ -10,11 +9,9 @@ import de.tr7zw.changeme.nbtapi.NBTType;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.experimental.UtilityClass;
 import lombok.var;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +43,7 @@ public final class ItemUtil {
     /**
      * Applies the placeholders to the given item.
      *
-     * @param itemStack the item
+     * @param itemStack    the item
      * @param placeholders the placeholders
      */
     public static void applyPlaceholders(ItemStack itemStack, Collection<Placeholder> placeholders) {
@@ -72,7 +69,7 @@ public final class ItemUtil {
     /**
      * Applies the multi-line placeholders to the given item.
      *
-     * @param itemStack the item.
+     * @param itemStack    the item.
      * @param placeholders the placeholders.
      */
     public static void applyMPlaceholders(ItemStack itemStack, Collection<MultiLinePlaceholder> placeholders) {
@@ -95,7 +92,7 @@ public final class ItemUtil {
      * @param check the check.
      * @return true if the item is air or null.
      */
-    public static boolean isAirOrNull(ItemStack check){
+    public static boolean isAirOrNull(ItemStack check) {
         return check == null || check.getType() == XMaterial.AIR.parseMaterial() || check.getAmount() <= 0;
     }
 

@@ -28,12 +28,7 @@ package com.golfing8.kcommon.struct.helper.util;
 import com.golfing8.kcommon.struct.helper.interfaces.Delegate;
 
 import java.util.concurrent.Callable;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * A collection of utility methods for delegating Java 8 functions
@@ -140,7 +135,7 @@ public final class Delegates {
         }
     }
 
-    private static final class ConsumerToBiConsumerSecond<T, U>extends AbstractDelegate<Consumer<U>> implements BiConsumer<T, U> {
+    private static final class ConsumerToBiConsumerSecond<T, U> extends AbstractDelegate<Consumer<U>> implements BiConsumer<T, U> {
         ConsumerToBiConsumerSecond(Consumer<U> delegate) {
             super(delegate);
         }

@@ -9,7 +9,8 @@ public final class ProgressBar {
 
     public static final char BOX_UNICODE = '\u2588';
 
-    private ProgressBar() {}
+    private ProgressBar() {
+    }
 
     public static String getProgressBar(double progress) {
         return getProgressBar(progress, 100.0D);
@@ -25,14 +26,14 @@ public final class ProgressBar {
 
     /**
      * Returns a progress bar, colored, of "length" length made up of "barChar" characters.
+     *
      * @param progress
      * @param maxProgress
      * @param barChar
      * @param length
      * @return
      */
-    public static String getProgressBar(double progress, double maxProgress, char barChar, int length)
-    {
+    public static String getProgressBar(double progress, double maxProgress, char barChar, int length) {
         return getProgressBar(progress, maxProgress, barChar, length, COLOR_GREEN, COLOR_LIME, COLOR_GRAY);
     }
 
@@ -43,13 +44,12 @@ public final class ProgressBar {
 
         double percentPerChar = (1D / length) * 100.0D;
 
-        for(int i = 0; i < length; i++)
-        {
+        for (int i = 0; i < length; i++) {
             double progressPassBar = percentPerChar * (i + 1);
 
-            if(percentage >= progressPassBar)
+            if (percentage >= progressPassBar)
                 progressBar.append(filledColor);
-            else if(percentage + percentPerChar >= progressPassBar)
+            else if (percentage + percentPerChar >= progressPassBar)
                 progressBar.append(semiFilledColor);
             else
                 progressBar.append(emptyColor);

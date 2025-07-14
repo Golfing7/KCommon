@@ -13,7 +13,6 @@ import com.golfing8.kcommon.data.DataManagerContainer;
 import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.struct.KNamespacedKey;
-import com.golfing8.kcommon.struct.helper.terminable.Terminable;
 import com.golfing8.kcommon.struct.helper.terminable.TerminableConsumer;
 import com.golfing8.kcommon.struct.helper.terminable.composite.CompositeClosingException;
 import com.golfing8.kcommon.struct.helper.terminable.composite.CompositeTerminable;
@@ -27,7 +26,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,8 +49,8 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Gets a module instance associated with the given type for the call.
      *
      * @param unused an unused array of objects used to reify the generic.
+     * @param <T>    the type.
      * @return the module instance.
-     * @param <T> the type.
      */
     @SuppressWarnings("unchecked")
     public static <T extends Module> T get(@NotNull T... unused) {
@@ -79,21 +77,32 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      */
     @Getter
     private final Set<String> moduleDependencies;
-    /** The plugin dependencies for this module */
+    /**
+     * The plugin dependencies for this module
+     */
     @Getter
     private final Set<String> pluginDependencies;
-    /** The logger used for this module */
+    /**
+     * The logger used for this module
+     */
     @Getter
     private final Logger logger;
-    /** The permission prefix */
+    /**
+     * The permission prefix
+     */
     @Getter
     private final String permissionPrefix;
-    /** The module info annotation on this class */
+    /**
+     * The module info annotation on this class
+     */
     @Getter
     private final @Nullable ModuleInfo moduleInfo;
-    /** The terminable for this life cycle of the module. */
+    /**
+     * The terminable for this life cycle of the module.
+     */
     @Getter
     private final CompositeTerminable terminable = CompositeTerminable.create();
+
     @Override
     public @NotNull <T extends AutoCloseable> T bind(@NotNull T terminable) {
         return this.terminable.bind(terminable);
@@ -105,7 +114,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      */
     @Getter
     private transient boolean enabled;
-    /** Used to indicate that the {@link #disable()} method was called during the execution of {@link #onEnable()} */
+    /**
+     * Used to indicate that the {@link #disable()} method was called during the execution of {@link #onEnable()}
+     */
     private transient boolean prematureDisable;
 
     /**
@@ -121,13 +132,16 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * All registered sub modules.
      */
     private final Set<SubModule<?>> subModules;
-    /** The path to the data folder */
+    /**
+     * The path to the data folder
+     */
     private Path dataFolder;
     /**
      * Other configs that are linked to this module.
      */
     @Getter
     private final Map<String, MConfiguration> configs;
+
     public @NotNull MConfiguration getMainConfig() {
         return configs.get("config");
     }
@@ -192,7 +206,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.moduleInfo = null;
 
         // Try to register this module to the registry.
-        if(Modules.moduleExists(this.getNamespacedKey())) {
+        if (Modules.moduleExists(this.getNamespacedKey())) {
             getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
             return;
         }
@@ -225,7 +239,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.moduleInfo = info;
 
         // Try to register this module to the registry.
-        if(Modules.moduleExists(this.getNamespacedKey())) {
+        if (Modules.moduleExists(this.getNamespacedKey())) {
             getLogger().warning(String.format("Module already exists with name %s!", this.getModuleName()));
             return;
         }
@@ -246,8 +260,8 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     public final void reloadWithDependencies() {
         this.reload();
 
-        for(Module module : Modules.getAll()) {
-            if(module.getModuleDependencies().contains(this.getModuleName()))
+        for (Module module : Modules.getAll()) {
+            if (module.getModuleDependencies().contains(this.getModuleName()))
                 module.reloadWithDependencies();
         }
     }
@@ -366,7 +380,8 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
             try {
                 runnable.cancel();
-            } catch (IllegalStateException ignored) {} // Can be thrown if the runnable wasn't scheduled yet
+            } catch (IllegalStateException ignored) {
+            } // Can be thrown if the runnable wasn't scheduled yet
         });
 
         //Unregister sub listeners.
@@ -395,7 +410,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     /**
      * Loads a config group from the given name.
      * <p>
-     *     Returns a list of configurations under the directory /{@code groupName}/ in the plugin's data folder.
+     * Returns a list of configurations under the directory /{@code groupName}/ in the plugin's data folder.
      * </p>
      *
      * @return the config group.
@@ -439,9 +454,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         //Create the parent directory.
         this.dataFolder = Paths.get(plugin.getDataFolder().getPath(), moduleName);
         boolean firstLoad = Files.notExists(dataFolder);
-        try{
+        try {
             Files.createDirectories(dataFolder.getParent());
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
         }
 
@@ -515,9 +530,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         YamlConfiguration source = new YamlConfiguration();
 
         //Create the parent directory.
-        try{
+        try {
             Files.createDirectories(configPath.getParent());
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
         }
 
@@ -528,11 +543,11 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             resourcePath = "/" + (defaultConfig ? moduleName + ".yml" : configPath.getFileName().toString());
         }
 
-        try(InputStream resource = this.plugin.getClass().getResourceAsStream(resourcePath)) {
+        try (InputStream resource = this.plugin.getClass().getResourceAsStream(resourcePath)) {
             ByteArrayOutputStream streamCloner = new ByteArrayOutputStream();
 
             //Check that the resource exists
-            if(resource == null) {
+            if (resource == null) {
                 if (Files.notExists(configPath))
                     Files.createFile(configPath);
             } else {
@@ -548,7 +563,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
                             configPath.getFileName().toString()), exc);
                 }
             }
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to load config %s for module %s. Is it missing? (Checked under plugin %s)",
                     configPath.getFileName().toString(),
                     getModuleName(),

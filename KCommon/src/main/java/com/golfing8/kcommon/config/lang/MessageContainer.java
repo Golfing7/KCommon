@@ -1,10 +1,7 @@
 package com.golfing8.kcommon.config.lang;
 
 import com.golfing8.kcommon.ComponentUtils;
-import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.struct.SoundWrapper;
-import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
-import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.struct.title.Title;
 import com.golfing8.kcommon.util.MS;
@@ -13,11 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -106,7 +98,7 @@ public interface MessageContainer {
     /**
      * Sends this message to the given player with the placeholders.
      *
-     * @param sender the sender.
+     * @param sender       the sender.
      * @param placeholders the placeholders.
      */
     default void send(CommandSender sender, Object... placeholders) {

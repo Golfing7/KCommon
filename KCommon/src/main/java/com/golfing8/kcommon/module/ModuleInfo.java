@@ -14,6 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface ModuleInfo {
     /**
      * The name of the module.
+     *
      * @return the name of the module.
      */
     @NotNull
@@ -43,6 +44,7 @@ public @interface ModuleInfo {
      * @return the minimum major version
      */
     int minimumMajorVersion() default -1;
+
     /**
      * The maximum major version that this module will load on.
      *
@@ -56,6 +58,7 @@ public @interface ModuleInfo {
      * @return the minimum minor version.
      */
     int minimumMinorVersion() default -1;
+
     /**
      * The maximum minor version that this module will load on.
      *

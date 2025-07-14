@@ -1,11 +1,9 @@
 package com.golfing8.kcommon.struct.placeholder;
 
-import com.golfing8.kcommon.config.lang.Message;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentIteratorType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -16,9 +14,13 @@ import java.util.*;
 @Getter
 public class PlaceholderContainer {
     public static final PlaceholderContainer EMPTY = new PlaceholderContainer(Collections.emptyList(), Collections.emptyList());
-    /** Contains normal placeholders */
+    /**
+     * Contains normal placeholders
+     */
     private final ImmutableList<Placeholder> placeholders;
-    /** Contains multi-line placeholders */
+    /**
+     * Contains multi-line placeholders
+     */
     private final ImmutableList<MultiLinePlaceholder> multiLinePlaceholders;
 
     public PlaceholderContainer(List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders) {
@@ -111,7 +113,7 @@ public class PlaceholderContainer {
      * @param objects the objects.
      * @return the flattened placeholder container.
      */
-    public static PlaceholderContainer compileTrusted(@NotNull Object @NotNull... objects) {
+    public static PlaceholderContainer compileTrusted(@NotNull Object @NotNull ... objects) {
         return compile(false, objects);
     }
 
@@ -121,11 +123,11 @@ public class PlaceholderContainer {
      * @param objects the objects.
      * @return the flattened placeholder container.
      */
-    public static PlaceholderContainer compileUntrusted(@NotNull Object @NotNull... objects) {
+    public static PlaceholderContainer compileUntrusted(@NotNull Object @NotNull ... objects) {
         return compile(true, objects);
     }
 
-    private static PlaceholderContainer compile(boolean trusted, @NotNull Object @NotNull... objects) {
+    private static PlaceholderContainer compile(boolean trusted, @NotNull Object @NotNull ... objects) {
         Preconditions.checkNotNull(objects, "Arguments cannot be null");
         if (objects.length == 0) {
             return EMPTY;

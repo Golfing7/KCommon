@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.menu;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.golfing8.kcommon.menu.shape.MenuCoordinate;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import lombok.Getter;
@@ -24,16 +23,26 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
             .material(XMaterial.OAK_SIGN)
             .name("&a{DIRECTION} Page");
 
-    /** The parent config section containing the information of the paged menu */
+    /**
+     * The parent config section containing the information of the paged menu
+     */
     private ConfigurationSection parentSection;
-    /** The last known size of the menu */
+    /**
+     * The last known size of the menu
+     */
     private int lastSize;
-    /** The page that is currently being displayed */
+    /**
+     * The page that is currently being displayed
+     */
     private int page;
-    /** The maximum page that can be set. By default, this is loaded from the config, but it is encouraged to override this value. */
+    /**
+     * The maximum page that can be set. By default, this is loaded from the config, but it is encouraged to override this value.
+     */
     @Setter
     private int maxPage;
-    /** How many elements should be expected to show per page. */
+    /**
+     * How many elements should be expected to show per page.
+     */
     @Setter
     private int elementsPerPage;
 

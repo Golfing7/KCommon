@@ -17,8 +17,8 @@ public class LocationUtil {
      * Loops over all locations expanded from the given location and performs the action.
      *
      * @param location the location.
-     * @param range the range.
-     * @param action the action.
+     * @param range    the range.
+     * @param action   the action.
      */
     public void forEachLocationInRange(Location location, int range, Consumer<Location> action) {
         forEachLocationInRange(location, range, range, range, action);
@@ -28,10 +28,10 @@ public class LocationUtil {
      * Loops over all locations expanded from the given location and performs the action.
      *
      * @param location the location.
-     * @param xRange the X range.
-     * @param yRange the Y range.
-     * @param zRange the Z range.
-     * @param action the action.
+     * @param xRange   the X range.
+     * @param yRange   the Y range.
+     * @param zRange   the Z range.
+     * @param action   the action.
      */
     public void forEachLocationInRange(Location location, int xRange, int yRange, int zRange, Consumer<Location> action) {
         for (int x = -xRange; x <= xRange; x++) {
@@ -46,8 +46,8 @@ public class LocationUtil {
     /**
      * Performs the given action once for every block position within the given positions
      *
-     * @param pos1 the first position
-     * @param pos2 the second position
+     * @param pos1   the first position
+     * @param pos2   the second position
      * @param action the action to perform
      */
     public void forEachLocationInRange(Location pos1, Location pos2, Consumer<Location> action) {

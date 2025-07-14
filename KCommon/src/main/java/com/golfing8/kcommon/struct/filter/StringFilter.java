@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
@@ -15,15 +14,25 @@ import java.util.regex.Pattern;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringFilter implements Filter<String> {
-    /** If case should be ignored */
+    /**
+     * If case should be ignored
+     */
     private boolean ignoreCase;
-    /** If the pattern should use regex */
+    /**
+     * If the pattern should use regex
+     */
     private boolean regex;
-    /** If we should only check for contains */
+    /**
+     * If we should only check for contains
+     */
     private boolean contains;
-    /** The pattern to match */
+    /**
+     * The pattern to match
+     */
     private String pattern;
-    /** Only set if {@link #regex} is true */
+    /**
+     * Only set if {@link #regex} is true
+     */
     private transient Pattern regexPattern;
 
     public StringFilter(String pattern, boolean ignoreCase, boolean contains, boolean regex) {

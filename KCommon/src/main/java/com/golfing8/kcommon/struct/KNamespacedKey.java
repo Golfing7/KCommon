@@ -123,10 +123,10 @@ public class KNamespacedKey implements Key {
      * fromString("", plugin) -{@literal >} null
      * </pre>
      *
-     * @param string the string to convert to a KNamespacedKey
+     * @param string           the string to convert to a KNamespacedKey
      * @param defaultNamespace the default namespace to use if none was
-     * supplied. If null, the {@code minecraft} namespace
-     * ({@link #minecraft(String)}) will be used
+     *                         supplied. If null, the {@code minecraft} namespace
+     *                         ({@link #minecraft(String)}) will be used
      * @return the created NamespacedKey. null if invalid key
      * @see #fromString(String)
      */
@@ -168,7 +168,7 @@ public class KNamespacedKey implements Key {
 
     /**
      * Get a KNamespacedKey from the supplied string.
-     *
+     * <p>
      * The default namespace will be Minecraft's (i.e.
      * {@link #minecraft(String)}).
      *
@@ -181,12 +181,12 @@ public class KNamespacedKey implements Key {
         return fromString(key, null);
     }
 
-    
+
     public String getNamespace() {
         return this.namespace;
     }
 
-    
+
     public String getKey() {
         return this.key;
     }
@@ -218,7 +218,7 @@ public class KNamespacedKey implements Key {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        KNamespacedKey other = (KNamespacedKey)obj;
+        KNamespacedKey other = (KNamespacedKey) obj;
         return (this.namespace.equals(other.namespace) && this.key.equals(other.key));
     }
 

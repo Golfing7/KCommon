@@ -1,8 +1,6 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;
@@ -16,7 +14,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Adapts all bukkit crafting recipes.

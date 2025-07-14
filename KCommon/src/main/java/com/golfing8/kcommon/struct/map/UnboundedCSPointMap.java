@@ -9,11 +9,10 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V>{
+public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V> {
     private final Long2ObjectMap<ChunkColumn<V>> storedValues;
 
-    public UnboundedCSPointMap()
-    {
+    public UnboundedCSPointMap() {
         this.storedValues = new Long2ObjectOpenHashMap<>(8096);
     }
 
@@ -75,12 +74,12 @@ public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V>{
 
         ChunkColumn<V> vs = storedValues.get(lKey);
 
-        if(vs == null)
+        if (vs == null)
             return null;
 
         V toReturn = vs.remove(p);
 
-        if(vs.size() == 0)
+        if (vs.size() == 0)
             storedValues.remove(lKey);
 
         return toReturn;
@@ -134,13 +133,11 @@ public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V>{
         return storedValues.get(createLongHash(position));
     }
 
-    static class MapEntry<V> implements Entry<Position, V>
-    {
+    static class MapEntry<V> implements Entry<Position, V> {
         Position key;
         V value;
 
-        MapEntry(Position key, V value)
-        {
+        MapEntry(Position key, V value) {
             this.key = key;
             this.value = value;
         }
@@ -161,8 +158,7 @@ public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V>{
         }
     }
 
-    private long createLongHash(Position p)
-    {
+    private long createLongHash(Position p) {
         return ((long) (p.getX() >> 4) << 32) + (p.getZ() >> 4) - Integer.MIN_VALUE;
     }
 }

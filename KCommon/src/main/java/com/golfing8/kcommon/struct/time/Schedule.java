@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
  * A class that contains timestamps for things to run at during the day.
  */
 public class Schedule {
-    /** Time stamps for actions to take place at. */
+    /**
+     * Time stamps for actions to take place at.
+     */
     @Getter
     private final List<ScheduleEntry> scheduleEntries = new ArrayList<>();
     /**
@@ -120,9 +122,13 @@ public class Schedule {
      */
     @RequiredArgsConstructor
     public static final class ScheduleEntry {
-        /** The timestamp to schedule on. */
+        /**
+         * The timestamp to schedule on.
+         */
         final Timestamp timestamp;
-        /** If this action has yet to occur today. */
+        /**
+         * If this action has yet to occur today.
+         */
         boolean yetToHappen = false;
     }
 }

@@ -26,28 +26,28 @@ public class SpiralHolder {
      */
     private void advance() {
         //Bump out currentX first, always.
-        if(this.currentX == radius && this.currentZ == -radius) {
+        if (this.currentX == radius && this.currentZ == -radius) {
             this.currentX++;
             this.radius++;
             return;
         }
 
-        if(this.currentX == radius && this.currentZ < radius) {
+        if (this.currentX == radius && this.currentZ < radius) {
             this.currentZ++;
             return;
         }
 
-        if(this.currentZ == radius && this.currentX > -radius) {
+        if (this.currentZ == radius && this.currentX > -radius) {
             this.currentX--;
             return;
         }
 
-        if(this.currentX == -radius && this.currentZ > -radius) {
+        if (this.currentX == -radius && this.currentZ > -radius) {
             this.currentZ--;
             return;
         }
 
-        if(this.currentZ == -radius && this.currentX < radius) {
+        if (this.currentZ == -radius && this.currentX < radius) {
             this.currentX++;
         }
     }

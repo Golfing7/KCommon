@@ -15,7 +15,8 @@ import java.util.regex.Pattern;
 /**
  * Represents a 'patch' to an item. This will apply a modification to some part of an item.
  */
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 public class ItemPatch implements CASerializable {
     private @Nullable Patch materialPatch;
@@ -26,12 +27,17 @@ public class ItemPatch implements CASerializable {
     @NoArgsConstructor
     public static class Patch implements CASerializable {
         private String pattern;
-        /** Lazily initialized */
+        /**
+         * Lazily initialized
+         */
         private transient Pattern compiledPattern;
+
         public Pattern getCompiledPattern() {
             return compiledPattern == null ? compiledPattern = Pattern.compile(pattern) : compiledPattern;
         }
+
         private String replacement;
+
         public Patch(String pattern, String replacement) {
             this.pattern = pattern;
             this.replacement = replacement;

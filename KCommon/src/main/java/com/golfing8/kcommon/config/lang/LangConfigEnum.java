@@ -5,5 +5,6 @@ package com.golfing8.kcommon.config.lang;
  */
 public interface LangConfigEnum extends MessageContainer {
     Message getMessage();
+
     void setMessage(Message message);
 }

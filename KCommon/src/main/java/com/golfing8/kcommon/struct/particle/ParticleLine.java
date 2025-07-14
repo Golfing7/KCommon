@@ -12,13 +12,12 @@ import java.util.Collection;
 /**
  * Represents a "line" of particles between two points.
  */
-public class ParticleLine extends Particle{
+public class ParticleLine extends Particle {
 
     private final Vector endPointOffset;
     private final Vector startingPointOffset;
 
-    public ParticleLine(Vector startingPointOffset, Vector endPointOffset)
-    {
+    public ParticleLine(Vector startingPointOffset, Vector endPointOffset) {
         this.startingPointOffset = startingPointOffset;
 
         this.endPointOffset = endPointOffset;
@@ -47,8 +46,7 @@ public class ParticleLine extends Particle{
 
         Vector finalEndPoint = manipulatedEnd.add(location.toVector());
 
-        while(!particleLocation.toVector().isInSphere(finalEndPoint, 0.1))
-        {
+        while (!particleLocation.toVector().isInSphere(finalEndPoint, 0.1)) {
             spawnParticle(players, particleLocation);
 
             particleLocation.add(lineDrawVector);

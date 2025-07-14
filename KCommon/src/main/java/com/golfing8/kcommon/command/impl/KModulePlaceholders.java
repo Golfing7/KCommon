@@ -5,13 +5,9 @@ import com.golfing8.kcommon.command.Cmd;
 import com.golfing8.kcommon.command.CommandContext;
 import com.golfing8.kcommon.command.KCommand;
 import com.golfing8.kcommon.command.argument.CommandArguments;
-import com.golfing8.kcommon.hook.placeholderapi.KPlaceholderDefinition;
 import com.golfing8.kcommon.module.Module;
 import lombok.var;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Lets you list placeholders for a module

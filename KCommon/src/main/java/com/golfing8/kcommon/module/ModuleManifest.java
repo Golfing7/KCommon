@@ -13,9 +13,11 @@ import java.util.Map;
  * </p>
  */
 public class ModuleManifest {
-    /** The states of all modules controlled by the plugin */
+    /**
+     * The states of all modules controlled by the plugin
+     */
     @Getter
-    private Map<String, Boolean> moduleStates = new HashMap<>();
+    private final Map<String, Boolean> moduleStates = new HashMap<>();
 
     /**
      * Called when a module is registering itself into the {@link Modules} class.

@@ -20,7 +20,8 @@ public class MorphingItem {
     private final SoundWrapper soundWrapper;
     private int currentSpot;
     private boolean removeOnFinish;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean frozen;
 
     //Internal field used for rollover

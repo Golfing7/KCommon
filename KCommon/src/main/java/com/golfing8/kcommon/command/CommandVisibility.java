@@ -10,5 +10,4 @@ public enum CommandVisibility {
     PROTECTED,
     // Public, everyone can see it.
     PUBLIC,
-    ;
 }

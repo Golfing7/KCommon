@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.config.adapter.xseries;
 
 import com.cryptomorin.xseries.XEnchantment;
-import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.adapter.ConfigAdapter;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.struct.reflection.FieldType;

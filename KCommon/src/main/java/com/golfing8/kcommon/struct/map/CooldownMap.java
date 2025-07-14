@@ -1,20 +1,22 @@
 package com.golfing8.kcommon.struct.map;
 
 import com.google.common.base.Preconditions;
-import lombok.var;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Stores cooldown information for unique IDs.
  */
 public class CooldownMap<T> {
-    /** The map we store cooldowns in */
+    /**
+     * The map we store cooldowns in
+     */
     private final Map<T, Long> backingMap;
 
     /**
@@ -92,7 +94,7 @@ public class CooldownMap<T> {
     /**
      * Sets the cooldown on the given id, overriding any pre-existing cooldown.
      *
-     * @param id the id.
+     * @param id             the id.
      * @param durationMillis the duration of the cooldown.
      */
     public void setCooldown(@NotNull T id, long durationMillis) {
@@ -106,7 +108,7 @@ public class CooldownMap<T> {
      * Tries to set the cooldown on the given id.
      * If the id is already on cooldown, the method returns true and nothing changes.
      *
-     * @param id the id to put on cooldown
+     * @param id             the id to put on cooldown
      * @param durationMillis the duration of the cooldown, in millis
      * @return if the player was on cooldown
      * @deprecated return value is inconsistent with expected behavior. {@link #checkAndSetCooldown(Object, long)}
@@ -124,7 +126,7 @@ public class CooldownMap<T> {
      * Checks if the user is on cooldown and sets them on cooldown if they aren't.
      * Supersedes {@link #trySetCooldown(Object, long)}
      *
-     * @param id the id.
+     * @param id             the id.
      * @param durationMillis the duration of their cooldown.
      * @return true if they were set on cooldown, false if they were already on cooldown.
      */
@@ -159,7 +161,9 @@ public class CooldownMap<T> {
      * TODO Maybe make this async?
      */
     private static class ExpiryTask extends BukkitRunnable {
-        /** The cooldown map this task is linked to */
+        /**
+         * The cooldown map this task is linked to
+         */
         private final WeakReference<CooldownMap<?>> link;
 
         public ExpiryTask(CooldownMap<?> link) {

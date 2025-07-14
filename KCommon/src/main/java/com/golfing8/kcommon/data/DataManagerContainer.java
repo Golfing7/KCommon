@@ -20,8 +20,8 @@ public interface DataManagerContainer {
     /**
      * Gets the data manager map backing this container.
      *
-     * @return the map.
      * @param <T> the type of data serializable.
+     * @return the map.
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     default <T extends DataSerializable> Map<Class<T>, DataManager<T>> getDataManagerMap() {
@@ -31,10 +31,10 @@ public interface DataManagerContainer {
     /**
      * Adds a local data manager with the given key.
      *
-     * @param key the key.
+     * @param key       the key.
      * @param dataClass the data class.
+     * @param <T>       the type
      * @return the data manager
-     * @param <T> the type
      */
     default <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass) {
         return addDataManager(key, dataClass, false);
@@ -43,10 +43,10 @@ public interface DataManagerContainer {
     /**
      * Adds a data manager with the given key and data class to this module's data manager map
      *
-     * @param key the key of the data manager
+     * @param key       the key of the data manager
      * @param dataClass the data class
-     * @param mongo if a remote data manager should be used
-     * @param <T> the type of the data
+     * @param mongo     if a remote data manager should be used
+     * @param <T>       the type of the data
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     default <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass, boolean mongo) {
@@ -77,8 +77,8 @@ public interface DataManagerContainer {
      * Gets the data manager associated with the given data class.
      *
      * @param dataClass the data class.
+     * @param <T>       the type of data serializable.
      * @return the data manager, or null.
-     * @param <T> the type of data serializable.
      */
     @SuppressWarnings("unchecked")
     default <T extends DataSerializable> DataManager<T> getDataManager(Class<T> dataClass) {
@@ -88,14 +88,14 @@ public interface DataManagerContainer {
     /**
      * Gets, or creates, the object of the given type linked to the given key.
      *
-     * @param key the key.
+     * @param key  the key.
      * @param type the type.
+     * @param <T>  the type of the data.
      * @return the data.
-     * @param <T> the type of the data.
      */
     default <T extends DataSerializable> T getOrCreate(String key, Class<T> type) {
         DataManager<T> dataManager = getDataManager(type);
-        if(dataManager == null)
+        if (dataManager == null)
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", type.getName()));
 
         if (!dataExists(key, type)) {
@@ -108,9 +108,9 @@ public interface DataManagerContainer {
      * Gets, or creates, the object of the given type linked to the given key.
      *
      * @param type the type.
-     * @param key the key.
+     * @param key  the key.
+     * @param <T>  the type of the data.
      * @return the data.
-     * @param <T> the type of the data.
      */
     default <T extends DataSerializable> T getOrCreate(UUID key, Class<T> type) {
         return getOrCreate(key.toString(), type);
@@ -120,12 +120,12 @@ public interface DataManagerContainer {
      * Generates a new unique data key for the given data class.
      *
      * @param dataClass the data class.
+     * @param <T>       the type of data serializable.
      * @return the new unique key.
-     * @param <T> the type of data serializable.
      */
     default <T extends DataSerializable> UUID getUniqueDataKey(Class<T> dataClass) {
         DataManager<T> dataManager = getDataManager(dataClass);
-        if(dataManager == null)
+        if (dataManager == null)
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", dataClass.getName()));
 
         return dataManager.getUniqueKey();
@@ -135,11 +135,11 @@ public interface DataManagerContainer {
      * Saves the given data to its respective data class
      *
      * @param data the data to save.
-     * @param <T> the type of data
+     * @param <T>  the type of data
      */
     @SuppressWarnings("unchecked")
     default <T extends DataSerializable> void saveData(T data) {
-        if(!getDataManagerMap().containsKey(data.getClass()))
+        if (!getDataManagerMap().containsKey(data.getClass()))
             throw new UnsupportedOperationException(String.format("Data with class %s not supported!", data.getClass().getName()));
 
         DataManager<T> dataManager = (DataManager<T>) getDataManager(data.getClass());
@@ -158,7 +158,7 @@ public interface DataManagerContainer {
      * @param <T> the type of the data.
      */
     default <T extends DataSerializable> void deleteData(String key, Class<T> dataClass) {
-        if(!this.getDataManagerMap().containsKey(dataClass))
+        if (!this.getDataManagerMap().containsKey(dataClass))
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", dataClass.getName()));
 
         DataManager<T> dataManager = getDataManager(dataClass);
@@ -169,11 +169,11 @@ public interface DataManagerContainer {
      * Deletes the given object.
      *
      * @param data the data.
-     * @param <T> the type of the data.
+     * @param <T>  the type of the data.
      */
     @SuppressWarnings("unchecked")
     default <T extends DataSerializable> void deleteData(T data) {
-        if(!this.getDataManagerMap().containsKey(data.getClass()))
+        if (!this.getDataManagerMap().containsKey(data.getClass()))
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", data.getClass().getName()));
 
         DataManager<T> dataManager = (DataManager<T>) getDataManager(data.getClass());
@@ -188,13 +188,13 @@ public interface DataManagerContainer {
     /**
      * Checks if the given data with the key exists for the data class.
      *
-     * @param key the key of the data
+     * @param key       the key of the data
      * @param dataClass the data class.
+     * @param <T>       the type of data.
      * @return true if it exists, or false if it doesn't
-     * @param <T> the type of data.
      */
     default <T extends DataSerializable> boolean dataExists(String key, Class<T> dataClass) {
-        if(!this.getDataManagerMap().containsKey(dataClass))
+        if (!this.getDataManagerMap().containsKey(dataClass))
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", dataClass.getName()));
 
         DataManager<T> dataManager = getDataManager(dataClass);
@@ -210,12 +210,12 @@ public interface DataManagerContainer {
     /**
      * Gets the given data with the given key from the data manager of its type.
      *
-     * @return the loaded object, or null if it didn't exist
      * @param <T> the type of data
+     * @return the loaded object, or null if it didn't exist
      */
     @Nullable
     default <T extends DataSerializable> T loadData(String key, Class<T> type) {
-        if(!this.getDataManagerMap().containsKey(type))
+        if (!this.getDataManagerMap().containsKey(type))
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", type.getName()));
 
         return getDataManager(type).getObject(key);
@@ -225,11 +225,11 @@ public interface DataManagerContainer {
      * Gets all the data instances for the given data type.
      *
      * @param type the type.
+     * @param <T>  the type of data.
      * @return a collection of all the data.
-     * @param <T> the type of data.
      */
-    default  <T extends DataSerializable> Collection<T> getAllDataOfType(Class<T> type) {
-        if(!this.getDataManagerMap().containsKey(type))
+    default <T extends DataSerializable> Collection<T> getAllDataOfType(Class<T> type) {
+        if (!this.getDataManagerMap().containsKey(type))
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", type.getName()));
 
         DataManager<T> dataManager = getDataManager(type);
@@ -241,11 +241,11 @@ public interface DataManagerContainer {
      * Gets all the cached data instances for the given data type.
      *
      * @param type the type.
+     * @param <T>  the type of data.
      * @return a collection of all the data.
-     * @param <T> the type of data.
      */
-    default  <T extends DataSerializable> Collection<T> getAllCachedDataOfType(Class<T> type) {
-        if(!this.getDataManagerMap().containsKey(type))
+    default <T extends DataSerializable> Collection<T> getAllCachedDataOfType(Class<T> type) {
+        if (!this.getDataManagerMap().containsKey(type))
             throw new UnsupportedOperationException(String.format("Data class %s not supported!", type.getName()));
 
         DataManager<T> dataManager = getDataManager(type);

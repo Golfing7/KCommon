@@ -1,20 +1,16 @@
 package com.golfing8.kcommon.data.local;
 
 import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.data.DataManager;
 import com.golfing8.kcommon.data.DataManagerAbstract;
 import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.key.FieldIndexer;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
 import lombok.Getter;
 import lombok.val;
-import lombok.var;
 import org.apache.commons.io.FileUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +22,6 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +32,18 @@ import java.util.stream.Stream;
  * Implements the {@link DataManager datamanager interface} on a local level, storing the objects in files.
  */
 public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbstract<T> {
-    /** The directory prefix of where we're storing/loading data from. */
+    /**
+     * The directory prefix of where we're storing/loading data from.
+     */
     @Getter
     private final Path directoryPrefix;
-    /** Caches the objects in a map for faster loading. */
+    /**
+     * Caches the objects in a map for faster loading.
+     */
     private final Map<String, T> objectCache;
-    /** The manager for alternative keys */
+    /**
+     * The manager for alternative keys
+     */
     private final FieldIndexerLocal<T> fieldIndexer;
 
     public DataManagerLocal(String key, Plugin plugin, Class<T> typeClass) {
@@ -50,9 +51,9 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         this.objectCache = new ConcurrentHashMap<>();
         this.directoryPrefix = Paths.get(getPlugin().getDataFolder().getPath(), "data", getKey());
 
-        try{
+        try {
 
-            if(Files.notExists(this.directoryPrefix)) {
+            if (Files.notExists(this.directoryPrefix)) {
                 // Copy over old file location.
                 // TODO Remove this after a while.
                 Path oldPath = Paths.get(KCommon.getInstance().getDataFolder().getPath(), "data", getKey());
@@ -62,7 +63,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
                 }
                 Files.createDirectories(this.directoryPrefix);
             }
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to create directories for data manager with key %s!", key));
         }
 
@@ -116,18 +117,18 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     @Nullable
     @Override
     public synchronized T getObject(@Nonnull String key) {
-        if(this.objectCache.containsKey(key))
+        if (this.objectCache.containsKey(key))
             return this.objectCache.get(key);
 
         //Check if the object exists
-        if(!this.objectExists(key)) {
+        if (!this.objectExists(key)) {
             return null;
         }
 
         T loaded;
-        try{
+        try {
             loaded = this.loadObject(directoryPrefix.resolve(String.format("%s.json", key)));
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed load object with type %s with key %s!", getTypeClass().getName(), key));
         }
         if (loaded == null)
@@ -162,7 +163,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         Map<String, T> toReturn = Maps.newHashMap();
 
         //Load all from the files
-        try(Stream<Path> dirStream = Files.walk(this.directoryPrefix)){
+        try (Stream<Path> dirStream = Files.walk(this.directoryPrefix)) {
             dirStream.forEach(path -> {
                 // Check if the cache has already loaded that object.
                 if (objectCache.containsKey(path.getFileName().toString().replace(".json", "")))
@@ -182,7 +183,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
                     throw new RuntimeException(String.format("Failed to load object with type %s under path %s!", getTypeClass().getName(), path), e);
                 }
             });
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to open directory stream for manager with type %s!", getTypeClass().getName()), exc);
         }
 
@@ -197,13 +198,13 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
     @Override
     public synchronized boolean delete(@Nonnull String key) {
-        if(!this.objectExists(key))
+        if (!this.objectExists(key))
             return false;
 
         this.objectCache.remove(key);
-        try{
+        try {
             Files.delete(directoryPrefix.resolve(String.format("%s.json", key)));
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to delete object with type %s with key %s!", this.getTypeClass().getName(), key));
         }
         return true;
@@ -212,7 +213,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     @Override
     public synchronized boolean store(@Nonnull T obj) {
         boolean replacing = this.exists(obj.getKey());
-        try{
+        try {
             this.writeObject(obj);
         } catch (IOException e) {
             throw new RuntimeException(String.format("Failed to write object with type %s with key %s!", this.getTypeClass().getName(), obj.getKey()), e);
@@ -287,10 +288,10 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
      */
     private void writeObject(T obj) throws IOException {
         Path objPath = directoryPrefix.resolve(String.format("%s.json", obj.getKey()));
-        if(Files.notExists(objPath))
+        if (Files.notExists(objPath))
             Files.createFile(objPath);
 
-        try(Writer writer = Files.newBufferedWriter(objPath)) {
+        try (Writer writer = Files.newBufferedWriter(objPath)) {
             writer.write(DataSerializer.getGSONBase().toJson(obj));
             writer.flush();
         }
@@ -299,7 +300,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     /**
      * Saves an object to a file.
      *
-     * @param key the key of the object.
+     * @param key    the key of the object.
      * @param object the object.
      * @throws IOException if there's a writing error.
      */
@@ -311,7 +312,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         if (Files.notExists(objPath))
             Files.createFile(objPath);
 
-        try(Writer writer = Files.newBufferedWriter(objPath)) {
+        try (Writer writer = Files.newBufferedWriter(objPath)) {
             writer.write(DataSerializer.getGSONBase().toJson(object));
             writer.flush();
         }

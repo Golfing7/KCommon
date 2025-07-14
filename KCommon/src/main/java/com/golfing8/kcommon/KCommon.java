@@ -49,7 +49,9 @@ public class KCommon extends KPlugin {
      */
     @Getter
     private @Nullable MongoConnector connector;
-    /** The main thread of Bukkit */
+    /**
+     * The main thread of Bukkit
+     */
     @Getter
     private Thread mainThread;
 

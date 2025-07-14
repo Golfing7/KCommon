@@ -21,7 +21,6 @@ public class ConfirmMenu extends PlayerMenuContainer {
         YES,
         NO,
         DIDNT_ANSWER,
-        ;
     }
 
     @Getter

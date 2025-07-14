@@ -8,10 +8,12 @@ public abstract class PlaceholderAbstract<I, O> {
     /**
      * If this placeholder is trusted, the contents of the placeholders will also be parsed.
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean trusted;
 
-    public PlaceholderAbstract() {}
+    public PlaceholderAbstract() {
+    }
 
     public PlaceholderAbstract(boolean trusted) {
         this.trusted = trusted;

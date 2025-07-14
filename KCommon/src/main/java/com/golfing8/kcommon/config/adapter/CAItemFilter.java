@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.filter.ItemFilter;
 import com.golfing8.kcommon.struct.filter.StringFilter;
@@ -28,10 +27,11 @@ public class CAItemFilter implements ConfigAdapter<ItemFilter> {
         if (entry.getPrimitive() == null)
             return null;
 
-        TypeToken<?> token = new TypeToken<Set<StringFilter>>() {};
+        TypeToken<?> token = new TypeToken<Set<StringFilter>>() {
+        };
         FieldType ftype = FieldType.extractFrom(token);
 
-        Map<String, Object> objectMap = (Map<String, Object>) entry.unwrap();
+        Map<String, Object> objectMap = entry.unwrap();
         Set<StringFilter> materialFilters = Collections.emptySet();
         Set<StringFilter> nameFilters = Collections.emptySet();
         Set<StringFilter> loreFilters = Collections.emptySet();

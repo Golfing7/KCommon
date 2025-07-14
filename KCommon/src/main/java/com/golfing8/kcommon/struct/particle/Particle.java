@@ -8,7 +8,6 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.util.VectorUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -178,7 +177,7 @@ public abstract class Particle {
     /**
      * Spawns the particle at the given location, showing it to the given players.
      *
-     * @param players the players, null if all online players should see it.
+     * @param players  the players, null if all online players should see it.
      * @param location the location.
      */
     public abstract void spawnAt(@Nullable Collection<Player> players, Location location);

@@ -1,6 +1,5 @@
 package com.golfing8.kcommon;
 
-import com.golfing8.kcommon.command.CommandManager;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
 import com.golfing8.kcommon.config.lang.Message;
@@ -48,16 +47,21 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
      */
     @Getter
     private KPAPIHook placeholderAPIHook;
-    /** The module manifest */
+    /**
+     * The module manifest
+     */
     @Getter
     private ModuleManifest manifest;
-    /** Dynamic library loader */
+    /**
+     * Dynamic library loader
+     */
     protected LibraryLoader libraryLoader;
 
     public final void onEnable() {
         try {
             this.saveDefaultConfig();
-        } catch (IllegalArgumentException ignored) {} // Config doesn't exist
+        } catch (IllegalArgumentException ignored) {
+        } // Config doesn't exist
         this.libraryLoader = new LibraryLoader(this, getDataFolder().toPath().resolve("libraries"));
         this.menuManager = new MenuManager(this);
         //Setup PAPI.
@@ -280,12 +284,12 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             traversed.add(entry.getKey());
 
             //Do a breadth first walk to properly detect cycles.
-            while(!nextUp.isEmpty()) {
+            while (!nextUp.isEmpty()) {
                 Class<?> type = nextUp.poll();
 
-                for(Class<?> value : classToClassDependencyGraph.get(type)) {
+                for (Class<?> value : classToClassDependencyGraph.get(type)) {
                     //If this is the case, we've detected a cycle.
-                    if(!traversed.add(value)) {
+                    if (!traversed.add(value)) {
                         getLogger().severe(String.format("Detected cycle in dependencies for module '%s'!", entry.getKey().getSimpleName()));
                         getServer().getPluginManager().disablePlugin(this);
                         return;
@@ -300,7 +304,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         Set<Class<?>> enabled = new HashSet<>();
         Stack<Class<?>> dependencies = new Stack<>();
         for (Map.Entry<Class<?>, List<Class<?>>> entry : classToClassDependencyGraph.entrySet()) {
-            if(enabled.contains(entry.getKey()))
+            if (enabled.contains(entry.getKey()))
                 continue;
 
             dependencies.addAll(entry.getValue());
@@ -312,7 +316,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
                 List<Class<?>> depends = classToClassDependencyGraph.get(currDepend);
 
                 //Does it have any dependencies? If so, enable them!
-                if(!dependencies.isEmpty() && !enabled.containsAll(depends)) {
+                if (!dependencies.isEmpty() && !enabled.containsAll(depends)) {
                     dependencies.addAll(depends);
                     continue;
                 }
@@ -321,7 +325,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
                 dependencies.pop();
 
                 //If it's already been enabled, simply skip it.
-                if(!enabled.add(currDepend))
+                if (!enabled.add(currDepend))
                     continue;
 
                 instances.get(currDepend).initialize();
@@ -335,7 +339,12 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         }
     }
 
-    public void onPreEnableInner() {}
-    public void onEnableInner() {}
-    public void onDisableInner() {}
+    public void onPreEnableInner() {
+    }
+
+    public void onEnableInner() {
+    }
+
+    public void onDisableInner() {
+    }
 }

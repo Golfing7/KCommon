@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
@@ -17,7 +16,9 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE) // For serialization
 public class CuboidRegion implements Region {
-    /** The world that this region belongs to, can be null */
+    /**
+     * The world that this region belongs to, can be null
+     */
     private World world;
     private double minX, maxX, minY, maxY, minZ, maxZ;
 
@@ -226,21 +227,21 @@ public class CuboidRegion implements Region {
 
         @Override
         public BlockVector next() {
-            if(!hasNext())
+            if (!hasNext())
                 throw new NoSuchElementException("This iterator does not have any elements remaining!");
 
             BlockVector next = new BlockVector(this.currentX, this.currentY, this.currentZ);
 
-            if(currentX < maxX) {
+            if (currentX < maxX) {
                 currentX++;
-            }else if(currentY < maxY) {
+            } else if (currentY < maxY) {
                 currentX = (int) Math.floor(CuboidRegion.this.minX);
                 currentY++;
-            }else if(currentZ < maxZ) {
+            } else if (currentZ < maxZ) {
                 currentX = (int) Math.floor(CuboidRegion.this.minX);
                 currentY = (int) Math.floor(CuboidRegion.this.minY);
                 currentZ++;
-            }else {
+            } else {
                 finished = true;
             }
             return next;

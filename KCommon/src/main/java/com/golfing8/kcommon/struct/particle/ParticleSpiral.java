@@ -12,12 +12,12 @@ import java.util.Map;
 /**
  * Spawns a "spiral" of particles around a certain point with a radius.
  */
-public class ParticleSpiral extends ParticleCircle{
+public class ParticleSpiral extends ParticleCircle {
     //The length of the spiral.
     @Getter
     protected double length = 1;
-    public ParticleSpiral length(double length)
-    {
+
+    public ParticleSpiral length(double length) {
         this.length = length;
         return this;
     }
@@ -25,13 +25,13 @@ public class ParticleSpiral extends ParticleCircle{
     //The periods of the spiral.
     private double periods = 1;
 
-    public ParticleSpiral periods(double periods)
-    {
+    public ParticleSpiral periods(double periods) {
         this.periods = periods;
         return this;
     }
 
-    public ParticleSpiral() {}
+    public ParticleSpiral() {
+    }
 
     protected ParticleSpiral(ConfigurationSection section) {
         super(section);
@@ -66,8 +66,7 @@ public class ParticleSpiral extends ParticleCircle{
         double angle = 0.0D;
 
         Location currentLocation = location.clone();
-        while(angle <= finalAngle)
-        {
+        while (angle <= finalAngle) {
             angle += dAngle;
 
             Vector offset = new Vector(0, 0.1, 0);

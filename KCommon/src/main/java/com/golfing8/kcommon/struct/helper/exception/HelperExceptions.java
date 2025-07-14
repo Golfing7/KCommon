@@ -41,7 +41,8 @@ import java.util.logging.Level;
  * Runnables and handlers running in helper.
  */
 public final class HelperExceptions {
-    private HelperExceptions() {}
+    private HelperExceptions() {
+    }
 
     private static final ThreadLocal<AtomicBoolean> NOT_TODAY_STACK_OVERFLOW_EXCEPTION =
             ThreadLocal.withInitial(() -> new AtomicBoolean(false));

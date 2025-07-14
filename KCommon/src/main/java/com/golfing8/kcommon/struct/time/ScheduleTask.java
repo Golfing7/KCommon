@@ -7,7 +7,6 @@ import lombok.var;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -18,19 +17,34 @@ import java.util.function.Supplier;
 public class ScheduleTask extends BukkitRunnable {
     private static final TimeLength MAX_ANTICIPATE_LENGTH = new TimeLength(100); // 5 seconds
 
-    /** The schedule to run off of */
+    /**
+     * The schedule to run off of
+     */
     private final Schedule schedule;
-    /** The action to run when available */
+    /**
+     * The action to run when available
+     */
     private final Consumer<Timestamp> action;
-    /** A condition in which no new timestamps should be generated */
+    /**
+     * A condition in which no new timestamps should be generated
+     */
     private final Supplier<Boolean> pauseCondition;
-    /** Keeps track of the timestamps that have been run */
+    /**
+     * Keeps track of the timestamps that have been run
+     */
     private final TreeMap<TimeLength, Boolean> ranTimestamps = new TreeMap<>();
-    /** An optional consumer for handling events where it's X time UNTIL an action. */
-    @Getter @Setter @Nullable
+    /**
+     * An optional consumer for handling events where it's X time UNTIL an action.
+     */
+    @Getter
+    @Setter
+    @Nullable
     private Consumer<TimeLength> anticipateTask;
-    /** The rate at which this task ticks */
-    @Getter @Setter
+    /**
+     * The rate at which this task ticks
+     */
+    @Getter
+    @Setter
     private int tickRate = 20;
     @Getter
     private boolean started = false;

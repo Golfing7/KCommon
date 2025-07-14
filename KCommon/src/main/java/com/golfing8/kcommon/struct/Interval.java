@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.struct;
 
-import com.golfing8.kcommon.config.adapter.CASerializable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -32,11 +31,11 @@ public class Interval implements Iterable<Double> {
     transient final int intervalSize;
 
     //Our overflow behavior. Default is STOP
-    @Setter @Getter
+    @Setter
+    @Getter
     transient int overflowBehavior = STOP;
 
-    public Interval(double x1, double x2, double interval)
-    {
+    public Interval(double x1, double x2, double interval) {
         this.interval = interval;
         this.x1 = x1;
         this.x2 = x2;
@@ -44,17 +43,19 @@ public class Interval implements Iterable<Double> {
         int size = 0;
 
         //We loop through our interval
-        for(double d : this){size++;}
+        for (double d : this) {
+            size++;
+        }
 
         intervalSize = size;
     }
 
     /**
      * Gets the effective size of this interval.
+     *
      * @return the effective size of this interval.
      */
-    public double getIntervalSize()
-    {
+    public double getIntervalSize() {
         return this.intervalSize;
     }
 
@@ -67,13 +68,11 @@ public class Interval implements Iterable<Double> {
     }
 
     @Override
-    public @NonNull Iterator<Double> iterator()
-    {
+    public @NonNull Iterator<Double> iterator() {
         return new IntervalIterator();
     }
 
-    public Iterator<Double> tinyIterator()
-    {
+    public Iterator<Double> tinyIterator() {
         return new IntervalIterator(TINY_INTERVAL);
     }
 
@@ -85,13 +84,11 @@ public class Interval implements Iterable<Double> {
         //The current number we're on.
         private double current = x1;
 
-        IntervalIterator()
-        {
+        IntervalIterator() {
             this.interval = Interval.this.interval * (positive ? 1 : -1);
         }
 
-        IntervalIterator(double interval)
-        {
+        IntervalIterator(double interval) {
             this.interval = interval * (positive ? 1 : -1);
         }
 
@@ -103,33 +100,30 @@ public class Interval implements Iterable<Double> {
 
         @Override
         public Double next() {
-            if(!hasNext())
+            if (!hasNext())
                 throw new NoSuchElementException("IntervalIterator already finished!");
 
             //Save our current state.
             double toReturn = current;
 
-            if(overflowBehavior == OVERFLOW)
-            {
+            if (overflowBehavior == OVERFLOW) {
                 current += interval;
             }
 
             //Check if we'll be done next iteration.
-            if(positive ? (current == x2) : (current == x1))
-            {
+            if (positive ? (current == x2) : (current == x1)) {
                 //NaN marks our "end".
                 //If we're on CAP mode, the function simply "caps" at the end of its interval.
-                if(overflowBehavior != CAP)
+                if (overflowBehavior != CAP)
                     current = Double.NaN;
                 //If we're on WRAP mode, set our current back to x1.
-                if(overflowBehavior == WRAP)
+                if (overflowBehavior == WRAP)
                     current = x1;
                 return toReturn;
             }
 
             //Check if we'll exceed our bounds.
-            if((positive && current + interval > x2) || (!positive && current + interval < x2))
-            {
+            if ((positive && current + interval > x2) || (!positive && current + interval < x2)) {
                 //Mark our final iteration.
                 current = x2;
                 return toReturn;

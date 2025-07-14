@@ -1,9 +1,6 @@
 package com.golfing8.kcommon.struct.drop;
 
-import com.golfing8.kcommon.config.adapter.CASerializable;
-import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.random.RandomTestable;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -18,16 +15,26 @@ import java.util.List;
 @Getter
 @Setter
 public abstract class Drop<T> implements RandomTestable {
-    /** The key that was used to load this from the config */
+    /**
+     * The key that was used to load this from the config
+     */
     private String _key;
-    /** The chance for this drop */
+    /**
+     * The chance for this drop
+     */
     private double chance;
-    /** The display name of this drop */
+    /**
+     * The display name of this drop
+     */
     private @Nullable String displayName;
-    /** The maximum boost that this drop can use */
+    /**
+     * The maximum boost that this drop can use
+     */
     private double maxBoost;
 
-    /** The drop table this drop is linked to. Can be null */
+    /**
+     * The drop table this drop is linked to. Can be null
+     */
     public Drop(double chance, @Nullable String displayName, double maxBoost) {
         this.chance = chance;
         this.displayName = displayName;
@@ -37,6 +44,7 @@ public abstract class Drop<T> implements RandomTestable {
     public Drop(double chance, @Nullable String displayName) {
         this(chance, displayName, Double.MAX_VALUE);
     }
+
     /**
      * Gets the set of dropped objects.
      *
@@ -63,7 +71,7 @@ public abstract class Drop<T> implements RandomTestable {
     /**
      * Gives the player this drop, or drops it at the given location.
      *
-     * @param context the context.
+     * @param context  the context.
      * @param location the location.
      */
     public void giveOrDropAt(DropContext context, Location location) {
@@ -79,7 +87,8 @@ public abstract class Drop<T> implements RandomTestable {
      *
      * @param location the location.
      */
-    public void dropAt(DropContext context, Location location) {}
+    public void dropAt(DropContext context, Location location) {
+    }
 
     /**
      * If the drop is physical, that means that the {@link #dropAt(DropContext, Location)} implementation exists.

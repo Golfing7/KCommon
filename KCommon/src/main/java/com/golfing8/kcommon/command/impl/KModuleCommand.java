@@ -1,8 +1,6 @@
 package com.golfing8.kcommon.command.impl;
 
 import com.golfing8.kcommon.command.Cmd;
-import com.golfing8.kcommon.command.CommandContext;
-import com.golfing8.kcommon.command.CommandVisibility;
 import com.golfing8.kcommon.command.KCommand;
 
 @Cmd(

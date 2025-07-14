@@ -35,27 +35,44 @@ public abstract class ConfigClass {
      * The class backing this config.
      */
     private final Class<?> self;
-    /** All source classes to load */
+    /**
+     * All source classes to load
+     */
     private final Set<ConfigClassSource> extraSources = Collections.newSetFromMap(new IdentityHashMap<>());
-    /** The backing instance of this config */
+    /**
+     * The backing instance of this config
+     */
     @Getter
     private final Object configInstance;
     /**
      * The parent class of this config.
      */
-    @Nullable @Getter
+    @Nullable
+    @Getter
     private ConfigClass parent;
-    /** The optional conf annotation for this class */
-    @Nullable @Getter
+    /**
+     * The optional conf annotation for this class
+     */
+    @Nullable
+    @Getter
     private Conf confAnnotation;
-    /** If this config class requires the {@link Conf} annotation on fields. */
-    @Getter @Setter
+    /**
+     * If this config class requires the {@link Conf} annotation on fields.
+     */
+    @Getter
+    @Setter
     private boolean requireAnnotation = false;
-    /** If this config class is in 'read only' mode. This will make it so default values are NOT set */
-    @Getter @Setter
+    /**
+     * If this config class is in 'read only' mode. This will make it so default values are NOT set
+     */
+    @Getter
+    @Setter
     private boolean readOnly;
-    /** If config mapping should be enabled for loading/saving values */
-    @Getter @Setter
+    /**
+     * If config mapping should be enabled for loading/saving values
+     */
+    @Getter
+    @Setter
     private boolean configMappingEnabled = false;
 
     public ConfigClass() {
@@ -103,8 +120,8 @@ public abstract class ConfigClass {
      * Gets a child of this config class.
      *
      * @param clazz the class.
+     * @param <T>   the type of the child.
      * @return the child.
-     * @param <T> the type of the child.
      */
     @SuppressWarnings("unchecked")
     public <T extends ConfigClass> T getChild(Class<T> clazz) {
@@ -117,7 +134,8 @@ public abstract class ConfigClass {
     /**
      * Unregisters this config class.
      */
-    public void unregister() {}
+    public void unregister() {
+    }
 
     /**
      * Adds a source to this config class where values will be loaded from
@@ -242,7 +260,8 @@ public abstract class ConfigClass {
                     instance.confAnnotation = clazz.getAnnotation(Conf.class);
 
                 this.children.put((Class<? extends ConfigClass>) clazz, instance);
-            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                     IllegalAccessException e) {
                 throw new RuntimeException(String.format("Failed to load child config class %s.", clazz.getName()), e);
             }
         }

@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class LayoutShapeRectangle implements MenuLayoutShape {
-    private List<MenuCoordinate> inRange;
+    private final List<MenuCoordinate> inRange;
 
     public LayoutShapeRectangle(MenuCoordinate low, MenuCoordinate high) {
         inRange = new LinkedList<>();

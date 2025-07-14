@@ -9,9 +9,12 @@ import java.nio.file.Path;
  * A {@link Configuration} with a hard link to a module.
  */
 public class MConfiguration extends Configuration {
-    /** The owning module of this config */
+    /**
+     * The owning module of this config
+     */
     @Getter
     private final Module module;
+
     public MConfiguration(Path path, Module module) {
         super(path);
         this.module = module;

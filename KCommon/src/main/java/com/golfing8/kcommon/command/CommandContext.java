@@ -4,7 +4,6 @@ import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.flag.CommandFlag;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.var;
 import net.kyori.adventure.util.TriState;
 import org.bukkit.Bukkit;
@@ -13,7 +12,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,11 +42,17 @@ public class CommandContext {
     @Getter
     private final KCommand command;
 
-    /** Maps states of flags */
+    /**
+     * Maps states of flags
+     */
     private final Map<CommandFlag, TriState> flagStates;
-    /** Maps long name flag states */
+    /**
+     * Maps long name flag states
+     */
     private final Map<String, TriState> longNameFlagStates;
-    /** Maps short name flag states. */
+    /**
+     * Maps short name flag states.
+     */
     private final Map<Character, TriState> shortNameFlagStates;
 
     public CommandContext(CommandSender sender, String label, List<String> arguments, KCommand command) {
@@ -122,7 +126,7 @@ public class CommandContext {
      * @return the sender as a player.
      */
     public Player getPlayer() {
-        if(!(sender instanceof Player))
+        if (!(sender instanceof Player))
             throw new ClassCastException("Sender is not a player");
 
         return (Player) sender;
@@ -135,7 +139,7 @@ public class CommandContext {
      * @return the argument.
      */
     public String getArg(int index) {
-        if(index < 0 || index >= arguments.size())
+        if (index < 0 || index >= arguments.size())
             throw new IndexOutOfBoundsException(String.format("Index %s is out of bounds for arguments %s!", index, arguments.toString()));
 
         return this.arguments.get(index);
@@ -186,8 +190,8 @@ public class CommandContext {
      * Gets the argument at the given index.
      *
      * @param index the index.
+     * @param <T>   the type.
      * @return the next available argument.
-     * @param <T> the type.
      */
     @SuppressWarnings("unchecked")
     public <T> T get(int index) {
@@ -199,8 +203,8 @@ public class CommandContext {
     /**
      * Gets the next available argument from the argument list.
      *
-     * @return the next available argument.
      * @param <T> the type.
+     * @return the next available argument.
      */
     public <T> T next() {
         return get(this.argumentIndex++);

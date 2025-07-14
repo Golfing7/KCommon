@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.module;
 
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class ModuleLogger extends Logger {

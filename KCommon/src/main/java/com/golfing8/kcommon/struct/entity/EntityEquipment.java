@@ -13,12 +13,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Wraps a living entity's equipment (armor/weapon)
@@ -32,17 +30,29 @@ public class EntityEquipment implements CASerializable {
         Bukkit.getServer().getPluginManager().registerEvents(new Listener(), KCommon.getInstance());
     }
 
-    /** The entity's helmet */
+    /**
+     * The entity's helmet
+     */
     private EntityEquipmentPiece helmet;
-    /** The entity's chestplate */
+    /**
+     * The entity's chestplate
+     */
     private EntityEquipmentPiece chestplate;
-    /** The entity's leggings */
+    /**
+     * The entity's leggings
+     */
     private EntityEquipmentPiece leggings;
-    /** The entity's boots */
+    /**
+     * The entity's boots
+     */
     private EntityEquipmentPiece boots;
-    /** The entity's item in hand */
+    /**
+     * The entity's item in hand
+     */
     private EntityEquipmentPiece hand;
-    /** The entity's off-hand item */
+    /**
+     * The entity's off-hand item
+     */
     private EntityEquipmentPiece offHand;
 
     /**
@@ -111,6 +121,7 @@ public class EntityEquipment implements CASerializable {
 
     private static class Listener implements org.bukkit.event.Listener {
         private final Random random = new Random();
+
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onEntityDeath(EntityDeathEvent event) {
             org.bukkit.inventory.EntityEquipment equipment = event.getEntity().getEquipment();

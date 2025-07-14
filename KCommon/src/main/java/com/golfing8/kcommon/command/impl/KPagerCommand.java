@@ -28,6 +28,7 @@ public class KPagerCommand extends KCommand {
     private final ExpiringMap<String, PagedMessage> liveMessages = ExpiringMap.builder()
             .expiration(60L, TimeUnit.SECONDS)
             .build();
+
     public void addMessage(PagedMessage message) {
         liveMessages.put(message.getId(), message);
     }

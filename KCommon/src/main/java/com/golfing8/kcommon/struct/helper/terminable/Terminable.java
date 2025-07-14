@@ -25,7 +25,6 @@
 
 package com.golfing8.kcommon.struct.helper.terminable;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -33,7 +32,8 @@ import javax.annotation.Nullable;
  */
 @FunctionalInterface
 public interface Terminable extends AutoCloseable {
-    Terminable EMPTY = () -> {};
+    Terminable EMPTY = () -> {
+    };
 
     /**
      * Closes this resource.

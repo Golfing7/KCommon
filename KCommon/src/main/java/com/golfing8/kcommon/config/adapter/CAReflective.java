@@ -64,7 +64,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
                 (CASerializable.TypeResolver) Enum.valueOf((Class) typeResolverClass, primitives.get(TYPE_FIELD_NAME).toString().toUpperCase()) :
                 null;
 
-        Class<?> parentClass = getParentSerializableClass((Class<? extends CASerializable>) type.getType());
+        Class<?> parentClass = getParentSerializableClass(type.getType());
         Class<?> deserializationType = typeResolver != null ? typeResolver.getType() : type.getType();
         var fieldHandles = typeFieldCache.containsKey(deserializationType) ?
                 typeFieldCache.get(deserializationType) :
@@ -80,7 +80,8 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
                 constructor.setAccessible(true);
             }
             instance = (CASerializable) constructor.newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             KCommon.getInstance().getLogger().severe(String.format("Failed to deserialize type %s!", deserializationType.getName()));
             throw new RuntimeException(e);
         }

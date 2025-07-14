@@ -1,16 +1,16 @@
 package com.golfing8.kcommon.data;
 
-import com.google.gson.JsonObject;
 import lombok.Getter;
-import lombok.Setter;
-
-import javax.annotation.Nullable;
 
 public abstract class AbstractSerializable implements DataSerializable {
-    /** The ID of this  object */
+    /**
+     * The ID of this  object
+     */
     @Getter
     private String _objectId;
-    /** If this object has changed */
+    /**
+     * If this object has changed
+     */
     @Getter
     private transient boolean changed;
 

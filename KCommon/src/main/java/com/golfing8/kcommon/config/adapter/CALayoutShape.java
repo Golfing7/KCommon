@@ -2,11 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.exc.InvalidConfigException;
-import com.golfing8.kcommon.menu.shape.LayoutShapeOutline;
-import com.golfing8.kcommon.menu.shape.LayoutShapePoints;
-import com.golfing8.kcommon.menu.shape.LayoutShapeRectangle;
-import com.golfing8.kcommon.menu.shape.MenuCoordinate;
-import com.golfing8.kcommon.menu.shape.MenuLayoutShape;
+import com.golfing8.kcommon.menu.shape.*;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.gson.reflect.TypeToken;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +41,8 @@ public class CALayoutShape implements ConfigAdapter<MenuLayoutShape> {
             MenuCoordinate slotHigh = ConfigTypeRegistry.getFromType(entry.getSubValue("high-slot"), MenuCoordinate.class);
             return new LayoutShapeOutline(slotLow, slotHigh);
         } else if (layoutType.equalsIgnoreCase("POINTS")) {
-            List<MenuCoordinate> menuCoordinates = ConfigTypeRegistry.getFromType(entry.getSubValue("points"), FieldType.extractFrom(new TypeToken<List<MenuCoordinate>>() {}));
+            List<MenuCoordinate> menuCoordinates = ConfigTypeRegistry.getFromType(entry.getSubValue("points"), FieldType.extractFrom(new TypeToken<List<MenuCoordinate>>() {
+            }));
             return new LayoutShapePoints(menuCoordinates);
         } else {
             throw new InvalidConfigException("Unsupported Layout Type: " + layoutType);

@@ -8,12 +8,14 @@ import org.bukkit.inventory.ItemStack;
 public interface ItemHandle {
     /**
      * Gets the item
+     *
      * @return the item
      */
     ItemStack get();
 
     /**
      * Sets the item
+     *
      * @param item the item
      */
     void set(ItemStack item);

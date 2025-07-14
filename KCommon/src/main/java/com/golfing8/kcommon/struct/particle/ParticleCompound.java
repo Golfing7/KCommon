@@ -10,11 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ParticleCompound extends Particle {
     private final List<Pair<Particle, Vector>> particleOffset;
@@ -66,8 +62,8 @@ public class ParticleCompound extends Particle {
         }
     }
 
-    public ParticleCompound addParticle(Particle particle, Vector offset){
-        if(this == particle)
+    public ParticleCompound addParticle(Particle particle, Vector offset) {
+        if (this == particle)
             throw new IllegalArgumentException("Can't add self to particle compound!");
 
         particleOffset.add(new Pair<>(particle, offset));
@@ -76,8 +72,7 @@ public class ParticleCompound extends Particle {
 
     @Override
     public void spawnAt(Collection<Player> players, Location location) {
-        for(Pair<Particle, Vector> pair : particleOffset)
-        {
+        for (Pair<Particle, Vector> pair : particleOffset) {
             Vector offset = pair.getB().clone();
 
             manipulateToAngles(offset);

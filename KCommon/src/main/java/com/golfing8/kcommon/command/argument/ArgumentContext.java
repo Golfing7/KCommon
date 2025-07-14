@@ -36,6 +36,8 @@ public class ArgumentContext {
      * </p>
      */
     private final List<String> allArguments;
-    /** The index that this argument was provided. */
+    /**
+     * The index that this argument was provided.
+     */
     private final int argumentIndex;
 }

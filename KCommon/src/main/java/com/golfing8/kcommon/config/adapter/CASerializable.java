@@ -12,17 +12,20 @@ public interface CASerializable {
     /**
      * Called when this object has finished deserialization.
      */
-    default void onDeserialize() {}
+    default void onDeserialize() {
+    }
 
     /**
      * Called when this object has finished deserialization.
      */
-    default void onDeserialize(ConfigPrimitive primitive) {}
+    default void onDeserialize(ConfigPrimitive primitive) {
+    }
 
     /**
      * Called when this object is being serialized.
      */
-    default void onSerialize() {}
+    default void onSerialize() {
+    }
 
     /**
      * A resolver for finding the right type to deserialize.
@@ -36,7 +39,8 @@ public interface CASerializable {
         Class<? extends CASerializable> getType();
     }
 
-    @Retention(RetentionPolicy.RUNTIME) @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
     @interface Options {
         /**
          * If set to true, this will try to flatten the serialization.

@@ -53,9 +53,11 @@ public final class ItemStackBuilder {
      * The type of the item stack.
      */
     private String itemType;
+
     public XMaterial getItemType() {
         return XMaterial.matchXMaterial(itemType).orElse(null);
     }
+
     public String getItemTypeString() {
         return this.itemType;
     }
@@ -76,9 +78,11 @@ public final class ItemStackBuilder {
      * An amount for the item, will override {@link #amount} if set.
      */
     private Range variableAmount;
+
     private int newAmount() {
         return variableAmount == null ? amount : variableAmount.getRandomI();
     }
+
     /**
      * Item durability, should only be used in cases of older versions.
      */
@@ -87,7 +91,9 @@ public final class ItemStackBuilder {
      * If this item is unbreakable or not.
      */
     private boolean unbreakable;
-    /** If the item can be made shiny */
+    /**
+     * If the item can be made shiny
+     */
     private boolean glowing;
     /**
      * The name of the item.
@@ -105,9 +111,13 @@ public final class ItemStackBuilder {
      * The item flags to apply to the item.
      */
     private Set<ItemFlag> itemFlags = new HashSet<>();
-    /** The potion data for this item */
+    /**
+     * The potion data for this item
+     */
     private PotionData potionData;
-    /** Stores attributes modifiers for the item */
+    /**
+     * Stores attributes modifiers for the item
+     */
     private Map<EntityAttribute, Set<EntityAttributeModifier>> attributeModifierMap = new HashMap<>();
     /**
      * The placeholders for the item, applied to all parts.
@@ -133,7 +143,9 @@ public final class ItemStackBuilder {
      * The UUID of the owner of the skull. Only applied if this item builder builds a player head.
      */
     private UUID skullOwner;
-    /** If this item is unstackable. */
+    /**
+     * If this item is unstackable.
+     */
     private boolean unstackable;
     /**
      * The last built itemstack for this builder.
@@ -144,7 +156,7 @@ public final class ItemStackBuilder {
     /**
      * Default constructor useful for building.
      */
-    public ItemStackBuilder(){/*Intentionally empty*/}
+    public ItemStackBuilder() {/*Intentionally empty*/}
 
     /**
      * Generates an instance from the given bukkit item stack.
@@ -213,22 +225,24 @@ public final class ItemStackBuilder {
         this.amount = Math.max(section.getInt("amount", 1), 1);
         this.unstackable = section.getBoolean("unstackable", false);
         if (section.contains("nbt-data")) {
-            this.extraData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "nbt-data"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {}));
+            this.extraData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "nbt-data"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {
+            }));
         }
         if (section.contains("components")) {
-            this.components = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "components"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {}));
+            this.components = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "components"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {
+            }));
         }
         if (section.contains("variable-amount")) {
             this.variableAmount = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "variable-amount"), Range.class);
         }
 
         //Load the enchantments.
-        if(section.contains("enchantments")) {
+        if (section.contains("enchantments")) {
             ConfigurationSection enchSection = section.getConfigurationSection("enchantments");
             enchSection.getKeys(false).forEach(key -> {
                 //Check that the enchantment is actually defined.
                 Optional<XEnchantment> optionalEnchantment = XEnchantment.matchXEnchantment(key);
-                if(!optionalEnchantment.isPresent()) {
+                if (!optionalEnchantment.isPresent()) {
                     throw new ImproperlyConfiguredValueException(enchSection, key);
                 }
 
@@ -239,12 +253,12 @@ public final class ItemStackBuilder {
         }
 
         //Load the item flags.
-        if(section.contains("flags")) {
+        if (section.contains("flags")) {
             section.getStringList("flags").forEach(flag -> {
-                try{
+                try {
                     ItemFlag itemFlag = ItemFlag.valueOf(flag);
                     this.itemFlags.add(itemFlag);
-                }catch(IllegalArgumentException exc) {
+                } catch (IllegalArgumentException exc) {
                     throw new ImproperlyConfiguredValueException(section, "flags");
                 }
             });
@@ -490,14 +504,14 @@ public final class ItemStackBuilder {
             NMS.getTheNMS().getMagicItems().setItemModel(meta, itemModel);
         }
 
-        if(this.itemName != null) {
+        if (this.itemName != null) {
             String itemName = this.itemName;
             if (placeholderTarget != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 itemName = PlaceholderAPI.setPlaceholders(placeholderTarget, itemName);
             }
             NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(itemName, (Object[]) placeholderArr));
         }
-        if(this.itemLore != null && !this.itemLore.isEmpty()) {
+        if (this.itemLore != null && !this.itemLore.isEmpty()) {
             //Parse both single and multi placeholders.
             List<String> lore = MS.parseAll(this.itemLore, placeholderArr, multiLinePlaceholders);
             if (placeholderTarget != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
@@ -512,20 +526,20 @@ public final class ItemStackBuilder {
         }
 
         //Next, apply item flags
-        if(this.itemFlags != null)
+        if (this.itemFlags != null)
             meta.addItemFlags(this.itemFlags.toArray(new ItemFlag[0]));
 
         //Then, enchants
-        if(this.enchantments != null) {
+        if (this.enchantments != null) {
             this.enchantments.forEach((ench, level) -> meta.addEnchant(ench.getEnchant(), level, true));
         }
 
         //Now, try to apply the custom model data.
-        if(this.customModelData != 0) {
+        if (this.customModelData != 0) {
             NMS.getTheNMS().getMagicItems().setCustomModelData(meta, this.customModelData);
         }
 
-        if(this.itemDurability > 0) {
+        if (this.itemDurability > 0) {
             newCopy.setDurability(this.itemDurability);
         }
 

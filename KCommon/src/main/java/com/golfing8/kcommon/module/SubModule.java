@@ -1,19 +1,15 @@
 package com.golfing8.kcommon.module;
 
-import com.golfing8.kcommon.command.exc.CommandInstantiationException;
 import com.golfing8.kcommon.config.generator.Conf;
 import com.golfing8.kcommon.config.generator.ConfigClass;
-import com.golfing8.kcommon.config.generator.ConfigClassWrapper;
 import com.golfing8.kcommon.config.lang.LangConf;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
-import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
 import lombok.Getter;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -31,11 +27,13 @@ import java.util.logging.Level;
  * <p>
  * Note that the {@link #module} reference is may be null until {@link #onEnable()} is called.
  * </p>
+ *
  * @param <T>
  */
 public abstract class SubModule<T extends Module> extends ConfigClass implements Listener, LangConfigContainer {
     @Getter
     private T module;
+
     public SubModule() {
         this.setRequireAnnotation(true);
         this.setConfigMappingEnabled(true);
@@ -68,7 +66,9 @@ public abstract class SubModule<T extends Module> extends ConfigClass implements
         return module.getLangConfig(); // Piggy back :)
     }
 
-    public void onEnable() {}
+    public void onEnable() {
+    }
 
-    public void onDisable() {}
+    public void onDisable() {
+    }
 }

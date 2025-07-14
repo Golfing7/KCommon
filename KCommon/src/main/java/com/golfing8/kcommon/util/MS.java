@@ -2,10 +2,7 @@ package com.golfing8.kcommon.util;
 
 import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.NMSVersion;
-import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
-import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.struct.title.Title;
 import com.google.common.collect.Lists;
@@ -21,9 +18,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +40,7 @@ public final class MS {
 
         //Try hex coloring, if we're on a version which supports it.
         TRANSFORMERS.add(string -> {
-            if(KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_16))
+            if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_16))
                 return RGBUtils.INSTANCE.hexColor(string);
             return string;
         });
@@ -50,11 +48,12 @@ public final class MS {
         //Lower case something
         TRANSFORMERS.add(new Function<String, String>() {
             final Pattern pattern = Pattern.compile("\\$lc\\{[^}]+}");
+
             @Override
             public String apply(String s) {
                 Matcher matcher = pattern.matcher(s);
 
-                while(matcher.find()){
+                while (matcher.find()) {
                     String grouped = matcher.group(0);
 
                     s = s.replace(grouped, grouped.replace("$lc{", "").replace("}", "").toLowerCase(Locale.ROOT));
@@ -66,11 +65,12 @@ public final class MS {
         //Upper case something
         TRANSFORMERS.add(new Function<String, String>() {
             final Pattern pattern = Pattern.compile("\\$uc\\{[^}]+}");
+
             @Override
             public String apply(String s) {
                 Matcher matcher = pattern.matcher(s);
 
-                while(matcher.find()){
+                while (matcher.find()) {
                     String grouped = matcher.group(0);
 
                     s = s.replace(grouped, grouped.replace("$uc{", "").replace("}", "").toUpperCase(Locale.ROOT));
@@ -82,11 +82,12 @@ public final class MS {
         //Properly capitalize something
         TRANSFORMERS.add(new Function<String, String>() {
             final Pattern pattern = Pattern.compile("\\$cap\\{[^}]+}");
+
             @Override
             public String apply(String s) {
                 Matcher matcher = pattern.matcher(s);
 
-                while(matcher.find()){
+                while (matcher.find()) {
                     String grouped = matcher.group(0);
 
                     s = s.replace(grouped, StringUtil.capitalize(grouped.replace("$cap{", "").replace("}", "")));
@@ -103,7 +104,7 @@ public final class MS {
             public String apply(String s) {
                 Matcher matcher = pattern.matcher(s);
 
-                while(matcher.find()){
+                while (matcher.find()) {
                     String grouped = matcher.group(0);
 
                     s = s.replace(grouped, StringUtil.parseCommas(grouped.replace("$commas{", "").replace("}", "")));
@@ -117,10 +118,11 @@ public final class MS {
             private static final int DEFAULT_LENGTH = 8;
             final Pattern pattern = Pattern.compile("\\$rs\\([0-9]+\\)\\{[^}]+}");
             final Pattern numberMatcher = Pattern.compile("\\([0-9]+\\)");
+
             public String apply(String s) {
                 Matcher matcher = pattern.matcher(s);
 
-                while(matcher.find()){
+                while (matcher.find()) {
                     String grouped = matcher.group(0);
 
                     Matcher numbers = numberMatcher.matcher(grouped);
@@ -129,7 +131,7 @@ public final class MS {
 
                     String numGroup = "";
 
-                    if(numbers.find()){
+                    if (numbers.find()) {
                         numGroup = numbers.group();
 
                         characters = Integer.parseInt(numGroup.replace("(", "").replace(")", ""));
@@ -153,11 +155,12 @@ public final class MS {
         //Strip color
         TRANSFORMERS.add(new Function<String, String>() {
             final Pattern pattern = Pattern.compile("\\$sc\\{[^}]+}");
+
             @Override
             public String apply(String s) {
                 Matcher matcher = pattern.matcher(s);
 
-                while(matcher.find()){
+                while (matcher.find()) {
                     String grouped = matcher.group(0);
 
                     s = s.replace(grouped, ChatColor.stripColor(grouped.replace("$sc{", "").replace("}", "")));
@@ -169,18 +172,20 @@ public final class MS {
         //To roman numeral
         TRANSFORMERS.add(new Function<String, String>() {
             final Pattern pattern = Pattern.compile("\\$roman\\{(\\d+)}");
+
             @Override
             public String apply(String s) {
                 Matcher matcher = pattern.matcher(s);
 
-                while(matcher.find()){
+                while (matcher.find()) {
                     String grouped = matcher.group(0);
                     String number = matcher.group(1);
 
                     try {
                         int numeral = Integer.parseInt(number);
                         s = s.replace(grouped, StringUtil.toRoman(numeral));
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
                 return s;
             }
@@ -189,7 +194,7 @@ public final class MS {
 
     @Contract(pure = true)
     public static @NotNull String applyTransformers(@NotNull String str) {
-        for(Function<String, String> func : TRANSFORMERS){
+        for (Function<String, String> func : TRANSFORMERS) {
             str = func.apply(str);
         }
         return str;
@@ -198,7 +203,7 @@ public final class MS {
     /**
      * Parses all the messages by calling parseSingle for every message.
      *
-     * @param messages the messages to parse
+     * @param messages     the messages to parse
      * @param placeholders the placeholders to use
      * @return the built list
      */
@@ -209,12 +214,12 @@ public final class MS {
     /**
      * Parses a single string.
      *
-     * @param message the message
+     * @param message      the message
      * @param placeholders the placeholders
      * @return the parsed string.
      */
-    public static String parseSingle(String message, Object... placeholders){
-        if(message == null)
+    public static String parseSingle(String message, Object... placeholders) {
+        if (message == null)
             return null;
 
         PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
@@ -226,7 +231,7 @@ public final class MS {
     /**
      * Converts the message to a component.
      *
-     * @param message the message
+     * @param message      the message
      * @param placeholders the placeholders
      * @return the component
      */
@@ -240,7 +245,7 @@ public final class MS {
     /**
      * Converts the message to a component.
      *
-     * @param message the message
+     * @param message      the message
      * @param placeholders the placeholders
      * @return the component
      */
@@ -258,8 +263,8 @@ public final class MS {
     /**
      * Sends a title to a player.
      *
-     * @param player the player.
-     * @param title the title to send.
+     * @param player       the player.
+     * @param title        the title to send.
      * @param placeholders the placeholders.
      */
     public static void sendTitle(Player player, Title title, Object... placeholders) {
@@ -276,8 +281,8 @@ public final class MS {
     /**
      * Sends an action bar to a player.
      *
-     * @param player the player.
-     * @param actionBar the action bar to send.
+     * @param player       the player.
+     * @param actionBar    the action bar to send.
      * @param placeholders the placeholders.
      */
     public static void sendActionBar(Player player, String actionBar, Object... placeholders) {
@@ -285,11 +290,11 @@ public final class MS {
         audience.sendActionBar(toComponent(actionBar, placeholders));
     }
 
-    public static void pass(CommandSender sender, String message, Object... placeholders){
+    public static void pass(CommandSender sender, String message, Object... placeholders) {
         ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
     }
 
-    public static void pass(CommandSender sender, List<String> message, Object... placeholders){
+    public static void pass(CommandSender sender, List<String> message, Object... placeholders) {
         ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
     }
 }

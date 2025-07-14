@@ -29,12 +29,19 @@ import java.util.Map;
 public final class ConfigPrimitive {
     private static final ConfigPrimitive NULL = new ConfigPrimitive(null);
 
-    /** The primitive object */
-    @Getter @Nullable
+    /**
+     * The primitive object
+     */
+    @Getter
+    @Nullable
     private final Object primitive;
-    /** The source of the data. */
-    @Getter @Nullable
+    /**
+     * The source of the data.
+     */
+    @Getter
+    @Nullable
     private final ConfigurationSection source;
+
     private ConfigPrimitive(@Nullable Object value, @Nullable ConfigurationSection source) {
         this.source = source;
         this.primitive = value;
@@ -239,7 +246,7 @@ public final class ConfigPrimitive {
     /**
      * Tries to coerce a string back into its java box object.
      *
-     * @param val the string.
+     * @param val       the string.
      * @param boxedType the boxed type of object
      * @return the boxed object.
      */

@@ -12,9 +12,13 @@ import java.util.Objects;
  */
 @RequiredArgsConstructor
 public class FieldPointer<T> implements Pointer<T> {
-    /** The instance of the object */
+    /**
+     * The instance of the object
+     */
     private final @Nullable Object instance;
-    /** The handle of the field */
+    /**
+     * The handle of the field
+     */
     private final FieldHandle<T> fieldHandle;
 
     /**

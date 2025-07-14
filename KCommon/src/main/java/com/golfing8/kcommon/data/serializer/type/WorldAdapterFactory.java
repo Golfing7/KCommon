@@ -1,6 +1,8 @@
 package com.golfing8.kcommon.data.serializer.type;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -8,11 +10,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 /**
  * A type adapter for bukkit worlds.
- *
+ * <p>
  * Adaptations are simply done in World to String and String to World form.
  */
 public enum WorldAdapterFactory implements TypeAdapterFactory {

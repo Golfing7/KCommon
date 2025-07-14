@@ -28,7 +28,7 @@ public class Range {
      * @param i the number to check.
      * @return true if it's within the range.
      */
-    public boolean inRange(int i){
+    public boolean inRange(int i) {
         return min <= i && i <= max;
     }
 
@@ -65,7 +65,7 @@ public class Range {
      *
      * @return the random number.
      */
-    public int getRandomI(){
+    public int getRandomI() {
         return ThreadLocalRandom.current().nextInt((int) min, (int) max + 1);
     }
 
@@ -74,7 +74,7 @@ public class Range {
      *
      * @return the random number.
      */
-    public double getRandomD(){
+    public double getRandomD() {
         return ThreadLocalRandom.current().nextDouble(min, max + EPSILON);
     }
 
@@ -101,11 +101,11 @@ public class Range {
      * @param string the string to parse from.
      * @return the created range.
      */
-    public static Range fromString(String string){
+    public static Range fromString(String string) {
         String[] split = string.split("[:;|]");
 
-        if(split.length == 1){
-            split = new String[] {split[0], split[0]};
+        if (split.length == 1) {
+            split = new String[]{split[0], split[0]};
         }
 
         double n1 = Double.parseDouble(split[0]);

@@ -38,13 +38,7 @@ import org.bukkit.Bukkit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -634,10 +628,15 @@ final class HelperPromise<V> implements Promise<V> {
 
     private final class ThrowingSupplyRunnable implements Runnable, Delegate<Callable<V>> {
         private final Callable<V> supplier;
+
         private ThrowingSupplyRunnable(Callable<V> supplier) {
             this.supplier = supplier;
         }
-        @Override public Callable<V> getDelegate() { return this.supplier; }
+
+        @Override
+        public Callable<V> getDelegate() {
+            return this.supplier;
+        }
 
         @Override
         public void run() {
@@ -655,10 +654,15 @@ final class HelperPromise<V> implements Promise<V> {
 
     private final class SupplyRunnable implements Runnable, Delegate<Supplier<V>> {
         private final Supplier<V> supplier;
+
         private SupplyRunnable(Supplier<V> supplier) {
             this.supplier = supplier;
         }
-        @Override public Supplier<V> getDelegate() { return this.supplier; }
+
+        @Override
+        public Supplier<V> getDelegate() {
+            return this.supplier;
+        }
 
         @Override
         public void run() {
@@ -678,12 +682,17 @@ final class HelperPromise<V> implements Promise<V> {
         private final HelperPromise<U> promise;
         private final Function<? super V, ? extends U> function;
         private final V value;
+
         private ApplyRunnable(HelperPromise<U> promise, Function<? super V, ? extends U> function, V value) {
             this.promise = promise;
             this.function = function;
             this.value = value;
         }
-        @Override public Function getDelegate() { return this.function; }
+
+        @Override
+        public Function getDelegate() {
+            return this.function;
+        }
 
         @Override
         public void run() {
@@ -704,13 +713,18 @@ final class HelperPromise<V> implements Promise<V> {
         private final Function<? super V, ? extends Promise<U>> function;
         private final V value;
         private final boolean sync;
+
         private ComposeRunnable(HelperPromise<U> promise, Function<? super V, ? extends Promise<U>> function, V value, boolean sync) {
             this.promise = promise;
             this.function = function;
             this.value = value;
             this.sync = sync;
         }
-        @Override public Function getDelegate() { return this.function; }
+
+        @Override
+        public Function getDelegate() {
+            return this.function;
+        }
 
         @Override
         public void run() {
@@ -739,12 +753,17 @@ final class HelperPromise<V> implements Promise<V> {
         private final HelperPromise<U> promise;
         private final Function<Throwable, ? extends U> function;
         private final Throwable t;
+
         private ExceptionallyRunnable(HelperPromise<U> promise, Function<Throwable, ? extends U> function, Throwable t) {
             this.promise = promise;
             this.function = function;
             this.t = t;
         }
-        @Override public Function getDelegate() { return this.function; }
+
+        @Override
+        public Function getDelegate() {
+            return this.function;
+        }
 
         @Override
         public void run() {

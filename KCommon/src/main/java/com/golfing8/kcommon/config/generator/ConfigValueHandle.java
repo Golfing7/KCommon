@@ -5,8 +5,8 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.config.commented.KConfigurationSection;
 import com.golfing8.kcommon.config.commented.MConfiguration;
-import com.golfing8.kcommon.util.StringUtil;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import com.golfing8.kcommon.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -36,9 +36,9 @@ public class ConfigValueHandle {
     /**
      * Loads the handle's value from the config or sets it.
      *
-     * @param sourceSection the source section.
-     * @param path the path to the value.
-     * @param readOnly if we should only read in values and not write.
+     * @param sourceSection  the source section.
+     * @param path           the path to the value.
+     * @param readOnly       if we should only read in values and not write.
      * @param mappingEnabled if we should pay attention to the MConfiguration's file name.
      * @return true if the config was modified, false if not
      */
@@ -66,7 +66,8 @@ public class ConfigValueHandle {
                 return false;
             }
         } catch (Exception exc) {
-            throw new RuntimeException(String.format("Failed to load config value at path %s", path), exc);        }
+            throw new RuntimeException(String.format("Failed to load config value at path %s", path), exc);
+        }
     }
 
     /**

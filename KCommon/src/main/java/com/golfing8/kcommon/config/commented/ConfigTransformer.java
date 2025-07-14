@@ -2,7 +2,6 @@ package com.golfing8.kcommon.config.commented;
 
 import com.golfing8.kcommon.KCommon;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,25 +11,43 @@ import java.util.*;
  * A utility class for recognizing config keys and allowing iteration over them.
  */
 public class ConfigTransformer implements Iterator<String>, Iterable<String> {
-    /** The index of the last key in the transformed lines list. */
+    /**
+     * The index of the last key in the transformed lines list.
+     */
     private int lastKeyIndex = -1;
-    /** The list of new lines to put into the config */
+    /**
+     * The list of new lines to put into the config
+     */
     @Getter
-    private List<String> transformedLines = new ArrayList<>();
-    /** The amount of lines that have been artificially inserted */
+    private final List<String> transformedLines = new ArrayList<>();
+    /**
+     * The amount of lines that have been artificially inserted
+     */
     private int linesInserted = 0;
-    /** Lines, up to the current key, that weren't keys. */
+    /**
+     * Lines, up to the current key, that weren't keys.
+     */
     @Getter
     private List<String> junk = new ArrayList<>(), junk2 = new ArrayList<>();
-    /** The index of the lines */
+    /**
+     * The index of the lines
+     */
     private int index = 0;
-    /** The indent of the lines */
+    /**
+     * The indent of the lines
+     */
     private int indent = -1, lastIndent = -1;
-    /** The lines of the config */
-    private String[] lines;
-    /** The list of keys making up the path of the current key */
+    /**
+     * The lines of the config
+     */
+    private final String[] lines;
+    /**
+     * The list of keys making up the path of the current key
+     */
     private List<String> keys = new ArrayList<>();
-    /** The key to return on the next {@link #next()} call. */
+    /**
+     * The key to return on the next {@link #next()} call.
+     */
     private String nextKey;
 
     public ConfigTransformer(String configString) {

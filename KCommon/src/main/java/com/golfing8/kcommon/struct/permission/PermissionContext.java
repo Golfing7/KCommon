@@ -2,7 +2,6 @@ package com.golfing8.kcommon.struct.permission;
 
 import com.golfing8.kcommon.util.StringUtil;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -20,7 +19,7 @@ public interface PermissionContext {
     /**
      * Checks if the sender has the permission.
      *
-     * @param sender the sender
+     * @param sender     the sender
      * @param permission the permission
      * @return true if they have the permission
      */

@@ -12,7 +12,7 @@ public class RGBUtils {
     private final Pattern fix2 = Pattern.compile("\\{&#[0-9a-fA-F]{6}\\}");
     private final Pattern fix3 = Pattern.compile("&x[&0-9a-fA-F]{12}");
 
-    private String toChatColor(String hexCode){
+    private String toChatColor(String hexCode) {
         StringBuilder magic = new StringBuilder(ChatColor.COLOR_CHAR + "x");
         char[] var3 = hexCode.substring(2).toCharArray();
 
@@ -22,27 +22,27 @@ public class RGBUtils {
         return magic.toString();
     }
 
-    private String applyFormats(String textInput){
+    private String applyFormats(String textInput) {
         String text = textInput;
         text = fixFormat2(text);
         text = fixFormat3(text);
         return text;
     }
 
-    public String hexColor(String in){
+    public String hexColor(String in) {
         String text = applyFormats(in);
         Matcher m = hex.matcher(text);
-        while(m.find()){
+        while (m.find()) {
             String hexCode = m.group();
             text = text.replace(hexCode, toChatColor(hexCode));
         }
         return ChatColor.translateAlternateColorCodes('&', text);
     }
 
-    private String fixFormat2(String input){
+    private String fixFormat2(String input) {
         String text = input;
         Matcher m = fix2.matcher(text);
-        while(m.find()){
+        while (m.find()) {
             String hexcode = m.group();
             String fixed = hexcode.substring(2, 8);
             text = text.replace(hexcode, "#" + fixed);
@@ -50,12 +50,12 @@ public class RGBUtils {
         return text;
     }
 
-    private String fixFormat3(String input){
+    private String fixFormat3(String input) {
         String text = input;
         Matcher m = fix3.matcher(text);
-        while(m.find()){
+        while (m.find()) {
             String hexcode = m.group();
-            String fixed = new String(new char[] {
+            String fixed = new String(new char[]{
                     hexcode.charAt(3),
                     hexcode.charAt(5),
                     hexcode.charAt(7),

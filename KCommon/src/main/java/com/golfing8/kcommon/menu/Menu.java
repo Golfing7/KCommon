@@ -4,7 +4,6 @@ import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
@@ -26,6 +25,7 @@ public interface Menu extends Listener {
 
     /**
      * Gets the shape of this menu.
+     *
      * @return the actual shape.
      */
     MenuShape getMenuShape();
@@ -131,16 +131,22 @@ public interface Menu extends Listener {
     void addClickAction(int slot, ClickAction clickAction);
 
     void clearClickActions(int slot);
+
     void clearAllClickActions();
+
     Map<Integer, List<ClickAction>> getClickActions();
+
     void setClickActions(Map<Integer, List<ClickAction>> newActions);
 
     void onClose(CloseRunnable runnable);
+
     void onPostClose(CloseRunnable runnable);
 
     Inventory getGUI();
 
-    /** A tick method. Called once per second. */
+    /**
+     * A tick method. Called once per second.
+     */
     void onTick();
 
     /**
@@ -156,6 +162,7 @@ public interface Menu extends Listener {
      * @return true if the menu wasn't previously registered.
      */
     boolean register();
+
     void shutdown();
 
     List<Player> getViewers();

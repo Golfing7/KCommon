@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.config.adapter.xseries;
 
-import com.cryptomorin.xseries.XEntityType;
 import com.cryptomorin.xseries.XSound;
 import com.golfing8.kcommon.config.adapter.ConfigAdapter;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;

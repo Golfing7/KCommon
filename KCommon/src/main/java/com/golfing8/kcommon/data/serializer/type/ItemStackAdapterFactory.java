@@ -3,15 +3,14 @@ package com.golfing8.kcommon.data.serializer.type;
 import com.golfing8.kcommon.util.ItemBase64;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A type adapter for bukkit {@link ItemStack} instances.
@@ -20,7 +19,8 @@ import java.util.*;
 public enum ItemStackAdapterFactory implements JsonSerializer<ConfigurationSerializable>, JsonDeserializer<ConfigurationSerializable> {
     INSTANCE;
 
-    final Type objectStringMapType = new TypeToken<Map<String, Object>>() {}.getType();
+    final Type objectStringMapType = new TypeToken<Map<String, Object>>() {
+    }.getType();
 
     @Override
     public ConfigurationSerializable deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {

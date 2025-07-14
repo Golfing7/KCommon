@@ -4,8 +4,6 @@ import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.Modules;
-import com.golfing8.kcommon.struct.KNamespacedKey;
-import com.golfing8.kcommon.struct.Pair;
 import lombok.AllArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
@@ -96,7 +94,7 @@ public class ConfigPath {
      *
      * @param moduleContext the module context.
      * @param configContext the config context.
-     * @param path the path.
+     * @param path          the path.
      * @return the config path.
      */
     public static ConfigPath parseWithContext(@Nullable Module moduleContext, @Nullable Configuration configContext, String path) {

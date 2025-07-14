@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.library;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**

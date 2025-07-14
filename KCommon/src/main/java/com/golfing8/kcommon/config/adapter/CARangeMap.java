@@ -6,11 +6,8 @@ import com.golfing8.kcommon.struct.map.RangeMap;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 

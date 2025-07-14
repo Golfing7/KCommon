@@ -34,7 +34,7 @@ public class DHHologram implements Hologram {
     @Override
     public void clearLines() {
         HologramPage page = this.backingHologram.getPage(0);
-        while(page.size() > 0)
+        while (page.size() > 0)
             page.removeLine(0);
     }
 
@@ -50,7 +50,7 @@ public class DHHologram implements Hologram {
 
     @Override
     public void addLine(int index, String line) {
-        if(index == this.length())
+        if (index == this.length())
             DHAPI.addHologramLine(backingHologram, line);
         else
             DHAPI.insertHologramLine(backingHologram, index, line);
@@ -58,7 +58,7 @@ public class DHHologram implements Hologram {
 
     @Override
     public void addLine(int index, ItemStack itemStack) {
-        if(index == this.length())
+        if (index == this.length())
             DHAPI.addHologramLine(backingHologram, itemStack);
         else
             DHAPI.insertHologramLine(backingHologram, index, itemStack);

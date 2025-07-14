@@ -20,12 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents an item drop that is displayed on an armor stand rather than the ground.
@@ -39,11 +34,17 @@ public class FancyItemDrop extends BukkitRunnable {
     private final Collection<ItemStack> items;
     private final ItemStack icon;
     private final Hologram displayHologram;
-    /** The players that can pick this item up. If empty, everyone can pick it up. */
+    /**
+     * The players that can pick this item up. If empty, everyone can pick it up.
+     */
     private final Set<UUID> pickupPlayers;
-    /** A map used to store metadata on the item */
+    /**
+     * A map used to store metadata on the item
+     */
     private final Map<String, Object> metadata;
-    /** The item drop this fancy item was dropped by */
+    /**
+     * The item drop this fancy item was dropped by
+     */
     @Setter
     private @Nullable ItemDrop spawnedBy;
     @Setter

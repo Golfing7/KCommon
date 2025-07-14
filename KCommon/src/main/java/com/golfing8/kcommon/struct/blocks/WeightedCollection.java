@@ -3,11 +3,7 @@ package com.golfing8.kcommon.struct.blocks;
 import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.map.RangeMap;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -23,6 +19,7 @@ public class WeightedCollection<T> {
      * A map that contains the 'baked' odds of every object.
      */
     private final RangeMap<T> bakedOdds;
+
     public WeightedCollection() {
         this.chanceMap = new HashMap<>();
         this.bakedOdds = new RangeMap<>();
@@ -81,7 +78,7 @@ public class WeightedCollection<T> {
     /**
      * Adds a weighted object with chance to the block palette.
      *
-     * @param obj the obj to add.
+     * @param obj    the obj to add.
      * @param chance the chance for it to appear. (Should be 0-100)
      */
     public void addWeightedObject(T obj, double chance) {
@@ -96,7 +93,7 @@ public class WeightedCollection<T> {
      */
     public T get() {
         //We can't give an object if we're empty.
-        if(this.bakedOdds.isEmpty())
+        if (this.bakedOdds.isEmpty())
             return null;
 
         //Get a random number between 0 and 1, then get the value in the range.
@@ -119,13 +116,13 @@ public class WeightedCollection<T> {
     private void bakeOdds() {
         this.bakedOdds.clear();
         double totalChanceSum = 0.0D;
-        for(Double value : this.chanceMap.values()) {
+        for (Double value : this.chanceMap.values()) {
             totalChanceSum += value;
         }
 
         //Loop over all entries, adding the object and its normalized entry.
         double lastEntryStart = 0.0D;
-        for(Map.Entry<T, Double> entry : this.chanceMap.entrySet()) {
+        for (Map.Entry<T, Double> entry : this.chanceMap.entrySet()) {
             double normalChance = entry.getValue() / totalChanceSum;
             this.bakedOdds.put(new Range(lastEntryStart, lastEntryStart + normalChance), entry.getKey());
             lastEntryStart += normalChance;

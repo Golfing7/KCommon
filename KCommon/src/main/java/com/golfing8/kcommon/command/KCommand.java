@@ -102,9 +102,13 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      */
     @Getter
     private final List<BuiltCommandArgument> commandArguments = new ArrayList<>();
-    /** Contains the long name mapped command flags. */
+    /**
+     * Contains the long name mapped command flags.
+     */
     private final Map<String, CommandFlag> longNameMappedCommandFlags = new HashMap<>();
-    /** Contains the short name mapped command flags. */
+    /**
+     * Contains the short name mapped command flags.
+     */
     private final Map<Character, CommandFlag> shortNameMappedCommandFlags = new HashMap<>();
     /**
      * The sub commands of this command.
@@ -121,7 +125,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      */
     @Getter
     private final Set<Requirement> commandRequirements = new HashSet<>();
-    /** The source that this command uses for its lang */
+    /**
+     * The source that this command uses for its lang
+     */
     @Getter
     private final LangConfig langSource;
     /**
@@ -129,7 +135,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      */
     @Getter
     private Cmd annotation;
-    /** The visibility of the command */
+    /**
+     * The visibility of the command
+     */
     @Getter
     private CommandVisibility visibility = CommandVisibility.PUBLIC;
     /**
@@ -138,27 +146,40 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * This is set after {@link #onRegister()} is called as it can be dynamically built.
      * </p>
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     private String commandPermission = "";
-    /** A description of this command */
-    @Getter @Setter
+    /**
+     * A description of this command
+     */
+    @Getter
+    @Setter
     private String description;
     /**
      * The parent of this command, can be null.
      */
-    @Getter @Nullable
+    @Getter
+    @Nullable
     private KCommand parent;
 
-    /** If this command should be run async */
-    @Getter @Setter
+    /**
+     * If this command should be run async
+     */
+    @Getter
+    @Setter
     private boolean async;
 
-    /** The last time this command was executed. */
+    /**
+     * The last time this command was executed.
+     */
     @Getter
     private long lastExecutionTime;
 
-    /** If this command should accept extra arguments not defined specifically */
-    @Getter @Setter
+    /**
+     * If this command should accept extra arguments not defined specifically
+     */
+    @Getter
+    @Setter
     private boolean acceptExtraArguments = false;
 
     /**
@@ -166,7 +187,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      */
     public KCommand() {
         Cmd cmd = getClass().getAnnotation(Cmd.class);
-        if(cmd == null)
+        if (cmd == null)
             throw new CommandInstantiationException(String.format("Cannot instantiate command '%s' with default constructor without Cmd annotation!", this.getClass().getName()));
 
         this.annotation = cmd;
@@ -306,7 +327,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * Recursive method for calling sub commands' onRegister methods.
      */
     protected final void subRegister() {
-        for(KCommand sub : this.subcommands) {
+        for (KCommand sub : this.subcommands) {
             try {
                 sub.onRegister();
                 sub.subRegister();
@@ -323,7 +344,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * Recursive method for calling sub commands' onUnregister methods.
      */
     protected final void subUnregister() {
-        for(KCommand sub : this.subcommands) {
+        for (KCommand sub : this.subcommands) {
             sub.onUnregister();
             sub.subUnregister();
         }
@@ -353,10 +374,10 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * @param command the subcommand.
      */
     protected final void addSubCommand(KCommand command) {
-        if(command == this)
+        if (command == this)
             throw new CommandInstantiationException("Cannot add self as sub command!");
 
-        if(this.subcommands.contains(command))
+        if (this.subcommands.contains(command))
             throw new CommandInstantiationException("That subcommand is already registered!");
 
         this.subcommands.add(command);
@@ -367,7 +388,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Adds an argument to this command.
      *
-     * @param name the name of the argument.
+     * @param name     the name of the argument.
      * @param argument the argument to add.
      */
     protected final BuiltCommandArgument addArgument(String name, CommandArgument<?> argument) {
@@ -379,7 +400,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Adds the argument and its autofill function to the argument list.
      *
-     * @param name the name of the argument.
+     * @param name     the name of the argument.
      * @param argument the argument to add.
      * @param autofill the autofill function.
      */
@@ -413,9 +434,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * Builds the command context from the given sender, label, and arguments.
      * If the arguments are not valid, null is returned.
      *
-     * @param sender the sender of the command.
-     * @param label the label of the command used.
-     * @param args the arguments used in the command.
+     * @param sender  the sender of the command.
+     * @param label   the label of the command used.
+     * @param args    the arguments used in the command.
      * @param verbose if something goes wrong, should we send a message?
      * @return the command context or null.
      */
@@ -498,9 +519,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Builds the arguments for this command, up to the end of the argument array provided.
      *
-     * @param sender the sender.
-     * @param label the label.
-     * @param args the args.
+     * @param sender  the sender.
+     * @param label   the label.
+     * @param args    the args.
      * @param verbose verbose mode
      * @return the built arguments
      */
@@ -511,7 +532,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
             String stringArgument = args[i];
 
             //Check if we should just immediately add the argument.
-            if(this.commandArguments.size() <= i) {
+            if (this.commandArguments.size() <= i) {
                 // Try matching it against a flag.
                 var flagStates = matchArgumentForFlags(stringArgument, false);
                 if (flagStates != null)
@@ -545,7 +566,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
 
             //Create the argument context and test it.
             ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(allArguments), i);
-            if(!commandArgument.getPredicate().test(context)) {
+            if (!commandArgument.getPredicate().test(context)) {
                 // Handle the argument as invalid.
                 if (verbose) {
                     handleInvalidArgument(sender, builtCommandArgument, stringArgument);
@@ -563,7 +584,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         for (int i = builtArguments.size(); i < this.commandArguments.size(); i++) {
             BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
             Function<CommandSender, Object> autofill = builtCommandArgument.getAutoComplete();
-            if(autofill == null) {
+            if (autofill == null) {
                 // Handle the argument as missing.
                 if (verbose) {
                     handleMissingArgument(sender, builtCommandArgument);
@@ -593,11 +614,11 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * Checks for sub commands and runs them if found.
      *
      * @param sender the command sender.
-     * @param args the arguments of the command.
+     * @param args   the arguments of the command.
      * @return true if a sub command was found and run, false if not.
      */
     private boolean checkSubcommands(CommandSender sender, String[] args) {
-        if(this.subcommands.isEmpty() || args.length == 0)
+        if (this.subcommands.isEmpty() || args.length == 0)
             return false;
 
         //Build the new parts of the command.
@@ -606,8 +627,8 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         String newLabel = args[0];
 
         //Check all subcommands.
-        for(KCommand subcommand : this.subcommands) {
-            if(subcommand.labelMatches(newLabel)) {
+        for (KCommand subcommand : this.subcommands) {
+            if (subcommand.labelMatches(newLabel)) {
                 subcommand.pass(sender, newLabel, newArgs);
                 return true;
             }
@@ -644,7 +665,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Checks if the given sender has the given extension of the command's permission.
      *
-     * @param sender the sender.
+     * @param sender    the sender.
      * @param extension the extension.
      * @return if they have the permission extension.
      * @deprecated use {@link #hasPermission(CommandSender, String)}
@@ -661,7 +682,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * and that the command argument is an autocomplete argument.
      * </p>
      *
-     * @param sender the command sender.
+     * @param sender   the command sender.
      * @param argument the argument.
      * @return true if they can see the argument.
      */
@@ -753,7 +774,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Handles a user that is requesting a help message for this command.
      *
-     * @param sender the sender.
+     * @param sender       the sender.
      * @param lastArgument the last argument provided in the command.
      */
     private void handleHelpMessage(CommandSender sender, String lastArgument, int page) {
@@ -809,7 +830,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Checks if the argument matches the command name close enough for it to be displayed in the help message.
      *
-     * @param argument the argument.
+     * @param argument    the argument.
      * @param commandName the command name.
      * @return true if the command matches.
      */
@@ -825,9 +846,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Handles a user that has entered an invalid argument.
      *
-     * @param sender the sender.
+     * @param sender   the sender.
      * @param argument the argument.
-     * @param actual the actual argument.
+     * @param actual   the actual argument.
      */
     private void handleInvalidArgument(CommandSender sender, BuiltCommandArgument argument, String actual) {
         if (!canSee(sender)) {
@@ -840,7 +861,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Handles a user that has entered a missing argument.
      *
-     * @param sender the sender.
+     * @param sender   the sender.
      * @param argument the argument.
      */
     private void handleMissingArgument(CommandSender sender, BuiltCommandArgument argument) {
@@ -868,8 +889,8 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * A method to take the raw data from a bukkit command and run it through this one.
      *
      * @param sender the sender of the command.
-     * @param label the label of the command used.
-     * @param args the arguments used in the command.
+     * @param label  the label of the command used.
+     * @param args   the arguments used in the command.
      */
     public final void pass(CommandSender sender, String label, String[] args) {
         if (checkSubcommands(sender, args)) {
@@ -902,11 +923,11 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * @return true if the label matches.
      */
     public final boolean labelMatches(String label) {
-        if(label.equalsIgnoreCase(this.commandName))
+        if (label.equalsIgnoreCase(this.commandName))
             return true;
 
-        for(String alias : this.commandAliases) {
-            if(label.equalsIgnoreCase(alias))
+        for (String alias : this.commandAliases) {
+            if (label.equalsIgnoreCase(alias))
                 return true;
         }
         return false;
@@ -921,12 +942,12 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     public final boolean labelStartsWith(String prefix) {
         String prefixToLower = prefix.toLowerCase();
         //Check main label.
-        if(this.commandName.toLowerCase().startsWith(prefixToLower))
+        if (this.commandName.toLowerCase().startsWith(prefixToLower))
             return true;
 
         //Check all aliases.
-        for(String alias : this.commandAliases) {
-            if(alias.toLowerCase().startsWith(prefixToLower))
+        for (String alias : this.commandAliases) {
+            if (alias.toLowerCase().startsWith(prefixToLower))
                 return true;
         }
         return false;
@@ -936,12 +957,12 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * Gathers the tab completions for this command.
      *
      * @param sender the sender.
-     * @param label the command's label used
-     * @param args the arguments.
+     * @param label  the command's label used
+     * @param args   the arguments.
      * @return the list of tab completions.
      */
     public final List<String> gatherTabCompletions(CommandSender sender, String label, String[] args) {
-        if(args.length == 0)
+        if (args.length == 0)
             return Collections.emptyList();
 
         //We need to check our subcommands.
@@ -959,7 +980,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         }
 
         //Loop over the arguments to match.
-        if(args.length > this.commandArguments.size() + this.subcommands.size())
+        if (args.length > this.commandArguments.size() + this.subcommands.size())
             return Collections.emptyList();
 
         //Get the raw completions.
@@ -968,7 +989,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         List<String> completions = new ArrayList<>();
         String stringArgument = args[args.length - 1];
         if (builtArguments != null) {
-            if(this.commandArguments.size() > args.length - 1) {
+            if (this.commandArguments.size() > args.length - 1) {
                 CommandArgument<?> argument = this.commandArguments.get(args.length - 1).getArgument();
                 ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(builtArguments), args.length - 1);
                 completions.addAll(argument.getCompletions().apply(context));
@@ -995,17 +1016,17 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         // Then go through the subcommands and try to add those as well.
         if (args.length == 1) {
             String argToLower = stringArgument.toLowerCase();
-            for(KCommand command : this.getSubcommands()) {
+            for (KCommand command : this.getSubcommands()) {
                 if (!command.canSee(sender))
                     continue;
 
                 //Add the main label.
-                if(command.getCommandName().toLowerCase().startsWith(argToLower))
+                if (command.getCommandName().toLowerCase().startsWith(argToLower))
                     completions.add(command.getCommandName());
 
                 //Add all aliases.
-                for(String alias : command.getCommandAliases()) {
-                    if(alias.toLowerCase().startsWith(argToLower))
+                for (String alias : command.getCommandAliases()) {
+                    if (alias.toLowerCase().startsWith(argToLower))
                         completions.add(alias);
                 }
             }
@@ -1028,7 +1049,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
 
     @Override
     public final List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        if(strings.length == 0)
+        if (strings.length == 0)
             return Collections.emptyList();
 
         return gatherTabCompletions(commandSender, s, strings);
@@ -1037,7 +1058,8 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     /**
      * Used to register internals for {@link MCommand}.
      */
-    void internalOnRegister() {}
+    void internalOnRegister() {
+    }
 
     /**
      * Run when this command is registered. Should be used for bootstrapping things like command arguments.

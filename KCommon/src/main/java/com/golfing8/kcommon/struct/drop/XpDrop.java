@@ -1,32 +1,24 @@
 package com.golfing8.kcommon.struct.drop;
 
-import com.cryptomorin.xseries.XEnchantment;
-import com.golfing8.kcommon.struct.item.FancyItemDrop;
-import com.golfing8.kcommon.struct.item.ItemStackBuilder;
-import com.golfing8.kcommon.util.MathExpressions;
 import com.golfing8.kcommon.util.MathUtil;
-import com.golfing8.kcommon.util.PlayerUtil;
 import com.golfing8.kcommon.util.SetExpFix;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Represents a Drop for XP.
  */
 @Getter
 public class XpDrop extends Drop<Integer> {
-    private int xp;
-    private boolean boostQuantity;
-    private boolean giveDirectly;
+    private final int xp;
+    private final boolean boostQuantity;
+    private final boolean giveDirectly;
+
     public XpDrop(double chance,
                   @Nullable String displayName,
                   double maxBoost,

@@ -6,7 +6,10 @@ import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A placeholder for a given string. Can be used in messages or things like items. KCommon's general
@@ -54,9 +57,9 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
      * <br>
      * Uses the <code>valueFormat</code> for formatting values. If null, simply uses the default string from the list.
      *
-     * @param label the label, which is surrounded with {} and uppercased.
-     * @param value the value to replace it with.
-     * @param delimiter the delimiter to place between each value in the list.
+     * @param label       the label, which is surrounded with {} and uppercased.
+     * @param value       the value to replace it with.
+     * @param delimiter   the delimiter to place between each value in the list.
      * @param valueFormat the format for values.
      * @return the placeholder generated.
      */
@@ -74,7 +77,7 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
             listBuilder.append(String.format(trueFormat, value.get(i)));
 
             //Append a comma if necessary.
-            if(i + 1 != value.size()) {
+            if (i + 1 != value.size()) {
                 listBuilder.append(trueDelimiter);
             }
         }
@@ -213,8 +216,8 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
     /**
      * Generates a placeholder with the default convention for naming.
      *
-     * @param label the label, which is surrounded with {} and uppercased.
-     * @param value the value to replace it with.
+     * @param label   the label, which is surrounded with {} and uppercased.
+     * @param value   the value to replace it with.
      * @param trusted if the placeholder is trusted.
      * @return the placeholder generated.
      */

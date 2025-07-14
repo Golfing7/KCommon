@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ClickAction {
-    private long cooldownLength;
-    private ClickRunnable clickRunnable;
+    private final long cooldownLength;
+    private final ClickRunnable clickRunnable;
 
-    private Map<UUID, Long> clickTimes;
+    private final Map<UUID, Long> clickTimes;
 
     public ClickAction(ClickRunnable clickRunnable) {
         this(0, clickRunnable);

@@ -17,10 +17,14 @@ public class FancyItemPrePickupEvent extends PlayerEvent implements Cancellable 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
     private final FancyItemDrop itemDrop;
-    /** The item that the player picked up out of the fancy item drop */
+    /**
+     * The item that the player picked up out of the fancy item drop
+     */
     private final ItemStack itemPickedUp;
 
-    /** If set to true, this will remove the item from the fancy drop */
+    /**
+     * If set to true, this will remove the item from the fancy drop
+     */
     @Setter
     private boolean itemConsumed;
     @Setter

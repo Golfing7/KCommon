@@ -25,7 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class ChatInputHelper implements Listener {
     private static final Map<Player, ChatInputHelper> HELPERS = new ConcurrentHashMap<>();
-    /** The future of input. Completed with null if the player times out or disconnects */
+    /**
+     * The future of input. Completed with null if the player times out or disconnects
+     */
     @Getter(onMethod_ = @Deprecated)
     private final CompletableFuture<@Nullable String> result;
     private final Promise<@Nullable String> resultPromise;

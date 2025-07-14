@@ -30,11 +30,12 @@ public class MovingItem {
     private int currentStep;
     private ItemStack previousStack;
     private boolean removeOnFinish;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean frozen;
 
     @Getter
-    private List<ClickAction> clickActions;
+    private final List<ClickAction> clickActions;
 
     private boolean justReset, justOpened;
 

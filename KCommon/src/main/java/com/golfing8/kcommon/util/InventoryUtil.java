@@ -2,13 +2,11 @@ package com.golfing8.kcommon.util;
 
 import com.cryptomorin.xseries.XMaterial;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -62,7 +60,7 @@ public final class InventoryUtil {
     /**
      * Updates the items in the inventory given the function
      *
-     * @param inventory the inventory
+     * @param inventory    the inventory
      * @param itemFunction the item function
      * @return the amount of updated items
      */
@@ -84,7 +82,7 @@ public final class InventoryUtil {
      * Removes up to the given amount of items from the given inventory
      *
      * @param inventory the inventory
-     * @param amount the amount of items to remove
+     * @param amount    the amount of items to remove
      * @param predicate the item predicate
      * @return the actual amount of items removed.
      */

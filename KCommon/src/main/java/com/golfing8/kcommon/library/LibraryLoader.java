@@ -15,7 +15,6 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +38,7 @@ public class LibraryLoader {
     }
 
     private void ensureLibraryFolderExists() {
-        if (!Files.exists(libraryFolderPath))  {
+        if (!Files.exists(libraryFolderPath)) {
             try {
                 Files.createDirectories(libraryFolderPath);
             } catch (IOException e) {
@@ -77,9 +76,9 @@ public class LibraryLoader {
      * Loads the given library into runtime. Uses net/group/id notation instead of net.group.id notation to avoid
      * problems with the shade plugin.
      *
-     * @param groupId the group id.
+     * @param groupId    the group id.
      * @param artifactId the artifact ID.
-     * @param version the version.
+     * @param version    the version.
      */
     public void loadLibrary(String groupId, String artifactId, String version) {
         loadLibrary(groupId, artifactId, version, "https://repo1.maven.org/maven2");
@@ -111,15 +110,15 @@ public class LibraryLoader {
         AtomicInteger completed = new AtomicInteger(0);
         for (LibraryDefinition definition : libraryDefinitions) {
 //            LOADER_SERVICE.execute(() -> {
-                try {
-                    loadLibrary(definition);
-                } finally {
-                    synchronized (this) {
-                        if (completed.incrementAndGet() == libraryDefinitions.size()) {
-                            this.notifyAll();
-                        }
+            try {
+                loadLibrary(definition);
+            } finally {
+                synchronized (this) {
+                    if (completed.incrementAndGet() == libraryDefinitions.size()) {
+                        this.notifyAll();
                     }
                 }
+            }
 //            });
         }
 

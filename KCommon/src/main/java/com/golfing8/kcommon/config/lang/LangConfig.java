@@ -58,18 +58,18 @@ public class LangConfig {
         this.loadedMessages.clear();
 
         //Try to create the file first.
-        if(!Files.exists(this.configPath)) {
-            try{
+        if (!Files.exists(this.configPath)) {
+            try {
                 Files.createDirectories(this.configPath.getParent());
                 Files.createFile(this.configPath);
-            }catch(IOException exc) {
+            } catch (IOException exc) {
                 throw new RuntimeException(String.format("Failed to load language config under path %s!", this.configPath), exc);
             }
         }
 
-        try(BufferedReader reader = Files.newBufferedReader(this.configPath)) {
+        try (BufferedReader reader = Files.newBufferedReader(this.configPath)) {
             this.configuration = YamlConfiguration.loadConfiguration(reader);
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to load language config under path %s!", this.configPath), exc);
         }
     }
@@ -79,12 +79,12 @@ public class LangConfig {
      */
     public void save() {
         //No pending save? Not necessary then.
-        if(!pendingSave)
+        if (!pendingSave)
             return;
 
-        try{
+        try {
             this.configuration.save(this.configPath.toFile());
-        }catch(IOException exc) {
+        } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to save language config under path %s!", this.configPath), exc);
         }
 
@@ -94,7 +94,7 @@ public class LangConfig {
     /**
      * Used to add a language constant to this config.
      *
-     * @param key the key.
+     * @param key   the key.
      * @param value the values.
      * @return true if the item was added to the config.
      */
@@ -105,7 +105,7 @@ public class LangConfig {
     /**
      * Used to add a language constant to this config.
      *
-     * @param key the key.
+     * @param key   the key.
      * @param value the value.
      * @return true if the item was added to the config.
      */
@@ -116,26 +116,25 @@ public class LangConfig {
     /**
      * Used to add a language constant to this config.
      *
-     * @param key the key.
+     * @param key   the key.
      * @param value the value.
      * @return true if the item was added to the config.
      */
     public boolean addLanguageConstant(String key, Message value) {
-        if(!KEY_PATTERN.matcher(key).matches())
+        if (!KEY_PATTERN.matcher(key).matches())
             throw new IllegalArgumentException(String.format("Key %s does not match expected 'key-string-format' format!", key));
 
-        if(!this.configuration.contains(key)) {
+        if (!this.configuration.contains(key)) {
             ConfigTypeRegistry.setInConfig(this.configuration, key, value);
             this.loadedMessages.put(key, value);
             this.pendingSave = true;
             return true;
-        }else {
+        } else {
             //Load the item.
             this.loadedMessages.put(key, new Message(configuration.get(key)));
         }
         return false;
     }
-
 
 
     /**

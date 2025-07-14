@@ -47,6 +47,7 @@ public @interface Cmd {
 
     /**
      * If the command should be executed asynchronously.
+     *
      * @return true if the command should run async
      */
     boolean async() default false;

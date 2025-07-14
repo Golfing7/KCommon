@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.struct.time;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -75,15 +74,15 @@ public class TimeLength implements Comparable<TimeLength> {
 
         //Append all of them and return it.
         StringBuilder builder = new StringBuilder();
-        if(days > 0)
+        if (days > 0)
             builder.append(days).append("d ");
-        if(hours > 0)
+        if (hours > 0)
             builder.append(hours).append("h ");
-        if(minutes > 0)
+        if (minutes > 0)
             builder.append(minutes).append("m ");
-        if(seconds > 0)
+        if (seconds > 0)
             builder.append(seconds).append("s ");
-        if(ticks > 0 && includeTicks)
+        if (ticks > 0 && includeTicks)
             builder.append(ticks).append("t");
         return builder.toString().trim();
     }
@@ -111,14 +110,14 @@ public class TimeLength implements Comparable<TimeLength> {
         int accumulation = 0;
         for (int i = 0; i < input.length(); i++) {
             //Ignore any white space or commas.
-            if(Character.isWhitespace(input.charAt(i)) || input.charAt(i) == ',') {
-                if(accumulation > 0)
+            if (Character.isWhitespace(input.charAt(i)) || input.charAt(i) == ',') {
+                if (accumulation > 0)
                     return null;
                 continue;
             }
 
             //Interpret as a digit.
-            if(Character.isDigit(input.charAt(i))) {
+            if (Character.isDigit(input.charAt(i))) {
                 accumulation *= 10;
                 accumulation += input.charAt(i) - '0';
                 continue;

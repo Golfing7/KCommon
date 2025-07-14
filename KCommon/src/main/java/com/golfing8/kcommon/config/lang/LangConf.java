@@ -1,7 +1,5 @@
 package com.golfing8.kcommon.config.lang;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

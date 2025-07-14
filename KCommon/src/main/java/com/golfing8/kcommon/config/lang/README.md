@@ -1,14 +1,19 @@
 # Message Configuration
+
 Generally, all messages that are sent from a KCommon plugin are sent using a [Message](Message.java) instance.
 
 These messages are meant to be heavily configurable and comprehensive in how messages can be sent.
 
 ## Configuration
+
 Messages can range from the very simple
+
 ```yaml
 some-message: 'Hello World!'
 ```
+
 to the very complex
+
 ```yaml
 some-message:
   message:
@@ -31,7 +36,9 @@ some-message:
       # A delay in ticks to wait to send the sound.
       delay: 10
 ```
+
 You can even set a message to be paged if you think it's too long!
+
 ```yaml
 some-message:
   # Assume the multiline placeholder here gives back 50 lines.

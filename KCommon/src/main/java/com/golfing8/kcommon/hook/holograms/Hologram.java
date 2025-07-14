@@ -78,7 +78,7 @@ public interface Hologram {
     /**
      * Adds the line to the hologram at the specific index.
      *
-     * @param index the index to add the line.
+     * @param index     the index to add the line.
      * @param itemStack the line to add.
      */
     void addLine(int index, ItemStack itemStack);

@@ -9,7 +9,6 @@ import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.time.TimeLength;
 import com.golfing8.kcommon.util.MapUtil;
-import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -36,7 +35,9 @@ public final class CommandArguments {
 
     public static final CommandArgument<String> ANYTHING = new CommandArgument<>("Anything", (ctx) -> Collections.emptyList(), (context) -> true, ArgumentContext::getArgument);
 
-    /** A command argument for all offline players */
+    /**
+     * A command argument for all offline players
+     */
     public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER = new CommandArgument<>("An offline player", (context) -> {
         return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());
     }, (context) -> {
@@ -44,7 +45,9 @@ public final class CommandArguments {
         return player != null && player.getName().equalsIgnoreCase(context.getArgument());
     }, ctx -> Bukkit.getOfflinePlayer(ctx.getArgument()));
 
-    /** A command argument for all offline players that have played before */
+    /**
+     * A command argument for all offline players that have played before
+     */
     public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER_PLAYED_BEFORE = new CommandArgument<>("An offline player", (context) -> {
         return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());
     }, (context) -> {
@@ -52,12 +55,18 @@ public final class CommandArguments {
         return ifCached != null && ifCached.getName().equalsIgnoreCase(context.getArgument());
     }, ctx -> Bukkit.getOfflinePlayer(ctx.getArgument()));
 
-    /** Used for parsing raw booleans. The formatting of the inputs will be true/false */
+    /**
+     * Used for parsing raw booleans. The formatting of the inputs will be true/false
+     */
     public static final BooleanCommandArgument BOOLEAN = new BooleanCommandArgument(MapUtil.of("true", true, "false", false));
 
-    /** Used for parsing booleans in a nicer format such as yes/no */
+    /**
+     * Used for parsing booleans in a nicer format such as yes/no
+     */
     public static final BooleanCommandArgument BOOLEAN_FRIENDLY = new BooleanCommandArgument(MapUtil.of("yes", true, "no", false));
-    /** A boolean argument corresponding to the state of something (on/off) */
+    /**
+     * A boolean argument corresponding to the state of something (on/off)
+     */
     public static final BooleanCommandArgument BOOLEAN_STATE = new BooleanCommandArgument(MapUtil.of("on", true, "off", false));
 
     /**
@@ -85,10 +94,10 @@ public final class CommandArguments {
     public static final CommandArgument<Double> NON_NEGATIVE_NUMBER = new CommandArgument<>("A non negative number", (context) -> {
         return Collections.emptyList();
     }, (context) -> {
-        try{
+        try {
             double number = Double.parseDouble(context.getArgument());
             return number >= 0;
-        }catch(NumberFormatException exc) {
+        } catch (NumberFormatException exc) {
             return false;
         }
     }, ctx -> Double.parseDouble(ctx.getArgument()));
@@ -99,10 +108,10 @@ public final class CommandArguments {
     public static final CommandArgument<Long> NON_NEGATIVE_LONG = new CommandArgument<>("A non negative integer", (context) -> {
         return Collections.emptyList();
     }, (context) -> {
-        try{
+        try {
             long number = Long.parseLong(context.getArgument());
             return number >= 0;
-        }catch(NumberFormatException exc) {
+        } catch (NumberFormatException exc) {
             return false;
         }
     }, ctx -> Long.parseLong(ctx.getArgument()));
@@ -113,10 +122,10 @@ public final class CommandArguments {
     public static final CommandArgument<Double> DOUBLE = new CommandArgument<>("A non negative number", (context) -> {
         return Collections.emptyList();
     }, (context) -> {
-        try{
+        try {
             double number = Double.parseDouble(context.getArgument());
             return true;
-        }catch(NumberFormatException exc) {
+        } catch (NumberFormatException exc) {
             return false;
         }
     }, ctx -> Double.parseDouble(ctx.getArgument()));
@@ -127,10 +136,10 @@ public final class CommandArguments {
     public static final CommandArgument<Integer> NON_NEGATIVE_INTEGER = new CommandArgument<>("A non negative integer", (context) -> {
         return Collections.emptyList();
     }, (context) -> {
-        try{
+        try {
             int number = Integer.parseInt(context.getArgument());
             return number >= 0;
-        }catch(NumberFormatException exc) {
+        } catch (NumberFormatException exc) {
             return false;
         }
     }, ctx -> Integer.parseInt(ctx.getArgument()));
@@ -141,9 +150,9 @@ public final class CommandArguments {
     public static final CommandArgument<Integer> POSITIVE_INTEGER = new CommandArgument<>("A positive integer", (context) -> {
         return Collections.emptyList();
     }, (context) -> {
-        try{
+        try {
             return Integer.parseInt(context.getArgument()) > 0;
-        }catch(NumberFormatException exc) {
+        } catch (NumberFormatException exc) {
             return false;
         }
     }, ctx -> Integer.parseInt(ctx.getArgument()));
@@ -205,7 +214,9 @@ public final class CommandArguments {
         return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
     }, ctx -> (KPlugin) Bukkit.getServer().getPluginManager().getPlugin(ctx.getArgument()));
 
-    /** A command argument for parsing java UUIDs. */
+    /**
+     * A command argument for parsing java UUIDs.
+     */
     public static final CommandArgument<UUID> UUID = new CommandArgument<>("uuid", (context) -> Collections.emptyList(), (context) -> {
         try {
             java.util.UUID.fromString(context.getArgument());

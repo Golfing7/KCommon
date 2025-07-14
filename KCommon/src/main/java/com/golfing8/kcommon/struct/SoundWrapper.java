@@ -34,11 +34,11 @@ public class SoundWrapper {
      * @param player the player.
      */
     public void send(Player player) {
-        if(delay > 0) {
+        if (delay > 0) {
             Bukkit.getServer().getScheduler().runTaskLater(KCommon.getInstance(), () -> {
                 player.playSound(player.getLocation(), sound.parseSound(), volume, pitch);
             }, delay);
-        }else {
+        } else {
             player.playSound(player.getLocation(), sound.parseSound(), volume, pitch);
         }
     }
@@ -53,7 +53,7 @@ public class SoundWrapper {
             Bukkit.getServer().getScheduler().runTaskLater(KCommon.getInstance(), () -> {
                 location.getWorld().playSound(location, sound.parseSound(), volume, pitch);
             }, delay);
-        }else {
+        } else {
             location.getWorld().playSound(location, sound.parseSound(), volume, pitch);
         }
     }

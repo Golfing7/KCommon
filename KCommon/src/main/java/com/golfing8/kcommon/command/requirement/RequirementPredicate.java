@@ -2,7 +2,6 @@ package com.golfing8.kcommon.command.requirement;
 
 import com.golfing8.kcommon.command.CommandContext;
 import com.golfing8.kcommon.config.lang.Message;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

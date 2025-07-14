@@ -25,8 +25,8 @@
 
 package com.golfing8.kcommon.struct.helper.terminable.module;
 
-import com.golfing8.kcommon.struct.helper.terminable.TerminableConsumer;
 import com.golfing8.kcommon.struct.helper.terminable.Terminable;
+import com.golfing8.kcommon.struct.helper.terminable.TerminableConsumer;
 
 import javax.annotation.Nonnull;
 

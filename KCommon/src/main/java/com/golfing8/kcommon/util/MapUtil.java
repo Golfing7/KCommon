@@ -21,7 +21,7 @@ public class MapUtil {
         Map<K, K> newMap = new HashMap<>();
         newMap.put(k, v);
         for (int i = 0; i < values.length; i += 2) {
-            newMap.put((K) values[i], (K) values[i + 1]);
+            newMap.put(values[i], values[i + 1]);
         }
         return newMap;
     }

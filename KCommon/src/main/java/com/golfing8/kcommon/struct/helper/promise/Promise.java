@@ -30,12 +30,7 @@ import com.golfing8.kcommon.struct.helper.util.Delegates;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -81,7 +76,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a Promise which is already completed with the given value.
      *
      * @param value the value
-     * @param <U> the result type
+     * @param <U>   the result type
      * @return a new completed promise
      */
     @Nonnull
@@ -93,7 +88,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a Promise which is already completed with the given exception.
      *
      * @param exception the exception
-     * @param <U> the result type
+     * @param <U>       the result type
      * @return the new completed promise
      */
     @Nonnull
@@ -112,7 +107,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * future.</p>
      *
      * @param future the future to wrap
-     * @param <U> the result type
+     * @param <U>    the result type
      * @return the new promise
      */
     @Nonnull
@@ -123,9 +118,9 @@ public interface Promise<V> extends Future<V>, Terminable {
     /**
      * Returns a new Promise, and schedules it's population via the given supplier.
      *
-     * @param context the type of executor to use to supply the promise
+     * @param context  the type of executor to use to supply the promise
      * @param supplier the value supplier
-     * @param <U> the result type
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -138,7 +133,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given supplier.
      *
      * @param supplier the value supplier
-     * @param <U> the result type
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -151,7 +146,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given supplier.
      *
      * @param supplier the value supplier
-     * @param <U> the result type
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -164,10 +159,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given supplier,
      * after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param supplier the value supplier
+     * @param context    the type of executor to use to supply the promise
+     * @param supplier   the value supplier
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the promise
      */
     @Nonnull
@@ -180,11 +175,11 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given supplier,
      * after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
+     * @param context  the type of executor to use to supply the promise
      * @param supplier the value supplier
-     * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param delay    the delay
+     * @param unit     the unit of delay
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -197,9 +192,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given supplier,
      * after the delay has elapsed.
      *
-     * @param supplier the value supplier
+     * @param supplier   the value supplier
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the promise
      */
     @Nonnull
@@ -213,9 +208,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * after the delay has elapsed.
      *
      * @param supplier the value supplier
-     * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param delay    the delay
+     * @param unit     the unit of delay
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -228,9 +223,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given supplier,
      * after the delay has elapsed.
      *
-     * @param supplier the value supplier
+     * @param supplier   the value supplier
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the promise
      */
     @Nonnull
@@ -244,9 +239,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * after the delay has elapsed.
      *
      * @param supplier the value supplier
-     * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param delay    the delay
+     * @param unit     the unit of delay
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -258,9 +253,9 @@ public interface Promise<V> extends Future<V>, Terminable {
     /**
      * Returns a new Promise, and schedules it's population via the given callable.
      *
-     * @param context the type of executor to use to supply the promise
+     * @param context  the type of executor to use to supply the promise
      * @param callable the value callable
-     * @param <U> the result type
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -273,7 +268,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given callable.
      *
      * @param callable the value callable
-     * @param <U> the result type
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -286,7 +281,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given callable.
      *
      * @param callable the value callable
-     * @param <U> the result type
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -299,10 +294,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given callable,
      * after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param callable the value callable
+     * @param context    the type of executor to use to supply the promise
+     * @param callable   the value callable
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the promise
      */
     @Nonnull
@@ -315,11 +310,11 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given callable,
      * after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
+     * @param context  the type of executor to use to supply the promise
      * @param callable the value callable
-     * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param delay    the delay
+     * @param unit     the unit of delay
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -332,9 +327,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given callable,
      * after the delay has elapsed.
      *
-     * @param callable the value callable
+     * @param callable   the value callable
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the promise
      */
     @Nonnull
@@ -348,9 +343,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * after the delay has elapsed.
      *
      * @param callable the value callable
-     * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param delay    the delay
+     * @param unit     the unit of delay
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -363,9 +358,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise, and schedules it's population via the given callable,
      * after the delay has elapsed.
      *
-     * @param callable the value callable
+     * @param callable   the value callable
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the promise
      */
     @Nonnull
@@ -379,9 +374,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * after the delay has elapsed.
      *
      * @param callable the value callable
-     * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param delay    the delay
+     * @param unit     the unit of delay
+     * @param <U>      the result type
      * @return the promise
      */
     @Nonnull
@@ -389,7 +384,7 @@ public interface Promise<V> extends Future<V>, Terminable {
         Promise<U> p = empty();
         return p.supplyExceptionallyDelayedAsync(callable, delay, unit);
     }
-    
+
     /**
      * Attempts to cancel execution of this task.
      *
@@ -413,8 +408,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      *
      * @return the result value
      * @throws CancellationException if the computation was cancelled
-     * @throws CompletionException if this future completed
-     * exceptionally or a completion computation threw an exception
+     * @throws CompletionException   if this future completed
+     *                               exceptionally or a completion computation threw an exception
      */
     V join();
 
@@ -425,8 +420,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * @param valueIfAbsent the value to return if not completed
      * @return the result value, if completed, else the given valueIfAbsent
      * @throws CancellationException if the computation was cancelled
-     * @throws CompletionException if this future completed
-     * exceptionally or a completion computation threw an exception
+     * @throws CompletionException   if this future completed
+     *                               exceptionally or a completion computation threw an exception
      */
     V getNow(V valueIfAbsent);
 
@@ -453,7 +448,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     /**
      * Schedules the supply of the Promise's result, via the given supplier.
      *
-     * @param context the type of executor to use to supply the promise
+     * @param context  the type of executor to use to supply the promise
      * @param supplier the supplier
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
@@ -494,8 +489,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Schedules the supply of the Promise's result, via the given supplier,
      * after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param supplier the supplier
+     * @param context    the type of executor to use to supply the promise
+     * @param supplier   the supplier
      * @param delayTicks the delay in ticks
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
@@ -516,10 +511,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Schedules the supply of the Promise's result, via the given supplier,
      * after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
+     * @param context  the type of executor to use to supply the promise
      * @param supplier the supplier
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay    the delay
+     * @param unit     the unit of delay
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
      */
@@ -539,7 +534,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Schedules the supply of the Promise's result, via the given supplier,
      * after the delay has elapsed.
      *
-     * @param supplier the supplier
+     * @param supplier   the supplier
      * @param delayTicks the delay in ticks
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
@@ -552,8 +547,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * after the delay has elapsed.
      *
      * @param supplier the supplier
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay    the delay
+     * @param unit     the unit of delay
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
      */
@@ -564,7 +559,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Schedules the supply of the Promise's result, via the given supplier,
      * after the delay has elapsed.
      *
-     * @param supplier the supplier
+     * @param supplier   the supplier
      * @param delayTicks the delay in ticks
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
@@ -577,8 +572,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * after the delay has elapsed.
      *
      * @param supplier the supplier
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay    the delay
+     * @param unit     the unit of delay
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
      */
@@ -588,7 +583,7 @@ public interface Promise<V> extends Future<V>, Terminable {
     /**
      * Schedules the supply of the Promise's result, via the given callable.
      *
-     * @param context the type of executor to use to supply the promise
+     * @param context  the type of executor to use to supply the promise
      * @param callable the callable
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
@@ -629,8 +624,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Schedules the supply of the Promise's result, via the given callable,
      * after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param callable the callable
+     * @param context    the type of executor to use to supply the promise
+     * @param callable   the callable
      * @param delayTicks the delay in ticks
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
@@ -651,10 +646,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Schedules the supply of the Promise's result, via the given callable,
      * after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
+     * @param context  the type of executor to use to supply the promise
      * @param callable the callable
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay    the delay
+     * @param unit     the unit of delay
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
      */
@@ -674,7 +669,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Schedules the supply of the Promise's result, via the given callable,
      * after the delay has elapsed.
      *
-     * @param callable the callable
+     * @param callable   the callable
      * @param delayTicks the delay in ticks
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
@@ -687,8 +682,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * after the delay has elapsed.
      *
      * @param callable the callable
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay    the delay
+     * @param unit     the unit of delay
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
      */
@@ -699,7 +694,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Schedules the supply of the Promise's result, via the given callable,
      * after the delay has elapsed.
      *
-     * @param callable the callable
+     * @param callable   the callable
      * @param delayTicks the delay in ticks
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
@@ -712,8 +707,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * after the delay has elapsed.
      *
      * @param callable the callable
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay    the delay
+     * @param unit     the unit of delay
      * @return the same promise
      * @throws IllegalStateException if the promise is already being supplied, or has already been completed.
      */
@@ -726,8 +721,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * function.
      *
      * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value
-     * @param <U> the result type
+     * @param fn      the function to use to compute the value
+     * @param <U>     the result type
      * @return the new promise
      */
     @Nonnull
@@ -747,7 +742,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function.
      *
-     * @param fn the function to use to compute the value
+     * @param fn  the function to use to compute the value
      * @param <U> the result type
      * @return the new promise
      */
@@ -759,7 +754,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function.
      *
-     * @param fn the function to use to compute the value
+     * @param fn  the function to use to compute the value
      * @param <U> the result type
      * @return the new promise
      */
@@ -771,10 +766,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value
+     * @param context    the type of executor to use to supply the promise
+     * @param fn         the function to use to compute the value
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the new promise
      */
     @Nonnull
@@ -795,10 +790,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * function, after the delay has elapsed.
      *
      * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value
-     * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param fn      the function to use to compute the value
+     * @param delay   the delay
+     * @param unit    the unit of delay
+     * @param <U>     the result type
      * @return the new promise
      */
     @Nonnull
@@ -818,9 +813,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param fn the function to use to compute the value
+     * @param fn         the function to use to compute the value
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the new promise
      */
     @Nonnull
@@ -831,10 +826,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param fn the function to use to compute the value
+     * @param fn    the function to use to compute the value
      * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param unit  the unit of delay
+     * @param <U>   the result type
      * @return the new promise
      */
     @Nonnull
@@ -845,9 +840,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param fn the function to use to compute the value
+     * @param fn         the function to use to compute the value
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the new promise
      */
     @Nonnull
@@ -858,10 +853,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param fn the function to use to compute the value
+     * @param fn    the function to use to compute the value
      * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param unit  the unit of delay
+     * @param <U>   the result type
      * @return the new promise
      */
     @Nonnull
@@ -873,7 +868,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * action.
      *
      * @param context the type of executor to use to supply the promise
-     * @param action the action to perform before completing the returned future
+     * @param action  the action to perform before completing the returned future
      * @return the new promise
      */
     @Nonnull
@@ -919,8 +914,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * action, after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param action the action to perform before completing the returned future
+     * @param context    the type of executor to use to supply the promise
+     * @param action     the action to perform before completing the returned future
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -942,9 +937,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * action, after the delay has elapsed.
      *
      * @param context the type of executor to use to supply the promise
-     * @param action the action to perform before completing the returned future
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param action  the action to perform before completing the returned future
+     * @param delay   the delay
+     * @param unit    the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -964,7 +959,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * action, after the delay has elapsed.
      *
-     * @param action the action to perform before completing the returned future
+     * @param action     the action to perform before completing the returned future
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -979,8 +974,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * action, after the delay has elapsed.
      *
      * @param action the action to perform before completing the returned future
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay  the delay
+     * @param unit   the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -993,7 +988,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * action, after the delay has elapsed.
      *
-     * @param action the action to perform before completing the returned future
+     * @param action     the action to perform before completing the returned future
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -1008,8 +1003,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * action, after the delay has elapsed.
      *
      * @param action the action to perform before completing the returned future
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay  the delay
+     * @param unit   the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -1022,7 +1017,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * the given task.
      *
      * @param context the type of executor to use to supply the promise
-     * @param action the action to run before completing the returned future
+     * @param action  the action to run before completing the returned future
      * @return the new promise
      */
     @Nonnull
@@ -1065,8 +1060,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise that, when this promise completes normally, executes
      * the given task, after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param action the action to run before completing the returned future
+     * @param context    the type of executor to use to supply the promise
+     * @param action     the action to run before completing the returned future
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -1087,9 +1082,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * the given task, after the delay has elapsed.
      *
      * @param context the type of executor to use to supply the promise
-     * @param action the action to run before completing the returned future
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param action  the action to run before completing the returned future
+     * @param delay   the delay
+     * @param unit    the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -1108,7 +1103,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise that, when this promise completes normally, executes
      * the given task, after the delay has elapsed.
      *
-     * @param action the action to run before completing the returned future
+     * @param action     the action to run before completing the returned future
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -1122,8 +1117,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * the given task, after the delay has elapsed.
      *
      * @param action the action to run before completing the returned future
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay  the delay
+     * @param unit   the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -1135,7 +1130,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * Returns a new Promise that, when this promise completes normally, executes
      * the given task, after the delay has elapsed.
      *
-     * @param action the action to run before completing the returned future
+     * @param action     the action to run before completing the returned future
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -1149,8 +1144,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * the given task, after the delay has elapsed.
      *
      * @param action the action to run before completing the returned future
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param delay  the delay
+     * @param unit   the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -1164,8 +1159,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * function.
      *
      * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value
-     * @param <U> the result type
+     * @param fn      the function to use to compute the value
+     * @param <U>     the result type
      * @return the new promise
      */
     @Nonnull
@@ -1185,7 +1180,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function.
      *
-     * @param fn the function to use to compute the value
+     * @param fn  the function to use to compute the value
      * @param <U> the result type
      * @return the new promise
      */
@@ -1197,7 +1192,7 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function.
      *
-     * @param fn the function to use to compute the value
+     * @param fn  the function to use to compute the value
      * @param <U> the result type
      * @return the new promise
      */
@@ -1209,10 +1204,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value
+     * @param context    the type of executor to use to supply the promise
+     * @param fn         the function to use to compute the value
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the new promise
      */
     @Nonnull
@@ -1233,10 +1228,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * function, after the delay has elapsed.
      *
      * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value
-     * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param fn      the function to use to compute the value
+     * @param delay   the delay
+     * @param unit    the unit of delay
+     * @param <U>     the result type
      * @return the new promise
      */
     @Nonnull
@@ -1256,9 +1251,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param fn the function to use to compute the value
+     * @param fn         the function to use to compute the value
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the new promise
      */
     @Nonnull
@@ -1269,10 +1264,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param fn the function to use to compute the value
+     * @param fn    the function to use to compute the value
      * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param unit  the unit of delay
+     * @param <U>   the result type
      * @return the new promise
      */
     @Nonnull
@@ -1283,9 +1278,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param fn the function to use to compute the value
+     * @param fn         the function to use to compute the value
      * @param delayTicks the delay in ticks
-     * @param <U> the result type
+     * @param <U>        the result type
      * @return the new promise
      */
     @Nonnull
@@ -1296,10 +1291,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * executed with this promise's result as the argument to the given
      * function, after the delay has elapsed.
      *
-     * @param fn the function to use to compute the value
+     * @param fn    the function to use to compute the value
      * @param delay the delay
-     * @param unit the unit of delay
-     * @param <U> the result type
+     * @param unit  the unit of delay
+     * @param <U>   the result type
      * @return the new promise
      */
     @Nonnull
@@ -1312,8 +1307,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * returned promise also completes normally with the same value.
      *
      * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value of the returned
-     *           Promise, if this promise completed exceptionally
+     * @param fn      the function to use to compute the value of the returned
+     *                Promise, if this promise completed exceptionally
      * @return the new promise
      */
     @Nonnull
@@ -1361,9 +1356,9 @@ public interface Promise<V> extends Future<V>, Terminable {
      * completes normally, then the returned promise also completes normally
      * with the same value.
      *
-     * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value of the returned
-     *           Promise, if this promise completed exceptionally
+     * @param context    the type of executor to use to supply the promise
+     * @param fn         the function to use to compute the value of the returned
+     *                   Promise, if this promise completed exceptionally
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -1387,10 +1382,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * with the same value.
      *
      * @param context the type of executor to use to supply the promise
-     * @param fn the function to use to compute the value of the returned
-     *           Promise, if this promise completed exceptionally
-     * @param delay the delay
-     * @param unit the unit of delay
+     * @param fn      the function to use to compute the value of the returned
+     *                Promise, if this promise completed exceptionally
+     * @param delay   the delay
+     * @param unit    the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -1412,8 +1407,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * completes normally, then the returned promise also completes normally
      * with the same value.
      *
-     * @param fn the function to use to compute the value of the returned
-     *           Promise, if this promise completed exceptionally
+     * @param fn         the function to use to compute the value of the returned
+     *                   Promise, if this promise completed exceptionally
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -1427,10 +1422,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * completes normally, then the returned promise also completes normally
      * with the same value.
      *
-     * @param fn the function to use to compute the value of the returned
-     *           Promise, if this promise completed exceptionally
+     * @param fn    the function to use to compute the value of the returned
+     *              Promise, if this promise completed exceptionally
      * @param delay the delay
-     * @param unit the unit of delay
+     * @param unit  the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -1443,8 +1438,8 @@ public interface Promise<V> extends Future<V>, Terminable {
      * completes normally, then the returned promise also completes normally
      * with the same value.
      *
-     * @param fn the function to use to compute the value of the returned
-     *           Promise, if this promise completed exceptionally
+     * @param fn         the function to use to compute the value of the returned
+     *                   Promise, if this promise completed exceptionally
      * @param delayTicks the delay in ticks
      * @return the new promise
      */
@@ -1458,10 +1453,10 @@ public interface Promise<V> extends Future<V>, Terminable {
      * completes normally, then the returned promise also completes normally
      * with the same value.
      *
-     * @param fn the function to use to compute the value of the returned
-     *           Promise, if this promise completed exceptionally
+     * @param fn    the function to use to compute the value of the returned
+     *              Promise, if this promise completed exceptionally
      * @param delay the delay
-     * @param unit the unit of delay
+     * @param unit  the unit of delay
      * @return the new promise
      */
     @Nonnull
@@ -1471,13 +1466,13 @@ public interface Promise<V> extends Future<V>, Terminable {
     /**
      * Returns a {@link CompletableFuture} maintaining the same
      * completion properties as this Promise.
-     *
+     * <p>
      * A Promise implementation that does not choose to interoperate
      * with CompletableFutures may throw {@code UnsupportedOperationException}.
      *
      * @return the CompletableFuture
      * @throws UnsupportedOperationException if this implementation
-     * does not interoperate with CompletableFuture
+     *                                       does not interoperate with CompletableFuture
      */
     CompletableFuture<V> toCompletableFuture();
 

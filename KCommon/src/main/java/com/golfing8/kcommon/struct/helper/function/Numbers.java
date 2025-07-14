@@ -25,16 +25,11 @@
 
 package com.golfing8.kcommon.struct.helper.function;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * Utility methods for parsing {@link Number}s, {@link Integer}s, {@link Long}s,

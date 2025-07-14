@@ -21,7 +21,7 @@ public final class PlayerUtil {
      * is Strength 1, the potion effect will not be removed.
      * </p>
      *
-     * @param player the player to remove the effect from.
+     * @param player       the player to remove the effect from.
      * @param potionEffect the potion effect.
      * @return if the potion effect was removed.
      */
@@ -40,28 +40,28 @@ public final class PlayerUtil {
     /**
      * Gives the player the given item or drops it at their feet.
      *
-     * @param player the player to give the item to.
+     * @param player    the player to give the item to.
      * @param itemStack the item to give them.
      */
-    public static void givePlayerItemSafe(Player player, ItemStack itemStack){
+    public static void givePlayerItemSafe(Player player, ItemStack itemStack) {
         givePlayerItemsSafe(player, Collections.singleton(itemStack), false);
     }
 
     /**
      * Gives the player the given item or drops it at their feet.
      *
-     * @param player the player to give the item to.
+     * @param player    the player to give the item to.
      * @param itemStack the item to give them.
-     * @param silent if a message should be sent or not.
+     * @param silent    if a message should be sent or not.
      */
-    public static void givePlayerItemSafe(Player player, ItemStack itemStack, boolean silent){
+    public static void givePlayerItemSafe(Player player, ItemStack itemStack, boolean silent) {
         givePlayerItemsSafe(player, Collections.singleton(itemStack), silent);
     }
 
     /**
      * Gives the player the given items or drops them at their feet.
      *
-     * @param player the player to give the item to.
+     * @param player     the player to give the item to.
      * @param itemStacks the items to give them.
      */
     public static void givePlayerItemsSafe(Player player, Collection<ItemStack> itemStacks) {
@@ -71,25 +71,25 @@ public final class PlayerUtil {
     /**
      * Gives the player the given items safely, dropping excess on the ground
      *
-     * @param player the player
+     * @param player     the player
      * @param itemStacks the item stacks
-     * @param silent if the overflow message should be sent
+     * @param silent     if the overflow message should be sent
      */
     public static void givePlayerItemsSafe(Player player, Collection<ItemStack> itemStacks, boolean silent) {
         boolean notify = false;
         for (ItemStack itemStack : itemStacks) {
             int total = itemStack.getAmount();
 
-            for(int z = 0; z < total; z += 64){
+            for (int z = 0; z < total; z += 64) {
                 int toGiveThisTime = Math.min(64, total - z);
 
                 itemStack.setAmount(toGiveThisTime);
 
-                if(player.getInventory().firstEmpty() == -1){
+                if (player.getInventory().firstEmpty() == -1) {
                     player.getWorld().dropItem(player.getLocation(), itemStack.clone());
-                    if(!silent)
+                    if (!silent)
                         notify = true;
-                }else{
+                } else {
                     player.getInventory().addItem(itemStack.clone());
                 }
             }

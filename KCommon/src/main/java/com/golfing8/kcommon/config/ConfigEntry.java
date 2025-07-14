@@ -11,9 +11,13 @@ import org.bukkit.configuration.ConfigurationSection;
 @Getter
 @AllArgsConstructor
 public class ConfigEntry {
-    /** An ancestor section of the entry */
+    /**
+     * An ancestor section of the entry
+     */
     private final ConfigurationSection section;
-    /** The key to the value of the entry */
+    /**
+     * The key to the value of the entry
+     */
     private final String key;
 
     /**

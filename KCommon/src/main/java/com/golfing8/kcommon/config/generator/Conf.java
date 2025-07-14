@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Conf {
     String DEFAULT_CONF = "@default";
+
     /**
      * The comment lines to add to a configuration value.
      *

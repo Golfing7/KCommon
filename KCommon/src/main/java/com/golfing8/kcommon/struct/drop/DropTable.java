@@ -8,7 +8,6 @@ import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.StringUtil;
-import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Represents the drop table of something.
@@ -31,6 +29,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @CASerializable.Options(canDelegate = true)
 public class DropTable implements CASerializable {
     private static final String DEFAULT_GROUP = "@default";
+
     /**
      * A grouping of drops
      */
@@ -178,7 +177,7 @@ public class DropTable implements CASerializable {
     /**
      * Generates drops and gives them to the player.
      *
-     * @param player the player.
+     * @param player            the player.
      * @param dropMessageFormat the message format for if a drop was given.
      * @return the drops given to the player
      */
@@ -195,7 +194,7 @@ public class DropTable implements CASerializable {
     /**
      * Gives the player the drops or drops the drops at the given location.
      *
-     * @param player the player.
+     * @param player   the player.
      * @param location the location
      * @return the drops given to the player
      */
@@ -206,7 +205,7 @@ public class DropTable implements CASerializable {
     /**
      * Gives the player the drops or drops the drops at the given location.
      *
-     * @param context the drop context.
+     * @param context  the drop context.
      * @param location the location
      * @return the drops given to the player
      */
@@ -217,8 +216,8 @@ public class DropTable implements CASerializable {
     /**
      * Gives the player the drops or drops the drops at the given location.
      *
-     * @param context the drop context.
-     * @param location the location.
+     * @param context           the drop context.
+     * @param location          the location.
      * @param dropMessageFormat the message format for if a drop was given.
      * @return the drops given to the player
      */
@@ -238,8 +237,8 @@ public class DropTable implements CASerializable {
      * <li>REWARDS - A multi-line placeholder for all the rewards given</li>
      * </ol>
      *
-     * @param player the player.
-     * @param drops the drops parsed in.
+     * @param player  the player.
+     * @param drops   the drops parsed in.
      * @param message the drop message.
      */
     public void sendDropMessage(Player player, List<Drop<?>> drops, Message message) {

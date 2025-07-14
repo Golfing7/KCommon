@@ -11,10 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.function.Consumer;
 
 /**
  * A listener for handling linked entities.
@@ -22,6 +19,7 @@ import java.util.function.Consumer;
 public class LinkedEntityListener implements Listener {
     private final NamespacedKey key = new NamespacedKey(KCommon.getInstance(), EntityDefinition.ENTITY_LINK_KEY);
     private final ThreadLocal<Boolean> onDeath_listen = ThreadLocal.withInitial(() -> true);
+
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
         if (!onDeath_listen.get())
@@ -45,6 +43,7 @@ public class LinkedEntityListener implements Listener {
     }
 
     private final ThreadLocal<Boolean> entityDamage_listen = ThreadLocal.withInitial(() -> true);
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if (!entityDamage_listen.get())

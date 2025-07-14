@@ -6,9 +6,10 @@ import org.bukkit.entity.Player;
 /**
  * Represents a menu container that has a direct link to a player.
  */
-public abstract class PlayerMenuContainer extends MenuContainer{
+public abstract class PlayerMenuContainer extends MenuContainer {
     @Getter
     private final Player player;
+
     public PlayerMenuContainer(Player player) {
         this.player = player;
     }

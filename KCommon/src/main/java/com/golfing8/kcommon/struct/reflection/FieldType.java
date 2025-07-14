@@ -21,9 +21,13 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class FieldType {
-    /** The field's type. */
+    /**
+     * The field's type.
+     */
     private final Class<?> type;
-    /** All generic types of th`e field */
+    /**
+     * All generic types of th`e field
+     */
     private final List<Type> genericTypes;
 
     public FieldType(Class<?> type) {

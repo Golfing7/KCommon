@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 @UtilityClass
 public final class Placeholders {
-    public static String parseFully(String message, Object... placeholders){
+    public static String parseFully(String message, Object... placeholders) {
         if (placeholders == null || placeholders.length == 0)
             return message;
 
@@ -48,7 +48,7 @@ public final class Placeholders {
         return sp.get();
     }
 
-    public static StringPlaceholders start(String message){
+    public static StringPlaceholders start(String message) {
         return new StringPlaceholders(message);
     }
 
@@ -57,31 +57,34 @@ public final class Placeholders {
         final List<String> keys = Lists.newArrayList();
         final List<Supplier<Object>> values = Lists.newArrayList();
 
-        StringPlaceholders(String message){
+        StringPlaceholders(String message) {
             this.message = message;
         }
 
-        public StringPlaceholders keys(String... keys){
+        public StringPlaceholders keys(String... keys) {
             this.keys.clear();
             Collections.addAll(this.keys, keys);
             return this;
         }
-        public StringPlaceholders values(Object... values){
+
+        public StringPlaceholders values(Object... values) {
             this.values.clear();
-            for(Object obj : values){
+            for (Object obj : values) {
                 this.values.add(() -> obj);
             }
             return this;
         }
+
         @SafeVarargs
-        public final StringPlaceholders values(Supplier<Object>... values){
+        public final StringPlaceholders values(Supplier<Object>... values) {
             this.values.clear();
-            for(Object obj : values){
+            for (Object obj : values) {
                 this.values.add(() -> obj);
             }
             return this;
         }
-        public String get(){
+
+        public String get() {
             String toSend = message;
             for (int i = 0; i < keys.size() && i < values.size(); i++) {
                 Object o = values.get(i).get();
@@ -90,7 +93,8 @@ public final class Placeholders {
             }
             return toSend;
         }
-        public StringPlaceholders send(Player player){
+
+        public StringPlaceholders send(Player player) {
             player.sendMessage(get());
             return this;
         }

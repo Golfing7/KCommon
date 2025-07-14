@@ -1,13 +1,13 @@
 package com.golfing8.kcommon.config.exc;
 
 import com.golfing8.kcommon.config.commented.Configuration;
-import com.golfing8.kcommon.config.commented.KConfig;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
 public class ConfigException extends RuntimeException {
     private final @Nullable ConfigurationSection config;
+
     public ConfigException(@Nullable ConfigurationSection config, String message) {
         super(formatConfigPrefix(config) + message);
         this.config = config;

@@ -1,12 +1,9 @@
 package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.struct.reflection.FieldType;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

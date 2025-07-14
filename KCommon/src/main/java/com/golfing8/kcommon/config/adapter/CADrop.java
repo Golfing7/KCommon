@@ -53,14 +53,16 @@ public class CADrop implements ConfigAdapter<Drop> {
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             } else {
-                FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {});
+                FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {
+                });
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(entry.getSubValue("item"), fieldType);
                 ItemDrop drop = new ItemDrop(chance, displayName, maxBoost, items, giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
                 return drop;
             }
         } else if (primitive.containsKey("commands")) {
-            FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {});
+            FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {
+            });
             List<String> commands = ConfigTypeRegistry.getFromType(entry.getSubValue("commands"), fieldType);
             CommandDrop drop = new CommandDrop(chance, displayName, maxBoost, commands);
             drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);

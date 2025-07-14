@@ -33,19 +33,25 @@ public class SimpleGUIItem {
      */
     @Getter
     private final Set<MenuCoordinate> slots;
+
     @Deprecated
     public MenuCoordinate getSlot() {
         return slots.iterator().next();
     }
+
     /**
      * A supplier of the special placeholders.
      */
-    @Nullable @Getter @Setter
+    @Nullable
+    @Getter
+    @Setter
     private Supplier<Collection<Placeholder>> specialPlaceholders;
     /**
      * A supplier of the special multi-placeholders.
      */
-    @Nullable @Getter @Setter
+    @Nullable
+    @Getter
+    @Setter
     private Supplier<Collection<MultiLinePlaceholder>> specialMPlaceholders;
 
     public SimpleGUIItem(ItemStackBuilder item, MenuCoordinate slot) {
@@ -60,7 +66,8 @@ public class SimpleGUIItem {
             this.item = new ItemStackBuilder(section);
         }
         if (section.contains("slots")) {
-            this.slots = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slots"), FieldType.extractFrom(new TypeToken<Set<MenuCoordinate>>() {}));
+            this.slots = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slots"), FieldType.extractFrom(new TypeToken<Set<MenuCoordinate>>() {
+            }));
         } else {
             this.slots = Sets.newHashSet(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slot"), MenuCoordinate.class));
         }

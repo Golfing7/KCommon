@@ -1,34 +1,18 @@
 package com.golfing8.kcommon.config.lang;
 
-import com.golfing8.kcommon.ComponentUtils;
-import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
-import com.golfing8.kcommon.menu.PagedMenuContainer;
-import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.SoundWrapper;
-import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
-import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.title.Title;
-import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.var;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
+import lombok.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A message which can represent a string or a list of strings.
@@ -49,10 +33,14 @@ public class Message implements MessageContainer {
      */
     @Nullable
     private Title title;
-    /** The message for the player's action bar */
+    /**
+     * The message for the player's action bar
+     */
     @Nullable
     private String actionBar;
-    /** If the message should be paged */
+    /**
+     * If the message should be paged
+     */
     @Setter
     private boolean paged;
     @Setter
@@ -82,12 +70,12 @@ public class Message implements MessageContainer {
             return;
         }
 
-        if(message instanceof String) {
+        if (message instanceof String) {
             this.messages = Lists.newArrayList(message.toString());
-        }else if(message instanceof List) {
+        } else if (message instanceof List) {
             this.messages = new ArrayList<>();
             ((List<?>) message).forEach(object -> this.messages.add(object.toString()));
-        }else if(message instanceof ConfigurationSection) { //In this case the player might be defining a title too.
+        } else if (message instanceof ConfigurationSection) { //In this case the player might be defining a title too.
             ConfigurationSection section = (ConfigurationSection) message;
             //Check for the title
             this.title = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "title"),
@@ -96,12 +84,12 @@ public class Message implements MessageContainer {
             if (section.contains("message")) {
                 Object oMsg = section.get("message");
                 //Get the actual message.
-                if(oMsg instanceof String) {
+                if (oMsg instanceof String) {
                     this.messages = Lists.newArrayList(oMsg.toString());
-                }else if(oMsg instanceof List) {
+                } else if (oMsg instanceof List) {
                     this.messages = new ArrayList<>();
                     ((List<?>) oMsg).forEach(object -> this.messages.add(object.toString()));
-                }else {
+                } else {
                     throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", oMsg));
                 }
             }
@@ -111,8 +99,8 @@ public class Message implements MessageContainer {
 
             //Load the sounds.
             this.sounds = new ArrayList<>();
-            if(section.contains("sounds")) {
-                for(String soundKey : section.getConfigurationSection("sounds").getKeys(false)) {
+            if (section.contains("sounds")) {
+                for (String soundKey : section.getConfigurationSection("sounds").getKeys(false)) {
                     SoundWrapper fromType = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "sounds." + soundKey),
                             new FieldType(SoundWrapper.class));
                     this.sounds.add(fromType);
@@ -125,7 +113,7 @@ public class Message implements MessageContainer {
                 this.pageHeader = (String) section.get("page-header", PagedMessage.DEFAULT_PAGE_HEADER);
                 this.pageFooter = (String) section.get("page-footer", PagedMessage.DEFAULT_PAGE_FOOTER);
             }
-        }else if(message instanceof Map) { //In this case the player might be defining a title too.
+        } else if (message instanceof Map) { //In this case the player might be defining a title too.
             Map section = (Map) message;
             //Check for the title
             this.title = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofNullable(section.get("title")), Title.class);
@@ -136,19 +124,19 @@ public class Message implements MessageContainer {
             if (section.containsKey("message")) {
                 //Get the actual message.
                 Object oMsg = section.get("message");
-                if(oMsg instanceof String) {
+                if (oMsg instanceof String) {
                     this.messages = Lists.newArrayList(oMsg.toString());
-                }else if(oMsg instanceof List) {
+                } else if (oMsg instanceof List) {
                     this.messages = new ArrayList<>();
                     ((List<?>) oMsg).forEach(object -> this.messages.add(object.toString()));
-                }else {
+                } else {
                     throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", oMsg));
                 }
             }
 
             //Load the sounds.
             this.sounds = new ArrayList<>();
-            if(section.containsKey("sounds")) {
+            if (section.containsKey("sounds")) {
                 var soundSection = (Map<String, Object>) section.get("sounds");
                 for (var entry : soundSection.entrySet()) {
                     this.sounds.add(ConfigTypeRegistry.getFromType(ConfigPrimitive.of(entry.getValue()), SoundWrapper.class));
@@ -161,8 +149,8 @@ public class Message implements MessageContainer {
                 this.pageHeader = (String) section.getOrDefault("page-header", PagedMessage.DEFAULT_PAGE_HEADER);
                 this.pageFooter = (String) section.getOrDefault("page-footer", PagedMessage.DEFAULT_PAGE_FOOTER);
             }
-        }else {
-            throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", message.toString()));
+        } else {
+            throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", message));
         }
     }
 

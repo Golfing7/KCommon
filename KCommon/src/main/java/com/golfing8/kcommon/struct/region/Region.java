@@ -6,8 +6,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * An abstract region in three-dimensional space.
  */
@@ -25,6 +23,7 @@ public interface Region extends Iterable<BlockVector> {
      * @return the maximum X value.
      */
     double getMaximumXValue();
+
     /**
      * Gets the minimum X value this region occupies.
      *
@@ -38,6 +37,7 @@ public interface Region extends Iterable<BlockVector> {
      * @return the maximum Y value.
      */
     double getMaximumYValue();
+
     /**
      * Gets the minimum Y value this region occupies.
      *
@@ -51,6 +51,7 @@ public interface Region extends Iterable<BlockVector> {
      * @return the maximum Z value.
      */
     double getMaximumZValue();
+
     /**
      * Gets the minimum Z value this region occupies.
      *

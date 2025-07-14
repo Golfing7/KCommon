@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.command.argument;
 
 import com.golfing8.kcommon.util.StringUtil;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.var;
 
@@ -30,7 +29,9 @@ public class CommandArgument<A> {
      * The predicate to verify an argument.
      */
     private final Predicate<ArgumentContext> predicate;
-    /** A getter for the argument. Takes in the argument context and converts it to whatever type was requested. */
+    /**
+     * A getter for the argument. Takes in the argument context and converts it to whatever type was requested.
+     */
     private final Function<ArgumentContext, A> getter;
 
     /**

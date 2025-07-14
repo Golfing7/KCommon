@@ -1,12 +1,9 @@
 package com.golfing8.kcommon.util;
 
 import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import lombok.SneakyThrows;
-import lombok.var;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -17,7 +14,6 @@ import java.lang.reflect.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
@@ -38,7 +34,7 @@ public final class Reflection {
     public static Collection<Class<? extends Module>> discoverModules(URLClassLoader loader) {
         List<Class<? extends Module>> classes = new ArrayList<>();
         for (URL url : loader.getURLs()) {
-            try (JarFile file = new JarFile(url.toURI().getPath())){
+            try (JarFile file = new JarFile(url.toURI().getPath())) {
                 Enumeration<JarEntry> entries = file.entries();
                 while (entries.hasMoreElements()) {
                     JarEntry entry = entries.nextElement();
@@ -90,9 +86,9 @@ public final class Reflection {
     /**
      * Gets the parameterized types of the given class' super.
      * <p>
-     *     This method would work on a class like this: <br>
+     * This method would work on a class like this: <br>
      * <code>
-     *     public class SomeClass extends ArrayList&lt;String&gt; {}
+     * public class SomeClass extends ArrayList&lt;String&gt; {}
      * </code>
      * </p>
      *
@@ -156,7 +152,7 @@ public final class Reflection {
      * Particularly, we keep gathering fields of classes, until {@link Class#isAssignableFrom(Class)} returns false with the parent class.
      * </p>
      *
-     * @param clazz the class.
+     * @param clazz  the class.
      * @param parent the parent class to reach to.
      * @return all fields up to and including the parent class.
      */
@@ -190,7 +186,7 @@ public final class Reflection {
      * Particularly, we keep gathering fields of classes, until {@link Class#isAssignableFrom(Class)} returns false with the parent class.
      * </p>
      *
-     * @param clazz the class.
+     * @param clazz  the class.
      * @param parent the parent class to reach to.
      * @return all fields up to and including the parent class.
      */
@@ -208,7 +204,7 @@ public final class Reflection {
     /**
      * Gets all fields on a class with a given annotation.
      *
-     * @param clazz the class.
+     * @param clazz     the class.
      * @param annoClass the annotation's class.
      * @return the fields with that annotation.
      */
@@ -248,8 +244,8 @@ public final class Reflection {
     /**
      * Gets a method handle for the given information.
      *
-     * @param clazz the class
-     * @param name the name
+     * @param clazz          the class
+     * @param name           the name
      * @param parameterTypes the types
      * @return the method handle, or null if not found.
      */
@@ -267,7 +263,7 @@ public final class Reflection {
     /**
      * Gets a constructor handle for the given information.
      *
-     * @param clazz the class
+     * @param clazz          the class
      * @param parameterTypes the types
      * @return the constructor handle, or null if not found.
      */
@@ -299,7 +295,7 @@ public final class Reflection {
     /**
      * Instantiates an instance of the given class or returns the value by the supplier.
      *
-     * @param clazz the class type
+     * @param clazz    the class type
      * @param supplier the supplier
      * @return the value
      */
@@ -317,7 +313,8 @@ public final class Reflection {
         }
     }
 
-    @SneakyThrows @SuppressWarnings("unchecked")
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
     public static <T> T invokeQuietly(MethodHandle methodHandle, Object... arguments) {
         return (T) methodHandle.invokeWithArguments(arguments);
     }

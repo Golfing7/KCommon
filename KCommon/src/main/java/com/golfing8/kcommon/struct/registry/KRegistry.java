@@ -45,7 +45,7 @@ public interface KRegistry<T> extends Iterable<T> {
     /**
      * Registers the given value under the given key
      *
-     * @param key the key
+     * @param key   the key
      * @param value the value
      * @return value
      */

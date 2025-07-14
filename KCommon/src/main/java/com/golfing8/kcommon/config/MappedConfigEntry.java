@@ -9,8 +9,11 @@ import org.bukkit.configuration.ConfigurationSection;
  */
 @Getter
 public class MappedConfigEntry extends ConfigEntry {
-    /** The handle this entry is mapped to */
+    /**
+     * The handle this entry is mapped to
+     */
     private final ConfigValueHandle handle;
+
     public MappedConfigEntry(ConfigurationSection section, String key, ConfigValueHandle handle) {
         super(section, key);
         this.handle = handle;

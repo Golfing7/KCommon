@@ -1,20 +1,13 @@
 package com.golfing8.kcommon.data.serializer.type;
 
 import com.golfing8.kcommon.struct.map.CooldownMap;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import lombok.AllArgsConstructor;
-import lombok.var;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.UUID;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public enum CooldownMapAdapterFactory implements JsonSerializer<CooldownMap>, JsonDeserializer<CooldownMap> {
@@ -30,10 +23,10 @@ public enum CooldownMapAdapterFactory implements JsonSerializer<CooldownMap>, Js
             ParameterizedType parameterizedType = (ParameterizedType) type;
             Type keyType = parameterizedType.getActualTypeArguments()[0];
 
-            Map backingMap = jsonDeserializationContext.deserialize(jsonElement, new CooldownMapType(new Type[] {keyType, Long.class}));
+            Map backingMap = jsonDeserializationContext.deserialize(jsonElement, new CooldownMapType(new Type[]{keyType, Long.class}));
             return new CooldownMap(backingMap);
         } else {
-            Map backingMap = jsonDeserializationContext.deserialize(jsonElement, new CooldownMapType(new Type[] {Object.class, Long.class}));
+            Map backingMap = jsonDeserializationContext.deserialize(jsonElement, new CooldownMapType(new Type[]{Object.class, Long.class}));
             return new CooldownMap(backingMap);
         }
     }
@@ -47,9 +40,9 @@ public enum CooldownMapAdapterFactory implements JsonSerializer<CooldownMap>, Js
             ParameterizedType parameterizedType = (ParameterizedType) type;
             Type keyType = parameterizedType.getActualTypeArguments()[0];
 
-            return jsonSerializationContext.serialize(cooldownMap.getCooldowns(), new CooldownMapType(new Type[] {keyType, Long.class}));
+            return jsonSerializationContext.serialize(cooldownMap.getCooldowns(), new CooldownMapType(new Type[]{keyType, Long.class}));
         } else {
-            return jsonSerializationContext.serialize(cooldownMap.getCooldowns(), new CooldownMapType(new Type[] {Object.class, Long.class}));
+            return jsonSerializationContext.serialize(cooldownMap.getCooldowns(), new CooldownMapType(new Type[]{Object.class, Long.class}));
         }
     }
 

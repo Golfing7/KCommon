@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Acts as a registry for all the particle types.
