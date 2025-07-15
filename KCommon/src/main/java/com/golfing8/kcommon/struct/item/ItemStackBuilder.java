@@ -493,7 +493,7 @@ public final class ItemStackBuilder {
                 }
             } else {
                 newCopy = matchedItemType.parseItem();
-                if (itemDurability > 0) {
+                if (itemDurability > 0 && newCopy != null) {
                     newCopy.setDurability(itemDurability);
                 }
             }
@@ -503,10 +503,25 @@ public final class ItemStackBuilder {
             throw new IllegalArgumentException("Item type " + this.itemType + " does not exist!");
 
         newCopy.setAmount(newAmount());
+        if (newCopy.getItemMeta() != null) {
+            applyMetaTo(newCopy, placeholderTarget);
+        }
 
-        NMS.getTheNMS().getMagicItems().setAttributeModifiers(newCopy, attributeModifierMap);
+        cachedBuild = newCopy;
+        return newCopy;
+    }
 
-        ItemMeta meta = newCopy.getItemMeta();
+    /**
+     * Applies the meta from this to the given itemstack
+     *
+     * @param itemStack the item
+     */
+    public void applyMetaTo(ItemStack itemStack, @Nullable Player placeholderTarget) {
+        Placeholder[] placeholderArr = placeholders.toArray(new Placeholder[0]);
+
+        NMS.getTheNMS().getMagicItems().setAttributeModifiers(itemStack, attributeModifierMap);
+
+        ItemMeta meta = itemStack.getItemMeta();
         if (itemModel != null) {
             NMS.getTheNMS().getMagicItems().setItemModel(meta, itemModel);
         }
@@ -547,7 +562,7 @@ public final class ItemStackBuilder {
         }
 
         if (this.itemDurability > 0) {
-            newCopy.setDurability(this.itemDurability);
+            itemStack.setDurability(this.itemDurability);
         }
 
         //Set the item as unbreakable or not.
@@ -560,24 +575,21 @@ public final class ItemStackBuilder {
             meta.addEnchant(XEnchantment.UNBREAKING.get(), 1, true);
         }
 
-        newCopy.setItemMeta(meta);
+        itemStack.setItemMeta(meta);
 
         //Add the nbt item and extra data.
         if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_21)) {
-            NBT.modifyComponents(newCopy, (nbt) -> {
+            NBT.modifyComponents(itemStack, (nbt) -> {
                 ItemUtil.setInNBT(nbt, this.components);
             });
         }
-        NBT.modify(newCopy, (nbt) -> {
+        NBT.modify(itemStack, (nbt) -> {
             if (this.itemID != null) {
                 nbt.setString(ITEMSTACK_ID, this.itemID);
             }
             ItemUtil.setInNBT(nbt, this.extraData);
         });
-        NMS.getTheNMS().getMagicItems().setUnstackable(newCopy, this.unstackable);
-
-        cachedBuild = newCopy;
-        return newCopy;
+        NMS.getTheNMS().getMagicItems().setUnstackable(itemStack, this.unstackable);
     }
 
     /**
