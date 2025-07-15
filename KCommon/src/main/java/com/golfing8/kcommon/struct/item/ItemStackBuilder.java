@@ -9,6 +9,7 @@ import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.exc.ImproperlyConfiguredValueException;
+import com.golfing8.kcommon.nms.access.NMSAccess;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.PotionData;
@@ -18,6 +19,7 @@ import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.ItemUtil;
 import com.golfing8.kcommon.util.MS;
+import com.golfing8.kcommon.util.Placeholders;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
@@ -472,6 +474,11 @@ public final class ItemStackBuilder {
             if (customStack != null) {
                 newCopy = customStack.getItemStack();
             }
+        }
+
+        // Should we get the item from a command?
+        if (this.itemType.startsWith("/")) {
+            newCopy = ItemUtil.getItemFromCommand(Placeholders.parseFully(this.itemType.substring(1), "PLAYER", NMSAccess.ITEM_CAPTURE_NAME)).orElse(XMaterial.AIR.parseItem());
         }
 
         if (newCopy == null) {

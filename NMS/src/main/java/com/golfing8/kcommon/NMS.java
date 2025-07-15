@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.TreeMap;
+import java.util.logging.Level;
 
 /**
  * Controls the NMS access.
@@ -62,6 +63,9 @@ public final class NMS {
             Constructor<?> cons = mainClass.getConstructor(Plugin.class);
 
             theNMS = (NMSAccess) cons.newInstance(plugin);
+        } catch (RuntimeException exc) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to initialize NMS!", exc);
+            Bukkit.getPluginManager().disablePlugin(plugin);
         } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |
                  InstantiationException e) {
             try {
@@ -72,7 +76,7 @@ public final class NMS {
                 theNMS = (NMSAccess) cons.newInstance(plugin);
             } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |
                      InstantiationException e2) {
-                e2.printStackTrace();
+                plugin.getLogger().log(Level.SEVERE, "Failed to initialize NMS!", e2);
                 Bukkit.getPluginManager().disablePlugin(plugin);
             }
         }

@@ -2,25 +2,55 @@ package com.golfing8.kcommon.util;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.NMS;
+import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.struct.helper.promise.Promise;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import de.tr7zw.changeme.nbtapi.NBTType;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.experimental.UtilityClass;
 import lombok.var;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Utilities for {@link ItemStack} objects.
  */
 @UtilityClass
 public final class ItemUtil {
+
+    /**
+     * Dispatches the command as console and captures any item output.
+     * <p>
+     * The command should send the item to a player named {@code _}, otherwise it won't provide an item.
+     * </p>
+     *
+     * @param command the command.
+     * @return the item.
+     */
+    public static Optional<ItemStack> getItemFromCommand(String command) {
+        if (!Bukkit.isPrimaryThread())
+            throw new IllegalStateException("Cannot get item from command asynchronously!");
+
+        ItemCapturePlayer capturePlayer = NMS.getTheNMS().createPlayerForItemCapture();
+        try {
+            AtomicReference<ItemStack> reference = new AtomicReference<>();
+            capturePlayer.getInventoryItemHooks().add(reference::set);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+            return Optional.ofNullable(reference.get());
+        } finally {
+            // Clean up after ourselves.
+            NMS.getTheNMS().removeItemCapturePlayer(capturePlayer);
+        }
+    }
 
     /**
      * Gets the display name of the itemstack.

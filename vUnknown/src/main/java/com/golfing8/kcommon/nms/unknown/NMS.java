@@ -1,14 +1,18 @@
 package com.golfing8.kcommon.nms.unknown;
 
 import com.golfing8.kcommon.ComponentUtils;
+import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.access.*;
 import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.packets.NMSPacket;
+import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.nms.server.NMSServer;
 import com.golfing8.kcommon.nms.unknown.access.*;
 import com.golfing8.kcommon.nms.unknown.block.Block;
 import com.golfing8.kcommon.nms.unknown.event.NewArmorEquipListener;
 import com.golfing8.kcommon.nms.unknown.event.PreSpawnSpawnerAdapter;
+import com.golfing8.kcommon.nms.unknown.inventory.ItemCaptureInventory;
 import com.golfing8.kcommon.nms.unknown.server.Server;
 import com.golfing8.kcommon.nms.unknown.world.World;
 import com.golfing8.kcommon.nms.unknown.worldedit.WorldEdit;
@@ -16,18 +20,32 @@ import com.golfing8.kcommon.nms.unknown.worldguard.Worldguard;
 import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
+import com.mojang.authlib.GameProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ParticleStatus;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.player.ChatVisiblity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class NMS implements NMSAccess {
     private final Server server;
@@ -42,6 +60,11 @@ public class NMS implements NMSAccess {
     private final MagicEvents magicEvents;
     private final MagicInventories magicInventories;
 
+    private FieldHandle<Map<UUID, ServerPlayer>> byUUIDHandle;
+    private FieldHandle<Map<String, ServerPlayer>> byNameHandle;
+    private FieldHandle<CraftInventoryPlayer> inventoryHandle;
+
+    @SuppressWarnings("unchecked")
     public NMS(Plugin plugin){
         this.server = new Server();
 
@@ -58,6 +81,12 @@ public class NMS implements NMSAccess {
         Bukkit.getServer().getPluginManager().registerEvents(new PreSpawnSpawnerAdapter(), plugin);
         Bukkit.getServer().getPluginManager().registerEvents(new NewArmorEquipListener(), plugin);
         Bukkit.getServer().getPluginManager().registerEvents(this.magicInventories, plugin);
+
+        try {
+            byUUIDHandle = (FieldHandle<Map<UUID, ServerPlayer>>) FieldHandles.getHandle("playersByUUID", PlayerList.class);
+            byNameHandle = (FieldHandle<Map<String, ServerPlayer>>) FieldHandles.getHandle("playersByName", PlayerList.class);
+            inventoryHandle = (FieldHandle<CraftInventoryPlayer>) FieldHandles.getHandle("inventory", CraftHumanEntity.class);
+        } catch (RuntimeException ignored) {}
     }
 
     @Override
@@ -88,6 +117,34 @@ public class NMS implements NMSAccess {
     @Override
     public boolean supportsPersistentDataContainers() {
         return true;
+    }
+
+    @Override
+    public ItemCapturePlayer createPlayerForItemCapture() {
+        if (inventoryHandle == null || byUUIDHandle == null || byNameHandle == null)
+            throw new UnsupportedOperationException("Item capture player not supported.");
+
+        ServerPlayer nmsPlayer = new ServerPlayer(MinecraftServer.getServer(),
+                MinecraftServer.getServer().getAllLevels().iterator().next(),
+                new GameProfile(NMSAccess.ITEM_CAPTURE_UUID, NMSAccess.ITEM_CAPTURE_NAME),
+                new ClientInformation("en_us", 0, ChatVisiblity.HIDDEN, false, 0, HumanoidArm.RIGHT, false, false, ParticleStatus.MINIMAL));
+        byUUIDHandle.get(MinecraftServer.getServer().getPlayerList()).put(ITEM_CAPTURE_UUID, nmsPlayer);
+        byNameHandle.get(MinecraftServer.getServer().getPlayerList()).put(ITEM_CAPTURE_NAME, nmsPlayer);
+
+        CraftPlayer craftPlayer = nmsPlayer.getBukkitEntity();
+        ItemCapturePlayer player = new ItemCapturePlayer(craftPlayer);
+        inventoryHandle.set(craftPlayer, new ItemCaptureInventory(nmsPlayer.getInventory(), player));
+
+        return player;
+    }
+
+    @Override
+    public void removeItemCapturePlayer(ItemCapturePlayer player) {
+        if (inventoryHandle == null || byUUIDHandle == null || byNameHandle == null)
+            throw new UnsupportedOperationException("Item capture player not supported.");
+
+        byUUIDHandle.get(MinecraftServer.getServer().getPlayerList()).remove(ITEM_CAPTURE_UUID);
+        byNameHandle.get(MinecraftServer.getServer().getPlayerList()).remove(ITEM_CAPTURE_NAME);
     }
 
     @Override

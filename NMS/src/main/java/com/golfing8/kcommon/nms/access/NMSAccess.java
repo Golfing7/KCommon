@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.nms.access;
 
+import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.golfing8.kcommon.nms.block.NMSBlock;
@@ -17,7 +18,12 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
+import java.util.UUID;
+
 public interface NMSAccess {
+    String ITEM_CAPTURE_NAME = "_";
+    UUID ITEM_CAPTURE_UUID = UUID.randomUUID();
+
     NMSServer getMinecraftServer();
 
     NMSWorld getWorld(World world);
@@ -90,6 +96,18 @@ public interface NMSAccess {
      * @return true if the server supports persistent data containers.
      */
     boolean supportsPersistentDataContainers();
+
+    /**
+     * Creates an item capture player and returns it.
+     *
+     * @return the craft player.
+     */
+    ItemCapturePlayer createPlayerForItemCapture();
+
+    /**
+     * Removes the item capture player.
+     */
+    void removeItemCapturePlayer(ItemCapturePlayer player);
 
     OfflinePlayer getOfflinePlayerIfCached(String str);
 

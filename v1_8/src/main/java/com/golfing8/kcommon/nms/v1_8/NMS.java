@@ -1,12 +1,16 @@
 package com.golfing8.kcommon.nms.v1_8;
 
 import com.golfing8.kcommon.ComponentUtils;
+import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.access.*;
+import com.golfing8.kcommon.nms.reflection.FieldHandle;
+import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.nms.v1_8.access.*;
 import com.golfing8.kcommon.nms.v1_8.block.BlockDispenserV1_8;
 import com.golfing8.kcommon.nms.v1_8.event.ArmorEquipHandler;
 import com.golfing8.kcommon.nms.v1_8.event.WineSpigotArmorEquipListener;
+import com.golfing8.kcommon.nms.v1_8.inventory.ItemCaptureInventory;
 import com.golfing8.kcommon.nms.v1_8.packets.*;
 import com.golfing8.kcommon.nms.v1_8.server.ServerV1_8;
 import com.golfing8.kcommon.nms.v1_8.worldedit.WorldEditV1_8;
@@ -20,6 +24,7 @@ import com.golfing8.kcommon.nms.v1_8.world.WorldV1_8;
 import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import com.golfing8.kcommon.nms.v1_8.event.PreSpawnSpawnerAdapter;
+import com.mojang.authlib.GameProfile;
 import lombok.Getter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
@@ -30,8 +35,11 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -40,6 +48,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
 
 public class NMS implements NMSAccess {
     private final BukkitAudiences audiences;
@@ -118,6 +128,33 @@ public class NMS implements NMSAccess {
             }
         }
         return supportsPersistentDataContainers;
+    }
+
+    @SuppressWarnings("unchecked")
+    private final FieldHandle<Map<UUID, EntityPlayer>> byUUIDHandle = (FieldHandle<Map<UUID, EntityPlayer>>) FieldHandles.getHandle("j", PlayerList.class);
+    @SuppressWarnings("unchecked")
+    private final FieldHandle<Map<String, EntityPlayer>> byNameHandle = (FieldHandle<Map<String, EntityPlayer>>) FieldHandles.getHandle("playersByName", PlayerList.class);
+    @SuppressWarnings("unchecked")
+    private final FieldHandle<CraftInventoryPlayer> inventoryHandle = (FieldHandle<CraftInventoryPlayer>) FieldHandles.getHandle("inventory", CraftHumanEntity.class);
+
+    @Override
+    public ItemCapturePlayer createPlayerForItemCapture() {
+        WorldServer worldServer = MinecraftServer.getServer().getWorldServer(0);
+        EntityPlayer nmsPlayer = new EntityPlayer(MinecraftServer.getServer(), worldServer, new GameProfile(ITEM_CAPTURE_UUID, ITEM_CAPTURE_NAME), new PlayerInteractManager(worldServer));
+        ItemCapturePlayer player = new ItemCapturePlayer(nmsPlayer.getBukkitEntity());
+        byUUIDHandle.get(MinecraftServer.getServer().getPlayerList()).put(ITEM_CAPTURE_UUID, nmsPlayer);
+        byNameHandle.get(MinecraftServer.getServer().getPlayerList()).put(ITEM_CAPTURE_NAME, nmsPlayer);
+
+        CraftPlayer craftPlayer = nmsPlayer.getBukkitEntity();
+        inventoryHandle.set(craftPlayer, new ItemCaptureInventory(nmsPlayer.inventory, player));
+
+        return player;
+    }
+
+    @Override
+    public void removeItemCapturePlayer(ItemCapturePlayer player) {
+        byUUIDHandle.get(MinecraftServer.getServer().getPlayerList()).remove(ITEM_CAPTURE_UUID);
+        byNameHandle.get(MinecraftServer.getServer().getPlayerList()).remove(ITEM_CAPTURE_NAME);
     }
 
     @Override
