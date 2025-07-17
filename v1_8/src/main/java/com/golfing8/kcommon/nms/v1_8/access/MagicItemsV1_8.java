@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.nms.v1_8.access;
 
+import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
@@ -17,6 +18,7 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBTCompoundList;
 import lombok.var;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_8_R3.AttributeModifier;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -30,6 +32,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
@@ -58,12 +61,16 @@ public class MagicItemsV1_8 implements NMSMagicItems {
 
     @Override
     public void applyName(ItemMeta meta, @Nullable String name) {
-        meta.setDisplayName(name);
+        if (name == null) {
+            meta.setDisplayName(null);
+        } else {
+            meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(ComponentUtils.toComponent(name)));
+        }
     }
 
     @Override
     public void applyLore(ItemMeta meta, List<String> lore) {
-        meta.setLore(lore);
+        meta.setLore(ComponentUtils.toComponent(lore).stream().map(LegacyComponentSerializer.legacySection()::serialize).collect(Collectors.toList()));
     }
 
     @Override
