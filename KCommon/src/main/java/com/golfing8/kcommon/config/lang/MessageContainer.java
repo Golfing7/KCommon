@@ -66,7 +66,7 @@ public interface MessageContainer {
 
     default void broadcast(Object... placeholders) {
         PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
-        if (getMessage().getMessages() != null) {
+        if (getMessage().getMessages() != null && !getMessage().getMessages().isEmpty()) {
             if (getMessage().isPaged()) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     send(player, container);
@@ -103,7 +103,7 @@ public interface MessageContainer {
      */
     default void send(CommandSender sender, Object... placeholders) {
         PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
-        if (getMessage().getMessages() != null) {
+        if (getMessage().getMessages() != null && !getMessage().getMessages().isEmpty()) {
             if (getMessage().isPaged()) {
                 toPagedMessage(container).displayTo(sender, 1, placeholders);
             } else {
