@@ -33,7 +33,7 @@ public abstract class MenuAbstract implements Menu {
     /**
      * The gui items to apply when the menu is 'updated'
      */
-    private List<SimpleGUIItem> guiItems;
+    private Map<String, SimpleGUIItem> guiItems;
     @Getter
     private List<Placeholder> placeholders;
     @Getter
@@ -43,6 +43,9 @@ public abstract class MenuAbstract implements Menu {
      */
     @Getter
     private final UUID menuID = UUID.randomUUID();
+
+    @Getter
+    private final long createdTick;
 
     private Inventory backingInventory;
     private String title;
@@ -69,12 +72,13 @@ public abstract class MenuAbstract implements Menu {
         } else {
             this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getType().getType(), MS.parseSingle(title, placeholders));
         }
-        this.guiItems = new ArrayList<>();
+        this.guiItems = new HashMap<>();
         this.canExpire = canExpire;
         this.size = shape.getSize();
         this.clickable = clickable;
         this.placeholders = placeholders;
         this.multiLinePlaceholders = multiLinePlaceholders;
+        this.createdTick = NMS.getTheNMS().getCurrentTick();
 
         this.actionMap = actionMap;
         register();
@@ -203,39 +207,54 @@ public abstract class MenuAbstract implements Menu {
      *
      * @param item the item.
      */
-    public void addSpecialItem(SimpleGUIItem item) {
-        this.guiItems.add(item);
+    @Override
+    public void addSpecialItem(String key, SimpleGUIItem item) {
+        this.guiItems.put(key, item);
     }
 
     @Override
     public void refreshSpecialItems() {
-        for (SimpleGUIItem item : this.guiItems) {
-            ItemStackBuilder builder = item.getItem();
-
-            //Add both placeholders.
-            if (item.getSpecialMPlaceholders() != null)
-                builder.multiLinePlaceholders(
-                        item.getSpecialMPlaceholders().get().toArray(new MultiLinePlaceholder[0]));
-            if (item.getSpecialPlaceholders() != null)
-                builder.placeholders(item.getSpecialPlaceholders().get().toArray(new Placeholder[0]));
-
-            item.getSlots().forEach(coordinate -> {
-                int slot = MenuUtils.getSlotFromCartCoords(getMenuShape().getType(), coordinate.getX(), coordinate.getY());
-                this.setItemAt(slot, item.getItem().buildFromTemplate());
-            });
+        for (SimpleGUIItem item : this.guiItems.values()) {
+            refreshSpecialItem(item);
         }
 
         this.updateViewers();
     }
 
     @Override
-    public List<SimpleGUIItem> getSpecialItems() {
-        return new ArrayList<>(this.guiItems);
+    public void refreshSpecialItem(String key) {
+        if (!this.guiItems.containsKey(key))
+            return;
+
+        SimpleGUIItem item = this.guiItems.get(key);
+        refreshSpecialItem(item);
+        this.updateViewers();
+    }
+
+    private void refreshSpecialItem(SimpleGUIItem item) {
+        ItemStackBuilder builder = item.getItem();
+
+        //Add both placeholders.
+        if (item.getSpecialMPlaceholders() != null)
+            builder.multiLinePlaceholders(
+                    item.getSpecialMPlaceholders().get().toArray(new MultiLinePlaceholder[0]));
+        if (item.getSpecialPlaceholders() != null)
+            builder.placeholders(item.getSpecialPlaceholders().get().toArray(new Placeholder[0]));
+
+        item.getSlots().forEach(coordinate -> {
+            int slot = MenuUtils.getSlotFromCartCoords(getMenuShape().getType(), coordinate.getX(), coordinate.getY());
+            this.setItemAt(slot, item.getItem().buildFromTemplate());
+        });
     }
 
     @Override
-    public void setSpecialItems(List<SimpleGUIItem> specialItems) {
-        this.guiItems = new ArrayList<>(specialItems);
+    public Map<String, SimpleGUIItem> getSpecialItems() {
+        return new HashMap<>(this.guiItems);
+    }
+
+    @Override
+    public void setSpecialItems(Map<String, SimpleGUIItem> specialItems) {
+        this.guiItems = new HashMap<>(specialItems);
     }
 
     @Override

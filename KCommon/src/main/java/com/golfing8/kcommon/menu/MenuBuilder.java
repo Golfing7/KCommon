@@ -419,7 +419,7 @@ public final class MenuBuilder {
                 this.setAt(slot,
                         guiItem.getItem().buildFromTemplate(placeholderTarget));
             });
-            menu.addSpecialItem(guiItem);
+            menu.addSpecialItem(key, guiItem);
         }
 
         for (Map.Entry<Integer, ItemStack> items : specificItems.entrySet()) {

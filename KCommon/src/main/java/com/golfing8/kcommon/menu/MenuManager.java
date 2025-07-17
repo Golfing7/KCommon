@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.menu;
 
+import com.golfing8.kcommon.NMS;
 import lombok.Getter;
 import lombok.var;
 import org.bukkit.plugin.Plugin;
@@ -53,6 +54,10 @@ public final class MenuManager extends BukkitRunnable {
 
         while (menuIterator.hasNext()) {
             Menu menu = menuIterator.next().getValue();
+            // If the menu was just created, let it go for a bit.
+            if (menu.getCreatedTick() + 20 > NMS.getTheNMS().getCurrentTick())
+                continue;
+
             // If the menu was manually shutdown, just remove it
             if (!menu.isValid()) {
                 menuIterator.remove();

@@ -73,6 +73,13 @@ public interface Menu extends Listener {
         return setItemAt(getSlotFromCartCoords(getMenuShape().getType(), x, y), set);
     }
 
+    /**
+     * Gets the tick this menu was created.
+     *
+     * @return the tick
+     */
+    long getCreatedTick();
+
     List<Placeholder> getPlaceholders();
 
     void setPlaceholders(List<Placeholder> placeholders);
@@ -106,13 +113,15 @@ public interface Menu extends Listener {
 
     void setClickable(boolean clickable);
 
-    void addSpecialItem(SimpleGUIItem item);
+    void addSpecialItem(String key, SimpleGUIItem item);
 
     void refreshSpecialItems();
 
-    void setSpecialItems(List<SimpleGUIItem> specialItems);
+    void refreshSpecialItem(String key);
 
-    List<SimpleGUIItem> getSpecialItems();
+    void setSpecialItems(Map<String, SimpleGUIItem> specialItems);
+
+    Map<String, SimpleGUIItem> getSpecialItems();
 
     boolean canExpire();
 

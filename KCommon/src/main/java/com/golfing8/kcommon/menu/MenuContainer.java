@@ -53,4 +53,17 @@ public abstract class MenuContainer {
         menu.refreshSpecialItems();
         menu.updateViewers();
     }
+
+    /**
+     * Refreshes the specific special slot.
+     *
+     * @param slot the slot
+     */
+    public void refreshSpecialSlot(String slot) {
+        if (menu == null)
+            return;
+
+        Menu newMenu = getMenu();
+        newMenu.refreshSpecialItem(slot);
+    }
 }
