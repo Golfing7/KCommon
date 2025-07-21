@@ -4,6 +4,7 @@ import com.gmail.filoghost.holographicdisplays.api.line.ItemLine;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.golfing8.kcommon.hook.holograms.Hologram;
 import lombok.AllArgsConstructor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -17,6 +18,36 @@ public class HDHologram implements Hologram {
      * The backing hologram
      */
     private final com.gmail.filoghost.holographicdisplays.api.Hologram backingHologram;
+
+    @Override
+    public boolean isVisibleByDefault() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setVisibleByDefault(boolean visible) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setVisibleTo(Player player) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void removeVisibleTo(Player player) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setHideTo(Player player) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void removeHideTo(Player player) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public void setLine(int index, String line) {

@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.hook.holograms;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -8,6 +9,47 @@ import java.util.List;
  * Represents a hologram, provides abstract access to simple methods of them.
  */
 public interface Hologram {
+
+    /**
+     * True if this hologram is visible by default
+     * @return value
+     */
+    boolean isVisibleByDefault();
+
+    /**
+     * Sets if the hologram is visible by default
+     *
+     * @param visible true if visible
+     */
+    void setVisibleByDefault(boolean visible);
+
+    /**
+     * Sets this hologram as explicitly visible to the given player
+     *
+     * @param player the player to show
+     */
+    void setVisibleTo(Player player);
+
+    /**
+     * Removes the explicitly visible flag from the player
+     *
+     * @param player the player
+     */
+    void removeVisibleTo(Player player);
+
+    /**
+     * Sets this hologram as explicitly hidden to the given player
+     *
+     * @param player the player to hide
+     */
+    void setHideTo(Player player);
+
+    /**
+     * Removes the explicitly hide flag from the player
+     *
+     * @param player the player
+     */
+    void removeHideTo(Player player);
 
     /**
      * Sets a line in this hologram to the provided text at the specified index.

@@ -5,6 +5,7 @@ import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.DisableCause;
 import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import lombok.AllArgsConstructor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -15,6 +16,36 @@ import java.util.List;
 @AllArgsConstructor
 public class DHHologram implements Hologram {
     private final eu.decentsoftware.holograms.api.holograms.Hologram backingHologram;
+
+    @Override
+    public boolean isVisibleByDefault() {
+        return backingHologram.isDefaultVisibleState();
+    }
+
+    @Override
+    public void setVisibleByDefault(boolean visible) {
+        backingHologram.setDefaultVisibleState(visible);
+    }
+
+    @Override
+    public void setVisibleTo(Player player) {
+        backingHologram.setShowPlayer(player);
+    }
+
+    @Override
+    public void removeVisibleTo(Player player) {
+        backingHologram.removeShowPlayer(player);
+    }
+
+    @Override
+    public void setHideTo(Player player) {
+        backingHologram.setHidePlayer(player);
+    }
+
+    @Override
+    public void removeHideTo(Player player) {
+        backingHologram.removeHidePlayer(player);
+    }
 
     @Override
     public void setLine(int index, String line) {
