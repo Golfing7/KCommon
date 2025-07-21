@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.hook.holograms;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -8,6 +9,36 @@ import java.util.List;
  * An empty implementation of {@link Hologram}
  */
 public class EmptyHologram implements Hologram {
+    @Override
+    public boolean isVisibleByDefault() {
+        return false;
+    }
+
+    @Override
+    public void setVisibleByDefault(boolean visible) {
+
+    }
+
+    @Override
+    public void setVisibleTo(Player player) {
+
+    }
+
+    @Override
+    public void removeVisibleTo(Player player) {
+
+    }
+
+    @Override
+    public void setHideTo(Player player) {
+
+    }
+
+    @Override
+    public void removeHideTo(Player player) {
+
+    }
+
     @Override
     public void setLine(int index, String line) {
 
