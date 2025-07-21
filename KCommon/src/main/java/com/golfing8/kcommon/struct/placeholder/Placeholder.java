@@ -82,7 +82,7 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
             }
         }
 
-        return new Placeholder(trueLabel, listBuilder.toString());
+        return new Placeholder(trueLabel, listBuilder.toString(), true);
     }
 
     /**
