@@ -424,7 +424,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         try (Stream<Path> paths = Files.list(directoryPath)) {
             List<Configuration> toReturn = new ArrayList<>();
             paths.forEach(path -> {
-                toReturn.add(loadConfig(path, true));
+                toReturn.add(loadConfig(path, false));
             });
             return toReturn;
         } catch (IOException exc) {
