@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a singular drop in a {@link DropTable}.
@@ -31,10 +32,9 @@ public abstract class Drop<T> implements RandomTestable {
      * The maximum boost that this drop can use
      */
     private double maxBoost;
+    /** All keys and objects defined by the config. Can be null if this drop wasn't defined by a config. */
+    private transient @Nullable Map<String, Object> configDefinition;
 
-    /**
-     * The drop table this drop is linked to. Can be null
-     */
     public Drop(double chance, @Nullable String displayName, double maxBoost) {
         this.chance = chance;
         this.displayName = displayName;

@@ -74,12 +74,11 @@ public class KCommon extends KPlugin {
                 // For Kotlin
                 new LibraryDefinition("org,jetbrains,kotlin", "kotlin-stdlib", "2.0.0")
         );
-        if (serverVersion.isAtOrBefore(NMSVersion.v1_17)) {
-            libraries.add(new LibraryDefinition("me,lucko", "adventure-api", "4.13.0"));
-            libraries.add(new LibraryDefinition("me,lucko", "adventure-platform-api", "4.13.3"));
-            libraries.add(new LibraryDefinition("me,lucko", "adventure-platform-bukkit", "4.13.3"));
-            libraries.add(new LibraryDefinition("net,kyori", "adventure-text-minimessage", "4.17.0"));
-        }
+
+        libraries.add(new LibraryDefinition("me,lucko", "adventure-api", "4.13.0"));
+        libraries.add(new LibraryDefinition("me,lucko", "adventure-platform-api", "4.13.3"));
+        libraries.add(new LibraryDefinition("me,lucko", "adventure-platform-bukkit", "4.13.3"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-minimessage", "4.17.0"));
 
         libraryLoader.loadAllLibraries(libraries);
 

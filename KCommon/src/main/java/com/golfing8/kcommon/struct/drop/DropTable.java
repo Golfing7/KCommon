@@ -102,6 +102,15 @@ public class DropTable implements CASerializable {
     }
 
     /**
+     * Gets all drops from the table
+     *
+     * @return the drops
+     */
+    public Collection<Drop<?>> getDrops() {
+        return Collections.unmodifiableCollection(table.values());
+    }
+
+    /**
      * Initializes the default group in the groupings map.
      *
      * @param dropRange the drop range.

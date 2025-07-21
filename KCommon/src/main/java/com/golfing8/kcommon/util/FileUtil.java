@@ -36,7 +36,7 @@ public final class FileUtil {
                 if (!jarEntry.getName().startsWith(jarDirectory + "/"))
                     continue;
 
-                String fileName = jarEntry.getName().replace(jarDirectory + "/", "");
+                String fileName = jarEntry.getName().replaceFirst(jarDirectory + "/", "");
                 // Skip directories.
                 if (fileName.endsWith("/"))
                     continue;

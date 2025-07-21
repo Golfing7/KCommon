@@ -2,9 +2,11 @@ package com.golfing8.kcommon.struct.item;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.adapter.CASerializable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -18,6 +20,7 @@ import java.util.regex.Pattern;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemPatch implements CASerializable {
     private @Nullable Patch materialPatch;
     private @Nullable Patch namePatch;
@@ -26,6 +29,7 @@ public class ItemPatch implements CASerializable {
     @Getter
     @NoArgsConstructor
     public static class Patch implements CASerializable {
+        @Language("RegExp")
         private String pattern;
         /**
          * Lazily initialized
@@ -38,7 +42,7 @@ public class ItemPatch implements CASerializable {
 
         private String replacement;
 
-        public Patch(String pattern, String replacement) {
+        public Patch(@Language("RegExp") String pattern, String replacement) {
             this.pattern = pattern;
             this.replacement = replacement;
         }

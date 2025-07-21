@@ -39,6 +39,7 @@ public class CADrop implements ConfigAdapter<Drop> {
         double maxBoost = primitive.containsKey("max-boost") ?
                 (double) ConfigPrimitive.coerceObjectToBoxed(primitive.get("max-boost"), Double.class) :
                 1.0D;
+        Drop<?> drop = null;
         if (primitive.containsKey("items") || primitive.containsKey("item")) {
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             boolean fancy = (boolean) primitive.getOrDefault("fancy", false);
@@ -49,31 +50,33 @@ public class CADrop implements ConfigAdapter<Drop> {
             String lootingFormula = primitive.getOrDefault("looting-formula", "rand1({LOOTING})").toString();
             if (primitive.containsKey("item")) {
                 ItemStackBuilder deserialized = ConfigTypeRegistry.getFromType(entry.getSubValue("item"), ItemStackBuilder.class);
-                ItemDrop drop = new ItemDrop(chance, displayName, maxBoost, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
+                drop = new ItemDrop(chance, displayName, maxBoost, MapUtil.of("item", deserialized), giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
-                return drop;
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {
                 });
                 Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(entry.getSubValue("item"), fieldType);
-                ItemDrop drop = new ItemDrop(chance, displayName, maxBoost, items, giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
+                drop = new ItemDrop(chance, displayName, maxBoost, items, giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
-                return drop;
             }
         } else if (primitive.containsKey("commands")) {
             FieldType fieldType = FieldType.extractFrom(new TypeToken<List<String>>() {
             });
             List<String> commands = ConfigTypeRegistry.getFromType(entry.getSubValue("commands"), fieldType);
-            CommandDrop drop = new CommandDrop(chance, displayName, maxBoost, commands);
+            drop = new CommandDrop(chance, displayName, maxBoost, commands);
             drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
-            return drop;
         } else if (primitive.containsKey("xp")) {
             int xp = (int) primitive.getOrDefault("xp", 0);
             boolean giveDirectly = (boolean) primitive.getOrDefault("give-directly", false);
             boolean boostQuantity = (boolean) primitive.getOrDefault("boost-quantity", false);
-            return new XpDrop(chance, displayName, maxBoost, xp, boostQuantity, giveDirectly);
+            drop = new XpDrop(chance, displayName, maxBoost, xp, boostQuantity, giveDirectly);
+            drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
         }
-        throw new InvalidConfigException("Drop '%s' doesn't have 'commands' or 'items' key. Which type of drop is it?");
+        if (drop == null)
+            throw new InvalidConfigException("Drop '%s' doesn't have 'commands' or 'items' key. Which type of drop is it?");
+
+        drop.setConfigDefinition(primitive);
+        return drop;
     }
 
     @Override
@@ -99,6 +102,12 @@ public class CADrop implements ConfigAdapter<Drop> {
             return ConfigPrimitive.ofMap(serialized);
         } else if (object instanceof CommandDrop) {
             serialized.put("commands", ConfigTypeRegistry.toPrimitive(((CommandDrop) object).getDrop()));
+            return ConfigPrimitive.ofMap(serialized);
+        } else if (object instanceof XpDrop) {
+            XpDrop xpDrop = (XpDrop) object;
+            serialized.put("xp", xpDrop.getXp());
+            serialized.put("give-directly", xpDrop.isGiveDirectly());
+            serialized.put("boost-quantity", xpDrop.isBoostQuantity());
             return ConfigPrimitive.ofMap(serialized);
         }
         throw new IllegalArgumentException(String.format("Drop with type %s doesn't have serializer.", object.getClass().getSimpleName()));
