@@ -20,7 +20,7 @@ public final class PagedMessage {
     public static final String PAGE_IMMOVABLE_FORMAT = "<gray>{FORMAT}</gray>";
     public static final String NEXT_BUTTON = "[>]";
     public static final String PREVIOUS_BUTTON = "[\\<]";
-    public static final String DEFAULT_PAGE_HEADER = "&6&m----------&r &a{PREVIOUS} &ePage &e{PAGE}&7/&e{MAX_PAGE} &a{NEXT} &6&m----------";
+    public static final String DEFAULT_PAGE_HEADER = "&6&m-------------&r &a{PREVIOUS} &ePage &e{PAGE}&7/&e{MAX_PAGE} &a{NEXT} &6&m-------------";
     public static final String DEFAULT_PAGE_FOOTER = "&6&m----------------------------------------------------";
     public static final int DEFAULT_PAGE_HEIGHT = 10;
 
