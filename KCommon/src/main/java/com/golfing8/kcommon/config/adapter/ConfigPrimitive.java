@@ -8,10 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents something that can be natively interpreted by YAML.
@@ -60,7 +57,7 @@ public final class ConfigPrimitive {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public <T> T unwrap() {
         if (primitive instanceof Map) {
-            Map items = new HashMap();
+            Map items = new LinkedHashMap();
             Map m = (Map) primitive;
             m.forEach((k, v) -> {
                 if (v instanceof ConfigPrimitive) {
@@ -180,7 +177,7 @@ public final class ConfigPrimitive {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static ConfigPrimitive ofMap(Map<String, ?> map) {
-        Map safeValues = new HashMap();
+        Map safeValues = new LinkedHashMap();
         for (var entry : map.entrySet()) {
             String realKey = stringToSafeKeyString(entry.getKey());
             safeValues.put(realKey, entry.getValue());
@@ -189,7 +186,7 @@ public final class ConfigPrimitive {
     }
 
     public static ConfigPrimitive ofSection(ConfigurationSection section) {
-        Map<String, Object> values = new HashMap<>();
+        Map<String, Object> values = new LinkedHashMap<>();
         for (String key : section.getKeys(false)) {
             if (section.isConfigurationSection(key)) {
                 values.put(key, ConfigPrimitive.ofSection(section.getConfigurationSection(key)));
