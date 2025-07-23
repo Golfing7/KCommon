@@ -43,6 +43,7 @@ dependencies {
     testImplementation("org.mongodb:mongodb-driver-sync:5.0.1")
     testImplementation("com.github.cryptomorin:XSeries:13.2.0")
 
+    compileOnly("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     compileOnly("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
     compileOnly("com.github.cryptomorin:XSeries:13.2.0") //For XSeries
     compileOnly("org.mongodb:mongodb-driver-sync:5.0.1")
@@ -53,7 +54,6 @@ dependencies {
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0")
     compileOnly("com.github.decentsoftware-eu.decentholograms:decentholograms:2.9.5")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") //Vault
     compileOnly("dev.lone:api-itemsadder:4.0.10")
 }
