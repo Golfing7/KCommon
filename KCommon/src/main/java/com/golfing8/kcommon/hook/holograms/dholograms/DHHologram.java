@@ -30,21 +30,27 @@ public class DHHologram implements Hologram {
     @Override
     public void setVisibleTo(Player player) {
         backingHologram.setShowPlayer(player);
+        backingHologram.show(player, 0);
     }
 
     @Override
     public void removeVisibleTo(Player player) {
         backingHologram.removeShowPlayer(player);
+        if (!backingHologram.isDefaultVisibleState()) {
+            backingHologram.hide(player);
+        }
     }
 
     @Override
     public void setHideTo(Player player) {
         backingHologram.setHidePlayer(player);
+        backingHologram.hide(player);
     }
 
     @Override
     public void removeHideTo(Player player) {
         backingHologram.removeHidePlayer(player);
+        backingHologram.show(player, 0);
     }
 
     @Override
