@@ -37,9 +37,9 @@ public final class MenuBuilder {
     private boolean canExpire = true, clickable;
     @Getter
     private String title = "&cAspect GUI";
-    private Map<Integer, List<ClickAction>> clickActions = new HashMap<>();
+    private Map<Integer, List<ClickAction>> clickActions = new LinkedHashMap<>();
     private List<Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>>> shapeCreation = new ArrayList<>();
-    private Map<Integer, ItemStack> specificItems = new HashMap<>();
+    private Map<Integer, ItemStack> specificItems = new LinkedHashMap<>();
     /**
      * The bottom click action, run when any slot in the bottom inventory is clicked.
      */
@@ -52,20 +52,20 @@ public final class MenuBuilder {
      * A map containing all special GUI items, mapped from their keys.
      */
     @Getter
-    private Map<String, SimpleGUIItem> specialGUIItems = new HashMap<>();
+    private Map<String, SimpleGUIItem> specialGUIItems = new LinkedHashMap<>();
     /**
      * A map containing string key bindings to specific items in this GUI.
      * Will be applied to the same slot defined for the 'special gui items' or left out if they are not present.
      */
-    private Map<String, ClickAction> specialBindings = new HashMap<>();
+    private Map<String, ClickAction> specialBindings = new LinkedHashMap<>();
     /**
      * A map containing placeholders for each special item.
      */
-    private Map<String, Supplier<Collection<Placeholder>>> specialPlaceholders = new HashMap<>();
+    private Map<String, Supplier<Collection<Placeholder>>> specialPlaceholders = new LinkedHashMap<>();
     /**
      * A map containing multiline placeholders for each special item.
      */
-    private Map<String, Supplier<Collection<MultiLinePlaceholder>>> specialMPlaceholders = new HashMap<>();
+    private Map<String, Supplier<Collection<MultiLinePlaceholder>>> specialMPlaceholders = new LinkedHashMap<>();
     /**
      * The global placeholders to apply to EVERY string in this menu.
      */
@@ -79,7 +79,7 @@ public final class MenuBuilder {
     /**
      * The other GUI items to apply in this menu.
      */
-    private Map<String, SimpleGUIItem> otherGUIItems = new HashMap<>();
+    private Map<String, SimpleGUIItem> otherGUIItems = new LinkedHashMap<>();
     /**
      * The type of menu being built
      */
