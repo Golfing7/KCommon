@@ -77,7 +77,7 @@ subprojects {
         compileOnly("net.kyori:adventure-platform-bukkit:4.3.3")
         compileOnly("net.jodah:expiringmap:0.5.11")
         compileOnly("org.projectlombok:lombok:1.18.36")
-        compileOnly("de.tr7zw:item-nbt-api:2.15.0") //For items.
+        compileOnly("de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT") //For items.
         compileOnly("org.jetbrains:annotations:24.1.0")
     }
 
