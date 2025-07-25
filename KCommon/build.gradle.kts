@@ -41,13 +41,13 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(project(":NMS"))
     testImplementation("org.mongodb:mongodb-driver-sync:5.0.1")
-    testImplementation("com.github.cryptomorin:XSeries:13.2.0")
+    testImplementation("com.github.cryptomorin:XSeries:13.3.3")
 
     compileOnly("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     compileOnly("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
-    compileOnly("com.github.cryptomorin:XSeries:13.2.0") //For XSeries
+    compileOnly("com.github.cryptomorin:XSeries:13.3.3") //For XSeries
     compileOnly("org.mongodb:mongodb-driver-sync:5.0.1")
-    implementation("de.tr7zw:item-nbt-api:2.15.0") //For items.
+    implementation("de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT") //For items.
     implementation("me.lucko:jar-relocator:1.7")
 
     compileOnly(project(":NMS"))
