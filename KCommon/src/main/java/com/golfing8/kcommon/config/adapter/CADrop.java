@@ -55,7 +55,7 @@ public class CADrop implements ConfigAdapter<Drop> {
             } else {
                 FieldType fieldType = FieldType.extractFrom(new TypeToken<Map<String, ItemStackBuilder>>() {
                 });
-                Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(entry.getSubValue("item"), fieldType);
+                Map<String, ItemStackBuilder> items = ConfigTypeRegistry.getFromType(entry.getSubValue("items"), fieldType);
                 drop = new ItemDrop(chance, displayName, maxBoost, items, giveDirectly, fancy, playerLocked, boostQuantity, lootingEnabled, fortuneEnabled, lootingFormula);
                 drop.set_key(entry.getSource() != null ? entry.getSource().getName() : null);
             }
