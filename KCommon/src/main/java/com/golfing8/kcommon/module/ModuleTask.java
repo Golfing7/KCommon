@@ -1,16 +1,19 @@
 package com.golfing8.kcommon.module;
 
+import com.golfing8.kcommon.struct.helper.terminable.Terminable;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.function.Consumer;
+
 /**
  * A task that belongs to a module, extending the {@link BukkitRunnable} class to implement itself.
  * All ModuleTask instances are linked to a specific module and cancelled when a module is shutdown.
  */
-public class ModuleTask<T extends Module> {
+public class ModuleTask<T extends Module> implements Terminable {
     /**
      * The module this task belongs to.
      */
@@ -23,7 +26,7 @@ public class ModuleTask<T extends Module> {
     /**
      * The runnable that has been passed in
      */
-    private final Runnable delegateTask;
+    private final Consumer<Terminable> delegateTask;
     /**
      * The running bukkit task associated with this module task
      */
@@ -42,22 +45,32 @@ public class ModuleTask<T extends Module> {
      */
     @Getter
     private boolean ran;
+    /** The amount of times this task has been run */
+    @Getter
+    private int runs;
 
     protected ModuleTask(T module) {
         this.module = module;
-        this.delegateTask = this::run;
+        this.delegateTask = (t) -> this.run();
         this.registeredTask = this::runInternal;
     }
 
     public ModuleTask(T module, Runnable runnable) {
         this.module = module;
-        this.delegateTask = runnable;
+        this.delegateTask = (t) -> runnable.run();
+        this.registeredTask = this::runInternal;
+    }
+
+    public ModuleTask(T module, Consumer<Terminable> ticker) {
+        this.module = module;
+        this.delegateTask = ticker;
         this.registeredTask = this::runInternal;
     }
 
     private void runInternal() {
         this.ran = true;
-        this.delegateTask.run();
+        this.runs++;
+        this.delegateTask.accept(this);
         if (!this.timerTask) {
             this.module.removeTask(this);
         }
@@ -138,6 +151,11 @@ public class ModuleTask<T extends Module> {
     public ModuleTask<T> startTimerAsync(long tickDelay, long tickPeriod) {
         this.runTaskTimerAsynchronously(getModule().getPlugin(), tickDelay, tickPeriod);
         return this;
+    }
+
+    @Override
+    public void close() {
+        this.cancel();
     }
 
     public synchronized BukkitTask runTask(Plugin plugin) throws IllegalArgumentException, IllegalStateException {

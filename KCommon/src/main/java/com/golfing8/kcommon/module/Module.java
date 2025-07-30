@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -593,6 +594,13 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     @SuppressWarnings({"rawtypes", "unchecked", "unused"})
     public synchronized ModuleTask addTask(Runnable runnable) {
         ModuleTask mTask = new ModuleTask(this, runnable);
+        this.moduleTasks.add(mTask);
+        return mTask;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked", "unused"})
+    public synchronized ModuleTask addTask(Consumer<ModuleTask> ticker) {
+        ModuleTask mTask = new ModuleTask(this, ticker);
         this.moduleTasks.add(mTask);
         return mTask;
     }
