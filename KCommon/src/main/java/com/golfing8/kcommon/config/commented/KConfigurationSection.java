@@ -5,6 +5,7 @@ import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.gson.reflect.TypeToken;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -51,7 +52,18 @@ public interface KConfigurationSection extends ConfigurationSection {
      * @param path the path
      * @return the section
      */
+    @Nullable
     KConfigurationSection getConfigurationSection(String path);
+
+    /**
+     * An optional variant of {@link #getConfigurationSection(String)}
+     *
+     * @param path the path
+     * @return the optional section
+     */
+    default Optional<KConfigurationSection> getConfigurationSectionOpt(String path) {
+        return Optional.ofNullable(getConfigurationSection(path));
+    }
 
     /**
      * Iterates through every subsection in this section.
@@ -59,11 +71,24 @@ public interface KConfigurationSection extends ConfigurationSection {
      * @param action the action.
      */
     default void forEachSubsection(Consumer<? super KConfigurationSection> action) {
+        forEachSubsection("", action);
+    }
+
+    /**
+     * Iterates through every subsection in this section.
+     *
+     * @param action the action.
+     */
+    default void forEachSubsection(String path, Consumer<? super KConfigurationSection> action) {
+        KConfigurationSection section = this.getConfigurationSection(path);
+        if (section == null)
+            return;
+
         for (String key : this.getKeys(false)) {
-            if (!this.isConfigurationSection(key))
+            if (!section.isConfigurationSection(key))
                 continue;
 
-            action.accept(getConfigurationSection(key));
+            action.accept(section.getConfigurationSection(key));
         }
     }
 
@@ -73,7 +98,22 @@ public interface KConfigurationSection extends ConfigurationSection {
      * @param action the action.
      */
     default void forEachKey(Consumer<? super String> action) {
-        for (String key : this.getKeys(false)) {
+        this.forEachKey("", action);
+    }
+
+    /**
+     * Iterates through every key under the given path.
+     * If the path does not exist or is not a configuration section, nothing will happen.
+     *
+     * @param path the path
+     * @param action the action
+     */
+    default void forEachKey(String path, Consumer<? super String> action) {
+        KConfigurationSection section = this.getConfigurationSection(path);
+        if (section == null)
+            return;
+
+        for (String key : section.getKeys(false)) {
             action.accept(key);
         }
     }
