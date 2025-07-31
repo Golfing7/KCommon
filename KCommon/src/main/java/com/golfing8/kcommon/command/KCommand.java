@@ -182,6 +182,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     @Setter
     private boolean acceptExtraArguments = false;
 
+    /** A cached version of {@link #isExecutionImplemented()} */
+    private Boolean executionImplemented;
+
     /**
      * A constructor to initialize all fields with the {}
      */
@@ -237,11 +240,14 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * @return the command.
      */
     public boolean isExecutionImplemented() {
+        if (executionImplemented != null)
+            return executionImplemented;
+
         try {
             this.getClass().getDeclaredMethod("execute", CommandContext.class);
-            return true;
+            return executionImplemented = true;
         } catch (NoSuchMethodException exc) {
-            return false;
+            return executionImplemented = false;
         }
     }
 

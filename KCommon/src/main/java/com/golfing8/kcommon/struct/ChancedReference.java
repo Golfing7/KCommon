@@ -1,12 +1,14 @@
 package com.golfing8.kcommon.struct;
 
+import com.golfing8.kcommon.struct.random.RandomTestable;
 import lombok.Getter;
 
 import java.util.Random;
 
-public final class ChancedReference<T> {
+public final class ChancedReference<T> implements RandomTestable {
     private static final Random CHANCED_RANDOM = new Random();
 
+    @Getter
     private final double chance;
     @Getter
     private final T reference;

@@ -37,9 +37,6 @@ public class CAStringFilter implements ConfigAdapter<StringFilter> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull StringFilter object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         Map<String, Object> items = new HashMap<>();
         if (object.isSimple()) {
             return ConfigPrimitive.ofString(object.getPattern());

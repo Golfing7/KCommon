@@ -11,13 +11,14 @@ public class FieldHandles {
         return String.format("%s+%s", fieldName, clazz.getName());
     }
 
-    public static FieldHandle<?> getHandle(String fieldName, Class<?> clazz){
+    @SuppressWarnings("unchecked")
+    public static <T> FieldHandle<T> getHandle(String fieldName, Class<T> clazz){
         String serialized = getSerializedName(fieldName, clazz);
 
         if(handleCache.containsKey(serialized))
-            return handleCache.get(serialized);
+            return (FieldHandle<T>) handleCache.get(serialized);
 
-        FieldHandle<?> newHandle = new FieldHandle<>(fieldName, clazz);
+        FieldHandle<T> newHandle = new FieldHandle<>(fieldName, clazz);
         handleCache.put(serialized, newHandle);
         return newHandle;
     }

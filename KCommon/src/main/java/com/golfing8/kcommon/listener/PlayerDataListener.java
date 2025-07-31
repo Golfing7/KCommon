@@ -19,7 +19,9 @@ public class PlayerDataListener implements Listener {
         for (DataManager<?> manager : DataManagerContainer.dataManagers.values().stream().flatMap(z -> z.values().stream()).collect(Collectors.toList())) {
             if (SenderSerializable.class.isAssignableFrom(manager.getDataClass())) {
                 // Automatically save the data if it is associated with the player.
-                manager.save(event.getPlayer().getUniqueId().toString());
+                String playerId = event.getPlayer().getUniqueId().toString();
+                manager.save(playerId);
+                manager.uncache(playerId);
             }
         }
     }

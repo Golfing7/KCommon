@@ -22,7 +22,6 @@ public class CAItemFilter implements ConfigAdapter<ItemFilter> {
     }
 
     @Override
-    @SuppressWarnings({"unchecked"})
     public ItemFilter toPOJO(ConfigPrimitive entry, FieldType type) {
         if (entry.getPrimitive() == null)
             return null;

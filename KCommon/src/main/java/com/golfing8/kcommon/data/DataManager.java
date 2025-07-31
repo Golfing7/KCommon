@@ -1,9 +1,11 @@
 package com.golfing8.kcommon.data;
 
 import com.golfing8.kcommon.data.key.FieldIndexer;
+import com.golfing8.kcommon.struct.helper.promise.Promise;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,7 +48,15 @@ public interface DataManager<T extends DataSerializable> {
      * @param key the key.
      * @return the object.
      */
-    T getOrCreate(@Nonnull String key);
+    T getOrCreate(@NotNull String key);
+
+    /**
+     * Gets, or creates, a given object with the given key asynchronously.
+     *
+     * @param key the key.
+     * @return the promise of the object.
+     */
+    Promise<T> getOrCreateAsync(@NotNull String key);
 
     /**
      * Gets the object from the data manager, or null if it doesn't exist.
@@ -57,7 +67,7 @@ public interface DataManager<T extends DataSerializable> {
      * @return the object
      */
     @Nullable
-    T getObject(@Nonnull String key);
+    T getObject(@NotNull String key);
 
     /**
      * Gets all objects that have field values equal to the provided parameters.
@@ -79,7 +89,7 @@ public interface DataManager<T extends DataSerializable> {
      *
      * @param key the key of the object to uncache
      */
-    void uncache(@Nonnull String key);
+    void uncache(@NotNull String key);
 
     /**
      * Gets all objects stored in the data manager
@@ -87,6 +97,13 @@ public interface DataManager<T extends DataSerializable> {
      * @return a map of all objects mapped from their keys
      */
     Map<String, T> getAll();
+
+    /**
+     * Gets all objects stored in the data manager asynchronously
+     *
+     * @return a collection of all objects
+     */
+    Promise<Collection<T>> getAllAsync();
 
     /**
      * Gets all cached objects stored in the data manager
@@ -101,7 +118,7 @@ public interface DataManager<T extends DataSerializable> {
      * @param obj the object to delete
      * @return true if deleted, false if the object wasn't found
      */
-    default boolean delete(@Nonnull T obj) {
+    default boolean delete(@NotNull T obj) {
         return this.delete(obj.getKey());
     }
 
@@ -111,7 +128,7 @@ public interface DataManager<T extends DataSerializable> {
      * @param key the key of the object to delete
      * @return true if deleted, false if the object wasn't found
      */
-    boolean delete(@Nonnull String key);
+    boolean delete(@NotNull String key);
 
     /**
      * Stores the object in this data manager. This will delete any object that already exists with the same key
@@ -119,14 +136,14 @@ public interface DataManager<T extends DataSerializable> {
      * @param obj the object to store
      * @return true if the object didn't previously exist, false if we're replacing something
      */
-    boolean store(@Nonnull T obj);
+    boolean store(@NotNull T obj);
 
     /**
      * Saves the object with the given key, if it exists.
      *
      * @param key the key.
      */
-    void save(@Nonnull String key);
+    void save(@NotNull String key);
 
     /**
      * Checks if an object is stored under the given key in the data manager
@@ -134,7 +151,7 @@ public interface DataManager<T extends DataSerializable> {
      * @param key the key of the object being stored
      * @return true if it does, false if not
      */
-    boolean exists(@Nonnull String key);
+    boolean exists(@NotNull String key);
 
     /**
      * Only saves objects which strictly have been changed.

@@ -106,7 +106,7 @@ public interface KConfigurationSection extends ConfigurationSection {
      * If the path does not exist or is not a configuration section, nothing will happen.
      *
      * @param path the path
-     * @param action the action
+     * @param action the action applied to the path. The provided path is relative to THIS section.
      */
     default void forEachKey(String path, Consumer<? super String> action) {
         KConfigurationSection section = this.getConfigurationSection(path);
@@ -114,7 +114,7 @@ public interface KConfigurationSection extends ConfigurationSection {
             return;
 
         for (String key : section.getKeys(false)) {
-            action.accept(key);
+            action.accept(!path.isEmpty() ? path + "." + key : path);
         }
     }
 

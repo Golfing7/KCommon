@@ -6,6 +6,7 @@ import com.golfing8.kcommon.data.DataManagerAbstract;
 import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.key.FieldIndexer;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
+import com.golfing8.kcommon.struct.helper.promise.Promise;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
 import lombok.Getter;
@@ -13,19 +14,17 @@ import lombok.val;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 /**
@@ -114,9 +113,14 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         return created;
     }
 
+    @Override
+    public Promise<T> getOrCreateAsync(@NotNull String key) {
+        return Promise.supplyingAsync(() -> getOrCreate(key));
+    }
+
     @Nullable
     @Override
-    public synchronized T getObject(@Nonnull String key) {
+    public synchronized T getObject(@NotNull String key) {
         if (this.objectCache.containsKey(key))
             return this.objectCache.get(key);
 
@@ -154,7 +158,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public synchronized void uncache(@Nonnull String key) {
+    public synchronized void uncache(@NotNull String key) {
         this.objectCache.remove(key);
     }
 
@@ -192,12 +196,17 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public Map<String, T> getAllCached() {
-        return new HashMap<>(this.objectCache);
+    public Promise<Collection<T>> getAllAsync() {
+        return Promise.supplyingAsync(() -> getAll().values());
     }
 
     @Override
-    public synchronized boolean delete(@Nonnull String key) {
+    public Map<String, T> getAllCached() {
+        return Collections.unmodifiableMap(this.objectCache);
+    }
+
+    @Override
+    public synchronized boolean delete(@NotNull String key) {
         if (!this.objectExists(key))
             return false;
 
@@ -211,7 +220,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public synchronized boolean store(@Nonnull T obj) {
+    public synchronized boolean store(@NotNull T obj) {
         boolean replacing = this.exists(obj.getKey());
         try {
             this.writeObject(obj);
@@ -232,7 +241,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
-    public synchronized boolean exists(@Nonnull String key) {
+    public synchronized boolean exists(@NotNull String key) {
         return this.objectCache.containsKey(key) || this.objectExists(key);
     }
 
@@ -255,10 +264,9 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
      */
     private T loadObject(Path objPath) throws IOException {
         Reader reader = Files.newBufferedReader(objPath);
-        JsonParser parser = new JsonParser();
 
         //Read the object in
-        JsonElement object = parser.parse(reader);
+        JsonElement object = JsonParser.parseReader(reader);
 
         String key = objPath.getFileName().toString().replace(".json", "");
         //Create an empty instance
@@ -266,10 +274,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         try {
             newObject = DataSerializer.getGSONBase().fromJson(object, getTypeClass());
         } catch (JsonParseException exc) {
-            getPlugin().getLogger().warning(String.format("Cache %s failed to load object %s!", getTypeClass().getName(), key));
-            if (KCommon.getInstance().isDebug()) {
-                exc.printStackTrace();
-            }
+            getPlugin().getLogger().log(Level.WARNING, String.format("Cache %s failed to load object %s!", getTypeClass().getName(), key), exc);
             newObject = null;
         }
         if (newObject == null) {

@@ -24,9 +24,6 @@ public class CAWorld implements ConfigAdapter<World> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull World object) {
-        if (object == null)
-            return ConfigPrimitive.ofNull();
-
         return ConfigPrimitive.ofString(object.getName());
     }
 }

@@ -6,10 +6,16 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.Color;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Adapts bukkit colors.
  */
 public class CAColorBukkit implements ConfigAdapter<Color> {
+    /** Caches colors */
+    private static final Map<String, Color> colorCache = new HashMap<>();
+
     @Override
     public Class<Color> getAdaptType() {
         return Color.class;
@@ -43,9 +49,14 @@ public class CAColorBukkit implements ConfigAdapter<Color> {
         return ConfigPrimitive.ofString(String.format("%06X", object.asRGB() & 0xFFFFFF));
     }
 
-    @SuppressWarnings("unchecked")
     private static Color getColorByName(String name) {
-        FieldHandle<Color> fieldHandle = (FieldHandle<Color>) FieldHandles.getHandle(name, Color.class);
-        return fieldHandle.get(null);
+        if (colorCache.containsKey(name))
+            return colorCache.get(name);
+
+        FieldHandle<Color> fieldHandle = FieldHandles.getHandle(name, Color.class);
+        Color color = fieldHandle.get(null);
+        if (color != null)
+            colorCache.put(name, color);
+        return color;
     }
 }

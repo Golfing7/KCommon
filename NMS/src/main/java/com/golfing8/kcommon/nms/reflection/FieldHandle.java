@@ -22,7 +22,7 @@ public class FieldHandle<T> {
         this.clazz = field.getDeclaringClass();
     }
 
-    public FieldHandle(String fieldName, Class<?> clazz) {
+    public FieldHandle(String fieldName, Class<T> clazz) {
         this.fieldName = fieldName;
         this.clazz = clazz;
         try{

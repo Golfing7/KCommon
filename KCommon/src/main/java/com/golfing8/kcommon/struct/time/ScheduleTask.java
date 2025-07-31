@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 /**
  * A task that should be run based upon a given {@link Schedule}
  */
+@Getter
 public class ScheduleTask extends BukkitRunnable {
     private static final TimeLength MAX_ANTICIPATE_LENGTH = new TimeLength(100); // 5 seconds
 
@@ -36,17 +37,15 @@ public class ScheduleTask extends BukkitRunnable {
     /**
      * An optional consumer for handling events where it's X time UNTIL an action.
      */
-    @Getter
     @Setter
     @Nullable
     private Consumer<TimeLength> anticipateTask;
     /**
      * The rate at which this task ticks
      */
-    @Getter
     @Setter
     private int tickRate = 20;
-    @Getter
+    /** If the task has been started */
     private boolean started = false;
 
     public ScheduleTask(Schedule schedule, Consumer<Timestamp> action, Supplier<Boolean> pauseCondition) {
@@ -89,6 +88,22 @@ public class ScheduleTask extends BukkitRunnable {
     }
 
     /**
+     * Gets the time until the next event.
+     *
+     * @return the time length.
+     */
+    public TimeLength getTimeUntilNextEvent() {
+        Timestamp now = Timestamp.now();
+        Timestamp nextAvailable = this.schedule.getNextAvailableTimestamp().clone();
+        // Support time lengths of seconds.
+        if (nextAvailable.getSecond() == Timestamp.UNUSED)
+            nextAvailable.setSecond(0);
+
+        long difference = nextAvailable.getMillisDifference(now);
+        return new TimeLength(Math.max(0, difference / 50));
+    }
+
+    /**
      * Checks the upcoming anticipated times and tries to run the task.
      */
     private void checkAnticipatedTimes() {
@@ -122,6 +137,7 @@ public class ScheduleTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        started = true;
         if (pauseCondition.get())
             return;
 

@@ -6,6 +6,7 @@ import com.golfing8.kcommon.config.lang.PagedMessage;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.struct.title.Title;
+import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -31,6 +32,9 @@ public class CAMessage implements ConfigAdapter<Message> {
     @SuppressWarnings("unchecked")
     public ConfigPrimitive toPrimitive(@NotNull Message object) {
         if (object.isSimple()) {
+            if (object.getMessages() == null)
+                return ConfigPrimitive.ofList(Lists.newArrayList());
+
             return object.getMessages().size() == 1 ?
                     ConfigPrimitive.ofString(object.getMessages().get(0)) :
                     ConfigPrimitive.ofList(object.getMessages());
