@@ -33,7 +33,7 @@ tasks.getByName<Test>("test") {
 dependencies {
     implementation(parent!!)
 
-    implementation("de.tr7zw:item-nbt-api:2.15.0") //For items.
+    implementation("de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT") //For items.
     implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
     implementation("net.jodah:expiringmap:0.5.11")
 

@@ -49,11 +49,12 @@ public class CAColorBukkit implements ConfigAdapter<Color> {
         return ConfigPrimitive.ofString(String.format("%06X", object.asRGB() & 0xFFFFFF));
     }
 
+    @SuppressWarnings("unchecked")
     private static Color getColorByName(String name) {
         if (colorCache.containsKey(name))
             return colorCache.get(name);
 
-        FieldHandle<Color> fieldHandle = FieldHandles.getHandle(name, Color.class);
+        FieldHandle<Color> fieldHandle = (FieldHandle<Color>) FieldHandles.getHandle(name, Color.class);
         Color color = fieldHandle.get(null);
         if (color != null)
             colorCache.put(name, color);
