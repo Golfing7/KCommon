@@ -260,6 +260,11 @@ public abstract class ConfigClass {
                     instance.confAnnotation = clazz.getAnnotation(Conf.class);
 
                 this.children.put((Class<? extends ConfigClass>) clazz, instance);
+
+                // Copy settings over to the child.
+                instance.setReadOnly(this.isReadOnly());
+                instance.setRequireAnnotation(this.isRequireAnnotation());
+                instance.setConfigMappingEnabled(this.isConfigMappingEnabled());
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                      IllegalAccessException e) {
                 throw new RuntimeException(String.format("Failed to load child config class %s.", clazz.getName()), e);
