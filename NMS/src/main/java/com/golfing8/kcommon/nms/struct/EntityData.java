@@ -6,11 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.*;
 
 /**
  * Represents 'extra' data for an entity. Used specifically for server versions less than 1.13
@@ -20,15 +16,25 @@ import org.bukkit.entity.Skeleton;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class EntityData {
-    /** The type of entity */
+    /**
+     * The type of entity
+     */
     private final EntityType entityType;
-    /** If a creeper is charged */
+    /**
+     * If a creeper is charged
+     */
     private final boolean creeperCharged;
-    /** If a skeleton is a wither. */
+    /**
+     * If a skeleton is a wither.
+     */
     private final boolean skeletonWither;
-    /** If a horse is undead */
+    /**
+     * If a horse is undead
+     */
     private final boolean horseUndead;
-    /** If a horse is a skeleton */
+    /**
+     * If a horse is a skeleton
+     */
     private final boolean horseSkeleton;
 
     @Override
@@ -44,7 +50,7 @@ public class EntityData {
             return "WITHER_SKELETON";
         } else if (horseUndead) {
             return "UNDEAD_HORSE";
-        }else if (horseSkeleton) {
+        } else if (horseSkeleton) {
             return "SKELETON_HORSE";
         }
         return entityType.name();

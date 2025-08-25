@@ -7,6 +7,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutSpawnEntityLiving;
 @AllArgsConstructor
 public class OutSpawnEntityLivingV1_8 implements NMSOutSpawnEntityLiving {
     private final PacketPlayOutSpawnEntityLiving packet;
+
     @Override
     public Object getHandle() {
         return packet;

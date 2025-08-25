@@ -2,8 +2,8 @@ package com.golfing8.kcommon.nms.world;
 
 import com.golfing8.kcommon.nms.NMSObject;
 import com.golfing8.kcommon.nms.chunks.NMSChunkProvider;
-import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.struct.Position;
+import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,11 +19,13 @@ public interface NMSWorld extends NMSObject {
 
     NMSTileEntity getTileEntity(Position position);
 
-    default void refreshChestState(Player player, Position position) {}
+    default void refreshChestState(Player player, Position position) {
+    }
 
     void animateChest(Position position, boolean opening);
 
     void forceChestOpen(Position position);
+
     void forceChestClose(Position position);
 
     void playEffect(Location location, String effect, int data);

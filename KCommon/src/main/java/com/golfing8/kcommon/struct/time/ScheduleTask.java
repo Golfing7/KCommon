@@ -45,7 +45,9 @@ public class ScheduleTask extends BukkitRunnable {
      */
     @Setter
     private int tickRate = 20;
-    /** If the task has been started */
+    /**
+     * If the task has been started
+     */
     private boolean started = false;
 
     public ScheduleTask(Schedule schedule, Consumer<Timestamp> action, Supplier<Boolean> pauseCondition) {

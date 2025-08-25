@@ -40,7 +40,9 @@ public class DropTable implements CASerializable {
         private String _key;
         private List<String> drops;
         private Range dropTargetRange;
-        /** The maximum 'tries' that this group does to add a drop. If less than or equal to 0, no maximum is enforced */
+        /**
+         * The maximum 'tries' that this group does to add a drop. If less than or equal to 0, no maximum is enforced
+         */
         private int maxTries;
 
         /**
@@ -143,7 +145,8 @@ public class DropTable implements CASerializable {
      */
     public List<Drop<?>> generateDrops(@NotNull DropContext context) {
         List<Drop<?>> drops = new ArrayList<>();
-        group: for (var groupEntry : groupings.entrySet()) {
+        group:
+        for (var groupEntry : groupings.entrySet()) {
             List<String> dropKeys = new ArrayList<>(groupEntry.getValue().getDrops());
             int dropTarget = groupEntry.getValue().getDropTarget();
             int collectedDrops = 0;

@@ -45,7 +45,9 @@ public class ModuleTask<T extends Module> implements Terminable {
      */
     @Getter
     private boolean ran;
-    /** The amount of times this task has been run */
+    /**
+     * The amount of times this task has been run
+     */
     @Getter
     private int runs;
 

@@ -9,6 +9,7 @@ public interface NMSEnchant extends NMSObject {
 
     /**
      * Gets the locale name for the enchantment.
+     *
      * @return the locale name.
      */
     String getTranslatedName();

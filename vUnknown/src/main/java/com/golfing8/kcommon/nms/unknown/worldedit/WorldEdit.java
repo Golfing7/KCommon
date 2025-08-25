@@ -31,18 +31,19 @@ import java.nio.file.Path;
  */
 public class WorldEdit implements WorldEditHook {
     private final com.sk89q.worldedit.WorldEdit worldEdit;
+
     public WorldEdit() {
         this.worldEdit = com.sk89q.worldedit.WorldEdit.getInstance();
     }
 
     @Override
     public void pasteSchematic(Location location, Path path) {
-        if(!Files.exists(path))
+        if (!Files.exists(path))
             return;
 
-        try(EditSession session = worldEdit.newEditSession(new BukkitWorld(location.getWorld()))) {
+        try (EditSession session = worldEdit.newEditSession(new BukkitWorld(location.getWorld()))) {
             ClipboardFormat format = ClipboardFormats.findByFile(path.toFile());
-            if(format == null)
+            if (format == null)
                 throw new RuntimeException("Clipboard format wasn't recognized!");
 
             ClipboardReader reader = format.getReader(Files.newInputStream(path));

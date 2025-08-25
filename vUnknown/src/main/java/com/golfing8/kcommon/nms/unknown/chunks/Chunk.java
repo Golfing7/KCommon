@@ -8,7 +8,7 @@ import org.bukkit.block.BlockState;
 public class Chunk implements NMSChunk {
     private final org.bukkit.Chunk chunk;
 
-    public Chunk(org.bukkit.Chunk chunk){
+    public Chunk(org.bukkit.Chunk chunk) {
         this.chunk = chunk;
     }
 

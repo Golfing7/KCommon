@@ -12,6 +12,7 @@ public class OutEntityDestroyV1_8 implements NMSOutEntityDestroy {
     private static final FieldHandle handle = FieldHandles.getHandle("a", PacketPlayOutEntityDestroy.class);
 
     private final PacketPlayOutEntityDestroy packet;
+
     @Override
     public Object getHandle() {
         return packet;

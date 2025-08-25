@@ -28,10 +28,11 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MagicItems implements NMSMagicItems {
     @Override
@@ -51,7 +52,7 @@ public class MagicItems implements NMSMagicItems {
 
     @Override
     public int getRemainingItemDurability(ItemStack stack) {
-        if(!(stack.getItemMeta() instanceof Damageable))
+        if (!(stack.getItemMeta() instanceof Damageable))
             return -1;
 
         Damageable damageable = (Damageable) stack.getItemMeta();
@@ -76,7 +77,7 @@ public class MagicItems implements NMSMagicItems {
     public boolean setRemainingItemDurability(ItemStack stack, int amount) {
         int remaining = getRemainingItemDurability(stack);
 
-        if(remaining == -1)
+        if (remaining == -1)
             return false;
 
         Damageable damageable = (Damageable) stack.getItemMeta();

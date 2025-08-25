@@ -41,9 +41,11 @@ public enum EntityAttribute {
     ;
 
     Set<String> oldNames;
+
     EntityAttribute(String... names) {
         this.oldNames = Sets.newHashSet(names);
     }
+
     public static EntityAttribute byName(String name) {
         for (EntityAttribute value : values()) {
             try {

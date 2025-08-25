@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 public class PreSpawnSpawnerAdapter implements Listener {
 
     @EventHandler
-    public void onSpawn(SpawnerPreSpawnEvent event){
+    public void onSpawn(SpawnerPreSpawnEvent event) {
         PreSpawnSpawnerEvent preEvent = new PreSpawnSpawnerEvent(event.getLocation().getBlock(), event.getSpawnedType());
         preEvent.setCancelled(event.isCancelled());
 

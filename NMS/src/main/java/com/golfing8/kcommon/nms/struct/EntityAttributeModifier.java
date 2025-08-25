@@ -2,7 +2,6 @@ package com.golfing8.kcommon.nms.struct;
 
 import lombok.Getter;
 import org.apache.commons.lang.Validate;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

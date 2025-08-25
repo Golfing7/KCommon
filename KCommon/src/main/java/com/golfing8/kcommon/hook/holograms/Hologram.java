@@ -12,6 +12,7 @@ public interface Hologram {
 
     /**
      * True if this hologram is visible by default
+     *
      * @return value
      */
     boolean isVisibleByDefault();

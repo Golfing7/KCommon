@@ -7,7 +7,7 @@ import com.golfing8.kcommon.nms.world.NMSWorld;
 import org.bukkit.block.Dispenser;
 
 public class BlockDispenser extends Block implements NMSDispenser {
-    public BlockDispenser(Dispenser dispenser){
+    public BlockDispenser(Dispenser dispenser) {
         super(dispenser.getBlockData());
     }
 

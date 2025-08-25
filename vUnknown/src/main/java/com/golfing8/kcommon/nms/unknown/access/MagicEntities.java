@@ -16,8 +16,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.VoxelShape;
 
-import java.util.Arrays;
-
 public class MagicEntities implements NMSMagicEntities {
 
     @Override
@@ -31,18 +29,18 @@ public class MagicEntities implements NMSMagicEntities {
         return location.getWorld().spawn(location, Giant.class);
     }
 
-    public Slime spawnSlimeWithSize(Location location, int size, double health){
+    public Slime spawnSlimeWithSize(Location location, int size, double health) {
         Slime slime = location.getWorld().spawn(location, Slime.class);
         slime.setSize(size);
         slime.setHealth(health);
         return slime;
     }
 
-    public Monster spawnWitherSkeleton(Location location){
+    public Monster spawnWitherSkeleton(Location location) {
         return location.getWorld().spawn(location, WitherSkeleton.class);
     }
 
-    public Guardian spawnElderGuardian(Location location){
+    public Guardian spawnElderGuardian(Location location) {
         return location.getWorld().spawn(location, ElderGuardian.class);
     }
 
@@ -110,7 +108,7 @@ public class MagicEntities implements NMSMagicEntities {
     @Override
     public void setAttribute(LivingEntity entity, EntityAttribute attribute, double value) {
         AttributeInstance instance = null;
-        switch(attribute){
+        switch (attribute) {
             case GENERIC_ATTACK_DAMAGE:
                 instance = entity.getAttribute(getAttributeWithNameContaining("attack_damage"));
                 break;

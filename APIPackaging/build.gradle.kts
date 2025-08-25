@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow") version("8.3.6")
+    id("com.gradleup.shadow") version ("8.3.6")
     id("maven-publish")
 }
 
@@ -115,9 +115,6 @@ gradle.projectsEvaluated {
         })
         archiveClassifier.set("sources")
     }
-
-
-
 
 
     // -------------------------------------------------- //

@@ -11,7 +11,8 @@ import org.jetbrains.annotations.Nullable;
 public class PrepareResultEvent extends InventoryEvent {
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private ItemStack result;
 
     public PrepareResultEvent(InventoryView transaction, @Nullable ItemStack result) {

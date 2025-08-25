@@ -8,7 +8,7 @@ import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 public class ChunkSectionV1_8 implements NMSChunkSection {
     private final ChunkSection section;
 
-    public ChunkSectionV1_8(ChunkSection section){
+    public ChunkSectionV1_8(ChunkSection section) {
         this.section = section;
     }
 
@@ -19,7 +19,7 @@ public class ChunkSectionV1_8 implements NMSChunkSection {
 
     @Override
     public void setType(int x, int y, int z, Material material) {
-        if(section == null)
+        if (section == null)
             return;
 
         section.setType(x, y, z, CraftMagicNumbers.getBlock(material).getBlockData());

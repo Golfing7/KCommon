@@ -1,9 +1,9 @@
 package com.golfing8.kcommon.nms.v1_8.access;
 
 import com.golfing8.kcommon.nms.WineSpigot;
-import com.golfing8.kcommon.nms.struct.EntityData;
 import com.golfing8.kcommon.nms.access.NMSMagicEntities;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityData;
 import com.mojang.authlib.GameProfile;
 import de.tr7zw.changeme.nbtapi.NBTCompoundList;
 import de.tr7zw.changeme.nbtapi.NBTEntity;
@@ -16,8 +16,8 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,7 +38,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         WorldServer ws = ((CraftWorld) location.getWorld()).getHandle();
 
         //Nothing we can do here.
-        if(!WineSpigot.isWineSpigot()){
+        if (!WineSpigot.isWineSpigot()) {
             ws.addEntity(giantZombie);
 
             return (Giant) giantZombie.getBukkitEntity();
@@ -61,7 +61,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         return (Giant) giantZombie.getBukkitEntity();
     }
 
-    public Slime spawnSlimeWithSize(Location location, int size, double health){
+    public Slime spawnSlimeWithSize(Location location, int size, double health) {
         EntitySlime entitySlime = new EntitySlime(((CraftWorld) location.getWorld()).getHandle());
 
         entitySlime.loadChunks = true;
@@ -75,7 +75,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         return (Slime) entitySlime.getBukkitEntity();
     }
 
-    public Monster spawnWitherSkeleton(Location location){
+    public Monster spawnWitherSkeleton(Location location) {
         EntitySkeleton entitySkeleton = new EntitySkeleton(((CraftWorld) location.getWorld()).getHandle());
 
         entitySkeleton.loadChunks = true;
@@ -89,7 +89,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         return (Skeleton) entitySkeleton.getBukkitEntity();
     }
 
-    public Guardian spawnElderGuardian(Location location){
+    public Guardian spawnElderGuardian(Location location) {
         EntityGuardian entityGuardian = new EntityGuardian(((CraftWorld) location.getWorld()).getHandle());
 
         entityGuardian.loadChunks = true;
@@ -107,7 +107,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
     public <T extends Entity> T spawnEntity(World world, Location loc, EntityData entityData, boolean randomizeData) {
         net.minecraft.server.v1_8_R3.Entity entity = ((CraftWorld) world).createEntity(loc, entityData.getEntityType().getEntityClass());
         if (randomizeData && entity instanceof EntityInsentient) {
-            ((EntityInsentient)entity).prepare(((CraftWorld) world).getHandle().E(new BlockPosition(entity)), null);
+            ((EntityInsentient) entity).prepare(((CraftWorld) world).getHandle().E(new BlockPosition(entity)), null);
         }
 
         if (entityData.isCreeperCharged()) {
@@ -166,7 +166,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
     public boolean canEntitySpawn(LivingEntity entity) {
         EntityLiving living = ((CraftLivingEntity) entity).getHandle();
 
-        if(!(living instanceof EntityInsentient))
+        if (!(living instanceof EntityInsentient))
             return true;
 
         return ((EntityInsentient) living).canSpawn();
@@ -213,21 +213,21 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
 
         //Not the best way, but I don't want to extract it out of the switch.
         for (ReadWriteNBT nbtListCompound : nbtCompoundList) {
-            switch(nbtListCompound.getString("Name")){
+            switch (nbtListCompound.getString("Name")) {
                 case "generic.attackDamage":
-                    if(attribute == EntityAttribute.GENERIC_ATTACK_DAMAGE){
+                    if (attribute == EntityAttribute.GENERIC_ATTACK_DAMAGE) {
                         nbtListCompound.setDouble("Base", value);
                         return;
                     }
                     break;
                 case "generic.knockbackResistance":
-                    if(attribute == EntityAttribute.GENERIC_KNOCKBACK_RESISTANCE){
+                    if (attribute == EntityAttribute.GENERIC_KNOCKBACK_RESISTANCE) {
                         nbtListCompound.setDouble("Base", value);
                         return;
                     }
                     break;
                 case "generic.movementSpeed":
-                    if(attribute == EntityAttribute.GENERIC_MOVEMENT_SPEED){
+                    if (attribute == EntityAttribute.GENERIC_MOVEMENT_SPEED) {
                         nbtListCompound.setDouble("Base", value);
                         return;
                     }

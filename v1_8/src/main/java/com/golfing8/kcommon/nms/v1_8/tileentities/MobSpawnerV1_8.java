@@ -1,16 +1,16 @@
 package com.golfing8.kcommon.nms.v1_8.tileentities;
 
-import com.golfing8.kcommon.nms.tileentities.NMSMobSpawner;
-import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.struct.Position;
+import com.golfing8.kcommon.nms.tileentities.NMSMobSpawner;
+import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import net.minecraft.server.v1_8_R3.TileEntityMobSpawner;
 import org.bukkit.entity.EntityType;
 
 public class MobSpawnerV1_8 implements NMSMobSpawner {
     private final TileEntityMobSpawner handle;
 
-    public MobSpawnerV1_8(TileEntityMobSpawner handle){
+    public MobSpawnerV1_8(TileEntityMobSpawner handle) {
         this.handle = handle;
     }
 

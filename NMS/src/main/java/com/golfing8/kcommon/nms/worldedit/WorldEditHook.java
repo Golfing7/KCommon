@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.nio.file.Path;
 
 /**
@@ -18,7 +17,7 @@ public interface WorldEditHook {
      * Paste the schematic at the given position.
      *
      * @param location the location to paste at.
-     * @param path the path.
+     * @param path     the path.
      */
     void pasteSchematic(Location location, Path path);
 

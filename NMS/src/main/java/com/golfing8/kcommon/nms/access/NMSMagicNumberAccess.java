@@ -1,8 +1,8 @@
 package com.golfing8.kcommon.nms.access;
 
-import com.golfing8.kcommon.nms.item.NMSItem;
 import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.enchant.NMSEnchant;
+import com.golfing8.kcommon.nms.item.NMSItem;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 

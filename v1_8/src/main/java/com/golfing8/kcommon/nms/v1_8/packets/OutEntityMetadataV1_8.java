@@ -7,6 +7,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutEntityMetadata;
 @AllArgsConstructor
 public class OutEntityMetadataV1_8 implements NMSOutEntityMetadata {
     private final PacketPlayOutEntityMetadata packet;
+
     @Override
     public Object getHandle() {
         return packet;

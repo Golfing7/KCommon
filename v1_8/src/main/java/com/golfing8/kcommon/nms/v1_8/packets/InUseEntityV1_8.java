@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity;
 public class InUseEntityV1_8 implements NMSInUseEntity {
     private final PacketPlayInUseEntity packet;
 
-    public InUseEntityV1_8(PacketPlayInUseEntity packet){
+    public InUseEntityV1_8(PacketPlayInUseEntity packet) {
         this.packet = packet;
     }
 

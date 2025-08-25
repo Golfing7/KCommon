@@ -7,6 +7,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEffect;
 @AllArgsConstructor
 public class OutEntityEffectV1_8 implements NMSOutEntityEffect {
     private final PacketPlayOutEntityEffect packet;
+
     @Override
     public Object getHandle() {
         return packet;

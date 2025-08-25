@@ -9,7 +9,6 @@ import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.nms.server.NMSServer;
 import com.golfing8.kcommon.nms.unknown.access.*;
-import com.golfing8.kcommon.nms.unknown.block.Block;
 import com.golfing8.kcommon.nms.unknown.event.NewArmorEquipListener;
 import com.golfing8.kcommon.nms.unknown.event.PreSpawnSpawnerAdapter;
 import com.golfing8.kcommon.nms.unknown.inventory.ItemCaptureInventory;
@@ -22,7 +21,6 @@ import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.mojang.authlib.GameProfile;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ParticleStatus;
@@ -65,7 +63,7 @@ public class NMS implements NMSAccess {
     private FieldHandle<CraftInventoryPlayer> inventoryHandle;
 
     @SuppressWarnings("unchecked")
-    public NMS(Plugin plugin){
+    public NMS(Plugin plugin) {
         this.server = new Server();
 
         this.magicBlocks = new MagicBlocks();
@@ -86,7 +84,8 @@ public class NMS implements NMSAccess {
             byUUIDHandle = (FieldHandle<Map<UUID, ServerPlayer>>) FieldHandles.getHandle("playersByUUID", PlayerList.class);
             byNameHandle = (FieldHandle<Map<String, ServerPlayer>>) FieldHandles.getHandle("playersByName", PlayerList.class);
             inventoryHandle = (FieldHandle<CraftInventoryPlayer>) FieldHandles.getHandle("inventory", CraftHumanEntity.class);
-        } catch (RuntimeException ignored) {}
+        } catch (RuntimeException ignored) {
+        }
     }
 
     @Override

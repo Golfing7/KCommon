@@ -17,7 +17,7 @@ public class OutEntityStatusV1_8 implements NMSOutEntityStatus {
 
     private final PacketPlayOutEntityStatus packet;
 
-    public OutEntityStatusV1_8(PacketPlayOutEntityStatus packet){
+    public OutEntityStatusV1_8(PacketPlayOutEntityStatus packet) {
         this.packet = packet;
     }
 

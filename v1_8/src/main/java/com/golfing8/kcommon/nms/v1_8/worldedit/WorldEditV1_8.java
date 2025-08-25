@@ -2,19 +2,17 @@ package com.golfing8.kcommon.nms.v1_8.worldedit;
 
 import com.boydti.fawe.object.schematic.Schematic;
 import com.golfing8.kcommon.nms.chunks.NMSChunkProvider;
-import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.v1_8.NMS;
+import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.extent.clipboard.ClipboardFormats;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
-import com.sk89q.worldguard.session.Session;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,6 +28,7 @@ import java.nio.file.Path;
 public class WorldEditV1_8 implements WorldEditHook {
     private final WorldEdit worldEdit;
     private final NMS nms;
+
     public WorldEditV1_8(NMS nms) {
         this.worldEdit = WorldEdit.getInstance();
         this.nms = nms;
@@ -54,15 +53,15 @@ public class WorldEditV1_8 implements WorldEditHook {
 
             schematic.paste((com.sk89q.worldedit.world.World) world, Vector.toBlockPoint(location.getX(), location.getY(), location.getZ()));
 
-            new BukkitRunnable(){
+            new BukkitRunnable() {
                 @Override
-                public void run(){
+                public void run() {
                     NMSChunkProvider provider = nms.getWorld(location.getWorld()).getChunkProvider();
 
                     provider.setForceChunkLoad(true);
 
-                    for(int x = schematic.getClipboard().getMinimumPoint().getBlockX() >> 4; x <= schematic.getClipboard().getMaximumPoint().getBlockX() >> 4; x++){
-                        for(int z = schematic.getClipboard().getMinimumPoint().getBlockZ() >> 4; z <= schematic.getClipboard().getMaximumPoint().getBlockZ() >> 4; z++){
+                    for (int x = schematic.getClipboard().getMinimumPoint().getBlockX() >> 4; x <= schematic.getClipboard().getMaximumPoint().getBlockX() >> 4; x++) {
+                        for (int z = schematic.getClipboard().getMinimumPoint().getBlockZ() >> 4; z <= schematic.getClipboard().getMaximumPoint().getBlockZ() >> 4; z++) {
                             location.getWorld().refreshChunk(x, z);
                         }
                     }
@@ -75,7 +74,8 @@ public class WorldEditV1_8 implements WorldEditHook {
         }
     }
 
-    @Override @SuppressWarnings("deprecation")
+    @Override
+    @SuppressWarnings("deprecation")
     public @NotNull Selection getSelection(Player player) {
         WorldEditPlugin worldEditPlugin = WorldEditPlugin.getPlugin(WorldEditPlugin.class);
         BukkitPlayer bukkitPlayer = worldEditPlugin.wrapPlayer(player);

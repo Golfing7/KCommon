@@ -11,11 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.map.MinecraftFont;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,7 +58,7 @@ public class ComponentUtils {
     /**
      * Converts a {@link String} into a {@link Component}
      *
-     * @param message      the string to convert
+     * @param message the string to convert
      * @return the component
      */
     public static Component toComponent(String message) {
@@ -85,7 +81,7 @@ public class ComponentUtils {
     /**
      * Converts a {@link List} into a single {@link Component}
      *
-     * @param lines        the list with strings to convert
+     * @param lines the list with strings to convert
      * @return the component
      */
     public static Component toFlatComponent(List<@NotNull String> lines) {
@@ -102,7 +98,7 @@ public class ComponentUtils {
     /**
      * Converts a {@link List} into a {@link Component}
      *
-     * @param lines        the list with strings to convert
+     * @param lines the list with strings to convert
      * @return the component
      */
     public static List<Component> toComponent(List<@NotNull String> lines) {
@@ -165,7 +161,7 @@ public class ComponentUtils {
      * @return the string with the replaced colors
      */
     private static String replaceColors(String message, char character) {
-        for(Map.Entry<String, String> entry : legacyColorMap.entrySet()) {
+        for (Map.Entry<String, String> entry : legacyColorMap.entrySet()) {
             message = message.replace(character + entry.getKey(), entry.getValue());
         }
 
@@ -175,7 +171,7 @@ public class ComponentUtils {
     /**
      * Replaces all legacy hex / color codes with the ones we need to support in {@link MiniMessage}.
      *
-     * @param message the message to replace the hex codes / colors in
+     * @param message   the message to replace the hex codes / colors in
      * @param colorChar the color character to use
      * @return the string with the replaced colors
      */

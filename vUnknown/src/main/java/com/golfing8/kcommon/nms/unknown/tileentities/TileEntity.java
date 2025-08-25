@@ -9,7 +9,7 @@ import org.bukkit.block.TileState;
 public class TileEntity implements NMSTileEntity {
     private final TileState tileEntity;
 
-    public TileEntity(TileState tileEntity){
+    public TileEntity(TileState tileEntity) {
         this.tileEntity = tileEntity;
     }
 

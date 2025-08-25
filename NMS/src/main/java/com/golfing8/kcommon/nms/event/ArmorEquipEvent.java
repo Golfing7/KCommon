@@ -15,12 +15,12 @@ public class ArmorEquipEvent extends PlayerEvent {
     /**
      * Constructor for the ArmorEquipEvent.
      *
-     * @param player The player who put on / removed the armor.
-     * @param type The ArmorType of the armor added
+     * @param player        The player who put on / removed the armor.
+     * @param type          The ArmorType of the armor added
      * @param oldArmorPiece The ItemStack of the armor removed.
      * @param newArmorPiece The ItemStack of the armor added.
      */
-    public ArmorEquipEvent(final Player player, final EquipMethod equipType, final ArmorType type, final ItemStack oldArmorPiece, final ItemStack newArmorPiece){
+    public ArmorEquipEvent(final Player player, final EquipMethod equipType, final ArmorType type, final ItemStack oldArmorPiece, final ItemStack newArmorPiece) {
         super(player);
         this.equipType = equipType;
         this.type = type;
@@ -33,7 +33,7 @@ public class ArmorEquipEvent extends PlayerEvent {
      *
      * @return A list of handlers handling this com.golfing8.v1_19.event.
      */
-    public final static HandlerList getHandlerList(){
+    public final static HandlerList getHandlerList() {
         return handlers;
     }
 
@@ -43,44 +43,44 @@ public class ArmorEquipEvent extends PlayerEvent {
      * @return A list of handlers handling this com.golfing8.v1_19.event.
      */
     @Override
-    public final HandlerList getHandlers(){
+    public final HandlerList getHandlers() {
         return handlers;
     }
 
-    public final ArmorType getType(){
+    public final ArmorType getType() {
         return type;
     }
 
     /**
      * Returns the last equipped armor piece, could be a piece of armor, { Material#Air}, or null.
      */
-    public final ItemStack getOldArmorPiece(){
+    public final ItemStack getOldArmorPiece() {
         return oldArmorPiece;
     }
 
-    public final void setOldArmorPiece(final ItemStack oldArmorPiece){
+    public final void setOldArmorPiece(final ItemStack oldArmorPiece) {
         this.oldArmorPiece = oldArmorPiece;
     }
 
     /**
      * Returns the newly equipped armor, could be a piece of armor, { Material#Air}, or null.
      */
-    public final ItemStack getNewArmorPiece(){
+    public final ItemStack getNewArmorPiece() {
         return newArmorPiece;
     }
 
-    public final void setNewArmorPiece(final ItemStack newArmorPiece){
+    public final void setNewArmorPiece(final ItemStack newArmorPiece) {
         this.newArmorPiece = newArmorPiece;
     }
 
     /**
      * Gets the method used to either equip or unequip an armor piece.
      */
-    public EquipMethod getMethod(){
+    public EquipMethod getMethod() {
         return equipType;
     }
 
-    public enum EquipMethod{// These have got to be the worst documentations ever.
+    public enum EquipMethod {// These have got to be the worst documentations ever.
         /**
          * When you shift click an armor piece to equip or unequip
          */

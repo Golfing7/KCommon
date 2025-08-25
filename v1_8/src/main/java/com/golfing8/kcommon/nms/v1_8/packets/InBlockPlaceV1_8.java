@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 public class InBlockPlaceV1_8 implements NMSInBlockPlace {
     private final PacketPlayInBlockPlace packet;
 
-    public InBlockPlaceV1_8(PacketPlayInBlockPlace packet){
+    public InBlockPlaceV1_8(PacketPlayInBlockPlace packet) {
         this.packet = packet;
     }
 

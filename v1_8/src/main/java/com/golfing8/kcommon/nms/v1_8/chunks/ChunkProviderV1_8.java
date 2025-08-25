@@ -8,7 +8,7 @@ import net.minecraft.server.v1_8_R3.ChunkProviderServer;
 public class ChunkProviderV1_8 implements NMSChunkProvider {
     private final ChunkProviderServer handle;
 
-    public ChunkProviderV1_8(ChunkProviderServer server){
+    public ChunkProviderV1_8(ChunkProviderServer server) {
         this.handle = server;
     }
 

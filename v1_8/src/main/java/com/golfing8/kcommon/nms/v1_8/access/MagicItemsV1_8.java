@@ -47,14 +47,14 @@ public class MagicItemsV1_8 implements NMSMagicItems {
 
         NBTCompound nbtCompound = nbtItem.getCompound("BlockEntityTag");
 
-        if(nbtCompound == null){
-            if(nbtItem.hasKey("type")){
+        if (nbtCompound == null) {
+            if (nbtItem.hasKey("type")) {
                 return translateNMSTypes(nbtItem.getString("type").toUpperCase());
             }
             return EntityType.PIG;
         }
 
-        if(nbtCompound.getString("EntityId") == null)return EntityType.PIG;
+        if (nbtCompound.getString("EntityId") == null) return EntityType.PIG;
 
         return translateNMSTypes(nbtCompound.getString("EntityId").toUpperCase());
     }
@@ -105,7 +105,7 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     public boolean setRemainingItemDurability(ItemStack stack, int amount) {
         int remaining = getRemainingItemDurability(stack);
 
-        if(remaining == -1)
+        if (remaining == -1)
             return false;
 
         stack.setDurability((short) (stack.getType().getMaxDurability() - amount));
@@ -188,6 +188,7 @@ public class MagicItemsV1_8 implements NMSMagicItems {
 
     private Class<?> craftMetaSkullClass;
     private FieldHandle<GameProfile> gameProfileFieldHandle;
+
     @SuppressWarnings("unchecked")
     private void setupMetaSkullAccess() {
         if (craftMetaSkullClass != null)
@@ -267,8 +268,8 @@ public class MagicItemsV1_8 implements NMSMagicItems {
         });
     }
 
-    public static EntityType translateNMSTypes(String nmsType){
-        switch(nmsType.toLowerCase()){
+    public static EntityType translateNMSTypes(String nmsType) {
+        switch (nmsType.toLowerCase()) {
             case "pigzombie":
                 return EntityType.PIG_ZOMBIE;
             case "complexpart":

@@ -1,12 +1,12 @@
 package com.golfing8.kcommon.nms.access;
 
 import com.golfing8.kcommon.nms.ItemCapturePlayer;
-import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
-import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.packets.NMSPacket;
 import com.golfing8.kcommon.nms.server.NMSServer;
 import com.golfing8.kcommon.nms.world.NMSWorld;
+import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
+import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -74,8 +74,8 @@ public interface NMSAccess {
      * Creates an inventory and attempts to use mini message for the title.
      *
      * @param holder the holder of the inventory.
-     * @param size the size of the inventory.
-     * @param title the title of the inventory.
+     * @param size   the size of the inventory.
+     * @param title  the title of the inventory.
      * @return the inventory.
      */
     Inventory createInventory(InventoryHolder holder, int size, String title);
@@ -84,8 +84,8 @@ public interface NMSAccess {
      * Creates an inventory and attempts to use mini message for the title.
      *
      * @param holder the holder of the inventory.
-     * @param type the type of the inventory.
-     * @param title the title of the inventory.
+     * @param type   the type of the inventory.
+     * @param title  the title of the inventory.
      * @return the inventory.
      */
     Inventory createInventory(InventoryHolder holder, InventoryType type, String title);

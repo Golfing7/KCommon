@@ -4,6 +4,6 @@ import com.golfing8.kcommon.nms.struct.Position;
 
 import java.util.List;
 
-public interface NMSOutMultiBlockChange extends NMSPacket{
+public interface NMSOutMultiBlockChange extends NMSPacket {
     List<Position> getPositions();
 }

@@ -2,7 +2,7 @@ package com.golfing8.kcommon.nms.packets;
 
 import com.golfing8.kcommon.nms.struct.Position;
 
-public interface NMSInBlockDig extends NMSPacket{
+public interface NMSInBlockDig extends NMSPacket {
     Position getPosition();
 
     DigType getDigType();

@@ -7,7 +7,7 @@ import org.bukkit.inventory.Inventory;
 public class TileEntityContainerV1_8 extends TileEntityV1_8 implements NMSTileEntityContainer {
     private final TileEntityContainer tileEntity;
 
-    public TileEntityContainerV1_8(TileEntityContainer tileEntity){
+    public TileEntityContainerV1_8(TileEntityContainer tileEntity) {
         super(tileEntity);
         this.tileEntity = tileEntity;
     }

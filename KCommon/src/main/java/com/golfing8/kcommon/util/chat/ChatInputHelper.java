@@ -29,6 +29,7 @@ public class ChatInputHelper implements Listener {
      * The future of input. Completed with null if the player times out or disconnects
      */
     private final CompletableFuture<@Nullable String> result;
+
     @Deprecated
     public CompletableFuture<@Nullable String> getResult() {
         return result;

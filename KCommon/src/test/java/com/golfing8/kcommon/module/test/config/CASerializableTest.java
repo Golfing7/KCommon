@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CASerializableTest {
 
@@ -34,7 +34,8 @@ public class CASerializableTest {
     @CASerializable.Options(
             typeResolverEnum = PolymorphicEnum.class
     )
-    public interface PolymorphicSerializable extends CASerializable {}
+    public interface PolymorphicSerializable extends CASerializable {
+    }
 
     public enum PolymorphicEnum implements CASerializable.TypeResolver {
         TYPE_1(Type1Serializable.class),
@@ -42,6 +43,7 @@ public class CASerializableTest {
         ;
 
         Class<? extends CASerializable> type;
+
         PolymorphicEnum(Class<? extends CASerializable> type) {
             this.type = type;
         }

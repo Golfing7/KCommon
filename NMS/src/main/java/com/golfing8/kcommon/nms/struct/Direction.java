@@ -16,7 +16,7 @@ public enum Direction {
     @Getter
     private int xShift, yShift, zShift;
 
-    public static Direction fromOrdinal(int ordinal){
+    public static Direction fromOrdinal(int ordinal) {
         return values()[Math.abs(ordinal % values().length)];
     }
 }

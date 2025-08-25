@@ -7,14 +7,14 @@ import org.bukkit.event.Listener;
 
 /**
  * An extension event listener that uses WineSpigot for enchanced armor events.
- *
+ * <p>
  * This will recognize ANY changes to player equipment, even plugin manipulation!
  */
 public class WineSpigotArmorEquipListener implements Listener {
 
 
     @EventHandler
-    public void onArmorEquip(com.golfing8.winespigot.armorequip.ArmorEquipEvent event){
+    public void onArmorEquip(com.golfing8.winespigot.armorequip.ArmorEquipEvent event) {
         //It's awfully convenient for me to do this as the event in wine is essentially a copy of the cookies listener.
         ArmorEquipEvent realEvent = new ArmorEquipEvent(event.getPlayer(),
                 ArmorEquipEvent.EquipMethod.DELEGATED,

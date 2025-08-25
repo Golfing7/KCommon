@@ -2,6 +2,7 @@ package com.golfing8.kcommon.nms.v1_8.world;
 
 import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.chunks.NMSChunkProvider;
+import com.golfing8.kcommon.nms.struct.Position;
 import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.v1_8.chunks.ChunkProviderV1_8;
 import com.golfing8.kcommon.nms.v1_8.tileentities.MobSpawnerV1_8;
@@ -9,7 +10,6 @@ import com.golfing8.kcommon.nms.v1_8.tileentities.TileEntityBeaconV1_8;
 import com.golfing8.kcommon.nms.v1_8.tileentities.TileEntityContainerV1_8;
 import com.golfing8.kcommon.nms.v1_8.tileentities.TileEntityV1_8;
 import com.golfing8.kcommon.nms.world.NMSWorld;
-import com.golfing8.kcommon.nms.struct.Position;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class WorldV1_8 implements NMSWorld {
     private final WorldServer worldServer;
 
-    public WorldV1_8(WorldServer worldServer){
+    public WorldV1_8(WorldServer worldServer) {
         this.worldServer = worldServer;
     }
 
@@ -45,19 +45,19 @@ public class WorldV1_8 implements NMSWorld {
         return 0;
     }
 
-    public NMSTileEntity getTileEntity(Position position){
+    public NMSTileEntity getTileEntity(Position position) {
         BlockPosition blockPosition = new BlockPosition(position.getX(), position.getY(), position.getZ());
 
         TileEntity atLocation = worldServer.getTileEntity(blockPosition);
 
-        if(atLocation == null)
+        if (atLocation == null)
             return null;
 
-        if(atLocation instanceof TileEntityMobSpawner)
+        if (atLocation instanceof TileEntityMobSpawner)
             return new MobSpawnerV1_8((TileEntityMobSpawner) atLocation);
-        else if(atLocation instanceof TileEntityBeacon)
+        else if (atLocation instanceof TileEntityBeacon)
             return new TileEntityBeaconV1_8((TileEntityBeacon) atLocation);
-        else if(atLocation instanceof TileEntityContainer)
+        else if (atLocation instanceof TileEntityContainer)
             return new TileEntityContainerV1_8((TileEntityContainer) atLocation);
         return new TileEntityV1_8(atLocation);
     }
@@ -145,7 +145,7 @@ public class WorldV1_8 implements NMSWorld {
 
         MovingObjectPosition position = worldServer.rayTrace(playerEyes, end, false, false, false);
 
-        if(position == null || position.type != MovingObjectPosition.EnumMovingObjectType.BLOCK)
+        if (position == null || position.type != MovingObjectPosition.EnumMovingObjectType.BLOCK)
             return null;
 
         return new Position(position.a().getX(), position.a().getY(), position.a().getZ());
@@ -170,9 +170,9 @@ public class WorldV1_8 implements NMSWorld {
 
         server.chunkProviderServer.originalGetChunkAt(location.getBlockX() >> 4, location.getBlockZ() >> 4);
 
-        if(WineSpigot.isWineSpigot()){
+        if (WineSpigot.isWineSpigot()) {
             this.worldServer.setTypeAndData(new BlockPosition(location.getX(), location.getY(), location.getZ()), CraftMagicNumbers.getBlock(material).fromLegacyData(b0), 2, false);
-        }else{
+        } else {
             this.worldServer.setTypeAndData(new BlockPosition(location.getX(), location.getY(), location.getZ()), CraftMagicNumbers.getBlock(material).fromLegacyData(b0), 2);
         }
 

@@ -7,7 +7,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayInBlockDig;
 public class InBlockDigV1_8 implements NMSInBlockDig {
     private final PacketPlayInBlockDig packet;
 
-    public InBlockDigV1_8(PacketPlayInBlockDig packet){
+    public InBlockDigV1_8(PacketPlayInBlockDig packet) {
         this.packet = packet;
     }
 
@@ -23,7 +23,7 @@ public class InBlockDigV1_8 implements NMSInBlockDig {
 
     @Override
     public DigType getDigType() {
-        switch (packet.c()){
+        switch (packet.c()) {
             case DROP_ITEM:
                 return DigType.DROP_ITEM;
             case DROP_ALL_ITEMS:

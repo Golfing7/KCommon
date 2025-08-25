@@ -27,9 +27,11 @@ class ChunkMapTest {
     fun `test unbounded chunk map dynamic`() {
         val values = mutableMapOf<Position, Int>()
         (0..15).forEach {
-            values += Position(ThreadLocalRandom.current().nextInt(-15000, 15000),
+            values += Position(
+                ThreadLocalRandom.current().nextInt(-15000, 15000),
                 ThreadLocalRandom.current().nextInt(-64, 320),
-                ThreadLocalRandom.current().nextInt(-15000, 15000)) to it
+                ThreadLocalRandom.current().nextInt(-15000, 15000)
+            ) to it
         }
         testValues(values, UnboundedCSPointMap())
     }

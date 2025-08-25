@@ -74,7 +74,8 @@ public final class NMS {
                 Constructor<?> cons = mainClass.getConstructor(Plugin.class);
 
                 theNMS = (NMSAccess) cons.newInstance(plugin);
-            } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |
+            } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException |
+                     IllegalAccessException |
                      InstantiationException e2) {
                 plugin.getLogger().log(Level.SEVERE, "Failed to initialize NMS!", e2);
                 Bukkit.getPluginManager().disablePlugin(plugin);

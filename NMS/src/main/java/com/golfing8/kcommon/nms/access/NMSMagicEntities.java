@@ -8,7 +8,6 @@ import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 public interface NMSMagicEntities {
 
@@ -34,6 +33,7 @@ public interface NMSMagicEntities {
     default void setItemInOffHand(LivingEntity entity, ItemStack stack) {
         entity.getEquipment().setItemInOffHand(stack);
     }
+
     default void setItemInOffHandDropChance(LivingEntity entity, float chance) {
         entity.getEquipment().setItemInOffHandDropChance(chance);
     }

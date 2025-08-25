@@ -39,7 +39,7 @@ public class OutMultiBlockChangeV1_8 implements NMSOutMultiBlockChange {
         int blockX = cc.x << 4;
         int blockZ = cc.z << 4;
 
-        for(PacketPlayOutMultiBlockChange.MultiBlockChangeInfo changeInfo : array){
+        for (PacketPlayOutMultiBlockChange.MultiBlockChangeInfo changeInfo : array) {
             int x = changeInfo.b() & X_BITS;
             int y = changeInfo.b() & Y_BITS;
             int z = changeInfo.b() & Z_BITS;

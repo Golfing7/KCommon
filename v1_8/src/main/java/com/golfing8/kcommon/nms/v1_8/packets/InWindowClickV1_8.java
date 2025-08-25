@@ -6,7 +6,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayInWindowClick;
 public class InWindowClickV1_8 implements NMSInWindowClick {
     private final PacketPlayInWindowClick packet;
 
-    public InWindowClickV1_8(PacketPlayInWindowClick packet){
+    public InWindowClickV1_8(PacketPlayInWindowClick packet) {
         this.packet = packet;
     }
 

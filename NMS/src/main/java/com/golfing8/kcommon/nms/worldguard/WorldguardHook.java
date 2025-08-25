@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.nms.worldguard;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;

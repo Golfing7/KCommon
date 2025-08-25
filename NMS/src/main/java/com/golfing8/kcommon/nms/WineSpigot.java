@@ -7,8 +7,8 @@ import org.bukkit.Bukkit;
 public class WineSpigot {
     private static Boolean isWineSpigot;
 
-    public static boolean isWineSpigot(){
-        if(isWineSpigot == null)
+    public static boolean isWineSpigot() {
+        if (isWineSpigot == null)
             return isWineSpigot = Bukkit.getServer().getName().equals("WineSpigot");
         return isWineSpigot;
     }

@@ -1,8 +1,8 @@
 package com.golfing8.kcommon.nms.v1_8.packets;
 
+import com.golfing8.kcommon.nms.packets.NMSOutBlockChange;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
-import com.golfing8.kcommon.nms.packets.NMSOutBlockChange;
 import com.golfing8.kcommon.nms.struct.Position;
 import lombok.AllArgsConstructor;
 import net.minecraft.server.v1_8_R3.BlockPosition;

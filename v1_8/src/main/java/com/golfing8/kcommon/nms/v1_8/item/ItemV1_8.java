@@ -1,8 +1,8 @@
 package com.golfing8.kcommon.nms.v1_8.item;
 
+import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.item.NMSItem;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
-import com.golfing8.kcommon.nms.block.NMSBlock;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.Item;
 import net.minecraft.server.v1_8_R3.ItemStack;

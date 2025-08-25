@@ -4,7 +4,6 @@ import com.destroystokyo.paper.event.inventory.PrepareResultEvent;
 import com.golfing8.kcommon.nms.access.NMSMagicInventories;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.InventoryView;
 
 public class MagicInventories implements NMSMagicInventories, Listener {
 

@@ -6,7 +6,7 @@ import com.golfing8.kcommon.nms.block.NMSBlockData;
 public class Block implements NMSBlock {
     protected final org.bukkit.block.data.BlockData block;
 
-    public Block(org.bukkit.block.data.BlockData block){
+    public Block(org.bukkit.block.data.BlockData block) {
         this.block = block;
     }
 

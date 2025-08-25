@@ -1,9 +1,8 @@
-import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    id("com.gradleup.shadow") version("8.3.6")
+    id("com.gradleup.shadow") version ("8.3.6")
     id("maven-publish")
     kotlin("jvm")
 }

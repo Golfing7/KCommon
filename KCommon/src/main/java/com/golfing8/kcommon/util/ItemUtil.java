@@ -4,7 +4,6 @@ import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
-import com.golfing8.kcommon.struct.helper.promise.Promise;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import de.tr7zw.changeme.nbtapi.NBTType;

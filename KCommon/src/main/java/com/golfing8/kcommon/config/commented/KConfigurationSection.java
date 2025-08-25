@@ -105,7 +105,7 @@ public interface KConfigurationSection extends ConfigurationSection {
      * Iterates through every key under the given path.
      * If the path does not exist or is not a configuration section, nothing will happen.
      *
-     * @param path the path
+     * @param path   the path
      * @param action the action applied to the path. The provided path is relative to THIS section.
      */
     default void forEachKey(String path, Consumer<? super String> action) {

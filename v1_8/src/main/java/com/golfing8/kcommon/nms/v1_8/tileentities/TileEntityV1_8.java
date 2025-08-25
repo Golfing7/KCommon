@@ -1,15 +1,15 @@
 package com.golfing8.kcommon.nms.v1_8.tileentities;
 
-import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.struct.Position;
+import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import net.minecraft.server.v1_8_R3.TileEntity;
 
 public class TileEntityV1_8 implements NMSTileEntity {
     private final TileEntity tileEntity;
 
-    public TileEntityV1_8(TileEntity tileEntity){
+    public TileEntityV1_8(TileEntity tileEntity) {
         this.tileEntity = tileEntity;
     }
 

@@ -7,7 +7,7 @@ import net.minecraft.server.v1_8_R3.Chunk;
 public class ChunkV1_8 implements NMSChunk {
     private final Chunk chunk;
 
-    public ChunkV1_8(Chunk chunk){
+    public ChunkV1_8(Chunk chunk) {
         this.chunk = chunk;
     }
 

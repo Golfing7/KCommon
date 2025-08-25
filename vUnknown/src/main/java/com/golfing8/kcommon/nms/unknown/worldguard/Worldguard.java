@@ -19,11 +19,11 @@ public class Worldguard implements WorldguardHook {
     public List<String> getRegions(Location location) {
         RegionManager regionManager =
                 WorldGuard.getInstance().getPlatform().getRegionContainer().get(WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(location.getWorld().getName()));
-        if(regionManager == null)return Lists.newArrayList();
+        if (regionManager == null) return Lists.newArrayList();
 
         List<String> toReturn = Lists.newArrayList();
 
-        for(ProtectedRegion region : regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()))){
+        for (ProtectedRegion region : regionManager.getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()))) {
             toReturn.add(region.getId());
         }
         return toReturn;
@@ -47,13 +47,13 @@ public class Worldguard implements WorldguardHook {
     public boolean canBeDamaged(Player player) {
         RegionManager regionManager =
                 WorldGuard.getInstance().getPlatform().getRegionContainer().get(WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(player.getWorld().getName()));
-        if(regionManager == null)return true;
+        if (regionManager == null) return true;
 
         StateFlag invincibleFlag = (StateFlag) WorldGuard.getInstance().getFlagRegistry().get("invincible");
         StateFlag pvpFlag = (StateFlag) WorldGuard.getInstance().getFlagRegistry().get("pvp");
 
-        for(ProtectedRegion region : regionManager.getApplicableRegions(BlockVector3.at(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))){
-            if(region.getFlag(invincibleFlag) == StateFlag.State.ALLOW || region.getFlag(pvpFlag) == StateFlag.State.DENY)
+        for (ProtectedRegion region : regionManager.getApplicableRegions(BlockVector3.at(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
+            if (region.getFlag(invincibleFlag) == StateFlag.State.ALLOW || region.getFlag(pvpFlag) == StateFlag.State.DENY)
                 return false;
         }
         return true;

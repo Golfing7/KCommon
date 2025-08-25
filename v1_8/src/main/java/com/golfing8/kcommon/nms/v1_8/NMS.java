@@ -4,38 +4,35 @@ import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.access.*;
+import com.golfing8.kcommon.nms.block.NMSBlock;
+import com.golfing8.kcommon.nms.packets.NMSPacket;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
+import com.golfing8.kcommon.nms.server.NMSServer;
 import com.golfing8.kcommon.nms.v1_8.access.*;
 import com.golfing8.kcommon.nms.v1_8.block.BlockDispenserV1_8;
+import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import com.golfing8.kcommon.nms.v1_8.event.ArmorEquipHandler;
+import com.golfing8.kcommon.nms.v1_8.event.PreSpawnSpawnerAdapter;
 import com.golfing8.kcommon.nms.v1_8.event.WineSpigotArmorEquipListener;
 import com.golfing8.kcommon.nms.v1_8.inventory.ItemCaptureInventory;
 import com.golfing8.kcommon.nms.v1_8.packets.*;
 import com.golfing8.kcommon.nms.v1_8.server.ServerV1_8;
+import com.golfing8.kcommon.nms.v1_8.world.WorldV1_8;
 import com.golfing8.kcommon.nms.v1_8.worldedit.WorldEditV1_8;
 import com.golfing8.kcommon.nms.v1_8.worldguard.WorldguardV1_8;
+import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
-import com.golfing8.kcommon.nms.block.NMSBlock;
-import com.golfing8.kcommon.nms.packets.NMSPacket;
-import com.golfing8.kcommon.nms.server.NMSServer;
-import com.golfing8.kcommon.nms.v1_8.world.WorldV1_8;
-import com.golfing8.kcommon.nms.world.NMSWorld;
-import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
-import com.golfing8.kcommon.nms.v1_8.event.PreSpawnSpawnerAdapter;
 import com.mojang.authlib.GameProfile;
 import lombok.Getter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.v1_8_R3.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -67,7 +64,7 @@ public class NMS implements NMSAccess {
     @Getter
     private final Plugin plugin;
 
-    public NMS(Plugin plugin){
+    public NMS(Plugin plugin) {
         this.plugin = plugin;
         this.audiences = BukkitAudiences.create(plugin);
 
@@ -117,6 +114,7 @@ public class NMS implements NMSAccess {
     }
 
     private Boolean supportsPersistentDataContainers;
+
     @Override
     public boolean supportsPersistentDataContainers() {
         if (supportsPersistentDataContainers == null) {
@@ -180,42 +178,42 @@ public class NMS implements NMSAccess {
 
     @Override
     public NMSPacket wrapPacket(Object packet) {
-        if(packet instanceof PacketPlayInUseEntity)
+        if (packet instanceof PacketPlayInUseEntity)
             return new InUseEntityV1_8((PacketPlayInUseEntity) packet);
-        else if(packet instanceof PacketPlayInBlockPlace)
+        else if (packet instanceof PacketPlayInBlockPlace)
             return new InBlockPlaceV1_8((PacketPlayInBlockPlace) packet);
-        else if(packet instanceof PacketPlayInBlockDig)
+        else if (packet instanceof PacketPlayInBlockDig)
             return new InBlockDigV1_8((PacketPlayInBlockDig) packet);
-        else if(packet instanceof PacketPlayInWindowClick)
+        else if (packet instanceof PacketPlayInWindowClick)
             return new InWindowClickV1_8((PacketPlayInWindowClick) packet);
-        else if(packet instanceof PacketPlayInSetCreativeSlot)
+        else if (packet instanceof PacketPlayInSetCreativeSlot)
             return new InSetCreativeSlotV1_8((PacketPlayInSetCreativeSlot) packet);
-        else if(packet instanceof PacketPlayOutEntityDestroy)
+        else if (packet instanceof PacketPlayOutEntityDestroy)
             return new OutEntityDestroyV1_8((PacketPlayOutEntityDestroy) packet);
-        else if(packet instanceof PacketPlayOutEntityStatus)
+        else if (packet instanceof PacketPlayOutEntityStatus)
             return new OutEntityStatusV1_8((PacketPlayOutEntityStatus) packet);
-        else if(packet instanceof PacketPlayOutBlockBreakAnimation)
+        else if (packet instanceof PacketPlayOutBlockBreakAnimation)
             return new OutBreakAnimationV1_8((PacketPlayOutBlockBreakAnimation) packet);
-        else if(packet instanceof PacketPlayOutSpawnEntity)
+        else if (packet instanceof PacketPlayOutSpawnEntity)
             return new OutSpawnEntityV1_8((PacketPlayOutSpawnEntity) packet);
-        else if(packet instanceof PacketPlayOutEntityMetadata)
+        else if (packet instanceof PacketPlayOutEntityMetadata)
             return new OutEntityMetadataV1_8((PacketPlayOutEntityMetadata) packet);
-        else if(packet instanceof PacketPlayOutSpawnEntityLiving)
+        else if (packet instanceof PacketPlayOutSpawnEntityLiving)
             return new OutSpawnEntityLivingV1_8((PacketPlayOutSpawnEntityLiving) packet);
-        else if(packet instanceof PacketPlayOutMultiBlockChange)
+        else if (packet instanceof PacketPlayOutMultiBlockChange)
             return new OutMultiBlockChangeV1_8((PacketPlayOutMultiBlockChange) packet);
-        else if(packet instanceof PacketPlayOutBlockChange)
+        else if (packet instanceof PacketPlayOutBlockChange)
             return new OutBlockChangeV1_8((PacketPlayOutBlockChange) packet);
-        else if(packet instanceof PacketPlayOutEntityEffect)
+        else if (packet instanceof PacketPlayOutEntityEffect)
             return new OutEntityEffectV1_8((PacketPlayOutEntityEffect) packet);
-        else if(packet instanceof PacketPlayOutRemoveEntityEffect)
+        else if (packet instanceof PacketPlayOutRemoveEntityEffect)
             return new OutRemoveEntityEffectV1_8((PacketPlayOutRemoveEntityEffect) packet);
         return null;
     }
 
     @Override
     public NMSBlock getBlock(Material material) {
-        switch (material){
+        switch (material) {
             case DISPENSER:
                 return new BlockDispenserV1_8((BlockDispenser) Blocks.DISPENSER);
         }
@@ -259,7 +257,7 @@ public class NMS implements NMSAccess {
 
     @Override
     public void teleportPlayerNoEvent(Player player, Location location) {
-        if(player.getVehicle() != null)
+        if (player.getVehicle() != null)
             player.getVehicle().eject();
 
         WorldServer toWorld = ((CraftWorld) location.getWorld()).getHandle();
@@ -268,7 +266,7 @@ public class NMS implements NMSAccess {
 
         EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
-        if(toWorld == fromWorld)
+        if (toWorld == fromWorld)
             entityPlayer.playerConnection.teleport(location);
         else
             MinecraftServer.getServer().getPlayerList().moveToWorld(entityPlayer, toWorld.dimension, true, location, true);

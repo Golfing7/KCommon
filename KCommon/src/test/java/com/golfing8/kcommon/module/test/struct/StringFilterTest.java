@@ -1,10 +1,12 @@
 package com.golfing8.kcommon.module.test.struct;
 
 import com.golfing8.kcommon.struct.filter.StringFilter;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ThreadLocalRandom;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StringFilterTest {
     private static String randomString(int min, int max) {

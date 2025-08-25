@@ -14,8 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.potion.PotionType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -46,7 +44,7 @@ public interface NMSMagicItems {
      * Sets the item model for the given item meta.
      *
      * @param meta the meta
-     * @param key the key
+     * @param key  the key
      */
     void setItemModel(ItemMeta meta, @Nullable String key);
 
@@ -112,7 +110,7 @@ public interface NMSMagicItems {
     /**
      * Sets the custom model data for the given item meta.
      *
-     * @param meta the item meta.
+     * @param meta      the item meta.
      * @param modelData the custom model data.
      */
     void setCustomModelData(ItemMeta meta, int modelData);
@@ -145,8 +143,8 @@ public interface NMSMagicItems {
      */
     NMSItemStack wrapItemStack(ItemStack itemStack);
 
-    default void setUnbreakable(ItemStack itemStack, boolean value){
-        if(itemStack == null || !itemStack.hasItemMeta())
+    default void setUnbreakable(ItemStack itemStack, boolean value) {
+        if (itemStack == null || !itemStack.hasItemMeta())
             return;
 
         setUnbreakable(itemStack.getItemMeta(), value);

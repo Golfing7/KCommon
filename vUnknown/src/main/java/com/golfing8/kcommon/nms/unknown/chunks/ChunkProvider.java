@@ -7,7 +7,7 @@ import org.bukkit.World;
 public class ChunkProvider implements NMSChunkProvider {
     private final World handle;
 
-    public ChunkProvider(World server){
+    public ChunkProvider(World server) {
         this.handle = server;
     }
 

@@ -5,7 +5,7 @@ import com.golfing8.kcommon.nms.item.NMSItemStack;
 public class ItemStack implements NMSItemStack {
     private final org.bukkit.inventory.ItemStack stack;
 
-    public ItemStack(org.bukkit.inventory.ItemStack itemStack){
+    public ItemStack(org.bukkit.inventory.ItemStack itemStack) {
         this.stack = itemStack;
     }
 

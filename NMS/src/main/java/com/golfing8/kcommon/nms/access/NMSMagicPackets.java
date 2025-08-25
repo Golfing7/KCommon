@@ -14,10 +14,13 @@ public interface NMSMagicPackets {
     NMSPacket createBreakAnimationPacket(int entityID, Position position, int breakStage);
 
     NMSPacket createSpawnEntityPacket(Entity entity);
+
     NMSPacket createSpawnEntityLivingPacket(Entity entity);
+
     NMSPacket createUpdateEntityMetadataPacket(Entity entity);
 
     NMSPacket createEntityEffectPacket(LivingEntity entity, PotionEffect effect);
+
     NMSPacket createRemoveEntityEffectPacket(LivingEntity entity, PotionEffectType type);
 
     void sendPacket(Player player, NMSPacket packet);

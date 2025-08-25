@@ -182,7 +182,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     @Setter
     private boolean acceptExtraArguments = false;
 
-    /** A cached version of {@link #isExecutionImplemented()} */
+    /**
+     * A cached version of {@link #isExecutionImplemented()}
+     */
     private Boolean executionImplemented;
 
     /**

@@ -6,7 +6,7 @@ import org.bukkit.block.Beacon;
 public class TileEntityBeacon extends TileEntity implements NMSTileEntityBeacon {
     private final Beacon tileEntity;
 
-    public TileEntityBeacon(Beacon tileEntity){
+    public TileEntityBeacon(Beacon tileEntity) {
         super(tileEntity);
         this.tileEntity = tileEntity;
     }

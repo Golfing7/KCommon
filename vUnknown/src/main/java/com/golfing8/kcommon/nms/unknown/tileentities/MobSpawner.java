@@ -4,12 +4,10 @@ import com.golfing8.kcommon.nms.tileentities.NMSMobSpawner;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 
-import java.util.Optional;
-
 public class MobSpawner extends TileEntity implements NMSMobSpawner {
     private final CreatureSpawner handle;
 
-    public MobSpawner(CreatureSpawner handle){
+    public MobSpawner(CreatureSpawner handle) {
         super(handle);
         this.handle = handle;
     }

@@ -24,7 +24,7 @@ public class PreSpawnSpawnerEvent extends BlockEvent implements Cancellable {
         this.type = type;
     }
 
-    public static HandlerList getHandlerList(){
+    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 

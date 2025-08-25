@@ -13,7 +13,9 @@ import java.util.Map;
  * Adapts bukkit colors.
  */
 public class CAColorBukkit implements ConfigAdapter<Color> {
-    /** Caches colors */
+    /**
+     * Caches colors
+     */
     private static final Map<String, Color> colorCache = new HashMap<>();
 
     @Override

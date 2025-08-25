@@ -7,7 +7,7 @@ import net.minecraft.server.v1_8_R3.Block;
 public class BlockV1_8 implements NMSBlock {
     protected final Block block;
 
-    public BlockV1_8(Block block){
+    public BlockV1_8(Block block) {
         this.block = block;
     }
 

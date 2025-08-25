@@ -26,7 +26,9 @@ public class NMSVersion implements Comparable<NMSVersion> {
             v1_21 = new NMSVersion(21, -1);
 
     private final int major;
-    /** Negative values mean that the minor version is insignificant */
+    /**
+     * Negative values mean that the minor version is insignificant
+     */
     private final int minor;
 
     public NMSVersion(int value, int minor) {
@@ -95,10 +97,9 @@ public class NMSVersion implements Comparable<NMSVersion> {
         int major = Integer.parseInt(String.valueOf(split[1]));
         int minor = split.length > 2 ? Integer.parseInt(String.valueOf(split[2])) : 0;
 
-        try{
+        try {
             return new NMSVersion(major, minor);
-        }catch(IllegalArgumentException exc)
-        {
+        } catch (IllegalArgumentException exc) {
             return UNKNOWN;
         }
     }

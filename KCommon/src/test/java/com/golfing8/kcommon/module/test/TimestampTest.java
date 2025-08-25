@@ -1,16 +1,11 @@
 package com.golfing8.kcommon.module.test;
 
 import com.golfing8.kcommon.struct.time.Timestamp;
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 
-import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests some internals of timestamps

@@ -16,14 +16,14 @@ public class WorldguardV1_8 implements WorldguardHook {
 
     private final WorldGuardPlugin plugin;
 
-    public WorldguardV1_8(){
+    public WorldguardV1_8() {
         this.plugin = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
     }
 
     @Override
     public List<String> getRegions(Location location) {
         List<String> all = Lists.newArrayList();
-        for(ProtectedRegion region : plugin.getRegionManager(location.getWorld()).getApplicableRegions(location))
+        for (ProtectedRegion region : plugin.getRegionManager(location.getWorld()).getApplicableRegions(location))
             all.add(region.getId());
         return all;
     }
@@ -46,8 +46,8 @@ public class WorldguardV1_8 implements WorldguardHook {
     public boolean canBeDamaged(Player player) {
         StateFlag invincibleFlag = (StateFlag) plugin.getFlagRegistry().get("invincible");
         StateFlag pvpFlag = (StateFlag) plugin.getFlagRegistry().get("pvp");
-        for(ProtectedRegion region : plugin.getRegionManager(player.getWorld()).getApplicableRegions(player.getLocation()))
-            if(region.getFlag(invincibleFlag) == StateFlag.State.ALLOW || region.getFlag(pvpFlag) == StateFlag.State.DENY)
+        for (ProtectedRegion region : plugin.getRegionManager(player.getWorld()).getApplicableRegions(player.getLocation()))
+            if (region.getFlag(invincibleFlag) == StateFlag.State.ALLOW || region.getFlag(pvpFlag) == StateFlag.State.DENY)
                 return false;
 
         return true;
