@@ -6,10 +6,12 @@ import com.golfing8.kcommon.menu.Menu;
 import com.golfing8.kcommon.menu.MenuBuilder;
 import com.golfing8.kcommon.menu.MenuShapeType;
 import com.golfing8.kcommon.menu.PlayerMenuContainer;
+import com.golfing8.kcommon.struct.helper.promise.Promise;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -23,14 +25,21 @@ public class ConfirmMenu extends PlayerMenuContainer {
         DIDNT_ANSWER,
     }
 
-    @Getter
     private final CompletableFuture<ConfirmationType> result;
+    @Deprecated
+    public CompletableFuture<ConfirmationType> getResult() {
+        return result;
+    }
+    @Getter
+    private final Promise<ConfirmationType> resultPromise;
+
     private boolean answering = false;
 
     public ConfirmMenu(Player player) {
         super(player);
 
-        this.result = new CompletableFuture<>();
+        this.resultPromise = Promise.empty();
+        this.result = this.resultPromise.toCompletableFuture();
     }
 
     @Override
@@ -42,8 +51,8 @@ public class ConfirmMenu extends PlayerMenuContainer {
                     if (answering)
                         return;
 
-                    if (!result.isDone())
-                        result.complete(ConfirmationType.DIDNT_ANSWER);
+                    if (!resultPromise.isDone())
+                        resultPromise.supply(ConfirmationType.DIDNT_ANSWER);
                 });
 
         builder.setAt(0, new ItemStackBuilder().material(XMaterial.GREEN_STAINED_GLASS_PANE).name("&a✔").buildFromTemplate());
@@ -51,7 +60,7 @@ public class ConfirmMenu extends PlayerMenuContainer {
             answering = true;
             Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
                 getPlayer().closeInventory();
-                result.complete(ConfirmationType.YES);
+                resultPromise.supply(ConfirmationType.YES);
             });
         });
         builder.setAt(4, new ItemStackBuilder().material(XMaterial.RED_STAINED_GLASS_PANE).name("&c❌").buildFromTemplate());
@@ -59,7 +68,7 @@ public class ConfirmMenu extends PlayerMenuContainer {
             answering = true;
             Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
                 getPlayer().closeInventory();
-                result.complete(ConfirmationType.NO);
+                resultPromise.supply(ConfirmationType.NO);
             });
         });
         return builder.buildSimple();
