@@ -28,8 +28,12 @@ public class ChatInputHelper implements Listener {
     /**
      * The future of input. Completed with null if the player times out or disconnects
      */
-    @Getter(onMethod_ = @Deprecated)
     private final CompletableFuture<@Nullable String> result;
+    @Deprecated
+    public CompletableFuture<@Nullable String> getResult() {
+        return result;
+    }
+
     private final Promise<@Nullable String> resultPromise;
     private final Player player;
     private final @Nullable BukkitTask timeoutTask;
