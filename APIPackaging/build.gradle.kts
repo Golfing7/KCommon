@@ -133,6 +133,9 @@ gradle.projectsEvaluated {
                 // Add both documentation artifacts
                 artifact(tasks.named("aggregateJavadocJar")) // HTML documentation
                 artifact(tasks.named("aggregateSourcesJar")) // Java source files
+                artifact(tasks.named("shadowJar")) {
+                    classifier = null
+                }
             }
         }
     }
