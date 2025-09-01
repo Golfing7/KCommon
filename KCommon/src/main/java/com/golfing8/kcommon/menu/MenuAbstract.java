@@ -13,6 +13,7 @@ import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -67,10 +68,11 @@ public abstract class MenuAbstract implements Menu {
     public MenuAbstract(String title, MenuShape shape, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
                         List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders) {
         this.menuShape = shape;
+        String titleComponent = LegacyComponentSerializer.legacyAmpersand().serialize(MS.toComponent(title, placeholders));
         if (shape.getType().isSizeMutable()) {
-            this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getSize(), MS.parseSingle(title, placeholders));
+            this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getSize(), titleComponent);
         } else {
-            this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getType().getType(), MS.parseSingle(title, placeholders));
+            this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getType().getType(), titleComponent);
         }
         this.guiItems = new HashMap<>();
         this.canExpire = canExpire;
