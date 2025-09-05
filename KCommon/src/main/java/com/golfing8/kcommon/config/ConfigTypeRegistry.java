@@ -288,5 +288,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CAOptional());
         registerAdapter(new CATimeLength());
         registerAdapter(new CACraftingRecipe());
+        registerAdapter(new CADuration());
     }
 }
