@@ -57,12 +57,17 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
      */
     protected LibraryLoader libraryLoader;
 
+    @Override
+    public final void onLoad() {
+        this.libraryLoader = new LibraryLoader(this, getDataFolder().toPath().resolve("libraries"));
+        this.onLoadInner();
+    }
+
     public final void onEnable() {
         try {
             this.saveDefaultConfig();
         } catch (IllegalArgumentException ignored) {
         } // Config doesn't exist
-        this.libraryLoader = new LibraryLoader(this, getDataFolder().toPath().resolve("libraries"));
         this.menuManager = new MenuManager(this);
         //Setup PAPI.
         this.placeholderAPIHook = new KPAPIHook(this);
@@ -339,12 +344,11 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         }
     }
 
-    public void onPreEnableInner() {
-    }
+    public void onLoadInner() {}
 
-    public void onEnableInner() {
-    }
+    public void onPreEnableInner() {}
 
-    public void onDisableInner() {
-    }
+    public void onEnableInner() {}
+
+    public void onDisableInner() {}
 }

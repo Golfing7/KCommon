@@ -37,8 +37,8 @@ dependencies {
     implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
     implementation("net.jodah:expiringmap:0.5.11")
 
-    implementation("net.kyori:adventure-platform-bukkit:4.3.3")
-    implementation("net.kyori:adventure-text-minimessage:4.17.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.4.1")
+    implementation("net.kyori:adventure-text-minimessage:4.24.0")
     implementation("com.github.cryptomorin:XSeries:13.3.3") {
         isTransitive = false;
     } //For XSeries

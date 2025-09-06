@@ -3,8 +3,10 @@ package com.golfing8.kcommon;
 import com.golfing8.kcommon.nms.access.NMSAccess;
 import lombok.Getter;
 import lombok.var;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.PluginClassLoader;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -63,11 +65,10 @@ public final class NMS {
             Constructor<?> cons = mainClass.getConstructor(Plugin.class);
 
             theNMS = (NMSAccess) cons.newInstance(plugin);
-        } catch (RuntimeException exc) {
+        } catch (RuntimeException | InvocationTargetException exc) {
             plugin.getLogger().log(Level.SEVERE, "Failed to initialize NMS!", exc);
             Bukkit.getPluginManager().disablePlugin(plugin);
-        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException |
-                 InstantiationException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
             try {
                 Class<?> mainClass = Class.forName("com.golfing8.kcommon.nms.unknown.NMS");
 

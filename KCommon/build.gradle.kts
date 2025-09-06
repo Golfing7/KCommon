@@ -36,7 +36,7 @@ dependencies {
     testImplementation("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-    testRuntimeOnly("net.kyori:adventure-platform-bukkit:4.3.3")
+    testRuntimeOnly("net.kyori:adventure-platform-bukkit:4.4.1")
     testImplementation(kotlin("test"))
     testImplementation(project(":NMS"))
     testImplementation("org.mongodb:mongodb-driver-sync:5.0.1")

@@ -11,8 +11,10 @@ import com.golfing8.kcommon.listener.PlayerDataListener;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
 import lombok.Getter;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,10 +58,7 @@ public class KCommon extends KPlugin {
     private Thread mainThread;
 
     @Override
-    public void onPreEnableInner() {
-        this.serverVersion = NMSVersion.loadVersion();
-        this.mainThread = Thread.currentThread();
-
+    public void onLoadInner() {
         libraryLoader.addRelocation("de,tr7zw,changeme,nbtapi", "de,tr7zw,kcommon,nbtapi");
         libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
 
@@ -75,12 +74,22 @@ public class KCommon extends KPlugin {
                 new LibraryDefinition("org,jetbrains,kotlin", "kotlin-stdlib", "2.0.0")
         );
 
-        libraries.add(new LibraryDefinition("me,lucko", "adventure-api", "4.13.0"));
-        libraries.add(new LibraryDefinition("me,lucko", "adventure-platform-api", "4.13.3"));
-        libraries.add(new LibraryDefinition("me,lucko", "adventure-platform-bukkit", "4.13.3"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-minimessage", "4.17.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "examination-string", "1.3.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "examination-api", "1.3.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-key", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-api", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-api", "4.4.1"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-bukkit", "4.4.1"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-minimessage", "4.24.0"));
 
+        getLogger().info("Loading libraries...");
         libraryLoader.loadAllLibraries(libraries);
+    }
+
+    @Override
+    public void onPreEnableInner() {
+        this.serverVersion = NMSVersion.loadVersion();
+        this.mainThread = Thread.currentThread();
 
         NMS.initialize(this);
     }
