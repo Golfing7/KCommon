@@ -68,7 +68,7 @@ public abstract class MenuAbstract implements Menu {
     public MenuAbstract(String title, MenuShape shape, boolean clickable, boolean canExpire, Map<Integer, List<ClickAction>> actionMap,
                         List<Placeholder> placeholders, List<MultiLinePlaceholder> multiLinePlaceholders) {
         this.menuShape = shape;
-        String titleComponent = LegacyComponentSerializer.legacyAmpersand().serialize(MS.toComponent(title, placeholders));
+        String titleComponent = LegacyComponentSerializer.legacySection().serialize(MS.toComponent(title, placeholders));
         if (shape.getType().isSizeMutable()) {
             this.backingInventory = NMS.getTheNMS().createInventory(new MenuClickHolder(clickable, this), shape.getSize(), titleComponent);
         } else {
