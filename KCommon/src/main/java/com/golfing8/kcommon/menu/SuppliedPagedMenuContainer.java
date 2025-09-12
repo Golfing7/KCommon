@@ -97,6 +97,17 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
     }
 
     /**
+     * Sets the elements of the page.
+     * Effectively calls {@link #setElementCountSupplier(Supplier)} and {@link #setElementSource(Function)}
+     *
+     * @param elements the elements
+     */
+    public void setElements(@NotNull List<T> elements) {
+        this.setElementSource((range) -> elements.subList(range.getMinFloor(), range.getMaxFloor() + 1));
+        this.setElementCountSupplier(elements::size);
+    }
+
+    /**
      * Sets the element section for this menu.
      * Note that if the menu is currently open and the number of elements per page, that
      * change will NOT be reflected.
