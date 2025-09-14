@@ -74,11 +74,20 @@ public class KCommon extends KPlugin {
                 new LibraryDefinition("org,jetbrains,kotlin", "kotlin-stdlib", "2.0.0")
         );
 
+        libraries.add(new LibraryDefinition("net,kyori", "option", "1.1.0"));
         libraries.add(new LibraryDefinition("net,kyori", "examination-string", "1.3.0"));
         libraries.add(new LibraryDefinition("net,kyori", "examination-api", "1.3.0"));
         libraries.add(new LibraryDefinition("net,kyori", "adventure-key", "4.24.0"));
         libraries.add(new LibraryDefinition("net,kyori", "adventure-api", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-nbt", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-commons", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-legacy", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-json", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-json-legacy-impl", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-gson", "4.24.0"));
         libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-api", "4.4.1"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-viaversion", "4.4.1"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-facet", "4.4.1"));
         libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-bukkit", "4.4.1"));
         libraries.add(new LibraryDefinition("net,kyori", "adventure-text-minimessage", "4.24.0"));
 
