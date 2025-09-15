@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.menu;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.golfing8.kcommon.menu.marker.MenuClickHolder;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import lombok.Getter;
@@ -113,7 +114,10 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
      * @param page the page.
      */
     public void setPage(int page) {
-        boolean reopen = getPlayer().getOpenInventory().getTopInventory() == menu.getGUI();
+        boolean reopen = false;
+        if (getPlayer().getOpenInventory().getTopInventory() != null && getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof MenuClickHolder) {
+            reopen = ((MenuClickHolder) getPlayer().getOpenInventory().getTopInventory().getHolder()).getMenu() == menu;
+        }
         this.page = page;
         this.menu = loadMenu();
         if (reopen) {
@@ -157,11 +161,11 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
                         DEFAULT_PAGE.addPlaceholders(Placeholder.curly("DIRECTION", "Previous")),
                         MenuUtils.getCartCoordsFromSlot(builder.getSize() - 9))
                 );
-                builder.specialPlaceholders("previous-page", () -> Collections.singleton(Placeholder.curly("DIRECTION", "Previous")));
-                builder.bindTo("previous-page", (event) -> {
-                    setPage(page - 1);
-                });
             }
+            builder.specialPlaceholders("previous-page", () -> Collections.singleton(Placeholder.curlyTrusted("DIRECTION", "Previous")));
+            builder.bindTo("previous-page", (event) -> {
+                setPage(page - 1);
+            });
         }
 
         if (page < maxPage) {
@@ -170,13 +174,16 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
                         DEFAULT_PAGE.addPlaceholders(Placeholder.curly("DIRECTION", "Next")),
                         MenuUtils.getCartCoordsFromSlot(builder.getSize() - 1))
                 );
-                builder.specialPlaceholders("next-page", () -> Collections.singleton(Placeholder.curly("DIRECTION", "Next")));
-                builder.bindTo("next-page", (event) -> {
-                    setPage(page + 1);
-                });
             }
+            builder.specialPlaceholders("next-page", () -> Collections.singleton(Placeholder.curlyTrusted("DIRECTION", "Next")));
+            builder.bindTo("next-page", (event) -> {
+                setPage(page + 1);
+            });
         }
 
-        builder.globalPlaceholders(Placeholder.curly("PAGE", this.page));
+        builder.globalPlaceholders(
+                Placeholder.curlyTrusted("PAGE", this.page),
+                Placeholder.curlyTrusted("MAX_PAGE", this.maxPage)
+        );
     }
 }
