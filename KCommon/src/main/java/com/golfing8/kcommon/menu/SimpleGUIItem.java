@@ -13,8 +13,8 @@ import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -38,6 +38,10 @@ public class SimpleGUIItem {
     public MenuCoordinate getSlot() {
         return slots.iterator().next();
     }
+
+    /** The defining config section */
+    @Getter @Nullable
+    private ConfigurationSection configSection;
 
     /**
      * A supplier of the special placeholders.
@@ -71,5 +75,6 @@ public class SimpleGUIItem {
         } else {
             this.slots = Sets.newHashSet(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slot"), MenuCoordinate.class));
         }
+        this.configSection = section;
     }
 }

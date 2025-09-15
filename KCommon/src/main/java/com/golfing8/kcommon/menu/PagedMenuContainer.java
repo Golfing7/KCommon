@@ -155,35 +155,39 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
      * @param builder the builder.
      */
     protected void adaptBuilder(MenuBuilder builder) {
-        if (page > 0) {
-            if (builder.getSpecialItem("previous-page") == null) {
+        SimpleGUIItem previousPageItem = builder.getSpecialItem("previous-page");
+        if (page > 0 || (previousPageItem != null && previousPageItem.getConfigSection() != null && previousPageItem.getConfigSection().getBoolean("always-show"))) {
+            if (previousPageItem == null) {
                 builder.setSpecialItem("previous-page", new SimpleGUIItem(
-                        DEFAULT_PAGE.addPlaceholders(Placeholder.curly("DIRECTION", "Previous")),
+                        DEFAULT_PAGE.addPlaceholders(Placeholder.curlyTrusted("DIRECTION", "Previous")),
                         MenuUtils.getCartCoordsFromSlot(builder.getSize() - 9))
                 );
             }
             builder.specialPlaceholders("previous-page", () -> Collections.singleton(Placeholder.curlyTrusted("DIRECTION", "Previous")));
             builder.bindTo("previous-page", (event) -> {
-                setPage(page - 1);
+                if (page > 0)
+                    setPage(page - 1);
             });
         }
 
-        if (page < maxPage) {
-            if (builder.getSpecialItem("next-page") == null) {
+        SimpleGUIItem nextPageItem = builder.getSpecialItem("next-page");
+        if (page < maxPage || (nextPageItem != null && nextPageItem.getConfigSection() != null && nextPageItem.getConfigSection().getBoolean("always-show"))) {
+            if (nextPageItem == null) {
                 builder.setSpecialItem("next-page", new SimpleGUIItem(
-                        DEFAULT_PAGE.addPlaceholders(Placeholder.curly("DIRECTION", "Next")),
+                        DEFAULT_PAGE.addPlaceholders(Placeholder.curlyTrusted("DIRECTION", "Next")),
                         MenuUtils.getCartCoordsFromSlot(builder.getSize() - 1))
                 );
             }
             builder.specialPlaceholders("next-page", () -> Collections.singleton(Placeholder.curlyTrusted("DIRECTION", "Next")));
             builder.bindTo("next-page", (event) -> {
-                setPage(page + 1);
+                if (page < maxPage)
+                    setPage(page + 1);
             });
         }
 
         builder.globalPlaceholders(
-                Placeholder.curlyTrusted("PAGE", this.page),
-                Placeholder.curlyTrusted("MAX_PAGE", this.maxPage)
+                Placeholder.curlyTrusted("PAGE", this.page + 1),
+                Placeholder.curlyTrusted("MAX_PAGE", this.maxPage + 1)
         );
     }
 }

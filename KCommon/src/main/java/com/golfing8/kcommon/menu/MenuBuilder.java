@@ -240,7 +240,16 @@ public final class MenuBuilder {
     }
 
     public MenuBuilder globalPlaceholders(Placeholder... placeholders) {
-        this.globalPlaceholders = Arrays.asList(placeholders);
+        this.globalPlaceholders = new ArrayList<>(Arrays.asList(placeholders));
+        return this;
+    }
+
+    public MenuBuilder addGlobalPlaceholders(Placeholder... placeholders) {
+        if (this.globalPlaceholders == null || this.globalPlaceholders.isEmpty()) {
+            this.globalPlaceholders(placeholders);
+        } else {
+            this.globalPlaceholders.addAll(Arrays.asList(placeholders));
+        }
         return this;
     }
 
