@@ -1,6 +1,11 @@
 package com.golfing8.kcommon.util;
 
+import com.golfing8.kcommon.NMS;
+import com.golfing8.kcommon.struct.region.Region;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -8,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -93,5 +99,86 @@ public class EntityUtil {
                 return (Player) ((Projectile) entity).getShooter();
         }
         return null;
+    }
+
+    /**
+     * Gets a random position that the given region can spawn an entity on.
+     *
+     * @param region the region to look in
+     * @return the spawnable mob position, or null if one couldn't be found.
+     */
+    public static Optional<Location> tryGetSpawnPosition(Region region) {
+        // No world means that the region doesn't properly exist.
+        if (region.getWorld() == null)
+            return Optional.empty();
+
+        search: for (int attempt = 0; attempt < 10; attempt++) {
+            Location randomPosition = region.getRandomPosition().toLocation(region.getWorld());
+
+            Block block = randomPosition.getBlock();
+            if (!block.getType().isOccluding())
+                continue;
+
+            // Check for clear blocks above the block.
+            for (int y = 1; y <= 2; y++) {
+                block = block.getRelative(BlockFace.UP);
+                if (!NMS.getTheNMS().getMagicBlocks().isPassable(block.getLocation()) || block.isLiquid())
+                    continue search;
+            }
+
+            // We've found a position.
+            return Optional.of(randomPosition.add(0.5, 1.0, 0.5));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Gets a random position that the given region can spawn an entity on.
+     *
+     * @param location the location to fix
+     * @return the spawnable mob position, or null if one couldn't be found.
+     */
+    public static Optional<Location> tryFixSpawnLocation(Location location, int maxVariance) {
+        // No world means that the region doesn't properly exist.
+        if (location.getWorld() == null)
+            return Optional.empty();
+
+        Location workingLocation = location.clone();
+        boolean occludingUp = false;
+        int freeAirUp = 0;
+        for (int i = 0; i < maxVariance; i++) {
+            if (NMS.getTheNMS().getMagicBlocks().isPassable(workingLocation)) {
+                freeAirUp++;
+            } else if (workingLocation.getBlock().getType().isOccluding()) {
+                occludingUp = true;
+                freeAirUp = 0;
+            }
+
+            if (occludingUp && freeAirUp >= 2)
+                return Optional.of(workingLocation.subtract(0, 1, 0));
+
+            workingLocation.add(0, 1, 0);
+        }
+
+        workingLocation = location.clone();
+        boolean occludingDown = false;
+        int freeAirDown = 0;
+        for (int i = 0; i < maxVariance; i++) {
+            if (NMS.getTheNMS().getMagicBlocks().isPassable(workingLocation)) {
+                freeAirDown++;
+                occludingDown = false;
+            } else if (workingLocation.getBlock().getType().isOccluding()) {
+                occludingDown = true;
+            }
+
+            if (occludingDown && freeAirDown >= 2)
+                return Optional.of(workingLocation.add(0, 1, 0));
+
+            if (occludingDown)
+                freeAirDown = 0;
+
+            workingLocation.add(0, -1, 0);
+        }
+        return Optional.empty();
     }
 }

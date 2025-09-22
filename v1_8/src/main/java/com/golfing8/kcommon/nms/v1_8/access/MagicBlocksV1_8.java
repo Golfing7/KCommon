@@ -4,8 +4,16 @@ import com.golfing8.kcommon.nms.access.NMSMagicBlocks;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.v1_8_R3.AxisAlignedBB;
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.IBlockData;
+import net.minecraft.server.v1_8_R3.WorldServer;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftSkull;
 
 public class MagicBlocksV1_8 implements NMSMagicBlocks {
@@ -15,5 +23,13 @@ public class MagicBlocksV1_8 implements NMSMagicBlocks {
     @Override
     public void setSkullOwner(Skull skull, OfflinePlayer offlinePlayer) {
         skullProfileField.set(skull, new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName()));
+    }
+
+    @Override
+    public boolean isPassable(Location location) {
+        WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
+        IBlockData data = worldServer.getType(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        AxisAlignedBB bb = data.getBlock().a(worldServer, new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()), data);
+        return bb == null || (bb.a == bb.d && bb.b == bb.e && bb.c == bb.f);
     }
 }

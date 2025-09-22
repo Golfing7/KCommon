@@ -1,6 +1,8 @@
 package com.golfing8.kcommon.nms.access;
 
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 
 public interface NMSMagicBlocks {
@@ -11,4 +13,12 @@ public interface NMSMagicBlocks {
      * @param offlinePlayer the offline player.
      */
     void setSkullOwner(Skull skull, OfflinePlayer offlinePlayer);
+
+    /**
+     * Checks if the given block is passable
+     *
+     * @param location the location of the block
+     * @return true if passable
+     */
+    boolean isPassable(Location location);
 }
