@@ -4,7 +4,9 @@ import com.golfing8.kcommon.struct.region.CuboidRegion;
 import com.golfing8.kcommon.struct.region.Region;
 import com.google.common.base.Preconditions;
 import lombok.experimental.UtilityClass;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.function.Consumer;
 
@@ -56,5 +58,32 @@ public class LocationUtil {
         // Piggyback off of cuboid region
         Region region = new CuboidRegion(pos1, pos2);
         region.forEach(vec -> action.accept(vec.toLocation(pos1.getWorld())));
+    }
+
+    /**
+     * Encodes the given location to a string
+     *
+     * @param location the location
+     * @return the represented string
+     * @see #decodeFromString(String)
+     */
+    public String encodeBlockLocationToString(Location location) {
+
+        return location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ() + ";" + location.getWorld().getName();
+    }
+
+    /**
+     * Decodes the given string to a location
+     *
+     * @param str the string
+     * @return the location
+     */
+    public Location decodeFromString(String str) {
+        String[] split = str.split(";");
+        int x = Integer.parseInt(split[0]);
+        int y = Integer.parseInt(split[1]);
+        int z = Integer.parseInt(split[2]);
+        World world = Bukkit.getWorld(split[3]);
+        return new Location(world, x, y, z);
     }
 }
