@@ -149,7 +149,7 @@ public class EntityUtil {
         for (int i = 0; i < maxVariance; i++) {
             if (NMS.getTheNMS().getMagicBlocks().isPassable(workingLocation)) {
                 freeAirUp++;
-            } else if (workingLocation.getBlock().getType().isOccluding()) {
+            } else {
                 occludingUp = true;
                 freeAirUp = 0;
             }
@@ -160,14 +160,14 @@ public class EntityUtil {
             workingLocation.add(0, 1, 0);
         }
 
-        workingLocation = location.clone();
+        workingLocation = location.clone().add(0, 1, 0); // add 1 to allow for the mob to spawn at that level.
         boolean occludingDown = false;
         int freeAirDown = 0;
         for (int i = 0; i < maxVariance; i++) {
             if (NMS.getTheNMS().getMagicBlocks().isPassable(workingLocation)) {
                 freeAirDown++;
                 occludingDown = false;
-            } else if (workingLocation.getBlock().getType().isOccluding()) {
+            } else {
                 occludingDown = true;
             }
 

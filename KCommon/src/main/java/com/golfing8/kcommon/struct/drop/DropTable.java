@@ -269,6 +269,11 @@ public class DropTable implements CASerializable {
             if (drop.getDisplayName() != null)
                 displayNames.add(drop.getDisplayName());
         });
+
+        // If there are no winnings, don't send anything.
+        if (displayNames.isEmpty())
+            return;
+
         message.send(player, Placeholder.curlyTrusted("TOTAL_REWARDS", StringUtil.parseCommas(drops.size())), MultiLinePlaceholder.percentTrusted("REWARDS", displayNames));
     }
 }
