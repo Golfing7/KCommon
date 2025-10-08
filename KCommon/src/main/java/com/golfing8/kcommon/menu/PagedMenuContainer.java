@@ -187,7 +187,9 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
 
         builder.globalPlaceholders(
                 Placeholder.curlyTrusted("PAGE", this.page + 1),
-                Placeholder.curlyTrusted("MAX_PAGE", this.maxPage + 1)
+                Placeholder.curlyTrusted("MAX_PAGE", this.maxPage + 1),
+                Placeholder.curlyTrusted("PREVIOUS_PAGE", this.page),
+                Placeholder.curlyTrusted("NEXT_PAGE", this.page + 2)
         );
     }
 }
