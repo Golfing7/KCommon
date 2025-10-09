@@ -502,10 +502,12 @@ public final class ItemStackBuilder {
         if (newCopy == null)
             throw new IllegalArgumentException("Item type " + this.itemType + " does not exist!");
 
-        newCopy.setAmount(newAmount());
         if (newCopy.getItemMeta() != null) {
             applyMetaTo(newCopy, placeholderTarget);
         }
+
+        // Set the amount *after* applying the meta. This is necessary as the server can't serialize itemstacks with > 100 items in the stack.
+        newCopy.setAmount(newAmount());
 
         cachedBuild = newCopy;
         return newCopy;
