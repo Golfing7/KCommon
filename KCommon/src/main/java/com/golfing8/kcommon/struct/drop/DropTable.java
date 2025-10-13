@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.drop;
 
+import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
@@ -158,6 +159,11 @@ public class DropTable implements CASerializable {
                         continue group;
 
                     Drop<?> drop = table.get(dropKey);
+                    if (drop == null) {
+                        KCommon.getInstance().getLogger().warning("Drop '" + dropKey + "' not found in drop table under group '" + groupEntry.getKey() + "'");
+                        continue;
+                    }
+
                     double totalBoost = Math.min(drop.getMaxBoost(), context.getSpecificBoosts().getOrDefault(dropKey, context.getBoost()));
                     if (!drop.testRandom(totalBoost))
                         continue;
