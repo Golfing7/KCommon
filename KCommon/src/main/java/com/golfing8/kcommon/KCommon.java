@@ -69,9 +69,7 @@ public class KCommon extends KPlugin {
                 // For Mongo
                 new LibraryDefinition("org,mongodb", "mongodb-driver-core", "5.0.1"),
                 new LibraryDefinition("org,mongodb", "mongodb-driver-sync", "5.0.1"),
-                new LibraryDefinition("org,mongodb", "bson", "5.0.1"),
-                // For Kotlin
-                new LibraryDefinition("org,jetbrains,kotlin", "kotlin-stdlib", "2.0.0")
+                new LibraryDefinition("org,mongodb", "bson", "5.0.1")
         );
 
         libraries.add(new LibraryDefinition("net,kyori", "option", "1.1.0"));
