@@ -3,6 +3,7 @@ package com.golfing8.kcommon.util;
 import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMSVersion;
+import com.golfing8.kcommon.nms.access.NMSAccess;
 import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.struct.title.Title;
 import com.google.common.collect.Lists;
@@ -291,10 +292,18 @@ public final class MS {
     }
 
     public static void pass(CommandSender sender, String message, Object... placeholders) {
+        // Don't send messages to the item capture player.
+        if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+            return;
+
         ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
     }
 
     public static void pass(CommandSender sender, List<String> message, Object... placeholders) {
+        // Don't send messages to the item capture player.
+        if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+            return;
+
         ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
     }
 }
