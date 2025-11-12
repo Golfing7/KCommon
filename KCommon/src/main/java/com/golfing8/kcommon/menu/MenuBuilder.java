@@ -49,6 +49,11 @@ public final class MenuBuilder {
      */
     private ClickAction topClickEvent = null;
     /**
+     * Slots in the menu that are locked from interaction.
+     * Items cannot be placed in them and items cannot be taken from them.
+     */
+    private Set<Integer> lockedSlots = new HashSet<>();
+    /**
      * A map containing all special GUI items, mapped from their keys.
      */
     @Getter
@@ -229,6 +234,18 @@ public final class MenuBuilder {
         return this;
     }
 
+    public MenuBuilder lockedSlots(int... slots) {
+        this.lockedSlots.clear();
+        return addLockedSlots(slots);
+    }
+
+    public MenuBuilder addLockedSlots(int... slots) {
+        for (int i : slots) {
+            this.lockedSlots.add(i);
+        }
+        return this;
+    }
+
     public MenuBuilder globalMultiLinePlaceholders(MultiLinePlaceholder... placeholders) {
         this.globalMultiLinePlaceholders = Arrays.asList(placeholders);
         return this;
@@ -392,11 +409,12 @@ public final class MenuBuilder {
         }
 
         menu.setContents(contents);
-        menu.setTopClickAction(topClickEvent);
+        menu.setTopClickAction(this.topClickEvent);
         menu.setTickRunnable(this.tickRunnable);
+        menu.setLockedSlots(this.lockedSlots);
         menu.onClose(this.closeRunnable);
         menu.onPostClose(this.postCloseRunnable);
-        menu.setBottomClickAction(bottomClickEvent);
+        menu.setBottomClickAction(this.bottomClickEvent);
 
         otherGUIItems.forEach((key, item) -> {
             item.getSlots().forEach(coordinate -> {

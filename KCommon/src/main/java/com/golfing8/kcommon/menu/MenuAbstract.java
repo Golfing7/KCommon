@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -47,7 +48,6 @@ public abstract class MenuAbstract implements Menu {
 
     @Getter
     private final long createdTick;
-
     private Inventory backingInventory;
     private String title;
     private boolean canExpire;
@@ -57,6 +57,8 @@ public abstract class MenuAbstract implements Menu {
     @Getter
     @Setter
     private Runnable tickRunnable;
+    @Setter
+    private Set<Integer> lockedSlots;
 
     private boolean recreate;
 
@@ -99,6 +101,11 @@ public abstract class MenuAbstract implements Menu {
     @Override
     public MenuShape getMenuShape() {
         return menuShape;
+    }
+
+    @Override
+    public Set<Integer> getLockedSlots() {
+        return lockedSlots == null ? Collections.emptySet() : Collections.unmodifiableSet(lockedSlots);
     }
 
     @Override
@@ -385,24 +392,45 @@ public abstract class MenuAbstract implements Menu {
         return null;
     }
 
+    protected boolean isThisInventory(Inventory inventory) {
+        InventoryHolder holder = inventory.getHolder();
+        return holder instanceof MenuClickHolder && ((MenuClickHolder) holder).getMenu() == this;
+    }
+
+    @EventHandler
+    public void onDrag(InventoryDragEvent event) {
+        // Never allow inventory dragging if this menu is not clickable
+        if (!clickable) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!isThisInventory(event.getInventory()))
+            return;
+
+        for (int slot : event.getInventorySlots()) {
+            // Are any of those slots locked?
+            if (lockedSlots.contains(slot)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+    }
+
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (event.getWhoClicked().getOpenInventory().getTopInventory() == null)
             return;
 
-        InventoryHolder holder = event.getWhoClicked().getOpenInventory().getTopInventory().getHolder();
-        if (!(holder instanceof MenuClickHolder))
+        if (!isThisInventory(event.getWhoClicked().getOpenInventory().getTopInventory()))
             return;
 
-        MenuClickHolder clickHolder = (MenuClickHolder) holder;
-        if (clickHolder.getMenu() != this)
-            return;
-
-        if (!clickable) event.setCancelled(true);
+        if (!clickable)
+            event.setCancelled(true);
 
         Inventory clickedInventory = event.getClickedInventory();
-
-        if (clickedInventory == null) return;
+        if (clickedInventory == null)
+            return;
 
         if (clickedInventory != event.getWhoClicked().getOpenInventory().getTopInventory()) {
             if (clickedInventory != event.getWhoClicked().getOpenInventory().getBottomInventory())
@@ -415,11 +443,18 @@ public abstract class MenuAbstract implements Menu {
             return;
         }
 
+        // Handle the global top click event
         if (this.topClickEvent != null) {
             this.topClickEvent.attemptClick(event);
         }
+        // ...and handle any specific actions.
         if (actionMap.containsKey(event.getSlot())) {
             actionMap.get(event.getSlot()).forEach(z -> z.attemptClick(event));
+        }
+
+        // Finally, handle locked slots.
+        if (isThisInventory(clickedInventory) && lockedSlots.contains(event.getSlot())) {
+            event.setCancelled(true);
         }
     }
 

@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.golfing8.kcommon.menu.MenuUtils.getSlotFromCartCoords;
@@ -72,6 +73,20 @@ public interface Menu extends Listener {
     default ItemStack setItemAt(int x, int y, ItemStack set) {
         return setItemAt(getSlotFromCartCoords(getMenuShape().getType(), x, y), set);
     }
+
+    /**
+     * Gets the slots that are locked in this menu
+     *
+     * @return the locked slots
+     */
+    Set<Integer> getLockedSlots();
+
+    /**
+     * Sets the locked slots for this menu
+     *
+     * @param lockedSlots locked slots
+     */
+    void setLockedSlots(Set<Integer> lockedSlots);
 
     /**
      * Gets the tick this menu was created.
