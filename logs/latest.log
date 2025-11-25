@@ -1,3 +1,0 @@
-[13:51:27] [main/INFO]: [org.gradle.internal.impldep.org.apache.sshd.common.util.security.bouncycastle.BouncyCastleSecurityProviderRegistrar] getOrCreateProvider(BC) created instance of org.gradle.internal.impldep.org.bouncycastle.jce.provider.BouncyCastleProvider
-[13:51:27] [main/INFO]: [org.gradle.internal.impldep.org.apache.sshd.common.util.security.eddsa.EdDSASecurityProviderRegistrar] getOrCreateProvider(EdDSA) created instance of org.gradle.internal.impldep.net.i2p.crypto.eddsa.EdDSASecurityProvider
-[13:51:27] [main/INFO]: [org.gradle.internal.impldep.org.apache.sshd.common.io.DefaultIoServiceFactoryFactory] No detected/configured IoServiceFactoryFactory; using Nio2ServiceFactoryFactory
