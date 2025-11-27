@@ -1,12 +1,15 @@
 package com.golfing8.kcommon.struct.placeholder;
 
+import com.golfing8.kcommon.util.MS;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A container for both {@link Placeholder} instances and {@link MultiLinePlaceholder} instances.
@@ -51,28 +54,63 @@ public class PlaceholderContainer {
         return toReturn;
     }
 
-    /**
-     * Applies the trusted placeholders to the given messages.
-     *
-     * @param input the input.
-     * @return the messages.
-     */
-    public List<String> applyTrusted(List<String> input) {
-        return apply(input, true);
+    private List<Component> applyComponents(final List<Component> components, boolean trusted) {
+        List<Component> toReturn = new ArrayList<>(components);
+        for (MultiLinePlaceholder placeholder : multiLinePlaceholders) {
+            if (placeholder.isTrusted() != trusted)
+                continue;
+
+            List<Component> componentsToAdd = new ArrayList<>();
+            if (placeholder.isTrusted()) {
+                componentsToAdd.addAll(MS.toComponentList(placeholder.getReplacement()));
+            } else {
+                componentsToAdd.addAll(placeholder.getReplacement().stream().map(Component::text).collect(Collectors.toList()));
+            }
+
+            // Loop over all components and parse them.
+            for (int i = 0; i < toReturn.size(); i++) {
+                Component parseable = toReturn.get(i);
+
+                // We must encode, split, re-encode.
+                String encodedComponent = MiniMessage.miniMessage().serialize(parseable);
+                String[] splitEncode = encodedComponent.split(placeholder.getLabel());
+
+                // If the label is not present, do nothing.
+                if (splitEncode.length == 1)
+                    continue;
+
+                // Otherwise, add the components
+                if (componentsToAdd.isEmpty()) {
+                    toReturn.remove(i--);
+                    continue;
+                }
+
+                toReturn.set(i, componentsToAdd.get(0));
+                for (int j = 1; j < splitEncode.length; j++) {
+                    toReturn.add(i + j, componentsToAdd.get(j));
+                }
+            }
+        }
+
+        for (Placeholder placeholder : placeholders) {
+            if (placeholder.isTrusted() != trusted)
+                continue;
+
+            toReturn = toReturn.stream().map(parseable -> {
+                return parseable.replaceText(builder -> {
+                    if (placeholder.isTrusted()) {
+                        builder.matchLiteral(placeholder.getLabel()).replacement(MS.toComponent(placeholder.getValue()));
+                    } else {
+                        builder.matchLiteral(placeholder.getLabel()).replacement(placeholder.getValue());
+                    }
+                });
+            }).collect(Collectors.toList());
+        }
+        return toReturn;
     }
 
     /**
-     * Applies the untrusted placeholders to the given messages.
-     *
-     * @param input the input.
-     * @return the messages.
-     */
-    public List<String> applyUntrusted(List<String> input) {
-        return apply(input, false);
-    }
-
-    /**
-     * Applies the untrusted components to this placeholder.
+     * Applies the untrusted components to a single component placeholder.
      *
      * @param component the component.
      * @return the new component.
@@ -105,6 +143,46 @@ public class PlaceholderContainer {
             });
         }
         return toReturn;
+    }
+
+    /**
+     * Applies the trusted placeholders to the given messages.
+     *
+     * @param input the input.
+     * @return the messages.
+     */
+    public List<String> applyTrusted(List<String> input) {
+        return apply(input, true);
+    }
+
+    /**
+     * Applies the untrusted placeholders to the given messages.
+     *
+     * @param input the input.
+     * @return the messages.
+     */
+    public List<String> applyUntrusted(List<String> input) {
+        return apply(input, false);
+    }
+
+    /**
+     * Applies the trusted placeholders to the given list of components
+     *
+     * @param input the input
+     * @return the parsed components
+     */
+    public List<Component> applyComponentsTrusted(List<Component> input) {
+        return applyComponents(input, true);
+    }
+
+    /**
+     * Applies the untrusted placeholders to the given list of components
+     *
+     * @param input the input
+     * @return the parsed components
+     */
+    public List<Component> applyComponentsUntrusted(List<Component> input) {
+        return applyComponents(input, false);
     }
 
     /**

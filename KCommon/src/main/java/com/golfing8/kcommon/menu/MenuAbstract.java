@@ -205,8 +205,7 @@ public abstract class MenuAbstract implements Menu {
     @Override
     public ItemStack setItemAt(int slot, ItemStack set) {
         ItemStack there = getItemAt(slot);
-        ItemUtil.applyPlaceholders(set, placeholders);
-        ItemUtil.applyMPlaceholders(set, multiLinePlaceholders);
+        ItemUtil.applyPlaceholders(set, placeholders, multiLinePlaceholders);
         backingInventory.setItem(slot, set);
         return there;
     }
@@ -309,8 +308,7 @@ public abstract class MenuAbstract implements Menu {
             if (itemStack == null)
                 continue;
 
-            ItemUtil.applyPlaceholders(itemStack, placeholders);
-            ItemUtil.applyMPlaceholders(itemStack, multiLinePlaceholders);
+            ItemUtil.applyPlaceholders(itemStack, placeholders, multiLinePlaceholders);
         }
 
         if (contents.length != backingInventory.getSize()) {

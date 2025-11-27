@@ -180,6 +180,16 @@ public class MagicItems implements NMSMagicItems {
     }
 
     @Override
+    public void applyComponentName(ItemMeta meta, @Nullable Component component) {
+        meta.displayName(component);
+    }
+
+    @Override
+    public void applyComponentLore(ItemMeta meta, @Nullable List<? extends Component> components) {
+        meta.lore(components);
+    }
+
+    @Override
     public String getMMDisplayName(ItemMeta meta) {
         Component display = meta.displayName();
         return display == null ? null : MiniMessage.miniMessage().serialize(display);
@@ -192,6 +202,16 @@ public class MagicItems implements NMSMagicItems {
             return null;
 
         return lore.stream().map(MiniMessage.miniMessage()::serialize).toList();
+    }
+
+    @Override
+    public @Nullable Component getComponentDisplayName(ItemMeta meta) {
+        return meta.displayName();
+    }
+
+    @Override
+    public @Nullable List<Component> getComponentLore(ItemMeta meta) {
+        return meta.lore();
     }
 
     @Override

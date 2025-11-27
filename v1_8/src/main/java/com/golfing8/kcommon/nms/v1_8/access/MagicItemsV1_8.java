@@ -18,6 +18,7 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBTCompoundList;
 import lombok.var;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_8_R3.AttributeModifier;
 import org.bukkit.Material;
@@ -74,6 +75,24 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     }
 
     @Override
+    public void applyComponentName(ItemMeta meta, @Nullable Component component) {
+        if (component == null) {
+            meta.setDisplayName(null);
+        } else {
+            meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(component));
+        }
+    }
+
+    @Override
+    public void applyComponentLore(ItemMeta meta, @Nullable List<? extends Component> components) {
+        if (components == null) {
+            meta.setLore(null);
+        } else {
+            meta.setLore(components.stream().map(LegacyComponentSerializer.legacySection()::serialize).collect(Collectors.toList()));
+        }
+    }
+
+    @Override
     public String getMMDisplayName(ItemMeta meta) {
         return meta.getDisplayName();
     }
@@ -81,6 +100,24 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
     public List<String> getMMLore(ItemMeta meta) {
         return meta.getLore();
+    }
+
+    @Override
+    public @Nullable Component getComponentDisplayName(ItemMeta meta) {
+        if (meta.hasDisplayName()) {
+            return LegacyComponentSerializer.legacySection().deserialize(meta.getDisplayName());
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public @Nullable List<Component> getComponentLore(ItemMeta meta) {
+        if (meta.hasLore()) {
+            return meta.getLore().stream().map(LegacyComponentSerializer.legacySection()::deserialize).collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 
     @Override

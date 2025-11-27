@@ -262,6 +262,23 @@ public final class MS {
     }
 
     /**
+     * Converts the message to a component.
+     *
+     * @param message      the message
+     * @param placeholders the placeholders
+     * @return the component
+     */
+    public static List<Component> toComponentList(List<String> message, Object... placeholders) {
+        if (message == null || message.isEmpty())
+            return Collections.emptyList();
+
+        PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
+        List<String> messages = parseAll(message, container);
+        List<Component> componentList = ComponentUtils.toComponent(messages);
+        return componentList.stream().map(container::applyUntrusted).collect(Collectors.toList());
+    }
+
+    /**
      * Sends a title to a player.
      *
      * @param player       the player.

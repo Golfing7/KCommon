@@ -6,10 +6,13 @@ import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
+import com.google.common.collect.Lists;
 import de.tr7zw.changeme.nbtapi.NBTType;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.experimental.UtilityClass;
 import lombok.var;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -75,14 +78,16 @@ public final class ItemUtil {
      * @param itemStack    the item
      * @param placeholders the placeholders
      */
-    public static void applyPlaceholders(ItemStack itemStack, Collection<Placeholder> placeholders) {
+    public static void applyPlaceholders(ItemStack itemStack, Object... placeholders) {
         if (itemStack == null || !itemStack.hasItemMeta())
             return;
 
         ItemMeta meta = itemStack.getItemMeta();
+        PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
         if (meta.hasDisplayName()) {
-            String displayName = NMS.getTheNMS().getMagicItems().getMMDisplayName(meta);
-            NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(displayName, placeholders));
+            Component displayName = NMS.getTheNMS().getMagicItems().getComponentDisplayName(meta);
+            List<Component> displayNameComponents = container.applyComponentsUntrusted(container.applyComponentsTrusted(Lists.newArrayList(displayName)));
+            NMS.getTheNMS().getMagicItems().applyComponentName(meta, displayNameComponents.isEmpty() ? null : displayNameComponents.get(0));
         }
 
         if (!meta.hasLore()) {
@@ -90,28 +95,9 @@ public final class ItemUtil {
             return;
         }
 
-        List<String> lore = NMS.getTheNMS().getMagicItems().getMMLore(meta);
-        NMS.getTheNMS().getMagicItems().applyLore(meta, MS.parseAll(lore, placeholders));
-        itemStack.setItemMeta(meta);
-    }
-
-    /**
-     * Applies the multi-line placeholders to the given item.
-     *
-     * @param itemStack    the item.
-     * @param placeholders the placeholders.
-     */
-    public static void applyMPlaceholders(ItemStack itemStack, Collection<MultiLinePlaceholder> placeholders) {
-        if (itemStack == null || !itemStack.hasItemMeta())
-            return;
-
-        ItemMeta meta = itemStack.getItemMeta();
-        if (!meta.hasLore()) {
-            return;
-        }
-
-        List<String> lore = NMS.getTheNMS().getMagicItems().getMMLore(meta);
-        NMS.getTheNMS().getMagicItems().applyLore(meta, MS.parseAll(lore, placeholders));
+        List<Component> lore = NMS.getTheNMS().getMagicItems().getComponentLore(meta);
+        List<Component> applied = container.applyComponentsUntrusted(container.applyComponentsTrusted(lore));
+        NMS.getTheNMS().getMagicItems().applyComponentLore(meta, applied);
         itemStack.setItemMeta(meta);
     }
 

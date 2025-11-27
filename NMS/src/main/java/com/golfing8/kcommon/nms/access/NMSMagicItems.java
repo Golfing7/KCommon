@@ -7,6 +7,7 @@ import com.golfing8.kcommon.nms.struct.Hand;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.kyori.adventure.text.Component;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -65,6 +66,22 @@ public interface NMSMagicItems {
     void applyLore(ItemMeta meta, @Nullable List<String> lore);
 
     /**
+     * Applies the given name component to the given item meta
+     *
+     * @param meta the meta
+     * @param component the name component
+     */
+    void applyComponentName(ItemMeta meta, @Nullable Component component);
+
+    /**
+     * Applies the given lore component to the given item meta
+     *
+     * @param meta the meta
+     * @param components the lore component
+     */
+    void applyComponentLore(ItemMeta meta, @Nullable List<? extends Component> components);
+
+    /**
      * Gets a mini message serialized item name.
      *
      * @param meta the meta.
@@ -79,6 +96,22 @@ public interface NMSMagicItems {
      * @return the mini message formatted lore.
      */
     List<String> getMMLore(ItemMeta meta);
+
+    /**
+     * Gets the component display name of the given item meta
+     *
+     * @param meta the item meta
+     * @return the display name component
+     */
+    @Nullable Component getComponentDisplayName(ItemMeta meta);
+
+    /**
+     * Gets the component lore of the given item meta
+     *
+     * @param meta the meta
+     * @return the lore components
+     */
+    @Nullable List<Component> getComponentLore(ItemMeta meta);
 
     /**
      * Gets the displayed name of the given item.

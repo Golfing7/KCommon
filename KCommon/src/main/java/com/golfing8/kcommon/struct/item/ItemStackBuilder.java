@@ -533,7 +533,7 @@ public final class ItemStackBuilder {
             if (placeholderTarget != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 itemName = PlaceholderAPI.setPlaceholders(placeholderTarget, itemName);
             }
-            NMS.getTheNMS().getMagicItems().applyName(meta, MS.parseSingle(itemName, (Object[]) placeholderArr));
+            NMS.getTheNMS().getMagicItems().applyComponentName(meta, MS.toComponent(itemName, (Object[]) placeholderArr));
         }
         if (this.itemLore != null && !this.itemLore.isEmpty()) {
             //Parse both single and multi placeholders.
@@ -541,7 +541,7 @@ public final class ItemStackBuilder {
             if (placeholderTarget != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 lore = PlaceholderAPI.setPlaceholders(placeholderTarget, lore);
             }
-            NMS.getTheNMS().getMagicItems().applyLore(meta, lore);
+            NMS.getTheNMS().getMagicItems().applyComponentLore(meta, MS.toComponentList(lore, placeholderArr, multiLinePlaceholders));
         }
 
         if (meta instanceof PotionMeta && potionData != null) {
