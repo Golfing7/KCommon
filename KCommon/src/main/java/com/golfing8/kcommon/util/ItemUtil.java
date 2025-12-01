@@ -73,6 +73,24 @@ public final class ItemUtil {
     }
 
     /**
+     * Gets the display name of the item with the amount
+     *
+     * @param itemStack the itemstack.
+     * @return its displayed name with the amount of the item
+     */
+    public static String getDisplayNameWithAmount(ItemStack itemStack) {
+        if (itemStack == null)
+            return "Air 1x";
+
+        if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName()) {
+            return itemStack.getItemMeta().getDisplayName() + " " + itemStack.getAmount() + "x";
+        } else {
+            NMSItemStack stack = NMS.getTheNMS().getMagicItems().wrapItemStack(itemStack);
+            return stack.getI18DisplayName() + " " + itemStack.getAmount() + "x";
+        }
+    }
+
+    /**
      * Applies the placeholders to the given item.
      *
      * @param itemStack    the item
