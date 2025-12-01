@@ -11,6 +11,7 @@ import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.util.ItemUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,7 @@ public class ItemSelectionMenu extends PlayerMenuContainer {
     /** The promise of completion */
     @Getter
     private final Promise<@Nullable ItemStack> promise;
+    private @Nullable ConfigurationSection menuSource;
     private boolean answering = false;
 
     public ItemSelectionMenu(Player player) {
@@ -27,24 +29,36 @@ public class ItemSelectionMenu extends PlayerMenuContainer {
         this.promise = Promise.empty();
     }
 
+    public ItemSelectionMenu(Player player, @Nullable ConfigurationSection menuSource) {
+        this(player);
+
+        this.menuSource = menuSource;
+    }
+
     @Override
     protected Menu loadMenu() {
-        MenuBuilder builder = MenuBuilder.builder()
-                .title("&aSelect an Item")
-                .shapeType(MenuShapeType.HOPPER)
-                .postCloseRunnable((event) -> {
-                    if (answering)
-                        return;
+        MenuBuilder builder;
+        if (menuSource != null) {
+            builder = new MenuBuilder(menuSource);
+        } else {
+            builder = MenuBuilder.builder()
+                    .title("&aSelect an Item")
+                    .shapeType(MenuShapeType.HOPPER);
 
-                    if (!promise.isDone())
-                        promise.supply(null);
-                });
-        ItemStackBuilder item = new ItemStackBuilder()
-                .material(XMaterial.BLACK_STAINED_GLASS_PANE)
-                .name("&eSelect an item from your inventory");
-        for (int i = 0; i < 5; i++) {
-            builder.setAt(i, item.buildCached());
+            ItemStackBuilder item = new ItemStackBuilder()
+                    .material(XMaterial.BLACK_STAINED_GLASS_PANE)
+                    .name("&eSelect an item from your inventory");
+            for (int i = 0; i < 5; i++) {
+                builder.setAt(i, item.buildCached());
+            }
         }
+        builder.postCloseRunnable((event) -> {
+            if (answering)
+                return;
+
+            if (!promise.isDone())
+                promise.supply(null);
+        });
         builder.bottomClickAction(event -> {
             if (answering)
                 return;
