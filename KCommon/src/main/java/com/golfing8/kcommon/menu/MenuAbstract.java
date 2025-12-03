@@ -430,6 +430,10 @@ public abstract class MenuAbstract implements Menu {
         if (clickedInventory == null)
             return;
 
+        if (isThisInventory(clickedInventory) && lockedSlots.contains(event.getSlot())) {
+            event.setCancelled(true);
+        }
+
         if (clickedInventory != event.getWhoClicked().getOpenInventory().getTopInventory()) {
             if (clickedInventory != event.getWhoClicked().getOpenInventory().getBottomInventory())
                 return;
@@ -448,11 +452,6 @@ public abstract class MenuAbstract implements Menu {
         // ...and handle any specific actions.
         if (actionMap.containsKey(event.getSlot())) {
             actionMap.get(event.getSlot()).forEach(z -> z.attemptClick(event));
-        }
-
-        // Finally, handle locked slots.
-        if (isThisInventory(clickedInventory) && lockedSlots.contains(event.getSlot())) {
-            event.setCancelled(true);
         }
     }
 

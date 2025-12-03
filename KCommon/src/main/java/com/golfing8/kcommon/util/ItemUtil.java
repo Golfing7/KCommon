@@ -80,13 +80,13 @@ public final class ItemUtil {
      */
     public static String getDisplayNameWithAmount(ItemStack itemStack) {
         if (itemStack == null)
-            return "Air 1x";
+            return "1x Air";
 
         if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName()) {
-            return itemStack.getItemMeta().getDisplayName() + " " + itemStack.getAmount() + "x";
+            return itemStack.getAmount() + "x " + itemStack.getItemMeta().getDisplayName();
         } else {
             NMSItemStack stack = NMS.getTheNMS().getMagicItems().wrapItemStack(itemStack);
-            return stack.getI18DisplayName() + " " + itemStack.getAmount() + "x";
+            return itemStack.getAmount() + "x " + stack.getI18DisplayName();
         }
     }
 

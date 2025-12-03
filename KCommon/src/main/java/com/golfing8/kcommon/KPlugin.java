@@ -292,6 +292,10 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             while (!nextUp.isEmpty()) {
                 Class<?> type = nextUp.poll();
 
+                // Skip over classes that aren't in our graph, we don't need to worry about them.
+                if (!classToClassDependencyGraph.containsKey(type))
+                    continue;
+
                 for (Class<?> value : classToClassDependencyGraph.get(type)) {
                     //If this is the case, we've detected a cycle.
                     if (!traversed.add(value)) {
@@ -318,6 +322,13 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             while (!dependencies.isEmpty()) {
                 //Get the dependency.
                 Class<?> currDepend = dependencies.peek();
+
+                // If the class isn't in our graph, it's not our job to enable it.
+                if (!classToClassDependencyGraph.containsKey(currDepend)) {
+                    dependencies.pop();
+                    continue;
+                }
+
                 List<Class<?>> depends = classToClassDependencyGraph.get(currDepend);
 
                 //Does it have any dependencies? If so, enable them!

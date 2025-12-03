@@ -1,10 +1,12 @@
 package com.golfing8.kcommon.struct.time;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.struct.helper.function.Numbers;
 import com.google.common.base.Preconditions;
 import lombok.*;
 
 import java.time.DateTimeException;
+import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -79,8 +81,14 @@ public final class Timestamp implements Cloneable {
         if (this.month != timestamp.month && this.month != UNUSED && timestamp.month != UNUSED)
             return this.month > timestamp.month;
 
+        if (this.dayOfYear != timestamp.dayOfYear && this.dayOfYear != UNUSED && timestamp.dayOfYear != UNUSED)
+            return this.dayOfYear > timestamp.dayOfYear;
+
         if (this.dayOfMonth != timestamp.dayOfMonth && this.dayOfMonth != UNUSED && timestamp.dayOfMonth != UNUSED)
             return this.dayOfMonth > timestamp.dayOfMonth;
+
+        if (this.dayOfWeek != timestamp.dayOfWeek && this.dayOfWeek != UNUSED && timestamp.dayOfWeek != UNUSED)
+            return this.dayOfWeek > timestamp.dayOfWeek;
 
         if (this.hour != timestamp.hour && this.hour != UNUSED && timestamp.hour != UNUSED)
             return this.hour > timestamp.hour;
@@ -120,15 +128,17 @@ public final class Timestamp implements Cloneable {
             totalTime += TimeUnit.DAYS.toMillis(Math.floorMod(this.dayOfMonth - timeInPast.getDayOfMonth(), 30));
         }
 
+        // Seven-day weeks
+        if (this.dayOfWeek != UNUSED && timeInPast.getDayOfWeek() != UNUSED) {
+            totalTime += TimeUnit.DAYS.toMillis(Math.floorMod(this.dayOfWeek - timeInPast.getDayOfWeek(), 7));
+        }
+
         if (this.hour != UNUSED && timeInPast.getHour() != UNUSED) {
             if (timeInPast.getHour() > this.hour) {
                 totalTime -= TimeUnit.DAYS.toMillis(1);
             }
 
             totalTime += TimeUnit.HOURS.toMillis(Math.floorMod(this.hour - timeInPast.getHour(), 24));
-            if (timeInFuture) {
-                totalTime += TimeUnit.DAYS.toMillis(1);
-            }
         }
 
         if (this.minute != UNUSED && timeInPast.getMinute() != UNUSED) {
@@ -137,9 +147,6 @@ public final class Timestamp implements Cloneable {
             }
 
             totalTime += TimeUnit.MINUTES.toMillis(Math.floorMod(this.minute - timeInPast.getMinute(), 60));
-            if (timeInFuture) {
-                totalTime += TimeUnit.HOURS.toMillis(1);
-            }
         }
 
         if (this.second != UNUSED && timeInPast.getSecond() != UNUSED) {
@@ -148,9 +155,6 @@ public final class Timestamp implements Cloneable {
             }
 
             totalTime += TimeUnit.SECONDS.toMillis(Math.floorMod(this.second - timeInPast.getSecond(), 60));
-            if (timeInFuture) {
-                totalTime += TimeUnit.MINUTES.toMillis(1);
-            }
         }
         return totalTime;
     }
@@ -193,8 +197,9 @@ public final class Timestamp implements Cloneable {
      * Formatting should be match one of the following: (optional)
      * </p>
      * <ol>
-     * <li>hh:mm(:ss)</li>
-     * <li>MM-DD-YYYY(-hh:mm(:ss))</li>
+     * <li>{@code hh:mm(:ss)} Intra day time</li>
+     * <li>{@code MM-DD-YYYY(-hh:mm(:ss))} Time and date</li>
+     * <li>{@code D_hh:mm(:ss)} Weekly time</li>
      * </ol>
      *
      * @param timestamp the timestamp.
@@ -207,6 +212,7 @@ public final class Timestamp implements Cloneable {
         // Attempt parsing as a date time.
         int months = UNUSED;
         int days = UNUSED;
+        int dayOfWeek = UNUSED;
         int years = UNUSED;
         if (timestamp.contains("-")) {
             String[] dataSplit = toParse.split("-");
@@ -219,6 +225,21 @@ public final class Timestamp implements Cloneable {
 
             // Now let the remaining code parse hours.
             toParse = dataSplit[3];
+        } else if (timestamp.contains("_")) {
+            String[] dataSplit = toParse.split("_");
+            if (dataSplit.length != 2)
+                throw new DateTimeException(String.format("Timestamp format does not follow: D_hh:mm(:ss). Was %s", timestamp));
+
+            var optNum = Numbers.parseInteger(dataSplit[0]);
+            if (optNum.isPresent()) {
+                dayOfWeek = optNum.getAsInt();
+            } else {
+                // Check if the user is trying to use day names
+                dayOfWeek = DayOfWeek.valueOf(dataSplit[0].toUpperCase()).ordinal();
+            }
+
+            // Let remaining code parse hours.
+            toParse = dataSplit[1];
         }
 
         String[] timeSplit = toParse.split(":");
@@ -229,7 +250,7 @@ public final class Timestamp implements Cloneable {
         int minutes = Integer.parseInt(timeSplit[1]);
         int seconds = timeSplit.length > 2 ? Integer.parseInt(timeSplit[2]) : UNUSED;
 
-        return new Timestamp(years, months, UNUSED, days, UNUSED, hours, minutes, seconds);
+        return new Timestamp(years, months, dayOfWeek, days, UNUSED, hours, minutes, seconds);
     }
 
     /**
