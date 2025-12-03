@@ -80,7 +80,7 @@ public class ChatInputHelper implements Listener {
         complete(null);
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onAsyncChat(AsyncPlayerChatEvent event) {
         if (event.getPlayer() != player)
             return;
