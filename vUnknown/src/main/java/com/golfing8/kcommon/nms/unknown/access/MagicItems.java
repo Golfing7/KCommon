@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class MagicItems implements NMSMagicItems {
     @Override
@@ -150,8 +151,11 @@ public class MagicItems implements NMSMagicItems {
 
     @Override
     public void setSkullTexture(SkullMeta meta, String base64Texture) {
-        GameProfile mojProfile = NMSMagicItems.makeProfile(base64Texture);
-        PlayerProfile bukkitProfile = Bukkit.createProfile(mojProfile.getId(), mojProfile.getName());
+        UUID id = new UUID(
+                base64Texture.substring(base64Texture.length() - 20).hashCode(),
+                base64Texture.substring(base64Texture.length() - 10).hashCode()
+        );
+        PlayerProfile bukkitProfile = Bukkit.createProfile(id, "Player");
         bukkitProfile.setProperty(new ProfileProperty("textures", base64Texture));
         meta.setPlayerProfile(bukkitProfile);
     }
