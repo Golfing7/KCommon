@@ -21,6 +21,9 @@ import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.mojang.authlib.GameProfile;
 import net.kyori.adventure.text.Component;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.execution.ExecutionContext;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ParticleStatus;
@@ -61,6 +64,7 @@ public class NMS implements NMSAccess {
     private FieldHandle<Map<UUID, ServerPlayer>> byUUIDHandle;
     private FieldHandle<Map<String, ServerPlayer>> byNameHandle;
     private FieldHandle<CraftInventoryPlayer> inventoryHandle;
+    private FieldHandle<ThreadLocal<ExecutionContext<CommandSourceStack>>> executionContextHandle;
 
     @SuppressWarnings("unchecked")
     public NMS(Plugin plugin) {
@@ -84,8 +88,10 @@ public class NMS implements NMSAccess {
             byUUIDHandle = (FieldHandle<Map<UUID, ServerPlayer>>) FieldHandles.getHandle("playersByUUID", PlayerList.class);
             byNameHandle = (FieldHandle<Map<String, ServerPlayer>>) FieldHandles.getHandle("playersByName", PlayerList.class);
             inventoryHandle = (FieldHandle<CraftInventoryPlayer>) FieldHandles.getHandle("inventory", CraftHumanEntity.class);
-        } catch (RuntimeException ignored) {
-        }
+        } catch (RuntimeException ignored) {}
+        try {
+            executionContextHandle = (FieldHandle<ThreadLocal<ExecutionContext<CommandSourceStack>>>) FieldHandles.getHandle("CURRENT_EXECUTION_CONTEXT", Commands.class);
+        } catch (RuntimeException ignored) {}
     }
 
     @Override
@@ -135,6 +141,18 @@ public class NMS implements NMSAccess {
         inventoryHandle.set(craftPlayer, new ItemCaptureInventory(nmsPlayer.getInventory(), player));
 
         return player;
+    }
+
+    @Override
+    public void flushCommandQueue() {
+        if (executionContextHandle == null)
+            return;
+
+        var context = executionContextHandle.get(null).get();
+        if (context == null)
+            return;
+
+        context.runCommandQueue();
     }
 
     @Override

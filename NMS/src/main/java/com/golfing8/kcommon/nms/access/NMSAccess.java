@@ -105,6 +105,11 @@ public interface NMSAccess {
     ItemCapturePlayer createPlayerForItemCapture();
 
     /**
+     * Forces the current command queue to be flushed.
+     */
+    default void flushCommandQueue() {}
+
+    /**
      * Removes the item capture player.
      */
     void removeItemCapturePlayer(ItemCapturePlayer player);

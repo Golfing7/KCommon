@@ -47,6 +47,8 @@ public final class ItemUtil {
             AtomicReference<ItemStack> reference = new AtomicReference<>();
             capturePlayer.getInventoryItemHooks().add(reference::set);
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+            // We may have to **force** the command execution to continue.
+            NMS.getTheNMS().flushCommandQueue();
             return Optional.ofNullable(reference.get());
         } finally {
             // Clean up after ourselves.
