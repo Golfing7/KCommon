@@ -64,7 +64,7 @@ public class KCommon extends KPlugin {
 
         List<LibraryDefinition> libraries = Lists.newArrayList(
                 new LibraryDefinition("net,objecthunter", "exp4j", "0.4.8"),
-                new LibraryDefinition("com,github,cryptomorin", "XSeries", "13.3.3"),
+                new LibraryDefinition("com,github,cryptomorin", "XSeries", "13.5.1"),
                 new LibraryDefinition("net,jodah", "expiringmap", "0.5.11"),
                 // For Mongo
                 new LibraryDefinition("org,mongodb", "mongodb-driver-core", "5.0.1"),
