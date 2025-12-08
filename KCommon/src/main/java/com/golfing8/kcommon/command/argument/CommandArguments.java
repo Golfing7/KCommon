@@ -96,7 +96,27 @@ public final class CommandArguments {
     }, (context) -> {
         try {
             double number = Double.parseDouble(context.getArgument());
+            if (Double.isNaN(number) || Double.isInfinite(number))
+                return false;
+
             return number >= 0;
+        } catch (NumberFormatException exc) {
+            return false;
+        }
+    }, ctx -> Double.parseDouble(ctx.getArgument()));
+
+    /**
+     * A command argument to auto-complete non-negative numbers.
+     */
+    public static final CommandArgument<Double> POSITIVE_NUMBER = new CommandArgument<>("A positive number", (context) -> {
+        return Collections.emptyList();
+    }, (context) -> {
+        try {
+            double number = Double.parseDouble(context.getArgument());
+            if (Double.isNaN(number) || Double.isInfinite(number))
+                return false;
+
+            return number > 0;
         } catch (NumberFormatException exc) {
             return false;
         }
@@ -124,7 +144,8 @@ public final class CommandArguments {
     }, (context) -> {
         try {
             double number = Double.parseDouble(context.getArgument());
-            return true;
+
+            return !Double.isNaN(number) && !Double.isInfinite(number);
         } catch (NumberFormatException exc) {
             return false;
         }
