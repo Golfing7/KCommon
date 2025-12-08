@@ -1,10 +1,13 @@
 package com.golfing8.kcommon.struct.drop;
 
+import com.golfing8.kcommon.KCommon;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Represents a Drop for commands.
@@ -26,7 +29,11 @@ public class CommandDrop extends Drop<String> {
     @Override
     public void giveTo(DropContext context) {
         getDrop().forEach(command -> {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{PLAYER}", context.getPlayer().getName()));
+            try {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{PLAYER}", context.getPlayer().getName()));
+            } catch (CommandException exc) {
+                KCommon.getInstance().getLogger().log(Level.SEVERE, "Error while executing command " + command, exc);
+            }
         });
     }
 }
