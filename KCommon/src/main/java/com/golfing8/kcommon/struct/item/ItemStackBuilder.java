@@ -477,8 +477,11 @@ public final class ItemStackBuilder {
         }
 
         // Should we get the item from a command?
+        int commandItemAmount = 0;
         if (this.itemType.startsWith("/")) {
+            // The command might apply a different amount of items, so we should respect that.
             newCopy = ItemUtil.getItemFromCommand(Placeholders.parseFully(this.itemType.substring(1), "PLAYER", NMSAccess.ITEM_CAPTURE_NAME)).orElse(XMaterial.AIR.parseItem());
+            commandItemAmount = newCopy != null ? newCopy.getAmount() : 0;
         }
 
         if (newCopy == null) {
@@ -507,7 +510,9 @@ public final class ItemStackBuilder {
         }
 
         // Set the amount *after* applying the meta. This is necessary as the server can't serialize itemstacks with > 100 items in the stack.
-        newCopy.setAmount(newAmount());
+        if (commandItemAmount == 0) {
+            newCopy.setAmount(newAmount());
+        }
 
         cachedBuild = newCopy;
         return newCopy;
