@@ -1,0 +1,18 @@
+[versions]
+lombok = "1.18.42"
+adventure-libraries = "4.24.0"
+adventure-platform = "4.4.1"
+expiringmap = "0.5.11"
+item-nbt-api = "2.15.2-SNAPSHOT"
+annotations = "24.1.0"
+junit-jupiter = "5.9.0"
+
+[libraries]
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+adventure-libraries = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-libraries" }
+adventure-platform = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
+expiringmap = { module = "net.jodah:expiringmap", version.ref  = "expiringmap"}
+itemnbtapi = { module = "de.tr7zw:item-nbt-api", version.ref = "item-nbt-api" }
+annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }

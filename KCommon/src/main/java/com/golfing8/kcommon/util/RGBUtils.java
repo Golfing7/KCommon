@@ -5,6 +5,9 @@ import org.bukkit.ChatColor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Contains useful methods for working with RGB chat colors and text
+ */
 public class RGBUtils {
     public static final RGBUtils INSTANCE = new RGBUtils();
 
@@ -29,6 +32,12 @@ public class RGBUtils {
         return text;
     }
 
+    /**
+     * Formats the hex RGB colors in the given text
+     *
+     * @param in the text
+     * @return the formatted text
+     */
     public String hexColor(String in) {
         String text = applyFormats(in);
         Matcher m = hex.matcher(text);

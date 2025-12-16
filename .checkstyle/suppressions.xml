@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC "-//Checkstyle//DTD SuppressionXpathFilter Experimental Configuration 1.2//EN" "http://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+    <!-- Lombok suppressions from https://stackoverflow.com/questions/29627108/checkstyle-errors-while-using-lombok/63791277#63791277 -->
+    <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='UtilityClass']]"/>
+    <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='Getter']]"/>
+    <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='Setter']]"/>
+</suppressions>

@@ -1,7 +1,12 @@
 package com.golfing8.kcommon.util;
 
+import lombok.experimental.UtilityClass;
 import org.bukkit.util.Vector;
 
+/**
+ * Contains useful methods for {@link Vector} instances
+ */
+@UtilityClass
 public class VectorUtil {
     /**
      * Rotates the vector around the x axis.

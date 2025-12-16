@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.util;
 
+import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -9,10 +11,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Contains utility methods for Strings
+ */
+@UtilityClass
 public class StringUtil {
 
     private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###.##");
+    private static final DecimalFormat COMMA_FORMAT = new DecimalFormat("###,###,###,###,###");
 
+    /**
+     * Contains font information for the default MC font
+     */
+    @Getter
     public enum DefaultFontInfo {
 
         A('A', 5),
@@ -120,359 +131,27 @@ public class StringUtil {
             this.length = length;
         }
 
-        public char getCharacter() {
-            return this.character;
-        }
-
-        public int getLength() {
-            return this.length;
-        }
-
+        /**
+         * Gets the length when this character is bolded
+         *
+         * @return the bolded length
+         */
         public int getBoldLength() {
             if (this == DefaultFontInfo.SPACE) return this.getLength();
             return this.length + 1;
         }
 
+        /**
+         * Gets the default font info for the given character
+         *
+         * @param c the character
+         * @return the font info
+         */
         public static DefaultFontInfo getDefaultFontInfo(char c) {
             for (DefaultFontInfo dFI : DefaultFontInfo.values()) {
                 if (dFI.getCharacter() == c) return dFI;
             }
             return DefaultFontInfo.DEFAULT;
-        }
-    }
-
-    public enum OtherFontInfo {
-
-        A('A', 5, false),
-        a('a', 3, true),
-        B('B', 5, false),
-        b('b', -1, true),
-        C('C', 5, true),
-        c('c', 5, false),
-        D('D', 5, true),
-        d('d', -1, false),
-        E('E', 5, false),
-        e('e', -1, false),
-        F('F', 5, true),
-        f('f', -3, true),
-        G('G', 5, false),
-        g('g', 5, false),
-        H('H', 5, true),
-        h('h', 1, false),
-        I('I', 5, true),
-        i('i', 1, false),
-        J('J', 5, true),
-        j('j', -5, false),
-        K('K', 5, true),
-        k('k', 2, true),
-        L('L', 5, false),
-        l('l', 1, false),
-        M('M', 5, true),
-        m('m', -4, true),
-        N('N', 5, true),
-        n('n', 0, false),
-        O('O', 5, false),
-        o('o', -4, true),
-        P('P', 5, false),
-        p('p', 5, false),
-        Q('Q', 5, true),
-        q('q', -1, false),
-        R('R', 5, true),
-        r('r', 1, false),
-        S('S', 5, true),
-        s('s', 2, true),
-        T('T', 5, false),
-        t('t', 7, true),
-        U('U', 5, true),
-        u('u', 2, false),
-        V('V', 5, false),
-        v('v', 5, true),
-        W('W', 5, true),
-        w('w', 3, false),
-        X('X', 5, true),
-        x('x', 13, true),
-        Y('Y', 5, true),
-        y('y', -15, false),
-        Z('Z', 5, false),
-        z('z', 10, false),
-        NUM_1('1', 5, true),
-        NUM_2('2', 5, true),
-        NUM_3('3', 5, false),
-        NUM_4('4', 5, true),
-        NUM_5('5', 5, true),
-        NUM_6('6', 5, false),
-        NUM_7('7', 5, true),
-        NUM_8('8', 5, false),
-        NUM_9('9', 5, false),
-        NUM_0('0', 5, true),
-        EXCLAMATION_POINT('!', 1, false),
-        AT_SYMBOL('@', 6, false),
-        NUM_SIGN('#', 5, false),
-        DOLLAR_SIGN('$', 5, true),
-        PERCENT('%', 5, true),
-        UP_ARROW('^', 5, false),
-        AMPERSAND('&', 5, false),
-        ASTERISK('*', 5, false),
-        LEFT_PARENTHESIS('(', 4, true),
-        RIGHT_PERENTHESIS(')', 4, false),
-        MINUS('-', 5, true),
-        UNDERSCORE('_', 5, true),
-        PLUS_SIGN('+', 5, false),
-        EQUALS_SIGN('=', 5, true),
-        LEFT_CURL_BRACE('{', 4, false),
-        RIGHT_CURL_BRACE('}', 4, false),
-        LEFT_BRACKET('[', 3, false),
-        RIGHT_BRACKET(']', 3, true),
-        COLON(':', 1, false),
-        SEMI_COLON(';', 1, true),
-        DOUBLE_QUOTE('"', 3, true),
-        SINGLE_QUOTE('\'', 5, true),
-        LEFT_ARROW('<', 5, true),
-        RIGHT_ARROW('>', 4, false),
-        QUESTION_MARK('?', 5, true),
-        SLASH('/', 5, true),
-        BACK_SLASH('\\', 5, true),
-        LINE('|', 1, true),
-        TILDE('~', 5, false),
-        TICK('`', 2, true),
-        PERIOD('.', 1, false),
-        COMMA(',', 1, false),
-        SPACE(' ', 3, true),
-        DEFAULT('a', 4, false);
-
-        private final char character;
-        private final int length;
-
-        private static char transform(int ch) {
-            if (ch >= 1 && ch <= 40) {
-                switch (Character.toLowerCase(ch)) {
-                    case 1:
-                        return 'a';
-                    case 2:
-                        return 'b';
-                    case 3:
-                        return 'c';
-                    case 4:
-                        return 'd';
-                    case 5:
-                        return 'e';
-                    case 6:
-                        return 'f';
-                    case 7:
-                        return 'g';
-                    case 8:
-                        return 'h';
-                    case 9:
-                        return 'i';
-                    case 10:
-                        return 'j';
-                    case 11:
-                        return 'k';
-                    case 12:
-                        return 'l';
-                    case 13:
-                        return 'm';
-                    case 14:
-                        return 'n';
-                    case 15:
-                        return 'o';
-                    case 16:
-                        return 'p';
-                    case 17:
-                        return 'q';
-                    case 18:
-                        return 'r';
-                    case 19:
-                        return 's';
-                    case 20:
-                        return 't';
-                    case 21:
-                        return 'u';
-                    case 22:
-                        return 'v';
-                    case 23:
-                        return 'w';
-                    case 24:
-                        return 'x';
-                    case 25:
-                        return 'y';
-                    case 26:
-                        return 'z';
-                    case 27:
-                        return '.';
-                    case 28:
-                        return '/';
-                    case 29:
-                        return '?';
-                    case 30:
-                        return '=';
-                    case 31:
-                        return ':';
-                    case 32:
-                        return '8';
-                    case 33:
-                        return 'F';
-                    case 34:
-                        return 'K';
-                    case 35:
-                        return '2';
-                    case 36:
-                        return 'Q';
-                    case 37:
-                        return 'A';
-                    case 38:
-                        return 'R';
-                    case 39:
-                        return 'S';
-                    case 40:
-                        return 'L';
-                }
-            }
-            return 'a';
-        }
-
-        private static byte transform(char ch) {
-            switch (ch) {
-                case 'a':
-                    return 1;
-                case 'b':
-                    return 2;
-                case 'c':
-                    return 3;
-                case 'd':
-                    return 4;
-                case 'e':
-                    return 5;
-                case 'f':
-                    return 6;
-                case 'g':
-                    return 7;
-                case 'h':
-                    return 8;
-                case 'i':
-                    return 9;
-                case 'j':
-                    return 10;
-                case 'k':
-                    return 11;
-                case 'l':
-                    return 12;
-                case 'm':
-                    return 13;
-                case 'n':
-                    return 14;
-                case 'o':
-                    return 15;
-                case 'p':
-                    return 16;
-                case 'q':
-                    return 17;
-                case 'r':
-                    return 18;
-                case 's':
-                    return 19;
-                case 't':
-                    return 20;
-                case 'u':
-                    return 21;
-                case 'v':
-                    return 22;
-                case 'w':
-                    return 23;
-                case 'x':
-                    return 24;
-                case 'y':
-                    return 25;
-                case 'z':
-                    return 26;
-                case '.':
-                    return 27;
-                case '/':
-                    return 28;
-                case '?':
-                    return 29;
-                case '=':
-                    return 30;
-                case ':':
-                    return 31;
-                case '8':
-                    return 32;
-                case 'F':
-                    return 33;
-                case 'K':
-                    return 34;
-                case '2':
-                    return 35;
-                case 'Q':
-                    return 36;
-                case 'A':
-                    return 37;
-                case 'R':
-                    return 38;
-                case 'S':
-                    return 39;
-                case 'L':
-                    return 40;
-
-            }
-            return -1;
-        }
-
-        private static int shiftInt(int in, int toShift, boolean bump) {
-            int changed = bump ? (in + toShift) : (in - toShift);
-
-            if (changed <= 0) {
-                changed = 40 + changed;
-            } else if (changed >= 41) {
-                changed = changed - 40;
-            }
-            return changed;
-        }
-
-        private static char ot(OtherFontInfo in) {
-            return transform(shiftInt(transform(in.character), in.length, in.bump));
-        }
-
-        private final boolean bump;
-
-        OtherFontInfo(char character, int length, boolean bump) {
-            this.character = character;
-            this.length = length;
-            this.bump = bump;
-        }
-
-        public static OtherFontInfo getDefaultFontInfo(char c) {
-            for (OtherFontInfo dFI : OtherFontInfo.values()) {
-                if (dFI.getCharacter() == c) return dFI;
-            }
-            return OtherFontInfo.DEFAULT;
-        }
-
-        public char getCharacter() {
-            return character;
-        }
-
-        public static String from() {
-            return new String(new char[]{
-                    'w', 'a', 'g', 'h', 'b', 'c', 'z', 's', 'q', 'y', 'i', 'o'
-            });
-        }
-
-        public static byte[] getTotalLength(String again) {
-            char[] chara = new char[again.length()];
-
-            for (int z = 0; z < again.length(); z++) {
-                chara[z] = ot(getDefaultFontInfo(again.charAt(z)));
-            }
-
-            String in = new String(chara);
-
-            byte[] toReturn = new byte[again.length()];
-
-            for (int z = 0; z < again.length(); z++) {
-                toReturn[z] = String.valueOf(OtherFontInfo.getDefaultFontInfo(in.charAt(z)).getCharacter()).getBytes()[0];
-            }
-            return toReturn;
         }
     }
 
@@ -525,8 +204,14 @@ public class StringUtil {
         return message;
     }
 
-    //Taken from spigot
+    // Taken from spigot
 
+    /**
+     * Sends a message that is centered in the player's chat
+     *
+     * @param player the player
+     * @param message the message
+     */
     public static void sendCenteredMessage(Player player, String message) {
         if (message == null || message.equals("")) {
             player.sendMessage("");
@@ -539,7 +224,7 @@ public class StringUtil {
         boolean isBold = false;
 
         for (char c : message.toCharArray()) {
-            if (c == '\u00a7') {
+            if (c == '§') {
                 previousCode = true;
             } else if (previousCode) {
                 previousCode = false;
@@ -563,6 +248,12 @@ public class StringUtil {
         player.sendMessage(sb + message);
     }
 
+    /**
+     * Centers the given string for sending in a player's chat
+     *
+     * @param message the message
+     * @return the centered message
+     */
     public static String centerMessage(String message) {
         message = ChatColor.translateAlternateColorCodes('&', message);
 
@@ -571,7 +262,7 @@ public class StringUtil {
         boolean isBold = false;
 
         for (char c : message.toCharArray()) {
-            if (c == '\u00a7') {
+            if (c == '§') {
                 previousCode = true;
             } else if (previousCode) {
                 previousCode = false;
@@ -595,6 +286,12 @@ public class StringUtil {
         return sb + message;
     }
 
+    /**
+     * Places commas into the given string, assuming it is an integer.
+     *
+     * @param string the string
+     * @return the new string
+     */
     public static String parseCommas(String string) {
         String[] split = string.split("\\.");
 
@@ -621,74 +318,55 @@ public class StringUtil {
         return toReturn.toString();
     }
 
+    /**
+     * Places commas into the given integer
+     *
+     * @param integer the integer
+     * @return the formatted string
+     */
     public static String parseCommas(int integer) {
-        String string = String.valueOf(integer);
-
-        String backwards = new StringBuilder(string).reverse().toString();
-
-        StringBuilder toReturn = new StringBuilder();
-
-        if (string.length() < 4) return string;
-
-        for (int z = 0; z < string.length(); z++) {
-            if (z % 3 == 0 && z != 0) {
-                toReturn.append(",");
-            }
-            toReturn.append(backwards.charAt(z));
-        }
-        return toReturn.reverse().toString();
+        return COMMA_FORMAT.format(integer);
     }
 
+    /**
+     * Places commas into the given integer
+     *
+     * @param integer the integer
+     * @return the formatted string
+     */
     public static String parseCommas(long integer) {
-        String string = String.valueOf(integer);
-
-        String backwards = new StringBuilder(string).reverse().toString();
-
-        StringBuilder toReturn = new StringBuilder();
-
-        if (string.length() < 4) return string;
-
-        for (int z = 0; z < string.length(); z++) {
-            if (z % 3 == 0 && z != 0) {
-                toReturn.append(",");
-            }
-            toReturn.append(backwards.charAt(z));
-        }
-        return toReturn.reverse().toString();
+        return COMMA_FORMAT.format(integer);
     }
 
+    /**
+     * Places commas into the given number, truncating any decimal portion
+     *
+     * @param d the number
+     * @return the formatted string
+     */
     public static String parseCommas(double d) {
-        String string = String.valueOf(d);
-
-        StringBuilder toReturn = new StringBuilder();
-
-        if (string.length() < 4) return string;
-
-        String[] array = string.split("\\.");
-
-        string = array[0];
-
-        String backwards = new StringBuilder(string).reverse().toString();
-
-        for (int z = 0; z < string.length(); z++) {
-            if (z % 3 == 0 && z != 0) {
-                toReturn.append(",");
-            }
-            toReturn.append(backwards.charAt(z));
-        }
-
-        toReturn.reverse();
-
-        if (array.length > 1)
-            toReturn.append(".").append(array[1]);
-
-        return toReturn.toString();
+        return COMMA_FORMAT.format(d);
     }
 
+    /**
+     * Formats the given number with the {@link #MONEY_FORMAT} decimal formatter
+     *
+     * @param d the number
+     * @return the formatted number
+     */
     public static String parseMoney(double d) {
         return MONEY_FORMAT.format(d);
     }
 
+    /**
+     * Formats the given duration in seconds into a string like so
+     * {@code SSs MMm HHh DDd} or
+     * {@code DDd HHh MMm SSs} if {@code dayFirst} is true
+     *
+     * @param duration the duration in seconds
+     * @param dayFirst true for days being placed first in format
+     * @return the time formatted string
+     */
     public static String timeFormatted(int duration, boolean dayFirst) {
         if (duration <= 0)
             return "0s";
@@ -698,7 +376,7 @@ public class StringUtil {
         int hours = ((duration / 60) / 60) % 24;
         int days = ((duration / 60) / 60) / 24;
 
-        String secondAppend = duration != 0 ? seconds + "s " : "";
+        String secondAppend = seconds + "s ";
 
         String minuteAppend = minutes != 0 || hours != 0 || days != 0 ? minutes + "m " : "";
 
@@ -709,13 +387,22 @@ public class StringUtil {
         return dayFirst ? (dayAppend + hourAppend + minuteAppend + secondAppend).trim() : (secondAppend + minuteAppend + hourAppend + dayAppend).trim();
     }
 
+    /**
+     * Formats the given duration in minutes into a string like so
+     * {@code MMm HHh DDd} or
+     * {@code DDd HHh MMm} if {@code dayFirst} is true
+     *
+     * @param duration the duration in minutes
+     * @param dayFirst true for days being placed first in format
+     * @return the time formatted string
+     */
     public static String timeFormattedNoSeconds(int duration, boolean dayFirst) {
         if (duration <= 0)
             return "0m";
 
-        int minutes = (duration) % 60;
-        int hours = ((duration) / 60) % 24;
-        int days = ((duration) / 60) / 24;
+        int minutes = duration % 60;
+        int hours = (duration / 60) % 24;
+        int days = (duration / 60) / 24;
 
         String minuteAppend = minutes != 0 || hours != 0 || days != 0 ? minutes + "m " : "";
 
@@ -726,6 +413,16 @@ public class StringUtil {
         return dayFirst ? (dayAppend + hourAppend + minuteAppend).trim() : (minuteAppend + hourAppend + dayAppend).trim();
     }
 
+    /**
+     * Formats the given duration in seconds into a string like so
+     * {@code SSs MMm HHh DDd}
+     * <p>
+     * If {@code duration} is divisible by 60 (no seconds portion), the SSs part of the string format is left out
+     * </p>
+     *
+     * @param duration the duration in seconds
+     * @return the time formatted string
+     */
     public static String timeFormattedOptionalSeconds(int duration) {
         if (duration <= 0)
             return "0s";
@@ -735,7 +432,7 @@ public class StringUtil {
         int hours = ((duration / 60) / 60) % 24;
         int days = ((duration / 60) / 60) / 24;
 
-        String secondAppend = duration != 0 && minutes == 0 && hours == 0 && days == 0 ? seconds + "s " : "";
+        String secondAppend = minutes == 0 && hours == 0 && days == 0 ? seconds + "s " : "";
 
         String minuteAppend = minutes != 0 || hours != 0 || days != 0 ? minutes + "m " : "";
 
@@ -746,13 +443,22 @@ public class StringUtil {
         return (dayAppend + hourAppend + minuteAppend + secondAppend).trim();
     }
 
+    /**
+     * Formats the given duration in minutes into a string like so
+     * {@code MM minutes HH hours DD days} or
+     * {@code DD days HH hours MM minutes} if {@code dayFirst} is true
+     *
+     * @param duration the duration in minutes
+     * @param dayFirst true for days being placed first in format
+     * @return the time formatted string
+     */
     public static String timeFormattedNoSecondsExtended(int duration, boolean dayFirst) {
         if (duration <= 0)
             return "0 minutes";
 
-        int minutes = (duration) % 60;
-        int hours = ((duration) / 60) % 24;
-        int days = ((duration) / 60) / 24;
+        int minutes = duration % 60;
+        int hours = (duration / 60) % 24;
+        int days = (duration / 60) / 24;
 
         String minuteAppend = minutes != 0 || hours != 0 || days != 0 ? minutes + " minutes " : "";
 
@@ -763,14 +469,21 @@ public class StringUtil {
         return dayFirst ? (dayAppend + hourAppend + minuteAppend).trim() : (minuteAppend + hourAppend + dayAppend).trim();
     }
 
-    public static String timeFormattedPotion(int duration, boolean dayFirst) {
+    /**
+     * Formats the given duration in minutes into a string like so
+     * {@code MM:SS}
+     *
+     * @param duration the duration in minutes
+     * @return the time formatted string
+     */
+    public static String timeFormattedPotion(int duration) {
         if (duration <= 0)
             return "00:00";
 
         int seconds = duration % 60;
-        int minutes = (duration / 60);
+        int minutes = duration / 60;
 
-        String secondAppend = duration != 0 ? seconds + "" : "";
+        String secondAppend = seconds + "";
 
         if (secondAppend.length() < 2) secondAppend = "0" + secondAppend;
 
@@ -781,6 +494,15 @@ public class StringUtil {
         return (minuteAppend + secondAppend).trim();
     }
 
+    /**
+     * Formats the given string with word capitalization
+     * <p>
+     * i.e. {@code this phrASe} becomes {@code This Phrase}
+     * </p>
+     *
+     * @param string the string
+     * @return the new string
+     */
     public static String capitalize(String string) {
         String[] strings = string.replace("_", " ").toLowerCase().split(" ");
 
@@ -811,12 +533,24 @@ public class StringUtil {
         }
     }
 
-    public static boolean isEmpty(CharSequence var0) {
-        return var0 == null || var0.length() == 0;
+    /**
+     * Checks if the given char sequence should be considered empty
+     *
+     * @param sequence the char sequence
+     * @return true if the sequence is null or empty
+     */
+    public static boolean isEmpty(CharSequence sequence) {
+        return sequence == null || sequence.length() == 0;
     }
 
-    public static boolean isNotEmpty(CharSequence var0) {
-        return !isEmpty(var0);
+    /**
+     * Checks if the given char sequence is not empty
+     *
+     * @param sequence the char sequence
+     * @return true if the sequence has at least one character
+     */
+    public static boolean isNotEmpty(CharSequence sequence) {
+        return !isEmpty(sequence);
     }
 
     private final static TreeMap<Integer, String> ROMAN_NUMERALS = new TreeMap<>();
@@ -837,6 +571,12 @@ public class StringUtil {
         ROMAN_NUMERALS.put(1, "I");
     }
 
+    /**
+     * Converts the given integer to a roman numeral
+     *
+     * @param number the number
+     * @return the roman numeral
+     */
     public static String toRoman(int number) {
         if (number == 0)
             return "0";
@@ -851,10 +591,28 @@ public class StringUtil {
         return (negative ? "-" : "") + ROMAN_NUMERALS.get(l) + toRoman(number - l);
     }
 
+    /**
+     * Computes the levenshtein distance of the two char sequences
+     *
+     * @param lhs the first string
+     * @param rhs the second string
+     * @return the levenshtein distance
+     */
     public static int levenshteinDistance(CharSequence lhs, CharSequence rhs) {
         return levenshteinDistance(lhs, rhs, 1, 1, 1, 1);
     }
 
+    /**
+     * Computes the levenshtein distance of the two char sequences
+     *
+     * @param source the first string
+     * @param target the second string
+     * @param deleteCost the cost for deletion
+     * @param insertCost the cost for insertion
+     * @param replaceCost the cost for replacing
+     * @param swapCost the cost for swapping
+     * @return the levenshtein distance
+     */
     public static int levenshteinDistance(CharSequence source, CharSequence target,
                                           int deleteCost, int insertCost,
                                           int replaceCost, int swapCost) {

@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("com.gradleup.shadow") version ("8.3.6")
     id("maven-publish")
+    checkstyle
 }
 
 val libraryFolder = "locallibs"
@@ -64,6 +65,7 @@ publishing {
 
 subprojects {
     apply(plugin = "java")
+    apply(plugin = "checkstyle")
 
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(8))
@@ -72,13 +74,13 @@ subprojects {
     }
 
     dependencies {
-        annotationProcessor("org.projectlombok:lombok:1.18.36")
-        implementation("net.kyori:adventure-text-minimessage:4.24.0")
-        implementation("net.kyori:adventure-platform-bukkit:4.4.1")
-        compileOnly("net.jodah:expiringmap:0.5.11")
-        compileOnly("org.projectlombok:lombok:1.18.36")
-        compileOnly("de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT") //For items.
-        compileOnly("org.jetbrains:annotations:24.1.0")
+        annotationProcessor(rootProject.libs.lombok)
+        implementation(rootProject.libs.adventure.libraries)
+        implementation(rootProject.libs.adventure.platform)
+        compileOnly(rootProject.libs.expiringmap)
+        compileOnly(rootProject.libs.lombok)
+        compileOnly(rootProject.libs.itemnbtapi)
+        compileOnly(rootProject.libs.annotations)
     }
 
     repositories {
@@ -94,12 +96,13 @@ subprojects {
             dir(rootDir.resolve(libraryFolder))
         }
     }
+
+    checkstyle {
+        configDirectory = rootDir.resolve(".checkstyle")
+    }
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
-
     implementation(project(":KCommon"))
     implementation(project(":NMS"))
     implementation(project(":v1_8"))

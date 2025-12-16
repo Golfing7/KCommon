@@ -33,14 +33,14 @@ public final class CommandArguments {
      */
     private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("[\\w-]+");
 
-    public static final CommandArgument<String> ANYTHING = new CommandArgument<>("Anything", (ctx) -> Collections.emptyList(), (context) -> true, ArgumentContext::getArgument);
+    public static final CommandArgument<String> ANYTHING = new CommandArgument<>("Anything", ctx -> Collections.emptyList(), (context) -> true, ArgumentContext::getArgument);
 
     /**
      * A command argument for all offline players
      */
-    public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER = new CommandArgument<>("An offline player", (context) -> {
+    public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER = new CommandArgument<>("An offline player", context -> {
         return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());
-    }, (context) -> {
+    }, context -> {
         OfflinePlayer player = Bukkit.getOfflinePlayer(context.getArgument());
         return player != null && player.getName().equalsIgnoreCase(context.getArgument());
     }, ctx -> Bukkit.getOfflinePlayer(ctx.getArgument()));
@@ -48,9 +48,9 @@ public final class CommandArguments {
     /**
      * A command argument for all offline players that have played before
      */
-    public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER_PLAYED_BEFORE = new CommandArgument<>("An offline player", (context) -> {
+    public static final CommandArgument<OfflinePlayer> OFFLINE_PLAYER_PLAYED_BEFORE = new CommandArgument<>("An offline player", context -> {
         return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());
-    }, (context) -> {
+    }, context -> {
         OfflinePlayer ifCached = NMS.getTheNMS().getOfflinePlayerIfCached(context.getArgument());
         return ifCached != null && ifCached.getName().equalsIgnoreCase(context.getArgument());
     }, ctx -> Bukkit.getOfflinePlayer(ctx.getArgument()));
@@ -72,9 +72,9 @@ public final class CommandArguments {
     /**
      * A command argument to auto-complete online players.
      */
-    public static final CommandArgument<Player> PLAYER = new CommandArgument<>("An online player", (context) -> {
+    public static final CommandArgument<Player> PLAYER = new CommandArgument<>("An online player", context -> {
         return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());
-    }, (context) -> {
+    }, context -> {
         Player player = Bukkit.getPlayer(context.getArgument());
         //The double check is necessary as Bukkit.getPlayer()
         //returns the player with a name that starts with the string.
