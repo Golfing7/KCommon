@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A config adapter for old names of entity attribute enum values.
+ * Adapts instances of {@link EntityAttribute}
  */
 public class CAEntityAttribute implements ConfigAdapter<EntityAttribute> {
     @Override

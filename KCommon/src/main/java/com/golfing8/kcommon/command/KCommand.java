@@ -47,6 +47,13 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
             Pattern.CASE_INSENSITIVE
     );
 
+    /**
+     * Represents a fully constructed argument for an instance of {@link KCommand}
+     * <p>
+     * These instances are tied to a specific command and are intended to allow
+     * for specific commands to modify behavior such as autocompletion
+     * </p>
+     */
     @Data
     @AllArgsConstructor
     @RequiredArgsConstructor
@@ -362,7 +369,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * Registers this command to the bukkit command map.
      */
     public final void register() {
-        CommandManager.getInstance().registerNewCommand(plugin, this, true);
+        CommandManager.getINSTANCE().registerNewCommand(plugin, this, true);
         this.onRegister();
         this.subRegister();
     }
@@ -371,7 +378,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * Unregisters this command from the bukkit command map.
      */
     public final void unregister() {
-        CommandManager.getInstance().unregisterCommand(this);
+        CommandManager.getINSTANCE().unregisterCommand(this);
         this.onUnregister();
         this.subUnregister();
     }
@@ -714,7 +721,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         if (visibility == CommandVisibility.PRIVATE)
             return false;
 
-        return visibility == CommandVisibility.PUBLIC || (this.checkPermission(sender) && visibility == CommandVisibility.PROTECTED);
+        return visibility == CommandVisibility.PUBLIC || this.checkPermission(sender) && visibility == CommandVisibility.PROTECTED;
     }
 
     /**
@@ -1067,17 +1074,22 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * Used to register internals for {@link MCommand}.
      */
     void internalOnRegister() {
+        /*Intentionally empty*/
     }
 
     /**
      * Run when this command is registered. Should be used for bootstrapping things like command arguments.
      */
-    protected void onRegister() {/*Intentionally empty*/}
+    protected void onRegister() {
+        /*Intentionally empty*/
+    }
 
     /**
      * Run when this command is unregistered. Can be overridden if necessary.
      */
-    protected void onUnregister() {/*Intentionally empty*/}
+    protected void onUnregister() {
+        /*Intentionally empty*/
+    }
 
     /**
      * Run when a player has executed this command and it needs to function.

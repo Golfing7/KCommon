@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Adapts instances of {@link SoundWrapper}
+ */
 public class CASoundWrapper implements ConfigAdapter<SoundWrapper> {
     @Override
     public Class<SoundWrapper> getAdaptType() {

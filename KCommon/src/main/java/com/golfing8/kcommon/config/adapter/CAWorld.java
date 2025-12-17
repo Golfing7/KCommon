@@ -6,7 +6,7 @@ import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A config adapter for bukkit worlds.
+ * Adapts instances of {@link World}
  */
 public class CAWorld implements ConfigAdapter<World> {
     @Override

@@ -4,6 +4,9 @@ import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Adapts instances of {@link Range}
+ */
 public class CARange implements ConfigAdapter<Range> {
     private static final double EPSILON = 1e-7;
 

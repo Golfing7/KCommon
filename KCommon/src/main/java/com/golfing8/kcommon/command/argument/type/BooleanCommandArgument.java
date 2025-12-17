@@ -18,7 +18,7 @@ public class BooleanCommandArgument extends CommandArgument<Boolean> {
     private final Map<String, Boolean> valueMap;
 
     public BooleanCommandArgument(Map<String, Boolean> valueMap) {
-        super("A boolean", (context) -> valueMap.keySet(), (context) -> valueMap.containsKey(context.getArgument().toLowerCase()), ctx -> valueMap.get(ctx.getArgument().toLowerCase()));
+        super("A boolean", context -> valueMap.keySet(), context -> valueMap.containsKey(context.getArgument().toLowerCase()), ctx -> valueMap.get(ctx.getArgument().toLowerCase()));
         Map<String, Boolean> filteredMap = new HashMap<>();
         for (var entry : valueMap.entrySet()) {
             if (entry.getValue() == null)

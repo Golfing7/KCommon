@@ -52,6 +52,14 @@ public class CommandArgument<A> {
                 argument -> (T) allStrings.get(argument.getArgument().toUpperCase()));
     }
 
+    /**
+     * Constructs a command argument from the given map
+     *
+     * @param typeName the name of the type
+     * @param map the map containing string to value pairs
+     * @return the command argument
+     * @param <T> the type of argument
+     */
     public static <T> CommandArgument<T> fromMap(String typeName, Map<String, T> map) {
         Map<T, String> reverseMap = new HashMap<>();
         for (var entry : map.entrySet()) {
@@ -60,10 +68,29 @@ public class CommandArgument<A> {
         return fromCollection(typeName, map.values(), ctx -> map.get(ctx.getArgument()), reverseMap::get);
     }
 
+    /**
+     * Constructs a command argument from the given collection of values.
+     *
+     * @param typeName the type name
+     * @param coll the collection of values
+     * @param fromString the function converting context to values
+     * @return the command argument
+     * @param <T> the type of argument
+     */
     public static <T> CommandArgument<T> fromCollection(String typeName, Collection<T> coll, Function<ArgumentContext, T> fromString) {
         return fromCollection(typeName, coll, fromString, Objects::toString);
     }
 
+    /**
+     * Constructs a command argument from the given collection of values.
+     *
+     * @param typeName the type name
+     * @param coll the collection of values
+     * @param fromString the function converting context to values
+     * @param toString converts values to strings for command suggestions
+     * @return the command argument
+     * @param <T> the type of argument
+     */
     public static <T> CommandArgument<T> fromCollection(String typeName, Collection<T> coll, Function<ArgumentContext, T> fromString, Function<T, String> toString) {
         Set<String> completions = coll.stream().map(toString).collect(Collectors.toSet());
         return new CommandArgument<>("A type of " + typeName,

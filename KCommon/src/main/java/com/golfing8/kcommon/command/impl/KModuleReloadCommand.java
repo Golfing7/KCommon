@@ -8,6 +8,9 @@ import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.module.Module;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Reloads a KModule
+ */
 @Cmd(
         name = "reload",
         aliases = "r",

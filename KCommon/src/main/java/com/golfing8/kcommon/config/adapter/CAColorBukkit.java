@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Adapts bukkit colors.
+ * Adapts instances of {@link org.bukkit.Color}
  */
 public class CAColorBukkit implements ConfigAdapter<Color> {
     /**

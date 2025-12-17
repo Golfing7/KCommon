@@ -8,6 +8,9 @@ import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.module.Module;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Enables a module
+ */
 @Cmd(
         name = "enable",
         description = "Enables a module"

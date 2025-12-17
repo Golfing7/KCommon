@@ -20,7 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Adapts all bukkit crafting recipes.
+ * Adapts instances of {@link Recipe}
+ * <p>
+ * All types of crafting recipes are currently supported.
+ * </p>
  */
 @SuppressWarnings({"unchecked"})
 public class CACraftingRecipe implements ConfigAdapter<Recipe> {

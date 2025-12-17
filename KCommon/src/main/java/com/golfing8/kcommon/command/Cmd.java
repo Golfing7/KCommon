@@ -42,6 +42,9 @@ public @interface Cmd {
     @NotNull
     CommandVisibility visibility() default CommandVisibility.PROTECTED;
 
+    /**
+     * The description of this command.
+     */
     @NotNull
     String description() default "No provided description";
 

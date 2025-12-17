@@ -33,7 +33,7 @@ public final class CommandArguments {
      */
     private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("[\\w-]+");
 
-    public static final CommandArgument<String> ANYTHING = new CommandArgument<>("Anything", ctx -> Collections.emptyList(), (context) -> true, ArgumentContext::getArgument);
+    public static final CommandArgument<String> ANYTHING = new CommandArgument<>("Anything", ctx -> Collections.emptyList(), context -> true, ArgumentContext::getArgument);
 
     /**
      * A command argument for all offline players
@@ -84,16 +84,16 @@ public final class CommandArguments {
     /**
      * A command argument for alphanumeric strings. (A-Za-z0-9_)
      */
-    public static final CommandArgument<String> ALPHANUMERIC_STRING = new CommandArgument<>("An alphanumeric string", (context) -> {
+    public static final CommandArgument<String> ALPHANUMERIC_STRING = new CommandArgument<>("An alphanumeric string", context -> {
         return Collections.emptyList();
-    }, (context) -> ALPHANUMERIC_PATTERN.matcher(context.getArgument()).matches(), ArgumentContext::getArgument);
+    }, context -> ALPHANUMERIC_PATTERN.matcher(context.getArgument()).matches(), ArgumentContext::getArgument);
 
     /**
      * A command argument to auto-complete non-negative numbers.
      */
-    public static final CommandArgument<Double> NON_NEGATIVE_NUMBER = new CommandArgument<>("A non negative number", (context) -> {
+    public static final CommandArgument<Double> NON_NEGATIVE_NUMBER = new CommandArgument<>("A non negative number", context -> {
         return Collections.emptyList();
-    }, (context) -> {
+    }, context -> {
         try {
             double number = Double.parseDouble(context.getArgument());
             if (Double.isNaN(number) || Double.isInfinite(number))
@@ -108,9 +108,9 @@ public final class CommandArguments {
     /**
      * A command argument to auto-complete non-negative numbers.
      */
-    public static final CommandArgument<Double> POSITIVE_NUMBER = new CommandArgument<>("A positive number", (context) -> {
+    public static final CommandArgument<Double> POSITIVE_NUMBER = new CommandArgument<>("A positive number", context -> {
         return Collections.emptyList();
-    }, (context) -> {
+    }, context -> {
         try {
             double number = Double.parseDouble(context.getArgument());
             if (Double.isNaN(number) || Double.isInfinite(number))
@@ -125,9 +125,9 @@ public final class CommandArguments {
     /**
      * A command argument to auto-complete non-negative longs.
      */
-    public static final CommandArgument<Long> NON_NEGATIVE_LONG = new CommandArgument<>("A non negative integer", (context) -> {
+    public static final CommandArgument<Long> NON_NEGATIVE_LONG = new CommandArgument<>("A non negative integer", context -> {
         return Collections.emptyList();
-    }, (context) -> {
+    }, context -> {
         try {
             long number = Long.parseLong(context.getArgument());
             return number >= 0;
@@ -139,9 +139,9 @@ public final class CommandArguments {
     /**
      * A command argument to auto-complete doubles.
      */
-    public static final CommandArgument<Double> DOUBLE = new CommandArgument<>("A non negative number", (context) -> {
+    public static final CommandArgument<Double> DOUBLE = new CommandArgument<>("A non negative number", context -> {
         return Collections.emptyList();
-    }, (context) -> {
+    }, context -> {
         try {
             double number = Double.parseDouble(context.getArgument());
 
@@ -154,9 +154,9 @@ public final class CommandArguments {
     /**
      * A command argument to auto-complete non-negative integers.
      */
-    public static final CommandArgument<Integer> NON_NEGATIVE_INTEGER = new CommandArgument<>("A non negative integer", (context) -> {
+    public static final CommandArgument<Integer> NON_NEGATIVE_INTEGER = new CommandArgument<>("A non negative integer", context -> {
         return Collections.emptyList();
-    }, (context) -> {
+    }, context -> {
         try {
             int number = Integer.parseInt(context.getArgument());
             return number >= 0;
@@ -168,9 +168,9 @@ public final class CommandArguments {
     /**
      * A command argument to auto-complete positive integers.
      */
-    public static final CommandArgument<Integer> POSITIVE_INTEGER = new CommandArgument<>("A positive integer", (context) -> {
+    public static final CommandArgument<Integer> POSITIVE_INTEGER = new CommandArgument<>("A positive integer", context -> {
         return Collections.emptyList();
-    }, (context) -> {
+    }, context -> {
         try {
             return Integer.parseInt(context.getArgument()) > 0;
         } catch (NumberFormatException exc) {
@@ -181,18 +181,18 @@ public final class CommandArguments {
     /**
      * A command argument to auto-complete time lengths.
      */
-    public static final CommandArgument<TimeLength> TIME = new CommandArgument<>("A length of time", (context) -> {
+    public static final CommandArgument<TimeLength> TIME = new CommandArgument<>("A length of time", context -> {
         return Arrays.asList("1d", "1d,1h", "5m,1s");
-    }, (context) -> {
+    }, context -> {
         return TimeLength.parseTime(context.getArgument()) != null;
     }, ctx -> TimeLength.parseTime(ctx.getArgument()));
 
     /**
      * A command argument for all modules.
      */
-    public static final CommandArgument<Module> MODULE = new CommandArgument<>("A module", (context) -> {
+    public static final CommandArgument<Module> MODULE = new CommandArgument<>("A module", context -> {
         return Modules.getAll().stream().map(Module::getModuleName).collect(Collectors.toList());
-    }, (context) -> {
+    }, context -> {
         String argument = context.getArgument().toLowerCase();
         if (argument.contains(":")) {
             String[] split = argument.split(":");
@@ -220,25 +220,25 @@ public final class CommandArguments {
     /**
      * A command argument for plugins.
      */
-    public static final CommandArgument<Plugin> PLUGIN = new CommandArgument<>("plugin", (context) -> {
+    public static final CommandArgument<Plugin> PLUGIN = new CommandArgument<>("plugin", context -> {
         return Arrays.stream(Bukkit.getServer().getPluginManager().getPlugins()).map(Plugin::getName).collect(Collectors.toList());
-    }, (context) -> {
+    }, context -> {
         return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
     }, ctx -> Bukkit.getServer().getPluginManager().getPlugin(ctx.getArgument()));
 
     /**
      * A command argument for plugins that use this library.
      */
-    public static final CommandArgument<KPlugin> KPLUGIN = new CommandArgument<>("kcommon plugin", (context) -> {
+    public static final CommandArgument<KPlugin> KPLUGIN = new CommandArgument<>("kcommon plugin", context -> {
         return Arrays.stream(Bukkit.getServer().getPluginManager().getPlugins()).filter(pl -> pl instanceof KPlugin).map(Plugin::getName).collect(Collectors.toList());
-    }, (context) -> {
+    }, context -> {
         return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
     }, ctx -> (KPlugin) Bukkit.getServer().getPluginManager().getPlugin(ctx.getArgument()));
 
     /**
      * A command argument for parsing java UUIDs.
      */
-    public static final CommandArgument<UUID> UUID = new CommandArgument<>("uuid", (context) -> Collections.emptyList(), (context) -> {
+    public static final CommandArgument<UUID> UUID = new CommandArgument<>("uuid", context -> Collections.emptyList(), context -> {
         try {
             java.util.UUID.fromString(context.getArgument());
             return true;
@@ -247,11 +247,11 @@ public final class CommandArguments {
         }
     }, ctx -> java.util.UUID.fromString(ctx.getArgument()));
 
-    public static final CommandArgument<ConfigPath> CONFIG_PATH = new CommandArgument<>("config path", (context) -> Collections.emptyList(), (context) -> true, ctx -> ConfigPath.parse(ctx.getArgument()));
+    public static final CommandArgument<ConfigPath> CONFIG_PATH = new CommandArgument<>("config path", context -> Collections.emptyList(), context -> true, ctx -> ConfigPath.parse(ctx.getArgument()));
 
-    public static final CommandArgument<World> WORLD = new CommandArgument<>("world", (context) -> {
+    public static final CommandArgument<World> WORLD = new CommandArgument<>("world", context -> {
         return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
-    }, (context) -> {
+    }, context -> {
         return Bukkit.getWorld(context.getArgument()) != null;
     }, ctx -> Bukkit.getWorld(ctx.getArgument()));
 }

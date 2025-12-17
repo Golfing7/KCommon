@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
+/**
+ * Adapts instances of {@link Optional}
+ */
 @SuppressWarnings({"rawtypes"})
 public class CAOptional implements ConfigAdapter<Optional> {
     @Override
@@ -16,7 +19,7 @@ public class CAOptional implements ConfigAdapter<Optional> {
     }
 
     @Override
-    public @Nullable Optional toPOJO(ConfigPrimitive entry, FieldType type) {
+    public @NotNull Optional toPOJO(ConfigPrimitive entry, FieldType type) {
         if (entry.getPrimitive() == null)
             return Optional.empty();
 

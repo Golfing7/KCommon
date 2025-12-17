@@ -27,7 +27,7 @@ public class KItemCommand extends KCommand {
     protected void onRegister() {
         addArgument("path", CommandArguments.CONFIG_PATH);
         addArgument("player", CommandArguments.PLAYER);
-        addArgument("amount", CommandArguments.POSITIVE_INTEGER, (sender) -> "1");
+        addArgument("amount", CommandArguments.POSITIVE_INTEGER, sender -> "1");
 
         KCommon.getInstance().getLangConfig().addLanguageConstant("kitem-command.no-entries", "&cThat config entry does not exist!");
         KCommon.getInstance().getLangConfig().addLanguageConstant("kitem-command.item-not-defined-properly", "&cThat item was not defined properly!");

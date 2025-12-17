@@ -8,6 +8,9 @@ import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.module.Module;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Disable a module
+ */
 @Cmd(
         name = "disable",
         description = "Disables a module"

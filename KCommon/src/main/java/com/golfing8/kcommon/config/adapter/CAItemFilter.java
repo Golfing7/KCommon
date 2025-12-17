@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Adapts all {@link ItemFilter} objects.
+ * Adapts instances of {@link ItemFilter}
  */
 public class CAItemFilter implements ConfigAdapter<ItemFilter> {
     @Override

@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * An adapter for a list.
+ * Adapts instances of {@link List}
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CAList implements ConfigAdapter<List> {

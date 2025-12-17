@@ -13,6 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * List all modules that are registered to the KCommon framework.
+ */
 @Cmd(
         name = "list",
         aliases = "l",
@@ -21,7 +24,7 @@ import java.util.stream.Collectors;
 public class KModuleListCommand extends KCommand {
     @Override
     protected void onRegister() {
-        addArgument("plugin", CommandArguments.KPLUGIN, (sender) -> "");
+        addArgument("plugin", CommandArguments.KPLUGIN, sender -> "");
 
         KCommon.getInstance().getLangConfig().addLanguageConstant("list-command-none",
                 "&c{PLUGIN} doesn't have any modules.");

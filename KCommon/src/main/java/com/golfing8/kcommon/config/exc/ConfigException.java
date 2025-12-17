@@ -5,6 +5,9 @@ import com.golfing8.kcommon.config.commented.MConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A type of exception thrown that identifies a config as the source of the problem
+ */
 public class ConfigException extends RuntimeException {
     private final @Nullable ConfigurationSection config;
 

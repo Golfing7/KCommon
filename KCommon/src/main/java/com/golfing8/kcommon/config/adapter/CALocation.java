@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 /**
- * A config adapter for bukkit Locations.
+ * Adapts instances of {@link Location}
  */
 public class CALocation implements ConfigAdapter<Location> {
     private static final double DEF_COORD = 0.0D;

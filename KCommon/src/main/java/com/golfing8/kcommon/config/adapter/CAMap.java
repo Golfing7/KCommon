@@ -13,7 +13,7 @@ import java.util.Map;
 
 
 /**
- * A config adapter for maps.
+ * Adapts instances of {@link Map}
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CAMap implements ConfigAdapter<Map> {

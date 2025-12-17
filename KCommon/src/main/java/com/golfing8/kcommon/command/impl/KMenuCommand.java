@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Opens an arbitrary menu that is currently registered to the {@link MenuManager}
+ */
 @Cmd(
         name = "kmenu",
         aliases = "kmenus",
@@ -28,7 +31,7 @@ import java.util.stream.Collectors;
 public class KMenuCommand extends KCommand {
     @Override
     protected void onRegister() {
-        addArgument("menu-id", CommandArguments.UUID, (sender) -> "");
+        addArgument("menu-id", CommandArguments.UUID, sender -> "");
 
         KCommon.getInstance().getLangConfig().addLanguageConstant("kmenu-command.no-menu-exists-command", "&cNo menu exists with that ID.");
         KCommon.getInstance().getLangConfig().addLanguageConstant("kmenu-command.menus-list-command", Message.builder()

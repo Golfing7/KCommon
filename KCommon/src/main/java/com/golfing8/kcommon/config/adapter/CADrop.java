@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A serializer for {@link Drop}
+ * Adapts instances of {@link Drop}
  */
 @SuppressWarnings("rawtypes")
 public class CADrop implements ConfigAdapter<Drop> {

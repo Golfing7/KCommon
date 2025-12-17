@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * An adapter for a set.
+ * Adapts instances of {@link Set}
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CASet implements ConfigAdapter<Set> {

@@ -29,6 +29,11 @@ public class KPagerCommand extends KCommand {
             .expiration(60L, TimeUnit.SECONDS)
             .build();
 
+    /**
+     * Adds a message to the cache
+     *
+     * @param message the message
+     */
     public void addMessage(PagedMessage message) {
         liveMessages.put(message.getId(), message);
     }

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 /**
- * A type adapter for menu coordinates.
+ * Adapts instances of {@link MenuCoordinate}
  */
 public class CAMenuCoordinate implements ConfigAdapter<MenuCoordinate> {
     @Override

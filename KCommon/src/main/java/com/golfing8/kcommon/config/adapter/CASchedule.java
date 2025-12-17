@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A config adapter for {@link Schedule} instances.
+ * Adapts instances of {@link Schedule}
  */
 public class CASchedule implements ConfigAdapter<Schedule> {
     @Override

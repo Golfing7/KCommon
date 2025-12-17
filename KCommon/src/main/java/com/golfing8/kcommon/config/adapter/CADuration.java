@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 
 /**
- * A config adapter for a {@link Duration}
+ * Adapts instances of {@link java.time.Duration}
  */
 public class CADuration implements ConfigAdapter<Duration> {
     @Override

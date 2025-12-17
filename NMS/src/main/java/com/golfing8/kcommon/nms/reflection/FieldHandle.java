@@ -18,7 +18,7 @@ public class FieldHandle<T> {
         this.clazz = field.getDeclaringClass();
     }
 
-    public FieldHandle(String fieldName, Class<T> clazz) {
+    public FieldHandle(String fieldName, Class<?> clazz) {
         this.fieldName = fieldName;
         this.clazz = clazz;
         try {

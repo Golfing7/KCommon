@@ -4,7 +4,10 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A config adapter implementation for enums.
+ * Adapts instances of {@link Enum}
+ * <p>
+ * In particular, any type of enum is supported.
+ * </p>
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CAEnum implements ConfigAdapter<Enum> {

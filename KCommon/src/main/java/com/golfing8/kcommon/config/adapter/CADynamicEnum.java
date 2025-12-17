@@ -5,6 +5,11 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
+/**
+ * Adapts instances of {@link DynamicEnum}
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CADynamicEnum implements ConfigAdapter<DynamicEnum> {
     @Override
@@ -17,7 +22,8 @@ public class CADynamicEnum implements ConfigAdapter<DynamicEnum> {
         if (entry.getPrimitive() == null)
             return null;
 
-        return DynamicEnum.valueOf((Class<? extends DynamicEnum>) type.getType(), entry.getPrimitive().toString());
+        Optional<? extends DynamicEnum<?>> optional = DynamicEnum.valueOf((Class<? extends DynamicEnum>) type.getType(), entry.getPrimitive().toString());
+        return optional.orElse(null);
     }
 
     @Override

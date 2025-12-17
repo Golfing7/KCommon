@@ -12,7 +12,7 @@ import java.util.Map;
 
 
 /**
- * A config adapter for maps.
+ * Adapts instances of {@link RangeMap}
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CARangeMap implements ConfigAdapter<RangeMap> {

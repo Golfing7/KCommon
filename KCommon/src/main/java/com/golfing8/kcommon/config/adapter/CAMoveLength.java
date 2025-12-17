@@ -13,6 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapts instances of {@link MoveLength}
+ */
 @SuppressWarnings({"rawtypes"})
 public class CAMoveLength implements ConfigAdapter<MoveLength> {
     @Override

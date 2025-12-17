@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 /**
- * A config adapter for bukkit Locations.
+ * Adapts instances of {@link Vector}
  */
 public class CAVector implements ConfigAdapter<Vector> {
     private static final double DEF_COORD = 0.0D;

@@ -9,6 +9,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+/**
+ * Adapts instances of {@link Particle}
+ */
 public class CAParticle implements ConfigAdapter<Particle> {
     @Override
     public Class<Particle> getAdaptType() {

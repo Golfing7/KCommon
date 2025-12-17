@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A config adapter for bukkit {@link ItemStackBuilder} instances.
+ * Adapts instances of {@link ItemStackBuilder}.
  * <p>
  * This class uses the {@link ItemStackBuilder} class to build instances from the config.
  * </p>

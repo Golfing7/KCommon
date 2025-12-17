@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * An adapter for all {@link CAStringFilter} types.
+ * Adapts instances of {@link StringFilter}
  */
 public class CAStringFilter implements ConfigAdapter<StringFilter> {
     @Override

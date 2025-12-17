@@ -10,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Adapts instances of {@link CAPotionEffect}
+ */
 public class CAPotionEffect implements ConfigAdapter<PotionEffect> {
     @Override
     public Class<PotionEffect> getAdaptType() {

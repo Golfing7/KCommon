@@ -4,6 +4,9 @@ import com.golfing8.kcommon.nms.struct.EntityData;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Adapts instances of {@link EntityData}
+ */
 public class CAEntityData implements ConfigAdapter<EntityData> {
     @Override
     public Class<EntityData> getAdaptType() {

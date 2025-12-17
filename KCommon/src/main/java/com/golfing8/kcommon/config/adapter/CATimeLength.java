@@ -5,6 +5,9 @@ import com.golfing8.kcommon.struct.time.TimeLength;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Adapts instances of {@link TimeLength}
+ */
 public class CATimeLength implements ConfigAdapter<TimeLength> {
     @Override
     public Class<TimeLength> getAdaptType() {

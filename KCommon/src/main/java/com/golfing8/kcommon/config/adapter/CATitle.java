@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Adapts instances of {@link Title}
+ */
 public class CATitle implements ConfigAdapter<Title> {
     @Override
     public Class<Title> getAdaptType() {

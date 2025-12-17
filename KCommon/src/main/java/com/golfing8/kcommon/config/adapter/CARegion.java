@@ -12,6 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Adapts instances of {@link Region}
+ * <p>
+ * Currently only {@code CUBOID} and {@code RECTANGLE} region types are supported
+ * </p>
+ */
 public class CARegion implements ConfigAdapter<Region> {
     @Override
     public Class<Region> getAdaptType() {

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A serializer for local {@link PotionData} instances.
+ * Adapts instances of {@link PotionData}.
  */
 public class CAPotionData implements ConfigAdapter<PotionData> {
     @Override

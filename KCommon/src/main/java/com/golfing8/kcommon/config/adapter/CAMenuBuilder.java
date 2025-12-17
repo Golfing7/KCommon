@@ -5,7 +5,7 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Adapts menu builders from primitives.
+ * Adapts instances of {@link MenuBuilder}
  */
 public class CAMenuBuilder implements ReadOnlyConfigAdapter<MenuBuilder> {
     @Override

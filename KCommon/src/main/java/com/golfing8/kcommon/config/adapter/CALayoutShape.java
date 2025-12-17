@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An adapter for layout shapes.
+ * Adapts instances of {@link MenuLayoutShape}
  */
 public class CALayoutShape implements ConfigAdapter<MenuLayoutShape> {
 

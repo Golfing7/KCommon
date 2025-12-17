@@ -9,6 +9,9 @@ import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Adapts instances of {@link ZonedDateTime}
+ */
 public class CAZonedDateTime implements ConfigAdapter<ZonedDateTime> {
     @Override
     public Class<ZonedDateTime> getAdaptType() {

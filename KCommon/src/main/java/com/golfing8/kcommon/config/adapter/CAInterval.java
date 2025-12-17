@@ -5,6 +5,9 @@ import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Adapts instances of {@link Interval}
+ */
 public class CAInterval implements ConfigAdapter<Interval> {
     @Override
     public Class<Interval> getAdaptType() {

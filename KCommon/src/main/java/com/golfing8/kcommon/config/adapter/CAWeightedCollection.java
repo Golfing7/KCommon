@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A config adapter for {@link WeightedCollection} instances.
+ * Adapts instances of {@link WeightedCollection}
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CAWeightedCollection implements ConfigAdapter<WeightedCollection> {

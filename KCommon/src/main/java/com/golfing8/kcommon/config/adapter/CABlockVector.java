@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
+/**
+ * Adapts instances of {@link BlockVector}
+ */
 public class CABlockVector implements ConfigAdapter<BlockVector> {
     @Override
     public Class<BlockVector> getAdaptType() {

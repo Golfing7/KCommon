@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Adapts instances of {@link Message}
+ */
 public class CAMessage implements ConfigAdapter<Message> {
     @Override
     public Class<Message> getAdaptType() {

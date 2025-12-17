@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Adapts instances of {@link EntityAttributeModifier}
+ */
 public class CAEntityAttributeModifier implements ConfigAdapter<EntityAttributeModifier> {
     private static final String DEFAULT_SERIALIZED_NAME = "KCommon Attribute Modifier";
 

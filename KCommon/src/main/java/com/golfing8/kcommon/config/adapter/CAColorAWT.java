@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 /**
- * Adapts java AWT colors.
+ * Adapts instances of {@link java.awt.Color}
  */
 public class CAColorAWT implements ConfigAdapter<Color> {
     @Override
@@ -44,9 +44,8 @@ public class CAColorAWT implements ConfigAdapter<Color> {
         return ConfigPrimitive.ofString(String.format("%06X", object.getRGB() & 0xFFFFFF));
     }
 
-    @SuppressWarnings("unchecked")
     private static Color getColorByName(String name) {
-        FieldHandle<Color> fieldHandle = (FieldHandle<Color>) FieldHandles.getHandle(name, Color.class);
+        FieldHandle<Color> fieldHandle = FieldHandles.getHandle(name, Color.class);
         return fieldHandle.get(null);
     }
 }

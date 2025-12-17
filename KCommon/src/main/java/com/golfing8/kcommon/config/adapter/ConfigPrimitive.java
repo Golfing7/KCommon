@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.var;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -116,9 +117,16 @@ public final class ConfigPrimitive {
         return source == null || !source.getCurrentPath().isEmpty() ? key : source.getCurrentPath() + "." + key;
     }
 
-    @Contract("null -> fail")
-    public static ConfigPrimitive of(Object value) {
-        Preconditions.checkNotNull(value, "value cannot be null");
+    /**
+     * Constructs a config primitive from the given non-null value.
+     * <p>
+     * If the given value is not a primitively mappable type, it is rejected.
+     * </p>
+     *
+     * @param value the value
+     * @return the primitive
+     */
+    public static ConfigPrimitive of(@NotNull Object value) {
         // We should still handle sections.
         if (value instanceof ConfigurationSection) {
             return ofSection((ConfigurationSection) value);
@@ -135,6 +143,15 @@ public final class ConfigPrimitive {
         }
     }
 
+    /**
+     * Constructs a config primitive from the given nullable value.
+     * <p>
+     * If the given value is not a primitively mappable type, it is rejected.
+     * </p>
+     *
+     * @param value the value
+     * @return the primitive
+     */
     public static ConfigPrimitive ofNullable(@Nullable Object value) {
         if (value == null)
             return NULL;
@@ -142,18 +159,42 @@ public final class ConfigPrimitive {
         return of(value);
     }
 
+    /**
+     * Gets the {@link #NULL} config primitive instance
+     *
+     * @return the null config primitive
+     */
     public static ConfigPrimitive ofNull() {
         return NULL;
     }
 
+    /**
+     * An internally available factory method for constructing a primitive with a trusted value
+     *
+     * @param value the value
+     * @return the primitive
+     */
     static ConfigPrimitive ofTrusted(Object value) {
         return new ConfigPrimitive(value);
     }
 
+    /**
+     * An internally available factory method for constructing a primitive with a trusted value
+     *
+     * @param value the value
+     * @param source the config source
+     * @return the primitive
+     */
     static ConfigPrimitive ofTrusted(Object value, ConfigurationSection source) {
         return new ConfigPrimitive(value, source);
     }
 
+    /**
+     * Constructs a config primitive from the given entry
+     *
+     * @param entry the entry
+     * @return the primitive
+     */
     public static ConfigPrimitive ofValue(ConfigEntry entry) {
         Object value = entry.get();
         if (value instanceof ConfigurationSection) {
@@ -162,22 +203,58 @@ public final class ConfigPrimitive {
         return new ConfigPrimitive(entry.get(), entry.getSection());
     }
 
+    /**
+     * Constructs a config primitive from the given string
+     *
+     * @param string the string
+     * @return the primitive
+     */
     public static ConfigPrimitive ofString(String string) {
         return new ConfigPrimitive(string);
     }
 
+    /**
+     * Constructs a config primitive from the given int
+     *
+     * @param value the integer
+     * @return the primitive
+     */
     public static ConfigPrimitive ofInt(int value) {
         return new ConfigPrimitive(value);
     }
 
+    /**
+     * Constructs a config primitive from the given double
+     *
+     * @param value the double
+     * @return the primitive
+     */
     public static ConfigPrimitive ofDouble(double value) {
         return new ConfigPrimitive(value);
     }
 
+    /**
+     * Constructs a config primitive from the given list
+     * <p>
+     * This does not check the values contained within the list to check if they're also primitive
+     * </p>
+     *
+     * @param list the list
+     * @return the primitive
+     */
     public static ConfigPrimitive ofList(List<?> list) {
         return new ConfigPrimitive(list);
     }
 
+    /**
+     * Constructs a config primitive from the given map
+     * <p>
+     * This does not check the values contained within the map to check if they're also primitive
+     * </p>
+     *
+     * @param map the map
+     * @return the primitive
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static ConfigPrimitive ofMap(Map<String, ?> map) {
         Map safeValues = new LinkedHashMap();
@@ -188,6 +265,12 @@ public final class ConfigPrimitive {
         return new ConfigPrimitive(safeValues);
     }
 
+    /**
+     * Constructs a config primitive from the given config section
+     *
+     * @param section the config section
+     * @return the primitive
+     */
     public static ConfigPrimitive ofSection(ConfigurationSection section) {
         Map<String, Object> values = new LinkedHashMap<>();
         for (String key : section.getKeys(false)) {
@@ -201,10 +284,22 @@ public final class ConfigPrimitive {
         return new ConfigPrimitive(values, section);
     }
 
+    /**
+     * Converts the given string to a safe key that can be used in the config
+     *
+     * @param original the original string
+     * @return the safe key string
+     */
     public static String stringToSafeKeyString(String original) {
         return original.replace(".", ",");
     }
 
+    /**
+     * Converts the given safe key string back to a normal string
+     *
+     * @param original the safe key string
+     * @return the normal string
+     */
     public static String safeKeyStringToString(String original) {
         return original.replace(",", ".");
     }

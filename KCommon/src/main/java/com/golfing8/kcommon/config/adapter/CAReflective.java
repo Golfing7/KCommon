@@ -19,7 +19,11 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * This config adapter reflectively serializes and deserializes the incoming object.
+ * Adapts instances of {@link CASerializable}
+ * <p>
+ * This adapter allows for quick and easy serialization of basic POJOs.
+ * The adapter will map a class' fields and load them to/from the config reflectively.
+ * </p>
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CAReflective implements ConfigAdapter<CASerializable> {

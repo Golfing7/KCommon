@@ -5,7 +5,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * As the {@link PotionEffectType} class isn't an enum, special serialization is necessary.
+ * Adapts instances of {@link PotionEffectType}
  */
 public class CAPotionEffectType implements ConfigAdapter<PotionEffectType> {
     @Override
