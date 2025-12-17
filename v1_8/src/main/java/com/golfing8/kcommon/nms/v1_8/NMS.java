@@ -128,12 +128,9 @@ public class NMS implements NMSAccess {
         return supportsPersistentDataContainers;
     }
 
-    @SuppressWarnings("unchecked")
-    private final FieldHandle<Map<UUID, EntityPlayer>> byUUIDHandle = (FieldHandle<Map<UUID, EntityPlayer>>) FieldHandles.getHandle("j", PlayerList.class);
-    @SuppressWarnings("unchecked")
-    private final FieldHandle<Map<String, EntityPlayer>> byNameHandle = (FieldHandle<Map<String, EntityPlayer>>) FieldHandles.getHandle("playersByName", PlayerList.class);
-    @SuppressWarnings("unchecked")
-    private final FieldHandle<CraftInventoryPlayer> inventoryHandle = (FieldHandle<CraftInventoryPlayer>) FieldHandles.getHandle("inventory", CraftHumanEntity.class);
+    private final FieldHandle<Map<UUID, EntityPlayer>> byUUIDHandle = FieldHandles.getHandle("j", PlayerList.class);
+    private final FieldHandle<Map<String, EntityPlayer>> byNameHandle = FieldHandles.getHandle("playersByName", PlayerList.class);
+    private final FieldHandle<CraftInventoryPlayer> inventoryHandle = FieldHandles.getHandle("inventory", CraftHumanEntity.class);
 
     @Override
     public ItemCapturePlayer createPlayerForItemCapture() {

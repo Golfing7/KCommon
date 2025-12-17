@@ -9,6 +9,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
 @AllArgsConstructor
 public class OutEntityDestroyV1_8 implements NMSOutEntityDestroy {
     //Raw because primitive array -> wrapper array
+    @SuppressWarnings("rawtypes")
     private static final FieldHandle handle = FieldHandles.getHandle("a", PacketPlayOutEntityDestroy.class);
 
     private final PacketPlayOutEntityDestroy packet;

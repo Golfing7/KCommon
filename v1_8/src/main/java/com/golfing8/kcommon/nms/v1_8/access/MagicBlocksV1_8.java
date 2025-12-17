@@ -17,8 +17,7 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftSkull;
 
 public class MagicBlocksV1_8 implements NMSMagicBlocks {
-    @SuppressWarnings("unchecked")
-    private final FieldHandle<GameProfile> skullProfileField = (FieldHandle<GameProfile>) FieldHandles.getHandle("profile", CraftSkull.class);
+    private final FieldHandle<GameProfile> skullProfileField = FieldHandles.getHandle("profile", CraftSkull.class);
 
     @Override
     public void setSkullOwner(Skull skull, OfflinePlayer offlinePlayer) {

@@ -85,12 +85,12 @@ public class NMS implements NMSAccess {
         Bukkit.getServer().getPluginManager().registerEvents(this.magicInventories, plugin);
 
         try {
-            byUUIDHandle = (FieldHandle<Map<UUID, ServerPlayer>>) FieldHandles.getHandle("playersByUUID", PlayerList.class);
-            byNameHandle = (FieldHandle<Map<String, ServerPlayer>>) FieldHandles.getHandle("playersByName", PlayerList.class);
-            inventoryHandle = (FieldHandle<CraftInventoryPlayer>) FieldHandles.getHandle("inventory", CraftHumanEntity.class);
+            byUUIDHandle = FieldHandles.getHandle("playersByUUID", PlayerList.class);
+            byNameHandle = FieldHandles.getHandle("playersByName", PlayerList.class);
+            inventoryHandle = FieldHandles.getHandle("inventory", CraftHumanEntity.class);
         } catch (RuntimeException ignored) {}
         try {
-            executionContextHandle = (FieldHandle<ThreadLocal<ExecutionContext<CommandSourceStack>>>) FieldHandles.getHandle("CURRENT_EXECUTION_CONTEXT", Commands.class);
+            executionContextHandle = FieldHandles.getHandle("CURRENT_EXECUTION_CONTEXT", Commands.class);
         } catch (RuntimeException ignored) {}
     }
 

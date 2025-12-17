@@ -13,10 +13,8 @@ import java.util.List;
 
 @AllArgsConstructor
 public class OutMultiBlockChangeV1_8 implements NMSOutMultiBlockChange {
-    private static final FieldHandle<ChunkCoordIntPair> CC_FIELD =
-            (FieldHandle<ChunkCoordIntPair>) FieldHandles.getHandle("a", PacketPlayOutMultiBlockChange.class);
-    private static final FieldHandle<PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[]> BLOCK_CHANGE_INFO =
-            (FieldHandle<PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[]>) FieldHandles.getHandle("b", PacketPlayOutMultiBlockChange.class);
+    private static final FieldHandle<ChunkCoordIntPair> CC_FIELD = FieldHandles.getHandle("a", PacketPlayOutMultiBlockChange.class);
+    private static final FieldHandle<PacketPlayOutMultiBlockChange.MultiBlockChangeInfo[]> BLOCK_CHANGE_INFO = FieldHandles.getHandle("b", PacketPlayOutMultiBlockChange.class);
     private static final int X_BITS = 0b1111000000000000;
     private static final int Z_BITS = 0b0000111100000000;
     private static final int Y_BITS = 0b0000000011111111;

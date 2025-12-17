@@ -10,12 +10,9 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutBlockBreakAnimation;
 
 @AllArgsConstructor
 public class OutBreakAnimationV1_8 implements NMSOutBreakAnimation {
-    private static final FieldHandle<Integer> ID_HANDLE =
-            (FieldHandle<Integer>) FieldHandles.getHandle("a", PacketPlayOutBlockBreakAnimation.class);
-    private static final FieldHandle<BlockPosition> POSITION_HANDLE =
-            (FieldHandle<BlockPosition>) FieldHandles.getHandle("b", PacketPlayOutBlockBreakAnimation.class);
-    private static final FieldHandle<Integer> STAGE_HANDLE =
-            (FieldHandle<Integer>) FieldHandles.getHandle("c", PacketPlayOutBlockBreakAnimation.class);
+    private static final FieldHandle<Integer> ID_HANDLE = FieldHandles.getHandle("a", PacketPlayOutBlockBreakAnimation.class);
+    private static final FieldHandle<BlockPosition> POSITION_HANDLE = FieldHandles.getHandle("b", PacketPlayOutBlockBreakAnimation.class);
+    private static final FieldHandle<Integer> STAGE_HANDLE = FieldHandles.getHandle("c", PacketPlayOutBlockBreakAnimation.class);
 
     private final PacketPlayOutBlockBreakAnimation packet;
 

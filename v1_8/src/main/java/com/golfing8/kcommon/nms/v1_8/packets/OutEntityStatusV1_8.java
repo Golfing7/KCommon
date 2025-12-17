@@ -9,11 +9,9 @@ import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.entity.Entity;
 
 public class OutEntityStatusV1_8 implements NMSOutEntityStatus {
-    private static final FieldHandle<Integer> entityHandle =
-            (FieldHandle<Integer>) FieldHandles.getHandle("a", PacketPlayOutEntityStatus.class);
+    private static final FieldHandle<Integer> entityHandle = FieldHandles.getHandle("a", PacketPlayOutEntityStatus.class);
 
-    private static final FieldHandle<Byte> statusHandle =
-            (FieldHandle<Byte>) FieldHandles.getHandle("b", PacketPlayOutEntityStatus.class);
+    private static final FieldHandle<Byte> statusHandle = FieldHandles.getHandle("b", PacketPlayOutEntityStatus.class);
 
     private final PacketPlayOutEntityStatus packet;
 

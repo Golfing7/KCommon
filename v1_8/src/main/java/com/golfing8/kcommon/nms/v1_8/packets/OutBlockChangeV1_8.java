@@ -10,8 +10,7 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutBlockChange;
 
 @AllArgsConstructor
 public class OutBlockChangeV1_8 implements NMSOutBlockChange {
-    private static final FieldHandle<BlockPosition> POSITION_FIELD =
-            (FieldHandle<BlockPosition>) FieldHandles.getHandle("a", PacketPlayOutBlockChange.class);
+    private static final FieldHandle<BlockPosition> POSITION_FIELD = FieldHandles.getHandle("a", PacketPlayOutBlockChange.class);
 
     private final PacketPlayOutBlockChange packet;
 

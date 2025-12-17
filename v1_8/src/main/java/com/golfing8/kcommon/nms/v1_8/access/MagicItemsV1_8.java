@@ -226,14 +226,13 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     private Class<?> craftMetaSkullClass;
     private FieldHandle<GameProfile> gameProfileFieldHandle;
 
-    @SuppressWarnings("unchecked")
     private void setupMetaSkullAccess() {
         if (craftMetaSkullClass != null)
             return;
 
         try {
             craftMetaSkullClass = Class.forName("org.bukkit.craftbukkit.v1_8_R3.inventory.CraftMetaSkull");
-            gameProfileFieldHandle = (FieldHandle<GameProfile>) FieldHandles.getHandle("profile", craftMetaSkullClass);
+            gameProfileFieldHandle = FieldHandles.getHandle("profile", craftMetaSkullClass);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Failed to find CraftMetaSkull class", e);
         }
