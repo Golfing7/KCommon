@@ -8,6 +8,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
+/**
+ * An abstract implementation of {@link DataManager} storing basics for data management
+ *
+ * @param <T> the type stored
+ */
 public abstract class DataManagerAbstract<T extends DataSerializable> implements DataManager<T> {
     @Getter
     private final String key;

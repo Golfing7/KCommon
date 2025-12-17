@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A menu that can have {@link MorphingItem} and {@link MovingItem} instances registered to it
+ */
 public class MenuDynamic extends MenuAbstract {
     private final List<MorphingItem> morphingItems;
     private final List<MovingItem> movingItems;
@@ -25,6 +28,9 @@ public class MenuDynamic extends MenuAbstract {
         this.movingItems = new ArrayList<>();
     }
 
+    /**
+     * Tick dynamic item movement and morphing
+     */
     public void tickDynamics() {
         for (MorphingItem morphingItem : morphingItems) {
             if (morphingItem.morphCheck()) {
@@ -41,10 +47,20 @@ public class MenuDynamic extends MenuAbstract {
         updateViewers();
     }
 
+    /**
+     * Add a morphing item to this menu
+     *
+     * @param morphingItem the morphing item
+     */
     public void addMorphingItem(MorphingItem morphingItem) {
         morphingItems.add(morphingItem);
     }
 
+    /**
+     * Add a moving item to this menu
+     *
+     * @param movingItem the moving item
+     */
     public void addMovingItem(MovingItem movingItem) {
         movingItems.add(movingItem);
     }

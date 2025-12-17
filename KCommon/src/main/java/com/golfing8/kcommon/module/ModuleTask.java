@@ -53,13 +53,13 @@ public class ModuleTask<T extends Module> implements Terminable {
 
     protected ModuleTask(T module) {
         this.module = module;
-        this.delegateTask = (t) -> this.run();
+        this.delegateTask = t -> this.run();
         this.registeredTask = this::runInternal;
     }
 
     public ModuleTask(T module, Runnable runnable) {
         this.module = module;
-        this.delegateTask = (t) -> runnable.run();
+        this.delegateTask = t -> runnable.run();
         this.registeredTask = this::runInternal;
     }
 

@@ -115,7 +115,7 @@ public final class Modules {
             return false;
 
         MODULE_MAP.put(namespacedKey, module);
-        SMODULE_MAP.computeIfAbsent(module.getModuleName(), (k) -> new ArrayList<>()).add(module);
+        SMODULE_MAP.computeIfAbsent(module.getModuleName(), k -> new ArrayList<>()).add(module);
         CLASS_MODULE_MAP.put(module.getClass(), module);
         return true;
     }

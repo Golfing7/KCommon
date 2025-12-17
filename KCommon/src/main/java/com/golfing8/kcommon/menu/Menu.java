@@ -16,6 +16,10 @@ import java.util.UUID;
 
 import static com.golfing8.kcommon.menu.MenuUtils.getSlotFromCartCoords;
 
+/**
+ * A menu is a basic interface for players to control and click buttons
+ * using Minecraft inventories.
+ */
 public interface Menu extends Listener {
     /**
      * Gets a unique ID associated with this menu.
@@ -95,12 +99,32 @@ public interface Menu extends Listener {
      */
     long getCreatedTick();
 
+    /**
+     * Gets all placeholders registered to this menu
+     *
+     * @return the placeholders
+     */
     List<Placeholder> getPlaceholders();
 
+    /**
+     * Sets the placeholders registered to this menu
+     *
+     * @param placeholders the placeholders
+     */
     void setPlaceholders(List<Placeholder> placeholders);
 
+    /**
+     * Gets the multiline placeholders registered to this menu
+     *
+     * @return the multiline placeholders
+     */
     List<MultiLinePlaceholder> getMultiLinePlaceholders();
 
+    /**
+     * Sets the multiline placeholders associated with this menu
+     *
+     * @param placeholders the multiline placeholders
+     */
     void setMultiLinePlaceholders(List<MultiLinePlaceholder> placeholders);
 
     /**
@@ -110,62 +134,204 @@ public interface Menu extends Listener {
      */
     void setTopClickAction(ClickAction action);
 
+    /**
+     * Sets the action for when players click their own inventory with this menu open
+     *
+     * @param action the action
+     */
     void setBottomClickAction(ClickAction action);
 
+    /**
+     * Gets the title of the menu view
+     *
+     * @return the title
+     */
     String getTitle();
 
+    /**
+     * Sets the title of the menu view
+     *
+     * @param title the title
+     */
     void setTitle(String title);
 
+    /**
+     * Gets the size of the menu
+     *
+     * @return the size
+     */
     int getSize();
 
+    /**
+     * Sets the size of the menu
+     *
+     * @param size the size
+     */
     void setSize(int size);
 
+    /**
+     * Gets the contents of the menu
+     *
+     * @return the contents
+     */
     ItemStack[] getContents();
 
+    /**
+     * Sets the contents of the menu
+     *
+     * @param contents the contents
+     */
     void setContents(ItemStack[] contents);
 
+    /**
+     * Checks if players can click and take items out of the menu
+     *
+     * @return true if clickable
+     */
     boolean canClick();
 
+    /**
+     * Sets if this menu is clickable/interactable
+     *
+     * @param clickable clickability
+     */
     void setClickable(boolean clickable);
 
+    /**
+     * Add a special item to this menu
+     *
+     * @param key the key
+     * @param item the item
+     */
     void addSpecialItem(String key, SimpleGUIItem item);
 
+    /**
+     * Refresh every special item in this menu
+     */
     void refreshSpecialItems();
 
+    /**
+     * Refresh a specific special item and all placeholders associated with it
+     *
+     * @param key the key
+     */
     void refreshSpecialItem(String key);
 
+    /**
+     * Sets the registered special items for this menu
+     *
+     * @param specialItems the special items
+     */
     void setSpecialItems(Map<String, SimpleGUIItem> specialItems);
 
+    /**
+     * Get all registered special items for this menu
+     *
+     * @return the special items
+     */
     Map<String, SimpleGUIItem> getSpecialItems();
 
+    /**
+     * Checks if this menu is allowed to expire.
+     * <p>
+     * Menus that are allowed to expire will expire when there are no more viewers
+     * </p>
+     *
+     * @return true if the menu can expire
+     */
     boolean canExpire();
 
+    /**
+     * Sets if this menu can expire
+     *
+     * @param canExpire true if this can expire
+     */
     void setCanExpire(boolean canExpire);
 
+    /**
+     * Checks if this menu is still valid to be opened by new players
+     *
+     * @return true if valid
+     */
     boolean isValid();
 
+    /**
+     * Update all viewers of any changes
+     */
     void updateViewers();
 
+    /**
+     * Gets the actions under the given slot
+     *
+     * @param slot the slot
+     * @return the list of actions
+     */
     List<ClickAction> getActionsAt(int slot);
 
+    /**
+     * Gets the actions at the given coordinate pair
+     *
+     * @param x the x
+     * @param y the y
+     * @return the list of actions
+     */
     default List<ClickAction> getActionAt(int x, int y) {
         return getActionsAt(getSlotFromCartCoords(getMenuShape().getType(), x, y));
     }
 
+    /**
+     * Adds the click action under the given slot
+     *
+     * @param slot the slot
+     * @param clickAction the action
+     */
     void addClickAction(int slot, ClickAction clickAction);
 
+    /**
+     * Clears all click actions on the given slot
+     *
+     * @param slot the slot to clear
+     */
     void clearClickActions(int slot);
 
+    /**
+     * Clear all click actions for the menu
+     */
     void clearAllClickActions();
 
+    /**
+     * Gets all click actions for the menu
+     *
+     * @return the click actions
+     */
     Map<Integer, List<ClickAction>> getClickActions();
 
+    /**
+     * Sets all click actions for this menu
+     *
+     * @param newActions the new actions
+     */
     void setClickActions(Map<Integer, List<ClickAction>> newActions);
 
+    /**
+     * Sets the on close runnable
+     *
+     * @param runnable the runnable
+     */
     void onClose(CloseRunnable runnable);
 
+    /**
+     * Set the post close runnable
+     *
+     * @param runnable the runnable
+     */
     void onPostClose(CloseRunnable runnable);
 
+    /**
+     * Get the underlying inventory GUI
+     *
+     * @return the inventory
+     */
     Inventory getGUI();
 
     /**
@@ -187,9 +353,15 @@ public interface Menu extends Listener {
      */
     boolean register();
 
+    /**
+     * Shuts down the menu and all viewers are kicked out
+     */
     void shutdown();
 
+    /**
+     * Gets all player viewers of the menu
+     *
+     * @return the viewers
+     */
     List<Player> getViewers();
-
-    Menu clone();
 }

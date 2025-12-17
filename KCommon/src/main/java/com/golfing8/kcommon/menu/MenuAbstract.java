@@ -28,6 +28,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
+/**
+ * An abstract implementation of {@link Menu}.
+ * <p>
+ * This class contains most of the functioning logic for menus.
+ * </p>
+ */
 public abstract class MenuAbstract implements Menu {
 
     private final Map<Integer, List<ClickAction>> actionMap;
@@ -383,11 +389,6 @@ public abstract class MenuAbstract implements Menu {
         } else {
             getViewers().forEach(Player::updateInventory);
         }
-    }
-
-    @Override
-    public Menu clone() {
-        return null;
     }
 
     protected boolean isThisInventory(Inventory inventory) {
