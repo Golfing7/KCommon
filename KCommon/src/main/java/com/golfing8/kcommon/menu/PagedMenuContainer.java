@@ -63,6 +63,11 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
         super(player);
     }
 
+    /**
+     * Sets the parent section that this container is loading from
+     *
+     * @param section the defining config section
+     */
     public void setParentSection(@NotNull ConfigurationSection section) {
         this.parentSection = section;
         this.maxPage = section.getInt("max-page", 0);
@@ -156,7 +161,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
      */
     protected void adaptBuilder(MenuBuilder builder) {
         SimpleGUIItem previousPageItem = builder.getSpecialItem("previous-page");
-        if (page > 0 || (previousPageItem != null && previousPageItem.getConfigSection() != null && previousPageItem.getConfigSection().getBoolean("always-show"))) {
+        if (page > 0 || previousPageItem != null && previousPageItem.getConfigSection() != null && previousPageItem.getConfigSection().getBoolean("always-show")) {
             if (previousPageItem == null) {
                 builder.setSpecialItem("previous-page", new SimpleGUIItem(
                         DEFAULT_PAGE.addPlaceholders(Placeholder.curlyTrusted("DIRECTION", "Previous")),
@@ -164,14 +169,14 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
                 );
             }
             builder.specialPlaceholders("previous-page", () -> Collections.singleton(Placeholder.curlyTrusted("DIRECTION", "Previous")));
-            builder.bindTo("previous-page", (event) -> {
+            builder.bindTo("previous-page", event -> {
                 if (page > 0)
                     setPage(page - 1);
             });
         }
 
         SimpleGUIItem nextPageItem = builder.getSpecialItem("next-page");
-        if (page < maxPage || (nextPageItem != null && nextPageItem.getConfigSection() != null && nextPageItem.getConfigSection().getBoolean("always-show"))) {
+        if (page < maxPage || nextPageItem != null && nextPageItem.getConfigSection() != null && nextPageItem.getConfigSection().getBoolean("always-show")) {
             if (nextPageItem == null) {
                 builder.setSpecialItem("next-page", new SimpleGUIItem(
                         DEFAULT_PAGE.addPlaceholders(Placeholder.curlyTrusted("DIRECTION", "Next")),
@@ -179,7 +184,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
                 );
             }
             builder.specialPlaceholders("next-page", () -> Collections.singleton(Placeholder.curlyTrusted("DIRECTION", "Next")));
-            builder.bindTo("next-page", (event) -> {
+            builder.bindTo("next-page", event -> {
                 if (page < maxPage)
                     setPage(page + 1);
             });

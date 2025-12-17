@@ -57,7 +57,7 @@ public class StringFilter implements Filter<String> {
 
     @Override
     public int filter(String s) {
-        if ((s == null) && (pattern == null))
+        if (s == null && pattern == null)
             return 0;
 
         if (s == null || pattern == null)

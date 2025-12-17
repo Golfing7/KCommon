@@ -598,6 +598,12 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         return mTask;
     }
 
+    /**
+     * Adds the given task to this module
+     *
+     * @param ticker the task
+     * @return the generated module task instance
+     */
     @SuppressWarnings({"rawtypes", "unchecked", "unused"})
     public synchronized ModuleTask addTask(Consumer<ModuleTask> ticker) {
         ModuleTask mTask = new ModuleTask(this, ticker);
@@ -741,7 +747,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * @deprecated register constants in {@link #onEnable()}, use @LangConf, or use LangConfigEnum
      */
     @Deprecated
-    protected void loadLangConstants(LangConfig config) {/*Intentionally empty*/}
+    protected void loadLangConstants(LangConfig config) {
+        /*Intentionally empty*/
+    }
 
     @Override
     public void addPlaceholder(KPlaceholderDefinition definition, PlaceholderFunction function) {

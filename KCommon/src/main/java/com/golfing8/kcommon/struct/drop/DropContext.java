@@ -9,12 +9,20 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Context for generating drops from a {@link DropTable}
+ */
 @Data
 @AllArgsConstructor
 public class DropContext {
     private final @Nullable Player player;
     private double boost;
 
+    /**
+     * Sets the boost applied to this context
+     *
+     * @param boost the boost
+     */
     public void setBoost(double boost) {
         if (this == DEFAULT)
             throw new IllegalStateException("Cannot set boost rate of default drop context!");

@@ -22,7 +22,7 @@ public class DynamicEnum<T extends DynamicEnum<T>> {
      */
     protected DynamicEnum(String id) {
         this.id = id;
-        GLOBAL_REGISTRY.computeIfAbsent(getClass(), (k) -> HashBiMap.create()).put(id, this);
+        GLOBAL_REGISTRY.computeIfAbsent(getClass(), k -> HashBiMap.create()).put(id, this);
     }
 
     /**
@@ -55,7 +55,7 @@ public class DynamicEnum<T extends DynamicEnum<T>> {
      */
     @SuppressWarnings("unchecked")
     public static <T extends DynamicEnum<T>> Optional<T> valueOf(Class<T> dynamicEnum, String name) {
-        return Optional.ofNullable((T) GLOBAL_REGISTRY.computeIfAbsent(dynamicEnum, (k) -> HashBiMap.create()).get(name));
+        return Optional.ofNullable((T) GLOBAL_REGISTRY.computeIfAbsent(dynamicEnum, k -> HashBiMap.create()).get(name));
     }
 
     /**

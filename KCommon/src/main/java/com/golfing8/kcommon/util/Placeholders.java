@@ -11,8 +11,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+/**
+ * Utility class for parsing very basic placeholders on items
+ */
 @UtilityClass
 public final class Placeholders {
+    /**
+     * Parses the placeholders on the given message fully
+     *
+     * @param message the message
+     * @param placeholders the placeholders
+     * @return the string
+     */
     public static String parseFully(String message, Object... placeholders) {
         if (placeholders == null || placeholders.length == 0)
             return message;
@@ -48,10 +58,19 @@ public final class Placeholders {
         return sp.get();
     }
 
+    /**
+     * Start a string placeholder parser
+     *
+     * @param message the message
+     * @return the string placeholder parser
+     */
     public static StringPlaceholders start(String message) {
         return new StringPlaceholders(message);
     }
 
+    /**
+     * A parser for placeholders on a message
+     */
     public static class StringPlaceholders {
         final String message;
         final List<String> keys = Lists.newArrayList();
@@ -61,12 +80,24 @@ public final class Placeholders {
             this.message = message;
         }
 
+        /**
+         * Sets the keys to parse
+         *
+         * @param keys the keys
+         * @return this
+         */
         public StringPlaceholders keys(String... keys) {
             this.keys.clear();
             Collections.addAll(this.keys, keys);
             return this;
         }
 
+        /**
+         * Sets the values to parse into
+         *
+         * @param values the values
+         * @return this
+         */
         public StringPlaceholders values(Object... values) {
             this.values.clear();
             for (Object obj : values) {
@@ -75,6 +106,12 @@ public final class Placeholders {
             return this;
         }
 
+        /**
+         * Sets the values to parse into
+         *
+         * @param values the values
+         * @return this
+         */
         @SafeVarargs
         public final StringPlaceholders values(Supplier<Object>... values) {
             this.values.clear();
@@ -84,6 +121,11 @@ public final class Placeholders {
             return this;
         }
 
+        /**
+         * Gets the parsed string
+         *
+         * @return the parsed string
+         */
         public String get() {
             String toSend = message;
             for (int i = 0; i < keys.size() && i < values.size(); i++) {
@@ -94,6 +136,12 @@ public final class Placeholders {
             return toSend;
         }
 
+        /**
+         * Sends the parsed string to the given player
+         *
+         * @param player the player
+         * @return this
+         */
         public StringPlaceholders send(Player player) {
             player.sendMessage(get());
             return this;

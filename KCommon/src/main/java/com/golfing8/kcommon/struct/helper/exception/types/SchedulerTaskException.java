@@ -27,6 +27,9 @@ package com.golfing8.kcommon.struct.helper.exception.types;
 
 import com.golfing8.kcommon.struct.helper.exception.InternalException;
 
+/**
+ * Thrown when a scheduler task produces a scheduler
+ */
 public class SchedulerTaskException extends InternalException {
 
     public SchedulerTaskException(Throwable cause) {

@@ -204,7 +204,7 @@ public final class CommandArguments {
             }
         }
         return Modules.getModule(context.getArgument()) != null;
-    }, (ctx) -> {
+    }, ctx -> {
         if (ctx.getArgument().contains(":")) {
             String[] split = ctx.getArgument().split(":");
             Plugin plugin = Bukkit.getPluginManager().getPlugin(split[0]);

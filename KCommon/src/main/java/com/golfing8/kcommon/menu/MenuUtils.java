@@ -2,6 +2,7 @@ package com.golfing8.kcommon.menu;
 
 import com.golfing8.kcommon.menu.movement.MoveLength;
 import com.golfing8.kcommon.menu.shape.MenuCoordinate;
+import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +10,15 @@ import java.util.Arrays;
 /**
  * Util class used for some methods in the Menu classes
  */
+@UtilityClass
 public final class MenuUtils {
+    /**
+     * Gets the slot from the cartesian coordinates
+     *
+     * @param x the x
+     * @param y the y
+     * @return the slot
+     */
     public static int getSlotFromCartCoords(int x, int y) {
         return getSlotFromCartCoords(MenuShapeType.CHEST, x, y);
     }
@@ -25,16 +34,37 @@ public final class MenuUtils {
         return (y - 1) * type.getWidth() + (x - 1);
     }
 
+    /**
+     * Gets a coordinate instance from the given slot
+     *
+     * @param slot the slot
+     * @return the new coordinate
+     */
     public static MenuCoordinate getCartCoordsFromSlot(int slot) {
         return getCartCoordsFromSlot(MenuShapeType.CHEST, slot);
     }
 
+    /**
+     * Gets the coordinate from the given menu shape type and slot
+     *
+     * @param type the type
+     * @param slot the slot
+     * @return the new coordinate
+     */
     public static MenuCoordinate getCartCoordsFromSlot(MenuShapeType type, int slot) {
         int x = slot % type.getWidth() + 1;
         int y = slot / type.getWidth() + 1;
         return new MenuCoordinate(x, y);
     }
 
+    /**
+     * Calculate movement from the given slot to the given slot
+     *
+     * @param slotStart the start
+     * @param slotTarget the target
+     * @param allowDiagonal if diagonal movements are allowed
+     * @return a movement length
+     */
     public static MoveLength calculateMovement(int slotStart, int slotTarget, boolean allowDiagonal) {
         return calculateMovement(MenuShapeType.CHEST, slotStart, slotTarget, allowDiagonal);
     }

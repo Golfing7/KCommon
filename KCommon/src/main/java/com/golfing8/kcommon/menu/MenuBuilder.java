@@ -665,7 +665,7 @@ public final class MenuBuilder {
                 ItemStack found = null;
                 while (found == null) {
                     ChancedReference<ItemStack> itemStackChancedReference = shapeListPair.getB().get(ThreadLocalRandom.current().nextInt(shapeListPair.getB().size()));
-                    if (itemStackChancedReference.chance()) {
+                    if (itemStackChancedReference.testRandom()) {
                         found = itemStackChancedReference.getReference();
                     }
                 }

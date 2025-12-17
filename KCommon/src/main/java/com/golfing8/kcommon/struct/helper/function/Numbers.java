@@ -25,6 +25,8 @@
 
 package com.golfing8.kcommon.struct.helper.function;
 
+import lombok.experimental.UtilityClass;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.text.NumberFormat;
@@ -35,10 +37,17 @@ import java.util.*;
  * Utility methods for parsing {@link Number}s, {@link Integer}s, {@link Long}s,
  * {@link Float}s and {@link Double}s from {@link String}s.
  */
+@UtilityClass
 public final class Numbers {
 
     // number
 
+    /**
+     * Parses an arbitrary number from the given string
+     *
+     * @param s the string
+     * @return the number
+     */
     @Nullable
     public static Number parseNullable(@Nonnull String s) {
         Objects.requireNonNull(s);
@@ -49,6 +58,12 @@ public final class Numbers {
         }
     }
 
+    /**
+     * Parses an optional number from the given string
+     *
+     * @param s the string
+     * @return the optional number
+     */
     @Nonnull
     public static Optional<Number> parse(@Nonnull String s) {
         return Optional.ofNullable(parseNullable(s));
@@ -56,6 +71,12 @@ public final class Numbers {
 
     // integer
 
+    /**
+     * Parses a nullable integer from the given string
+     *
+     * @param s the string
+     * @return the integer
+     */
     @Nullable
     public static Integer parseIntegerNullable(@Nonnull String s) {
         Objects.requireNonNull(s);
@@ -66,11 +87,23 @@ public final class Numbers {
         }
     }
 
+    /**
+     * Parses an optional integer from the given string
+     *
+     * @param s the string
+     * @return the optional integer
+     */
     @Nonnull
     public static Optional<Integer> parseIntegerOpt(@Nonnull String s) {
         return Optional.ofNullable(parseIntegerNullable(s));
     }
 
+    /**
+     * Parses an optional integer from the given string
+     *
+     * @param s the string
+     * @return the optional integer
+     */
     @Nonnull
     public static OptionalInt parseInteger(@Nonnull String s) {
         try {
@@ -82,6 +115,12 @@ public final class Numbers {
 
     // long
 
+    /**
+     * Parses a nullable long from the given string
+     *
+     * @param s the string
+     * @return the long
+     */
     @Nullable
     public static Long parseLongNullable(@Nonnull String s) {
         Objects.requireNonNull(s);
@@ -92,11 +131,23 @@ public final class Numbers {
         }
     }
 
+    /**
+     * Parses an optional long from the given string
+     *
+     * @param s the string
+     * @return the optional long
+     */
     @Nonnull
     public static Optional<Long> parseLongOpt(@Nonnull String s) {
         return Optional.ofNullable(parseLongNullable(s));
     }
 
+    /**
+     * Parses an optional long from the given string
+     *
+     * @param s the string
+     * @return the optional long
+     */
     @Nonnull
     public static OptionalLong parseLong(@Nonnull String s) {
         try {
@@ -108,6 +159,12 @@ public final class Numbers {
 
     // float
 
+    /**
+     * Parses a nullable flot from the given string
+     *
+     * @param s the string
+     * @return the float
+     */
     @Nullable
     public static Float parseFloatNullable(@Nonnull String s) {
         Objects.requireNonNull(s);
@@ -118,11 +175,23 @@ public final class Numbers {
         }
     }
 
+    /**
+     * Parses an optional float from the given string
+     *
+     * @param s the string
+     * @return the optional float
+     */
     @Nonnull
     public static Optional<Float> parseFloatOpt(@Nonnull String s) {
         return Optional.ofNullable(parseFloatNullable(s));
     }
 
+    /**
+     * Parses an optional float from the given string
+     *
+     * @param s the string
+     * @return the optional float
+     */
     @Nonnull
     public static OptionalDouble parseFloat(@Nonnull String s) {
         try {
@@ -134,6 +203,12 @@ public final class Numbers {
 
     // double
 
+    /**
+     * Parses a nullable double from the given string
+     *
+     * @param s the string
+     * @return the double
+     */
     @Nullable
     public static Double parseDoubleNullable(@Nonnull String s) {
         Objects.requireNonNull(s);
@@ -144,11 +219,23 @@ public final class Numbers {
         }
     }
 
+    /**
+     * Parses an optional double from the given string
+     *
+     * @param s the string
+     * @return the optional double
+     */
     @Nonnull
     public static Optional<Double> parseDoubleOpt(@Nonnull String s) {
         return Optional.ofNullable(parseDoubleNullable(s));
     }
 
+    /**
+     * Parses an optional double from the given string
+     *
+     * @param s the string
+     * @return the optional double
+     */
     @Nonnull
     public static OptionalDouble parseDouble(@Nonnull String s) {
         try {
@@ -160,6 +247,12 @@ public final class Numbers {
 
     // byte
 
+    /**
+     * Parses a byte from the given string
+     *
+     * @param s the string
+     * @return the byte
+     */
     @Nullable
     public static Byte parseByteNullable(@Nonnull String s) {
         Objects.requireNonNull(s);
@@ -170,13 +263,14 @@ public final class Numbers {
         }
     }
 
+    /**
+     * Parses an optional byte from the given string
+     *
+     * @param s the string
+     * @return the optional byte
+     */
     @Nonnull
     public static Optional<Byte> parseByteOpt(@Nonnull String s) {
         return Optional.ofNullable(parseByteNullable(s));
     }
-
-    private Numbers() {
-        throw new UnsupportedOperationException("This class cannot be instantiated");
-    }
-
 }

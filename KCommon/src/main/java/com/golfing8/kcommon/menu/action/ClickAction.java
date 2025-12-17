@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * A wrapped click task that contains a cooldown for clicking
+ */
 public class ClickAction {
     private final long cooldownLength;
     private final ClickRunnable clickRunnable;
@@ -23,6 +26,11 @@ public class ClickAction {
         this.clickTimes = new HashMap<>();
     }
 
+    /**
+     * Called when a player attempts to click this action
+     *
+     * @param event the event
+     */
     public void attemptClick(InventoryClickEvent event) {
         if (!clickTimes.containsKey(event.getWhoClicked().getUniqueId())) {
             clickRunnable.click(event);

@@ -30,7 +30,7 @@ public class LinkedEntityListener implements Listener {
 
         try {
             onDeath_listen.set(false);
-            EntityUtil.applyToAllVehiclesAndPassengers(event.getEntity(), (entity) -> {
+            EntityUtil.applyToAllVehiclesAndPassengers(event.getEntity(), entity -> {
                 if (entity != event.getEntity() && entity instanceof LivingEntity) {
                     ((LivingEntity) entity).setLastDamage(0.0D);
                     ((LivingEntity) entity).setNoDamageTicks(0);
@@ -58,7 +58,7 @@ public class LinkedEntityListener implements Listener {
 
         try {
             entityDamage_listen.set(false);
-            EntityUtil.applyToAllVehiclesAndPassengers(event.getEntity(), (entity) -> {
+            EntityUtil.applyToAllVehiclesAndPassengers(event.getEntity(), entity -> {
                 if (entity != event.getEntity() && entity instanceof LivingEntity) {
                     ((LivingEntity) entity).damage(event.getDamage(), event.getDamager());
                 }
@@ -78,7 +78,7 @@ public class LinkedEntityListener implements Listener {
 
         try {
             entityDamage_listen.set(false);
-            EntityUtil.applyToAllVehiclesAndPassengers(event.getEntity(), (entity) -> {
+            EntityUtil.applyToAllVehiclesAndPassengers(event.getEntity(), entity -> {
                 if (entity != event.getEntity() && entity instanceof LivingEntity) {
                     ((LivingEntity) entity).damage(event.getDamage());
                 }

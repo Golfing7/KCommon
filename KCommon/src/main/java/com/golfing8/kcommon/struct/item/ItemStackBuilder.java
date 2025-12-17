@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 import de.tr7zw.changeme.nbtapi.NBT;
-import de.tr7zw.changeme.nbtapi.NBTItem;
 import de.tr7zw.changeme.nbtapi.iface.ReadableNBT;
 import dev.lone.itemsadder.api.CustomStack;
 import lombok.AccessLevel;
@@ -265,7 +264,7 @@ public final class ItemStackBuilder {
             ConfigurationSection enchSection = section.getConfigurationSection("enchantments");
             enchSection.getKeys(false).forEach(key -> {
                 //Check that the enchantment is actually defined.
-                Optional<XEnchantment> optionalEnchantment = XEnchantment.matchXEnchantment(key);
+                Optional<XEnchantment> optionalEnchantment = XEnchantment.of(key);
                 if (!optionalEnchantment.isPresent()) {
                     throw new ImproperlyConfiguredValueException(enchSection, key);
                 }
@@ -794,7 +793,7 @@ public final class ItemStackBuilder {
 
         //Then, enchants
         if (this.enchantments != null) {
-            this.enchantments.forEach((ench, level) -> meta.addEnchant(ench.getEnchant(), level, true));
+            this.enchantments.forEach((ench, level) -> meta.addEnchant(ench.get(), level, true));
         }
 
         //Now, try to apply the custom model data.
@@ -820,11 +819,11 @@ public final class ItemStackBuilder {
 
         //Add the nbt item and extra data.
         if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_21)) {
-            NBT.modifyComponents(itemStack, (nbt) -> {
+            NBT.modifyComponents(itemStack, nbt -> {
                 ItemUtil.setInNBT(nbt, this.components);
             });
         }
-        NBT.modify(itemStack, (nbt) -> {
+        NBT.modify(itemStack, nbt -> {
             if (this.itemID != null) {
                 nbt.setString(ITEMSTACK_ID, this.itemID);
             }

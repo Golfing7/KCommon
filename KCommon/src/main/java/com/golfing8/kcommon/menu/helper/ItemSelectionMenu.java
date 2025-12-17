@@ -16,6 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A menu for players to select an item from their own inventory
+ */
 public class ItemSelectionMenu extends PlayerMenuContainer {
     /** The promise of completion */
     @Getter
@@ -52,7 +55,7 @@ public class ItemSelectionMenu extends PlayerMenuContainer {
                 builder.setAt(i, item.buildCached());
             }
         }
-        builder.postCloseRunnable((event) -> {
+        builder.postCloseRunnable(event -> {
             if (answering)
                 return;
 

@@ -27,6 +27,9 @@ package com.golfing8.kcommon.struct.helper.exception.types;
 
 import com.golfing8.kcommon.struct.helper.exception.InternalException;
 
+/**
+ * Thrown when a chain of promises throws an exception
+ */
 public class PromiseChainException extends InternalException {
 
     public PromiseChainException(Throwable cause) {

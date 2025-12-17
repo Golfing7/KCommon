@@ -47,6 +47,9 @@ public class LibraryLoader {
         }
     }
 
+    /**
+     * Deletes libraries that are not currently loaded
+     */
     public void deleteUnloadedLibraries() {
         if (!Files.exists(libraryFolderPath))
             return;
@@ -68,6 +71,12 @@ public class LibraryLoader {
         }
     }
 
+    /**
+     * Adds a relocation for all libraries
+     *
+     * @param pre the original namespace
+     * @param post the relocated namespace
+     */
     public void addRelocation(String pre, String post) {
         relocationRules.add(new Relocation(pre.replace(",", "."), post.replace(",", ".")));
     }
@@ -84,6 +93,14 @@ public class LibraryLoader {
         loadLibrary(groupId, artifactId, version, "https://repo1.maven.org/maven2");
     }
 
+    /**
+     * Loads the library with the given information
+     *
+     * @param groupId the group id of the dependency
+     * @param artifactId the artifact id
+     * @param version the version
+     * @param repoUrl the residing repo
+     */
     public void loadLibrary(String groupId, String artifactId, String version, String repoUrl) {
         ensureLibraryFolderExists();
         loadLibrary(new LibraryDefinition(groupId, artifactId, version, repoUrl));
@@ -109,7 +126,6 @@ public class LibraryLoader {
 
         AtomicInteger completed = new AtomicInteger(0);
         for (LibraryDefinition definition : libraryDefinitions) {
-//            LOADER_SERVICE.execute(() -> {
             try {
                 loadLibrary(definition);
             } finally {
@@ -119,7 +135,6 @@ public class LibraryLoader {
                     }
                 }
             }
-//            });
         }
 
         // Wait until the execution has finished.

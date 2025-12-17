@@ -6,8 +6,11 @@ import lombok.Getter;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-@AllArgsConstructor
+/**
+ * An inventory holder that links back to a menu
+ */
 @Getter
+@AllArgsConstructor
 public class MenuClickHolder implements InventoryHolder {
     private boolean clickable;
     private MenuAbstract menu;

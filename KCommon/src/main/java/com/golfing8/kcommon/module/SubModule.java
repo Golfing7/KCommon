@@ -66,9 +66,15 @@ public abstract class SubModule<T extends Module> extends ConfigClass implements
         return module.getLangConfig(); // Piggy back :)
     }
 
+    /**
+     * Empty stub for onEnable implementation
+     */
     public void onEnable() {
     }
 
+    /**
+     * Empty stub for onDisable implementation
+     */
     public void onDisable() {
     }
 }

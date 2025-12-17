@@ -81,6 +81,11 @@ public class ModuleTask<T extends Module> implements Terminable {
     protected void run() {
     }
 
+    /**
+     * Cancel the task
+     *
+     * @throws IllegalStateException if the task was already canceled
+     */
     public synchronized void cancel() throws IllegalStateException {
         if (!this.started)
             return;
@@ -160,35 +165,69 @@ public class ModuleTask<T extends Module> implements Terminable {
         this.cancel();
     }
 
-    public synchronized BukkitTask runTask(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
+    /**
+     * Runs the task with the given plugin
+     *
+     * @param plugin the plugin
+     * @return the generated task
+     */
+    public synchronized BukkitTask runTask(Plugin plugin) {
         this.bukkitTask = Bukkit.getScheduler().runTask(plugin, registeredTask);
         this.module.addTask(this);
         this.started = true;
         return bukkitTask;
     }
 
-    public synchronized BukkitTask runTaskAsynchronously(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
+    /**
+     * Runs the task with the given plugin asynchronously
+     *
+     * @param plugin the plugin
+     * @return the generated task
+     */
+    public synchronized BukkitTask runTaskAsynchronously(Plugin plugin) {
         this.bukkitTask = Bukkit.getScheduler().runTaskAsynchronously(plugin, registeredTask);
         this.module.addTask(this);
         this.started = true;
         return bukkitTask;
     }
 
-    public synchronized BukkitTask runTaskLater(Plugin plugin, long delay) throws IllegalArgumentException, IllegalStateException {
+    /**
+     * Runs the task with the given plugin after a delay
+     *
+     * @param plugin the plugin
+     * @param delay the delay
+     * @return the generated task
+     */
+    public synchronized BukkitTask runTaskLater(Plugin plugin, long delay) {
         this.bukkitTask = Bukkit.getScheduler().runTaskLater(plugin, registeredTask, delay);
         this.module.addTask(this);
         this.started = true;
         return bukkitTask;
     }
 
-    public synchronized BukkitTask runTaskLaterAsynchronously(Plugin plugin, long delay) throws IllegalArgumentException, IllegalStateException {
+    /**
+     * Runs the task with the given plugin after a delay and asynchronously
+     *
+     * @param plugin the plugin
+     * @param delay the delay
+     * @return the generated task
+     */
+    public synchronized BukkitTask runTaskLaterAsynchronously(Plugin plugin, long delay) {
         this.bukkitTask = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, registeredTask, delay);
         this.module.addTask(this);
         this.started = true;
         return bukkitTask;
     }
 
-    public synchronized BukkitTask runTaskTimer(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
+    /**
+     * Runs the task with the given plugin after a delay and repeating every period
+     *
+     * @param plugin the plugin
+     * @param delay the delay
+     * @param period the period
+     * @return the generated task
+     */
+    public synchronized BukkitTask runTaskTimer(Plugin plugin, long delay, long period) {
         this.bukkitTask = Bukkit.getScheduler().runTaskTimer(plugin, registeredTask, delay, period);
         this.module.addTask(this);
         this.started = true;
@@ -196,7 +235,15 @@ public class ModuleTask<T extends Module> implements Terminable {
         return bukkitTask;
     }
 
-    public synchronized BukkitTask runTaskTimerAsynchronously(Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
+    /**
+     * Runs the task with the given plugin asynchronously, after a delay and repeating every period
+     *
+     * @param plugin the plugin
+     * @param delay the delay
+     * @param period the period
+     * @return the generated task
+     */
+    public synchronized BukkitTask runTaskTimerAsynchronously(Plugin plugin, long delay, long period) {
         this.bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, registeredTask, delay, period);
         this.module.addTask(this);
         this.started = true;

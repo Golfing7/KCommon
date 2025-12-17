@@ -5,6 +5,9 @@ import com.golfing8.kcommon.menu.MenuUtils;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * A layout implementation for filled in rectangles.
+ */
 public class LayoutShapeRectangle implements MenuLayoutShape {
     private final List<MenuCoordinate> inRange;
 

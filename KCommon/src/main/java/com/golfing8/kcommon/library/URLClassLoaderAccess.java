@@ -63,7 +63,6 @@ public abstract class URLClassLoaderAccess {
         this.classLoader = classLoader;
     }
 
-
     /**
      * Adds the given URL to the class loader.
      *
@@ -80,7 +79,7 @@ public abstract class URLClassLoaderAccess {
     /**
      * Accesses using reflection, not supported on Java 9+.
      */
-    private static class Reflection extends URLClassLoaderAccess {
+    private static final class Reflection extends URLClassLoaderAccess {
         private static final Method ADD_URL_METHOD;
 
         static {
@@ -117,7 +116,7 @@ public abstract class URLClassLoaderAccess {
      *
      * @author Vaishnav Anil (https://github.com/slimjar/slimjar)
      */
-    private static class Unsafe extends URLClassLoaderAccess {
+    private static final class Unsafe extends URLClassLoaderAccess {
         private static final sun.misc.Unsafe UNSAFE;
 
         static {
@@ -177,7 +176,7 @@ public abstract class URLClassLoaderAccess {
         }
     }
 
-    private static class Noop extends URLClassLoaderAccess {
+    private static final class Noop extends URLClassLoaderAccess {
         private static final Noop INSTANCE = new Noop();
 
         private Noop() {
@@ -189,6 +188,4 @@ public abstract class URLClassLoaderAccess {
             URLClassLoaderAccess.throwError(null);
         }
     }
-
-
 }

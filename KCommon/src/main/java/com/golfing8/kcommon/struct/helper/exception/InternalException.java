@@ -25,6 +25,9 @@
 
 package com.golfing8.kcommon.struct.helper.exception;
 
+/**
+ * An internal exception for helper libraries
+ */
 public abstract class InternalException extends RuntimeException {
 
     protected InternalException(String what, Throwable cause) {

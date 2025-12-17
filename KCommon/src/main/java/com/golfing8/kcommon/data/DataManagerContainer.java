@@ -147,6 +147,13 @@ public interface DataManagerContainer {
     }
 
     //Shorthand for the below method.
+    /**
+     * Deletes the data under the given key
+     *
+     * @param key the key
+     * @param dataClass the data class
+     * @param <T> the type
+     */
     default <T extends DataSerializable> void deleteData(UUID key, Class<T> dataClass) {
         this.deleteData(key.toString(), dataClass);
     }

@@ -105,6 +105,9 @@ public class EntityEquipment implements CASerializable {
         return new EntityEquipment(helmet, chestplate, leggings, boots, hand, offHand);
     }
 
+    /**
+     * A specific piece of equipment, containing chances to equip and drop
+     */
     @Getter
     @ToString
     @AllArgsConstructor
@@ -114,12 +117,18 @@ public class EntityEquipment implements CASerializable {
         private double chanceToEquip = 100.0D;
         private double chanceToDrop;
 
+        /**
+         * Builds the bukkit item stack from the entity context
+         *
+         * @param context the entity for context
+         * @return the item
+         */
         public ItemStack buildBukkitStack(LivingEntity context) {
             return piece == null ? null : piece.buildFromTemplate();
         }
     }
 
-    private static class Listener implements org.bukkit.event.Listener {
+    private static final class Listener implements org.bukkit.event.Listener {
         private final Random random = new Random();
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

@@ -43,9 +43,9 @@ public class TimeLength implements Comparable<TimeLength> {
             case MINUTES:
                 return (durationTicks / 20L) / 60L;
             case SECONDS:
-                return (durationTicks / 20L);
+                return durationTicks / 20L;
             case MILLISECONDS:
-                return (durationTicks * 50L);
+                return durationTicks * 50L;
             case MICROSECONDS:
                 return (durationTicks * 50L) * 1_000L;
             case NANOSECONDS:
@@ -92,6 +92,13 @@ public class TimeLength implements Comparable<TimeLength> {
         return getAsString(false);
     }
 
+    /**
+     * Constructs an instance from the given duration and time unit
+     *
+     * @param duration the duration
+     * @param unit the unit
+     * @return the instance
+     */
     public static TimeLength from(long duration, TimeUnit unit) {
         return new TimeLength(unit.toMillis(duration) / 50L);
     }

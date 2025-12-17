@@ -52,6 +52,12 @@ public final class Modules {
         return SMODULE_MAP.containsKey(moduleName.toLowerCase());
     }
 
+    /**
+     * Checks if the module under the given key is registered
+     *
+     * @param namespacedKey the key
+     * @return true if the module exists
+     */
     public static boolean moduleExists(@Nonnull KNamespacedKey namespacedKey) {
         Preconditions.checkNotNull(namespacedKey);
         return MODULE_MAP.containsKey(namespacedKey);

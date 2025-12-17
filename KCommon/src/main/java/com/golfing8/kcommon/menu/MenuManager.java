@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Manages and garbage collects old menus
+ */
 public final class MenuManager extends BukkitRunnable {
 
     @Getter
@@ -40,10 +43,21 @@ public final class MenuManager extends BukkitRunnable {
         return Collections.unmodifiableCollection(allMenus.values());
     }
 
+    /**
+     * Get the menu under the given id
+     *
+     * @param uuid the id
+     * @return the menu
+     */
     public @Nullable Menu getMenu(UUID uuid) {
         return this.allMenus.get(uuid);
     }
 
+    /**
+     * Add a menu to track
+     *
+     * @param menu the menu
+     */
     public void addMenu(Menu menu) {
         this.allMenus.put(menu.getMenuID(), menu);
     }

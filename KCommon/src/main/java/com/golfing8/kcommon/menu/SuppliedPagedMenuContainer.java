@@ -103,7 +103,7 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
      * @param elements the elements
      */
     public void setElements(@NotNull List<T> elements) {
-        this.setElementSource((range) -> elements.subList(range.getMinFloor(), range.getMaxFloor() + 1));
+        this.setElementSource(range -> elements.subList(range.getMinFloor(), range.getMaxFloor() + 1));
         this.setElementCountSupplier(elements::size);
     }
 
@@ -207,7 +207,19 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
         Preconditions.checkState(this.elementSection != null, "elementSection must not be null!");
     }
 
+    /**
+     * A consumer for elements, used because a tri-consumer is not readily available
+     *
+     * @param <T> the type
+     */
     public interface ElementConsumer<T> {
-        void accept(MenuCoordinate coordinate, int slot, T element);
+        /**
+         * Consumes a coordinate, index of the item in the global list, and element
+         *
+         * @param coordinate the coordinate
+         * @param index the index
+         * @param element the element
+         */
+        void accept(MenuCoordinate coordinate, int index, T element);
     }
 }

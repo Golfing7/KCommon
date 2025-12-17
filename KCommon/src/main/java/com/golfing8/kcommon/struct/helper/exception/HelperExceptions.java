@@ -62,18 +62,39 @@ public final class HelperExceptions {
         }
     }
 
+    /**
+     * Reports a scheduler exception
+     *
+     * @param throwable the causing throwable
+     */
     public static void reportScheduler(Throwable throwable) {
         log(new SchedulerTaskException(throwable));
     }
 
+    /**
+     * Reports a promise exception
+     *
+     * @param throwable the causing throwable
+     */
     public static void reportPromise(Throwable throwable) {
         log(new PromiseChainException(throwable));
     }
 
+    /**
+     * Reports an event exception
+     *
+     * @param throwable the causing throwable
+     */
     public static void reportEvent(Object event, Throwable throwable) {
         log(new EventHandlerException(throwable, event));
     }
 
+    /**
+     * Wraps a runnable into a scheduler runnable
+     *
+     * @param runnable the runnable
+     * @return the new runnable
+     */
     public static Runnable wrapSchedulerTask(Runnable runnable) {
         return new SchedulerWrappedRunnable(runnable);
     }

@@ -20,10 +20,26 @@ public abstract class Either<L, R> {
      */
     public abstract Optional<R> right();
 
+    /**
+     * Constructs an instance for the left value
+     *
+     * @param left the left value
+     * @return the instance
+     * @param <L> the left type
+     * @param <R> the right type
+     */
     public static <L, R> Either<L, R> left(L left) {
         return new Left<>(left);
     }
 
+    /**
+     * Constructs an instance for the right value
+     *
+     * @param right the right value
+     * @return the instance
+     * @param <L> the left type
+     * @param <R> the right type
+     */
     public static <L, R> Either<L, R> right(R right) {
         return new Right<>(right);
     }
@@ -35,6 +51,12 @@ public abstract class Either<L, R> {
      */
     public abstract Object get();
 
+    /**
+     * An implementation for Left values
+     *
+     * @param <L> the left type
+     * @param <R> the right type
+     */
     public static class Left<L, R> extends Either<L, R> {
         private final L left;
 
@@ -58,13 +80,18 @@ public abstract class Either<L, R> {
         }
     }
 
+    /**
+     * An implementation for right values
+     *
+     * @param <L> the left type
+     * @param <R> the right type
+     */
     public static class Right<L, R> extends Either<L, R> {
         private final R right;
 
         public Right(R right) {
             this.right = right;
         }
-
 
         @Override
         public Optional<L> left() {

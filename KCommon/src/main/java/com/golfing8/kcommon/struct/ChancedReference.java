@@ -3,11 +3,14 @@ package com.golfing8.kcommon.struct;
 import com.golfing8.kcommon.struct.random.RandomTestable;
 import lombok.Getter;
 
-import java.util.Random;
+import java.util.Optional;
 
+/**
+ * Wraps an object with methods for getting the object
+ *
+ * @param <T> the type
+ */
 public final class ChancedReference<T> implements RandomTestable {
-    private static final Random CHANCED_RANDOM = new Random();
-
     @Getter
     private final double chance;
     @Getter
@@ -22,11 +25,25 @@ public final class ChancedReference<T> implements RandomTestable {
         this.reference = reference;
     }
 
-    public boolean chance() {
-        return CHANCED_RANDOM.nextDouble() * 100 < chance;
+    /**
+     * Gets the object with the odds in this instance
+     *
+     * @return the optional of the object
+     */
+    public Optional<T> get() {
+        return get(1);
     }
 
-    public boolean chance(double boost) {
-        return CHANCED_RANDOM.nextDouble() * 100 < chance + boost;
+    /**
+     * Gets the object with the given boost
+     *
+     * @param boost the boost
+     * @return an optional of the object
+     */
+    public Optional<T> get(double boost) {
+        if (testRandom(boost))
+            return Optional.of(reference);
+        else
+            return Optional.empty();
     }
 }

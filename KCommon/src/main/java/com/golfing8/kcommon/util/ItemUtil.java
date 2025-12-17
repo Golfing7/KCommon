@@ -4,8 +4,6 @@ import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
-import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
-import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.google.common.collect.Lists;
 import de.tr7zw.changeme.nbtapi.NBTType;
@@ -17,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -128,15 +125,28 @@ public final class ItemUtil {
      * @return true if the item is air or null.
      */
     public static boolean isAirOrNull(ItemStack check) {
-        return check == null || check.getType() == XMaterial.AIR.parseMaterial() || check.getAmount() <= 0;
+        return check == null || check.getType() == XMaterial.AIR.get() || check.getAmount() <= 0;
     }
 
+    /**
+     * Removes the given data in the given NBT object
+     *
+     * @param nbt the nbt object
+     * @param data the data
+     */
     public static void removeInNBT(ReadWriteNBT nbt, Map<String, Object> data) {
         for (var entry : data.entrySet()) {
             nbt.removeKey(entry.getKey());
         }
     }
 
+    /**
+     * Removes the given key value specific pair in the given nbt object
+     *
+     * @param nbt the nbt object
+     * @param key the key
+     * @param value the value
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static void removeValueInNBT(ReadWriteNBT nbt, String key, Object value) {
         if (value instanceof Integer && nbt.hasTag(key, NBTType.NBTTagInt)) {
@@ -181,35 +191,48 @@ public final class ItemUtil {
         }
     }
 
+    /**
+     * Sets the values in the given nbt object
+     *
+     * @param nbt the nbt
+     * @param data the data
+     */
     public static void setInNBT(ReadWriteNBT nbt, Map<String, Object> data) {
         for (var entry : data.entrySet()) {
             setValueInNBT(nbt, entry.getKey(), entry.getValue());
         }
     }
 
+    /**
+     * Sets the key/value pair in the given nbt object
+     *
+     * @param nbt the nbt object
+     * @param key the key
+     * @param value the value
+     */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void setValueInNBT(ReadWriteNBT nbtItem, String key, Object value) {
+    public static void setValueInNBT(ReadWriteNBT nbt, String key, Object value) {
         if (value instanceof Integer) {
-            nbtItem.setInteger(key, (Integer) value);
+            nbt.setInteger(key, (Integer) value);
         } else if (value instanceof Float) {
-            nbtItem.setFloat(key, (Float) value);
+            nbt.setFloat(key, (Float) value);
         } else if (value instanceof Double) {
-            nbtItem.setDouble(key, (Double) value);
+            nbt.setDouble(key, (Double) value);
         } else if (value instanceof Byte) {
-            nbtItem.setByte(key, (Byte) value);
+            nbt.setByte(key, (Byte) value);
         } else if (value instanceof Short) {
-            nbtItem.setShort(key, (Short) value);
+            nbt.setShort(key, (Short) value);
         } else if (value instanceof Long) {
-            nbtItem.setLong(key, (Long) value);
+            nbt.setLong(key, (Long) value);
         } else if (value instanceof String) {
-            nbtItem.setString(key, (String) value);
+            nbt.setString(key, (String) value);
         } else if (value instanceof Map) {
-            var subCompound = nbtItem.getOrCreateCompound(key);
+            var subCompound = nbt.getOrCreateCompound(key);
             ((Map) value).forEach((k, v) -> {
                 setValueInNBT(subCompound, k.toString(), v);
             });
         } else if (value instanceof Boolean) {
-            nbtItem.setBoolean(key, (Boolean) value);
+            nbt.setBoolean(key, (Boolean) value);
         }
     }
 }

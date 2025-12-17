@@ -68,6 +68,13 @@ public class ParticleCompound extends Particle {
         }
     }
 
+    /**
+     * Adds a particle with the given offset to the compound display
+     *
+     * @param particle the particle
+     * @param offset the offset
+     * @return the compound
+     */
     public ParticleCompound addParticle(Particle particle, Vector offset) {
         if (this == particle)
             throw new IllegalArgumentException("Can't add self to particle compound!");

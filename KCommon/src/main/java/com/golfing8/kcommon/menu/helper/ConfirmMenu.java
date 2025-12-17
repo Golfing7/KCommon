@@ -11,7 +11,6 @@ import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -19,6 +18,9 @@ import java.util.concurrent.CompletableFuture;
  * A simple confirmation menu.
  */
 public class ConfirmMenu extends PlayerMenuContainer {
+    /**
+     * The type of confirmation a player made
+     */
     public enum ConfirmationType {
         YES,
         NO,
@@ -26,10 +28,12 @@ public class ConfirmMenu extends PlayerMenuContainer {
     }
 
     private final CompletableFuture<ConfirmationType> result;
+
     @Deprecated
     public CompletableFuture<ConfirmationType> getResult() {
         return result;
     }
+
     @Getter
     private final Promise<ConfirmationType> resultPromise;
 
@@ -47,7 +51,7 @@ public class ConfirmMenu extends PlayerMenuContainer {
         MenuBuilder builder = MenuBuilder.builder()
                 .title("&aConfirm?")
                 .shapeType(MenuShapeType.HOPPER)
-                .postCloseRunnable((event) -> {
+                .postCloseRunnable(event -> {
                     if (answering)
                         return;
 
@@ -56,7 +60,7 @@ public class ConfirmMenu extends PlayerMenuContainer {
                 });
 
         builder.setAt(0, new ItemStackBuilder().material(XMaterial.GREEN_STAINED_GLASS_PANE).name("&a✔").buildFromTemplate());
-        builder.addAction(0, (event) -> {
+        builder.addAction(0, event -> {
             answering = true;
             Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
                 getPlayer().closeInventory();
@@ -64,7 +68,7 @@ public class ConfirmMenu extends PlayerMenuContainer {
             });
         });
         builder.setAt(4, new ItemStackBuilder().material(XMaterial.RED_STAINED_GLASS_PANE).name("&c❌").buildFromTemplate());
-        builder.addAction(4, (event) -> {
+        builder.addAction(4, event -> {
             answering = true;
             Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
                 getPlayer().closeInventory();

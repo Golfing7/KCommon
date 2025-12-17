@@ -63,6 +63,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.onLoadInner();
     }
 
+    /**
+     * A final implementation for loading things related to the plugin
+     */
     public final void onEnable() {
         try {
             this.saveDefaultConfig();
@@ -102,6 +105,9 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         this.langConfig.save();
     }
 
+    /**
+     * A final implementation for shutting down things in the plugin
+     */
     public final void onDisable() {
         onDisableInner();
 
@@ -355,11 +361,31 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         }
     }
 
-    public void onLoadInner() {}
+    /**
+     * A method stub for {@link #onLoad()} overrides
+     */
+    public void onLoadInner() {
 
-    public void onPreEnableInner() {}
+    }
 
-    public void onEnableInner() {}
+    /**
+     * A method stub for an early {@link #onEnable()} override
+     */
+    public void onPreEnableInner() {
 
-    public void onDisableInner() {}
+    }
+
+    /**
+     * A method stub for {@link #onEnable()} overrides
+     */
+    public void onEnableInner() {
+
+    }
+
+    /**
+     * A method stub for {@link #onDisable()} override
+     */
+    public void onDisableInner() {
+
+    }
 }

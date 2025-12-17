@@ -27,6 +27,9 @@ package com.golfing8.kcommon.struct.helper.exception.types;
 
 import com.golfing8.kcommon.struct.helper.exception.InternalException;
 
+/**
+ * Called when an event handler throws an exception
+ */
 public class EventHandlerException extends InternalException {
 
     public EventHandlerException(Throwable cause, Object event) {

@@ -5,6 +5,10 @@ import com.golfing8.kcommon.menu.MenuUtils;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * An outline of a rectangle shape
+ * Particularly, just the edges are included
+ */
 public class LayoutShapeOutline implements MenuLayoutShape {
     private final List<MenuCoordinate> inRange;
 

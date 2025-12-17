@@ -58,6 +58,12 @@ public class ItemDrop extends Drop<ItemStack> {
         return getDrop(1.0D);
     }
 
+    /**
+     * Gets a list of item drops with the given boost applied
+     *
+     * @param boost the boost to apply
+     * @return the drops
+     */
     public List<ItemStack> getDrop(double boost) {
         double effectiveBoost = Math.min(boost, getMaxBoost());
         return items.values().stream().map(builder -> {
@@ -79,8 +85,14 @@ public class ItemDrop extends Drop<ItemStack> {
         return getDrop(new DropContext(player));
     }
 
+    /**
+     * Gets the drops based upon the given context
+     *
+     * @param context the context
+     * @return the drops
+     */
     public List<ItemStack> getDrop(DropContext context) {
-        if (context.getPlayer() == null || (!lootingEnabled && !fortuneEnabled))
+        if (context.getPlayer() == null || !lootingEnabled && !fortuneEnabled)
             return getDrop(context.getBoost());
 
         ItemStack inHand = context.getPlayer().getItemInHand();
@@ -90,10 +102,10 @@ public class ItemDrop extends Drop<ItemStack> {
         int lootingLevel;
         int fortuneLevel;
         List<ItemStack> itemStacks = new ArrayList<>();
-        if (lootingEnabled && (lootingLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.getEnchant())) > 0) {
+        if (lootingEnabled && (lootingLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.get())) > 0) {
             int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", lootingLevel);
             itemStacks.addAll(getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList()));
-        } else if (fortuneEnabled && (fortuneLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.getEnchant())) > 0) {
+        } else if (fortuneEnabled && (fortuneLevel = inHand.getEnchantmentLevel(XEnchantment.LOOTING.get())) > 0) {
             int extraDrops = (int) MathExpressions.evaluate(lootingFormula, "LOOTING", fortuneLevel);
             itemStacks.addAll(getDrop().stream().peek(item -> item.setAmount(item.getAmount() + extraDrops)).collect(Collectors.toList()));
         } else {
