@@ -24,10 +24,21 @@ public interface RandomTestable {
         return ThreadLocalRandom.current();
     }
 
+    /**
+     * Tests the random instance with default odds
+     *
+     * @return true if success
+     */
     default boolean testRandom() {
         return getChance() > getRandomInstance().nextDouble() * 100.0D;
     }
 
+    /**
+     * Tests the random with modified odds
+     *
+     * @param boost the boost
+     * @return true if success
+     */
     default boolean testRandom(double boost) {
         return getChance() * boost > getRandomInstance().nextDouble() * 100.0D;
     }

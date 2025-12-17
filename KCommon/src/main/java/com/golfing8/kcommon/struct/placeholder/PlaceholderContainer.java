@@ -129,7 +129,7 @@ public class PlaceholderContainer {
                     result = result.appendNewline();
             }
             Component finalComponent = result;
-            toReturn = toReturn.replaceText((builder) -> {
+            toReturn = toReturn.replaceText(builder -> {
                 builder.matchLiteral(placeholder.getLabel()).replacement(finalComponent);
             });
         }
@@ -138,7 +138,7 @@ public class PlaceholderContainer {
             if (placeholder.isTrusted())
                 continue;
 
-            toReturn = toReturn.replaceText((builder) -> {
+            toReturn = toReturn.replaceText(builder -> {
                 builder.matchLiteral(placeholder.getLabel()).replacement(placeholder.getValue());
             });
         }
@@ -191,7 +191,7 @@ public class PlaceholderContainer {
      * @param objects the objects.
      * @return the flattened placeholder container.
      */
-    public static PlaceholderContainer compileTrusted(@NotNull Object @NotNull ... objects) {
+    public static PlaceholderContainer compileTrusted(@NotNull Object @NotNull... objects) {
         return compile(true, objects);
     }
 
@@ -201,11 +201,11 @@ public class PlaceholderContainer {
      * @param objects the objects.
      * @return the flattened placeholder container.
      */
-    public static PlaceholderContainer compileUntrusted(@NotNull Object @NotNull ... objects) {
+    public static PlaceholderContainer compileUntrusted(@NotNull Object @NotNull... objects) {
         return compile(false, objects);
     }
 
-    private static PlaceholderContainer compile(boolean trusted, @NotNull Object @NotNull ... objects) {
+    private static PlaceholderContainer compile(boolean trusted, @NotNull Object @NotNull... objects) {
         Preconditions.checkNotNull(objects, "Arguments cannot be null");
         if (objects.length == 0) {
             return EMPTY;

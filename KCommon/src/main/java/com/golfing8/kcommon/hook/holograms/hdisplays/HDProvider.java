@@ -6,6 +6,9 @@ import com.golfing8.kcommon.hook.holograms.Hologram;
 import com.golfing8.kcommon.hook.holograms.HologramProvider;
 import org.bukkit.Location;
 
+/**
+ * A hologram provider implementation for HolographicDisplays
+ */
 public class HDProvider implements HologramProvider {
     @Override
     public Hologram createHologram(Location location) {

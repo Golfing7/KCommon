@@ -24,6 +24,12 @@ public interface MessageContainer {
      */
     Message getMessage();
 
+    /**
+     * Converts this container to a paged message
+     *
+     * @param placeholders the placeholders
+     * @return the new paged message
+     */
     default PagedMessage toPagedMessage(Object... placeholders) {
         return new PagedMessage(cloneAndParse(placeholders));
     }
@@ -64,6 +70,11 @@ public interface MessageContainer {
         return new Message(newMessages, newSounds, newTitle, newActionBar, getMessage().isPaged(), getMessage().getPageHeight(), MS.parseSingle(getMessage().getPageHeader(), placeholders), MS.parseSingle(getMessage().getPageFooter(), placeholders));
     }
 
+    /**
+     * Broadcasts the message with the given placeholders
+     *
+     * @param placeholders the placeholders
+     */
     default void broadcast(Object... placeholders) {
         PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
         if (getMessage().getMessages() != null && !getMessage().getMessages().isEmpty()) {
@@ -76,7 +87,6 @@ public interface MessageContainer {
                 ComponentUtils.bukkitAudiences.all().sendMessage(component);
             }
         }
-
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (getMessage().getTitle() != null) {

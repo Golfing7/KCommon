@@ -58,6 +58,12 @@ public interface ChunkColumn<V> extends Iterable<V> {
      */
     void clear();
 
+    /**
+     * Checks if the given position is valid in a world
+     *
+     * @param p the position
+     * @return true if valid
+     */
     default boolean checkValidLocation(Position p) {
         return p.getY() >= -64 && p.getY() <= 320;
     }

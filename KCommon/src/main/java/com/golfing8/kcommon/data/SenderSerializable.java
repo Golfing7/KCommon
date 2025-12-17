@@ -28,6 +28,11 @@ public abstract class SenderSerializable extends AbstractSerializable {
         playerUUID = UUID.fromString(objectId);
     }
 
+    /**
+     * Gets the player UUID associated with the key
+     *
+     * @return the player UUID
+     */
     public UUID getPlayerUUID() {
         if (playerUUID == null)
             playerUUID = UUID.fromString(super.getKey());

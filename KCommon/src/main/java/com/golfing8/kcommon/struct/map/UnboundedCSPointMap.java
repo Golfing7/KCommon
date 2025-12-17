@@ -9,6 +9,11 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A {@link ChunkStylePointMap} implementation that is unbounded in range.
+ *
+ * @param <V> the type
+ */
 public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V> {
     private final Long2ObjectMap<ChunkColumn<V>> storedValues;
 
@@ -116,7 +121,7 @@ public class UnboundedCSPointMap<V> implements ChunkStylePointMap<V> {
     public Set<Entry<Position, V>> entrySet() {
         Set<Entry<Position, V>> entries = Sets.newHashSet();
 
-        storedValues.long2ObjectEntrySet().forEach((obj) -> {
+        storedValues.long2ObjectEntrySet().forEach(obj -> {
             entries.addAll(obj.getValue().entries());
         });
 

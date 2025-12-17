@@ -5,4 +5,5 @@
     <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='UtilityClass']]"/>
     <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='Getter']]"/>
     <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='Setter']]"/>
+    <suppress-xpath checks="MissingJavadocMethod" query="//METHOD_DEF[.//ANNOTATION/IDENT[@text='EventHandler']]"/>
 </suppressions>

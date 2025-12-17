@@ -33,7 +33,7 @@ public class ParticleXFunction extends ParticleFunction {
 
         this.interval = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "interval"), Interval.class);
         String function = section.getString("function");
-        this.function = (x) -> MathExpressions.evaluate(function, "X", x);
+        this.function = x -> MathExpressions.evaluate(function, "X", x);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ParticleXFunction extends ParticleFunction {
             if (isSmartFill() &&
                     previousParticle != null &&
                     previousParticle.distance(at) >= smartFillThreshold &&
-                    (Math.abs(fValue - previousFValue) < Math.max(smartFillMaxThreshold, smartFillMaxThreshold * amplitude))) {
+                    Math.abs(fValue - previousFValue) < Math.max(smartFillMaxThreshold, smartFillMaxThreshold * amplitude)) {
                 smartFillLocations(previousParticle, at);
             }
 

@@ -67,6 +67,11 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
         linesInserted += insertion.length;
     }
 
+    /**
+     * Inserts the comment at the current key
+     *
+     * @param insertion the insertion
+     */
     public void insertComment(String... insertion) {
         for (String str : this.junk) {
             if (str.trim().startsWith("#"))

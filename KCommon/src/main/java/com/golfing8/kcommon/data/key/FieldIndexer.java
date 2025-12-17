@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.data.key;
 
-
 import com.golfing8.kcommon.data.DataSerializable;
 
 import java.util.List;

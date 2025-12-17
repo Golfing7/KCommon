@@ -42,10 +42,21 @@ public enum ThreadContext {
      */
     ASYNC;
 
+    /**
+     * Gets the context for the current thread
+     *
+     * @return the thread context
+     */
     public static ThreadContext forCurrentThread() {
         return forThread(Thread.currentThread());
     }
 
+    /**
+     * Gets the context for the given thread
+     *
+     * @param thread the thread
+     * @return the context
+     */
     public static ThreadContext forThread(Thread thread) {
         return thread == KCommon.getInstance().getMainThread() ? SYNC : ASYNC;
     }

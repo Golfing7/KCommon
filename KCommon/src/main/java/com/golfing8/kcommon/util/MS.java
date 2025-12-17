@@ -37,7 +37,7 @@ public final class MS {
 
     static {
         //Color first, always
-        TRANSFORMERS.add((str) -> ChatColor.translateAlternateColorCodes('&', str));
+        TRANSFORMERS.add(str -> ChatColor.translateAlternateColorCodes('&', str));
 
         //Try hex coloring, if we're on a version which supports it.
         TRANSFORMERS.add(string -> {
@@ -193,6 +193,12 @@ public final class MS {
         });
     }
 
+    /**
+     * Applies all transformers to the given string
+     *
+     * @param str the string
+     * @return the transformed string
+     */
     @Contract(pure = true)
     public static @NotNull String applyTransformers(@NotNull String str) {
         for (Function<String, String> func : TRANSFORMERS) {
@@ -308,6 +314,13 @@ public final class MS {
         audience.sendActionBar(toComponent(actionBar, placeholders));
     }
 
+    /**
+     * Passes the message to the given sender
+     *
+     * @param sender the sender
+     * @param message the message
+     * @param placeholders the placeholders
+     */
     public static void pass(CommandSender sender, String message, Object... placeholders) {
         // Don't send messages to the item capture player.
         if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
@@ -316,6 +329,13 @@ public final class MS {
         ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
     }
 
+    /**
+     * Passes the message to the given sender
+     *
+     * @param sender the sender
+     * @param message the message
+     * @param placeholders the placeholders
+     */
     public static void pass(CommandSender sender, List<String> message, Object... placeholders) {
         // Don't send messages to the item capture player.
         if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))

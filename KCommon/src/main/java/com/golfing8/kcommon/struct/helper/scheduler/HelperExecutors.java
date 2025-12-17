@@ -28,6 +28,7 @@ package com.golfing8.kcommon.struct.helper.scheduler;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.struct.helper.exception.HelperExceptions;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,36 +41,57 @@ public final class HelperExecutors {
     private static final Executor ASYNC_BUKKIT = new BukkitAsyncExecutor();
     private static final HelperAsyncExecutor ASYNC_HELPER = new HelperAsyncExecutor();
 
+    /**
+     * Gets the sync bukkit executor
+     *
+     * @return the sync bukkit executor
+     */
     public static Executor sync() {
         return SYNC_BUKKIT;
     }
 
+    /**
+     * Gets the async helper executor
+     *
+     * @return the async helper executor
+     */
     public static ScheduledExecutorService asyncHelper() {
         return ASYNC_HELPER;
     }
 
+    /**
+     * Gets the async bukkit executor
+     *
+     * @return the async bukkit executor
+     */
     public static Executor asyncBukkit() {
         return ASYNC_BUKKIT;
     }
 
+    /**
+     * Shuts the exectors down
+     */
     public static void shutdown() {
         ASYNC_HELPER.cancelRepeatingTasks();
     }
 
     private static final class BukkitSyncExecutor implements Executor {
         @Override
-        public void execute(Runnable runnable) {
+        public void execute(@NotNull Runnable runnable) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(KCommon.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
         }
     }
 
     private static final class BukkitAsyncExecutor implements Executor {
         @Override
-        public void execute(Runnable runnable) {
+        public void execute(@NotNull Runnable runnable) {
             Bukkit.getScheduler().runTaskAsynchronously(KCommon.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
         }
     }
 
+    /**
+     * Wraps the given runnable in a scheduler task
+     */
     @Deprecated
     public static Runnable wrapRunnable(Runnable runnable) {
         return HelperExceptions.wrapSchedulerTask(runnable);

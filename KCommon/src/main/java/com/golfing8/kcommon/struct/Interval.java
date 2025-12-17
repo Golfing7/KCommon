@@ -59,6 +59,11 @@ public class Interval implements Iterable<Double> {
         return this.intervalSize;
     }
 
+    /**
+     * Converts this interval into a serialized string
+     *
+     * @return the serialized string
+     */
     public String toSerialString() {
         if (interval != 1.0D) {
             return FORMAT.format(x1) + ";" + FORMAT.format(interval) + ";" + FORMAT.format(x2);
@@ -72,6 +77,11 @@ public class Interval implements Iterable<Double> {
         return new IntervalIterator();
     }
 
+    /**
+     * Creates an iterator with the {@link #TINY_INTERVAL}
+     *
+     * @return the tiny iterator
+     */
     public Iterator<Double> tinyIterator() {
         return new IntervalIterator(TINY_INTERVAL);
     }
@@ -123,7 +133,7 @@ public class Interval implements Iterable<Double> {
             }
 
             //Check if we'll exceed our bounds.
-            if ((positive && current + interval > x2) || (!positive && current + interval < x2)) {
+            if (positive && current + interval > x2 || !positive && current + interval < x2) {
                 //Mark our final iteration.
                 current = x2;
                 return toReturn;
@@ -136,6 +146,12 @@ public class Interval implements Iterable<Double> {
         }
     }
 
+    /**
+     * Constructs the interval from the given serialized string
+     *
+     * @param string the string
+     * @return the interval
+     */
     public static Interval fromString(String string) {
         String[] split = string.split(";");
         if (split.length >= 3) {

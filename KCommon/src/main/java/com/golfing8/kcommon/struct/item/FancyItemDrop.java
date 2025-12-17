@@ -29,7 +29,7 @@ import java.util.*;
  * </p>
  */
 @Getter
-public class FancyItemDrop extends BukkitRunnable {
+public final class FancyItemDrop extends BukkitRunnable {
     private final Location location;
     private final Collection<ItemStack> items;
     private final ItemStack icon;
@@ -149,6 +149,13 @@ public class FancyItemDrop extends BukkitRunnable {
         }
     }
 
+    /**
+     * Spawns a fancy item drop at the given location
+     *
+     * @param location the location
+     * @param items the drops
+     * @return the fancy item drop
+     */
     public static FancyItemDrop spawn(Location location, Collection<ItemStack> items) {
         if (items.isEmpty())
             throw new IllegalArgumentException("Items cannot be empty");
@@ -156,6 +163,14 @@ public class FancyItemDrop extends BukkitRunnable {
         return new FancyItemDrop(location, items, items.stream().findFirst().get());
     }
 
+    /**
+     * Spawns a fancy item drop at the given location
+     *
+     * @param location the location
+     * @param items the drops
+     * @param icon the icon to show
+     * @return the fancy item drop
+     */
     public static FancyItemDrop spawn(Location location, Collection<ItemStack> items, ItemStack icon) {
         return new FancyItemDrop(location, items, icon);
     }

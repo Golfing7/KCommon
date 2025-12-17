@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -171,7 +172,7 @@ public class CuboidRegion implements Region {
         if (this.minY > region.getMaximumYValue() || this.maxY < region.getMinimumYValue())
             return false;
 
-        return (this.minZ <= region.getMaximumZValue()) && (this.maxZ >= region.getMinimumZValue());
+        return this.minZ <= region.getMaximumZValue() && this.maxZ >= region.getMinimumZValue();
     }
 
     @Override
@@ -195,7 +196,7 @@ public class CuboidRegion implements Region {
     }
 
     @Override
-    public Iterator<BlockVector> iterator() {
+    public @NotNull Iterator<BlockVector> iterator() {
         return new CuboidRegionIterator();
     }
 
@@ -222,7 +223,7 @@ public class CuboidRegion implements Region {
 
         @Override
         public boolean hasNext() {
-            return !(finished) && (currentX <= maxX || currentY <= maxY || currentZ <= maxZ);
+            return !finished && (currentX <= maxX || currentY <= maxY || currentZ <= maxZ);
         }
 
         @Override

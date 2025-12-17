@@ -23,10 +23,22 @@ public enum ToolType {
 
     final Predicate<XMaterial> sameTypePredicate;
 
+    /**
+     * Checks if the given item is in the same category as this
+     *
+     * @param itemStack the item
+     * @return true if same category
+     */
     public boolean isSameType(ItemStack itemStack) {
         return isSameType(XMaterial.matchXMaterial(itemStack));
     }
 
+    /**
+     * Checks if the given material is in the same category as this
+     *
+     * @param material the material
+     * @return true if same category
+     */
     public boolean isSameType(XMaterial material) {
         return sameTypePredicate.test(material);
     }

@@ -52,6 +52,12 @@ public class FieldType {
 
     }
 
+    /**
+     * Extracts the field type from the given {@link TypeToken}
+     *
+     * @param token the token
+     * @return the new field type
+     */
     public static FieldType extractFrom(TypeToken<?> token) {
         ParameterizedType foundType = (ParameterizedType) token.getType();
         return new FieldType((Class<?>) foundType.getRawType(),

@@ -44,7 +44,6 @@ public interface LangConfigContainer {
         return (prefix.isEmpty() ? prefix : prefix + ".") + postfix;
     }
 
-
     /**
      * Sends a config message to the player, if it doesn't exist in the config it is added.
      * <p>

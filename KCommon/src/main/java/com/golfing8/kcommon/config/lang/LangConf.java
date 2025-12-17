@@ -15,5 +15,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 public @interface LangConf {
+    /**
+     * The path to map to in the lang config
+     *
+     * @return the path
+     */
     String path() default "";
 }

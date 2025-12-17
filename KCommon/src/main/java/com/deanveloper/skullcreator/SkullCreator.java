@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.NMS;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -27,10 +28,8 @@ import java.util.UUID;
  *
  * @author deanveloper on 12/28/2016.
  */
+@UtilityClass
 public class SkullCreator {
-
-    private SkullCreator() {
-    }
 
     // some reflection stuff to be used when setting a skull's profile
     private static Field blockProfileField;

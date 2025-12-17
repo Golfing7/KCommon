@@ -9,6 +9,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+/**
+ * A JSON adapter for instances of {@link CooldownMap}
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public enum CooldownMapAdapterFactory implements JsonSerializer<CooldownMap>, JsonDeserializer<CooldownMap> {
     INSTANCE;
@@ -47,7 +50,7 @@ public enum CooldownMapAdapterFactory implements JsonSerializer<CooldownMap>, Js
     }
 
     @AllArgsConstructor
-    private static class CooldownMapType implements ParameterizedType {
+    private static final class CooldownMapType implements ParameterizedType {
         private final @NotNull Type @NotNull [] types;
 
         @Override

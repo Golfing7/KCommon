@@ -64,7 +64,7 @@ public class RGBUtils {
         Matcher m = fix3.matcher(text);
         while (m.find()) {
             String hexcode = m.group();
-            String fixed = new String(new char[]{
+            String fixed = new String(new char[] {
                     hexcode.charAt(3),
                     hexcode.charAt(5),
                     hexcode.charAt(7),

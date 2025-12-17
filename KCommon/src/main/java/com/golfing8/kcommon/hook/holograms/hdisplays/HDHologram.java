@@ -89,7 +89,6 @@ public class HDHologram implements Hologram {
         return this.backingHologram.isDeleted();
     }
 
-
     @Override
     public void addLine(int index, String line) {
         this.backingHologram.insertTextLine(index, line);

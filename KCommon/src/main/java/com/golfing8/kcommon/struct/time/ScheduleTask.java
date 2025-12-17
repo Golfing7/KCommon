@@ -58,7 +58,7 @@ public class ScheduleTask extends BukkitRunnable {
     }
 
     public ScheduleTask(Schedule schedule, Runnable runnable, Supplier<Boolean> pauseCondition) {
-        this(schedule, (stamp) -> runnable.run(), pauseCondition);
+        this(schedule, stamp -> runnable.run(), pauseCondition);
     }
 
     public ScheduleTask(Schedule schedule, Consumer<Timestamp> action) {
@@ -66,7 +66,7 @@ public class ScheduleTask extends BukkitRunnable {
     }
 
     public ScheduleTask(Schedule schedule, Runnable runnable) {
-        this(schedule, (stamp) -> runnable.run());
+        this(schedule, stamp -> runnable.run());
     }
 
     /**

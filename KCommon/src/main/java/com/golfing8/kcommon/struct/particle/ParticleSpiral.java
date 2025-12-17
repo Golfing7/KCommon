@@ -17,6 +17,12 @@ public class ParticleSpiral extends ParticleCircle {
     @Getter
     protected double length = 1;
 
+    /**
+     * Sets the length of the spiral
+     *
+     * @param length the length
+     * @return this
+     */
     public ParticleSpiral length(double length) {
         this.length = length;
         return this;
@@ -25,6 +31,12 @@ public class ParticleSpiral extends ParticleCircle {
     //The periods of the spiral.
     private double periods = 1;
 
+    /**
+     * How many full spirals will be made across the length
+     *
+     * @param periods the periods
+     * @return this
+     */
     public ParticleSpiral periods(double periods) {
         this.periods = periods;
         return this;

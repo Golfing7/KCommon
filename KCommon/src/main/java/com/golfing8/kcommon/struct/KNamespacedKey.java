@@ -35,7 +35,7 @@ public class KNamespacedKey implements Key {
     public static final String KCOMMON = "kcommon";
 
     private static boolean isValidNamespaceChar(char c) {
-        return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '_' || c == '-';
+        return c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.' || c == '_' || c == '-';
     }
 
     private static boolean isValidKeyChar(char c) {
@@ -76,23 +76,23 @@ public class KNamespacedKey implements Key {
     private final String key;
 
     public KNamespacedKey(String namespace, String key) {
-        Preconditions.checkArgument((namespace != null && VALID_NAMESPACE.matcher(namespace).matches()), String.format("Invalid namespace. Must be [a-z0-9._-]: %s", namespace));
-        Preconditions.checkArgument((key != null && VALID_KEY.matcher(key).matches()), String.format("Invalid key. Must be [a-z0-9/._-]: %s", key));
+        Preconditions.checkArgument(namespace != null && VALID_NAMESPACE.matcher(namespace).matches(), String.format("Invalid namespace. Must be [a-z0-9._-]: %s", namespace));
+        Preconditions.checkArgument(key != null && VALID_KEY.matcher(key).matches(), String.format("Invalid key. Must be [a-z0-9/._-]: %s", key));
         this.namespace = namespace;
         this.key = key;
         String string = toString();
-        Preconditions.checkArgument((string.length() < 256), "KNamespacedKey must be less than 256 characters", string);
+        Preconditions.checkArgument(string.length() < 256, "KNamespacedKey must be less than 256 characters", string);
     }
 
     public KNamespacedKey(Plugin plugin, String key) {
-        Preconditions.checkArgument((plugin != null), "Plugin cannot be null");
-        Preconditions.checkArgument((key != null), "Key cannot be null");
+        Preconditions.checkArgument(plugin != null, "Plugin cannot be null");
+        Preconditions.checkArgument(key != null, "Key cannot be null");
         this.namespace = plugin.getName().toLowerCase(Locale.ROOT);
         this.key = key.toLowerCase(Locale.ROOT);
         Preconditions.checkArgument(VALID_NAMESPACE.matcher(this.namespace).matches(), String.format("Invalid namespace. Must be [a-z0-9._-]: %s", this.namespace));
         Preconditions.checkArgument(VALID_KEY.matcher(this.key).matches(), String.format("Invalid key. Must be [a-z0-9/._-]: %s", this.key));
         String string = toString();
-        Preconditions.checkArgument((string.length() < 256), String.format("KNamespacedKey must be less than 256 characters (%s)", string));
+        Preconditions.checkArgument(string.length() < 256, String.format("KNamespacedKey must be less than 256 characters (%s)", string));
     }
 
     /**
@@ -181,16 +181,6 @@ public class KNamespacedKey implements Key {
         return fromString(key, null);
     }
 
-
-    public String getNamespace() {
-        return this.namespace;
-    }
-
-
-    public String getKey() {
-        return this.key;
-    }
-
     @Override
     public @NotNull String namespace() {
         return namespace;
@@ -206,6 +196,11 @@ public class KNamespacedKey implements Key {
         return toString();
     }
 
+    /**
+     * Computes hashcode based on the namespace/key pair
+     *
+     * @return the hashcode
+     */
     public int hashCode() {
         int hash = 5;
         hash = 47 * hash + this.namespace.hashCode();
@@ -213,21 +208,38 @@ public class KNamespacedKey implements Key {
         return hash;
     }
 
+    /**
+     * Compares equality based on the namespace/key pair
+     *
+     * @param obj the other object
+     * @return true if equal
+     */
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
         KNamespacedKey other = (KNamespacedKey) obj;
-        return (this.namespace.equals(other.namespace) && this.key.equals(other.key));
+        return this.namespace.equals(other.namespace) && this.key.equals(other.key);
     }
 
+    /**
+     * Returns the namespace/key pair as a string in the format {@code namespace:key}
+     *
+     * @return the string
+     */
     public String toString() {
         return this.namespace + ":" + this.key;
     }
 
+    /**
+     * Generates a random key in the {@link #KCOMMON} namespace
+     *
+     * @return the random key
+     * @deprecated Generating random keys should be discouraged
+     */
     @Deprecated
     public static KNamespacedKey randomKey() {
-        return new KNamespacedKey("kcommon", UUID.randomUUID().toString());
+        return new KNamespacedKey(KCOMMON, UUID.randomUUID().toString());
     }
 }

@@ -2,6 +2,9 @@ package com.golfing8.kcommon.struct.map;
 
 import com.golfing8.kcommon.nms.struct.Position;
 
+/**
+ * Represents a node in a {@link ChunkColumn} instance
+ */
 class Node {
     Node next;
     Node previous;

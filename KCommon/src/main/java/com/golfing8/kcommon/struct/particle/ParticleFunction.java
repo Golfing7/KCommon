@@ -15,6 +15,12 @@ public abstract class ParticleFunction extends Particle {
     @Getter
     protected double amplitude = 1.0D;
 
+    /**
+     * Sets the amplitude of the function
+     *
+     * @param amplitude the amplitude
+     * @return this
+     */
     public ParticleFunction amplitude(double amplitude) {
         this.amplitude = amplitude;
         return this;
@@ -26,6 +32,12 @@ public abstract class ParticleFunction extends Particle {
     @Getter
     protected boolean smartFill = true;
 
+    /**
+     * If the function should interpolate between each sampled function point
+     *
+     * @param smartFill true if interpolation
+     * @return this
+     */
     public ParticleFunction smartFill(boolean smartFill) {
         this.smartFill = smartFill;
         return this;
@@ -35,6 +47,13 @@ public abstract class ParticleFunction extends Particle {
     @Getter
     protected double smartFillThreshold = 0.2D;
 
+    /**
+     * Sets the interpolation threshold.
+     * If two points are this far or further away, the range is filled with particles
+     *
+     * @param smartFillThreshold the threshold of interpolation
+     * @return this
+     */
     public ParticleFunction smartFillThreshold(double smartFillThreshold) {
         this.smartFillThreshold = smartFillThreshold;
         return this;
@@ -44,6 +63,12 @@ public abstract class ParticleFunction extends Particle {
     @Getter
     protected double smartFillMaxThreshold = 3.0D;
 
+    /**
+     * Sets the maximum range of interpolation
+     *
+     * @param smartFillMaxThreshold the maximum interpolation threshold
+     * @return this
+     */
     public ParticleFunction smartFillMaxThreshold(double smartFillMaxThreshold) {
         this.smartFillMaxThreshold = smartFillMaxThreshold;
         return this;

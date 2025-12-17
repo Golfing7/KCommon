@@ -18,12 +18,22 @@ public class RollingAverage {
         }
     }
 
+    /**
+     * Edits the head of the array
+     *
+     * @param edit the number to set to
+     */
     public void editHead(double edit) {
         total += edit;
 
         samples[index] += edit;
     }
 
+    /**
+     * Adds the given number
+     *
+     * @param amount the amount
+     */
     public void add(double amount) {
         total -= samples[index];
         samples[index] = amount;
@@ -33,6 +43,11 @@ public class RollingAverage {
         }
     }
 
+    /**
+     * Gets the total from this average
+     *
+     * @return the average
+     */
     public double getTotal() {
         return total / (size / 20D);
     }

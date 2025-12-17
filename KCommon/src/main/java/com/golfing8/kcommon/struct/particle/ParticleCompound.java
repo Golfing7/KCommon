@@ -12,6 +12,12 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
+/**
+ * Represents a collection of {@link Particle} that display around some central point
+ * <p>
+ * This class allows for even more complex displays
+ * </p>
+ */
 public class ParticleCompound extends Particle {
     private final List<Pair<Particle, Vector>> particleOffset;
 

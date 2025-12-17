@@ -39,6 +39,9 @@ public interface CASerializable {
         Class<? extends CASerializable> getType();
     }
 
+    /**
+     * An annotation for defining options on classes implementing {@link CASerializable}
+     */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     @interface Options {

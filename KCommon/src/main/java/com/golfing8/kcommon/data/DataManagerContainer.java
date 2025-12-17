@@ -25,7 +25,7 @@ public interface DataManagerContainer {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     default <T extends DataSerializable> Map<Class<T>, DataManager<T>> getDataManagerMap() {
-        return (Map) c2DataManagers.computeIfAbsent(this.getClass(), (k) -> new HashMap<>());
+        return (Map) c2DataManagers.computeIfAbsent(this.getClass(), k -> new HashMap<>());
     }
 
     /**
@@ -51,8 +51,8 @@ public interface DataManagerContainer {
     @SuppressWarnings({"rawtypes", "unchecked"})
     default <T extends DataSerializable> DataManager<T> addDataManager(String key, Class<T> dataClass, boolean mongo) {
         DataManager<T> local = mongo ? new DataManagerRemote<>(key, JavaPlugin.getProvidingPlugin(getClass()), dataClass) : new DataManagerLocal<>(key, JavaPlugin.getProvidingPlugin(getClass()), dataClass);
-        Map c2DataMap = c2DataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
-        Map dataMap = dataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
+        Map c2DataMap = c2DataManagers.computeIfAbsent(getClass(), k -> new HashMap<>());
+        Map dataMap = dataManagers.computeIfAbsent(getClass(), k -> new HashMap<>());
         c2DataMap.put(dataClass, local);
         dataMap.put(key, local);
         return local;
@@ -63,8 +63,8 @@ public interface DataManagerContainer {
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     default void shutdownDataManagers() {
-        Map c2DataMap = c2DataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
-        Map dataMap = dataManagers.computeIfAbsent(getClass(), (k) -> new HashMap<>());
+        Map c2DataMap = c2DataManagers.computeIfAbsent(getClass(), k -> new HashMap<>());
+        Map dataMap = dataManagers.computeIfAbsent(getClass(), k -> new HashMap<>());
         c2DataMap.values().forEach(obj -> {
             ((DataManager) obj).shutdown();
         });
@@ -180,6 +180,14 @@ public interface DataManagerContainer {
         dataManager.delete(data.getKey());
     }
 
+    /**
+     * Checks if the data associated with the key exists under the given data class
+     *
+     * @param key the key
+     * @param dataClass the data class
+     * @return true if exists
+     * @param <T> the type
+     */
     //Shorthand for the below method.
     default <T extends DataSerializable> boolean dataExists(UUID key, Class<T> dataClass) {
         return this.dataExists(key.toString(), dataClass);
@@ -201,6 +209,14 @@ public interface DataManagerContainer {
         return dataManager.exists(key);
     }
 
+    /**
+     * Loads the data under the given key and data type
+     *
+     * @param key the key
+     * @param type the type
+     * @return the data serializable instance, or null
+     * @param <T> the type
+     */
     //Shorthand for the below method.
     @Nullable
     default <T extends DataSerializable> T loadData(UUID key, Class<T> type) {

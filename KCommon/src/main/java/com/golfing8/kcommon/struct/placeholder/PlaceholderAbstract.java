@@ -4,6 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Contract;
 
+/**
+ * An abstract type of placeholder that parses on an object and produces output
+ *
+ * @param <I> the input type
+ * @param <O> the output type
+ */
 public abstract class PlaceholderAbstract<I, O> {
     /**
      * If this placeholder is trusted, the contents of the placeholders will also be parsed.

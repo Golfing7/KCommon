@@ -25,6 +25,8 @@
 
 package com.golfing8.kcommon.struct.helper.terminable.composite;
 
+import lombok.Getter;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -32,6 +34,7 @@ import java.util.List;
  * Exception thrown to propagate exceptions thrown by
  * {@link CompositeTerminable#close()}.
  */
+@Getter
 public class CompositeClosingException extends Exception {
     private final List<? extends Throwable> causes;
 
@@ -43,10 +46,9 @@ public class CompositeClosingException extends Exception {
         this.causes = Collections.unmodifiableList(causes);
     }
 
-    public List<? extends Throwable> getCauses() {
-        return this.causes;
-    }
-
+    /**
+     * Prints all stack traces found
+     */
     public void printAllStackTraces() {
         this.printStackTrace();
         for (Throwable cause : this.causes) {

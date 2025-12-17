@@ -19,8 +19,14 @@ public enum ParticleType {
     SPIRAL(ParticleSpiral::new),
     ;
 
-    Function<ConfigurationSection, Particle> constructor;
+    final Function<ConfigurationSection, Particle> constructor;
 
+    /**
+     * Loads the given particle instance from a config section
+     *
+     * @param section the section
+     * @return this
+     */
     public Particle fromConfig(ConfigurationSection section) {
         return constructor.apply(section);
     }

@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A wrapped configuration section that maintains metadata about source and adds a few extra methods
+ */
 @AllArgsConstructor
 public class WrappedConfigurationSection implements KConfigurationSection {
     private final ConfigurationSection wrapped;

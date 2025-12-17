@@ -4,6 +4,9 @@ import lombok.experimental.UtilityClass;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Contains utility functions for math
+ */
 @UtilityClass
 public final class MathUtil {
     /**

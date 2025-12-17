@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.map;
 
+import com.golfing8.kcommon.KCommon;
 import com.google.common.base.Preconditions;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -7,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Stores cooldown information for unique IDs.
@@ -17,13 +18,13 @@ public class CooldownMap<T> {
     /**
      * The map we store cooldowns in
      */
-    private final Map<T, Long> backingMap;
+    private final ConcurrentHashMap<T, Long> backingMap;
 
     /**
      * Creates a new cooldown map with no expiry task.
      */
     public CooldownMap() {
-        this.backingMap = new HashMap<>();
+        this(KCommon.getInstance());
     }
 
     /**
@@ -32,7 +33,7 @@ public class CooldownMap<T> {
      * @param backingMap the data
      */
     public CooldownMap(Map<T, Long> backingMap) {
-        this.backingMap = new HashMap<>(backingMap);
+        this(KCommon.getInstance());
     }
 
     /**
@@ -41,9 +42,8 @@ public class CooldownMap<T> {
      * @param plugin the plugin.
      */
     public CooldownMap(Plugin plugin) {
-        this();
-
-        new ExpiryTask(this).runTaskTimer(plugin, 0, 20);
+        this.backingMap = new ConcurrentHashMap<>();
+        new ExpiryTask(this).runTaskTimerAsynchronously(plugin, 0, 20);
     }
 
     /**
@@ -158,7 +158,6 @@ public class CooldownMap<T> {
     /**
      * This must be kept as a nested static class to allow the CooldownMap instance
      * it's linked to get GCed.
-     * TODO Maybe make this async?
      */
     private static class ExpiryTask extends BukkitRunnable {
         /**
@@ -166,7 +165,7 @@ public class CooldownMap<T> {
          */
         private final WeakReference<CooldownMap<?>> link;
 
-        public ExpiryTask(CooldownMap<?> link) {
+        ExpiryTask(CooldownMap<?> link) {
             this.link = new WeakReference<>(link);
         }
 

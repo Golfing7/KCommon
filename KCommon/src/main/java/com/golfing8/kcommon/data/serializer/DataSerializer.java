@@ -50,7 +50,7 @@ public final class DataSerializer {
     }
 
     static {
-        registerTransformer(Location.class, (loc) -> {
+        registerTransformer(Location.class, loc -> {
             JsonObject object = new JsonObject();
             object.addProperty("x", loc.getX());
             object.addProperty("y", loc.getY());
@@ -60,7 +60,7 @@ public final class DataSerializer {
             object.addProperty("yaw", loc.getYaw());
             object.addProperty("pitch", loc.getYaw());
             return object;
-        }, (json) -> {
+        }, json -> {
             double x = json.get("x").getAsDouble();
             double y = json.get("y").getAsDouble();
             double z = json.get("z").getAsDouble();
@@ -72,7 +72,7 @@ public final class DataSerializer {
             return new Location(world, x, y, z, yaw, pitch);
         });
 
-        registerTransformer(CuboidRegion.class, (loc) -> {
+        registerTransformer(CuboidRegion.class, loc -> {
             JsonObject object = new JsonObject();
             object.addProperty("min-x", loc.getMinimumXValue());
             object.addProperty("min-y", loc.getMinimumYValue());
@@ -82,7 +82,7 @@ public final class DataSerializer {
             object.addProperty("max-y", loc.getMaximumYValue());
             object.addProperty("max-z", loc.getMaximumZValue());
             return object;
-        }, (json) -> {
+        }, json -> {
             double minX = json.get("min-x").getAsDouble();
             double minY = json.get("min-y").getAsDouble();
             double minZ = json.get("min-z").getAsDouble();

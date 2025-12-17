@@ -13,11 +13,32 @@ import java.util.Map;
  * Represents functionality for requesting a placeholder throughout the KCommon plugin.
  */
 public interface PlaceholderProvider {
+    /**
+     * A function for requesting a normal placeholder on a player
+     */
     interface PlaceholderFunction {
+        /**
+         * Gets the placeholder value
+         *
+         * @param player the player
+         * @param args the arguments
+         * @return the value
+         */
         String get(OfflinePlayer player, String[] args);
     }
 
+    /**
+     * A function for requesting a relational placeholder on two players
+     */
     interface RelPlaceholderFunction {
+        /**
+         * Gets the placeholder value
+         *
+         * @param player the player
+         * @param other the other player
+         * @param args the arguments
+         * @return the value
+         */
         String get(OfflinePlayer player, Player other, String[] args);
     }
 

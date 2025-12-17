@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.config.lang;
 
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.BufferedReader;
@@ -30,6 +31,7 @@ public class LangConfig {
     /**
      * The path of the config.
      */
+    @Getter
     private final Path configPath;
     /**
      * The configuration this lang config is backed by.
@@ -136,7 +138,6 @@ public class LangConfig {
         return false;
     }
 
-
     /**
      * Gets the message with the given key.
      *
@@ -156,12 +157,4 @@ public class LangConfig {
         return this.configuration.getName();
     }
 
-    /**
-     * Gets the full path where this config file will be saved.
-     *
-     * @return the config path.
-     */
-    public Path getConfigPath() {
-        return this.configPath;
-    }
 }

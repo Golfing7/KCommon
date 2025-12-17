@@ -35,38 +35,106 @@ import java.util.function.*;
  */
 public final class Delegates {
 
+    /**
+     * Constructs a consumer from the given runnable
+     *
+     * @param runnable the runnable
+     * @return the consumer
+     * @param <T> the type
+     */
     public static <T> Consumer<T> runnableToConsumer(Runnable runnable) {
         return new RunnableToConsumer<>(runnable);
     }
 
+    /**
+     * Constructs a supplier from the given runnable
+     *
+     * @param runnable the runnable
+     * @return the supplier
+     */
     public static Supplier<Void> runnableToSupplier(Runnable runnable) {
         return new RunnableToSupplier<>(runnable);
     }
 
+    /**
+     * Constructs a supplier from the given callable
+     *
+     * @param callable the callable
+     * @return the supplier
+     * @param <T> the type
+     */
     public static <T> Supplier<T> callableToSupplier(Callable<T> callable) {
         return new CallableToSupplier<>(callable);
     }
 
+    /**
+     * Constructs a bi-consumer from the given consumer
+     *
+     * @param consumer the consumer
+     * @return the bi-consumer
+     * @param <T> the type
+     * @param <U> the second type
+     */
     public static <T, U> BiConsumer<T, U> consumerToBiConsumerFirst(Consumer<T> consumer) {
         return new ConsumerToBiConsumerFirst<>(consumer);
     }
 
+    /**
+     * Constructs a bi-consumer from the given consumer
+     *
+     * @param consumer the consumer
+     * @return the bi-consumer
+     * @param <T> the type
+     * @param <U> the second type
+     */
     public static <T, U> BiConsumer<T, U> consumerToBiConsumerSecond(Consumer<U> consumer) {
         return new ConsumerToBiConsumerSecond<>(consumer);
     }
 
+    /**
+     * Constructs a bi-predicate from the given predicate
+     *
+     * @param predicate the predicate
+     * @return the bi-predicate
+     * @param <T> the type
+     * @param <U> the second type
+     */
     public static <T, U> BiPredicate<T, U> predicateToBiPredicateFirst(Predicate<T> predicate) {
         return new PredicateToBiPredicateFirst<>(predicate);
     }
 
+    /**
+     * Constructs a bi-predicate from the given predicate
+     *
+     * @param predicate the predicate
+     * @return the bi-predicate
+     * @param <T> the type
+     * @param <U> the second type
+     */
     public static <T, U> BiPredicate<T, U> predicateToBiPredicateSecond(Predicate<U> predicate) {
         return new PredicateToBiPredicateSecond<>(predicate);
     }
 
+    /**
+     * Constructs a function from the given consumer
+     *
+     * @param consumer the consumer
+     * @return the function
+     * @param <T> the type
+     * @param <U> the return type
+     */
     public static <T, U> Function<T, U> consumerToFunction(Consumer<T> consumer) {
         return new ConsumerToFunction<>(consumer);
     }
 
+    /**
+     * Constructs a function from the given runnable
+     *
+     * @param runnable the runnable
+     * @return the function
+     * @param <T> the type
+     * @param <U> the second type
+     */
     public static <T, U> Function<T, U> runnableToFunction(Runnable runnable) {
         return new RunnableToFunction<>(runnable);
     }

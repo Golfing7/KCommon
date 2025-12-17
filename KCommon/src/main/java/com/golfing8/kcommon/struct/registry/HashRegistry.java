@@ -6,6 +6,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * A registry storing values using a hashmap backing
+ *
+ * @param <T> the type stored
+ */
 public class HashRegistry<T> implements KRegistry<T> {
     private final Map<Key, T> backingMap = new HashMap<>();
     private final Map<String, T> byName = new HashMap<>();

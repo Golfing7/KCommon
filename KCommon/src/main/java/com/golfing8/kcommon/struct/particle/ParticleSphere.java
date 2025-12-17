@@ -100,6 +100,13 @@ public class ParticleSphere extends ParticleCircle {
         spawnParticle(players, location.clone().add(bottom));
     }
 
+    /**
+     * Starts a wave effect that flows through the sphere
+     *
+     * @param vector the vector point on the sphere to start
+     * @param waveColor the color of the wave
+     * @param angleWidth the width of the wave in radians
+     */
     public void startWaveEffectAt(Vector vector, Color waveColor, double angleWidth) {
         vector = vector.clone();
 
@@ -114,6 +121,14 @@ public class ParticleSphere extends ParticleCircle {
         this.effectList.add(effect);
     }
 
+    /**
+     * Starts a wave effect that flows through the sphere
+     *
+     * @param vector the vector point on the sphere to start
+     * @param waveColor the color of the wave
+     * @param angleWidth the width of the wave in radians
+     * @param radiusSpeed the speed at which the wave flows
+     */
     public void startWaveEffectAt(Vector vector, Color waveColor, double angleWidth, double radiusSpeed) {
         vector = vector.clone();
 
@@ -182,7 +197,6 @@ public class ParticleSphere extends ParticleCircle {
             //If we're outside, entirely, of the width, return 0!
             if (dAngle > angleRadius)
                 return 0.0D;
-
 
             //This gets the ratio, from 0 to 1 of the two numbers.
             //Since it approaches 0 as it gets closer, we have to flip it around to get it to actually fit the necessary bill.

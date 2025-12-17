@@ -10,7 +10,20 @@ import java.util.Map;
  * This allows for faster hashing with block positions.
  */
 public interface ChunkStylePointMap<V> extends Map<Position, V> {
+    /**
+     * Gets the chunk column associated with the given position
+     *
+     * @param position the position
+     * @return the chunk column
+     */
     ChunkColumn<V> getChunkColumn(Position position);
 
+    /**
+     * Gets the chunk column associated with the given x/z chunk coordinate
+     *
+     * @param x the x
+     * @param z the z
+     * @return the chunk column
+     */
     ChunkColumn<V> getChunkColumn(int x, int z);
 }

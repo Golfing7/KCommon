@@ -2,6 +2,7 @@ package com.golfing8.kcommon.struct.map;
 
 import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.Range;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -86,7 +87,13 @@ public class RangeMap<V> implements Map<Range, V> {
         return entryPair == null ? null : entryPair.getB();
     }
 
-    public Pair<Range, V> getEntryPair(double dKey) {
+    /**
+     * Gets the entry pair associated with the given key
+     *
+     * @param dKey the key
+     * @return the entry pair
+     */
+    public @Nullable Pair<Range, V> getEntryPair(double dKey) {
         Entry<Double, Pair<Range, V>> floor = this.rangeMap.floorEntry(dKey);
         if (floor == null) {
             return null;
@@ -109,6 +116,13 @@ public class RangeMap<V> implements Map<Range, V> {
         return this.originalMap.get(key);
     }
 
+    /**
+     * Puts a value associated to a given key
+     *
+     * @param key the key
+     * @param value the value
+     * @return this
+     */
     public V put(double key, V value) {
         return put(new Range(key), value);
     }
@@ -195,15 +209,35 @@ public class RangeMap<V> implements Map<Range, V> {
     public static class Builder<T> {
         private final List<Pair<Range, T>> values = new ArrayList<>();
 
+        /**
+         * Puts a new value into this builder
+         *
+         * @param key the number
+         * @param object the object
+         * @return this
+         */
         public Builder<T> put(double key, T object) {
             return put(new Range(key), object);
         }
 
+        /**
+         * Puts a new value into this builder
+         *
+         * @param range the range
+         * @param object the object
+         * @return this
+         */
         public Builder<T> put(Range range, T object) {
             this.values.add(new Pair<>(range, object));
             return this;
         }
 
+        /**
+         * Builds the range map for this builder
+         *
+         * @return the range map
+         * @param <V> the type of values
+         */
         @SuppressWarnings("unchecked")
         public <V> RangeMap<V> build() {
             RangeMap<T> map = new RangeMap<T>();

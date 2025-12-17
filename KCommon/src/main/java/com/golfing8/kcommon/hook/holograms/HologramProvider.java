@@ -5,6 +5,9 @@ import com.golfing8.kcommon.hook.holograms.hdisplays.HDProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+/**
+ * An abstract provider for holograms
+ */
 public interface HologramProvider {
     /**
      * Creates a hologram at the specified location with the specified id.
@@ -25,6 +28,6 @@ public interface HologramProvider {
         else if (Bukkit.getServer().getPluginManager().isPluginEnabled("HolographicDisplays"))
             return new HDProvider();
         else
-            return (location) -> new EmptyHologram();
+            return location -> new EmptyHologram();
     }
 }

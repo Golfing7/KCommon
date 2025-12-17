@@ -2,6 +2,9 @@ package com.golfing8.kcommon.data;
 
 import lombok.Getter;
 
+/**
+ * An abstract type of serializable object for the built in {@link DataManager}
+ */
 public abstract class AbstractSerializable implements DataSerializable {
     /**
      * The ID of this  object

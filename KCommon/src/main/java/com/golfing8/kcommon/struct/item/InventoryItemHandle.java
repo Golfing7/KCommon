@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * An item handle mapping to an inventory and slot
+ */
 @AllArgsConstructor
 public class InventoryItemHandle implements ItemHandle {
     private final Inventory inventory;

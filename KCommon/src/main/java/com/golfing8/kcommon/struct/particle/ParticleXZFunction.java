@@ -84,7 +84,7 @@ public class ParticleXZFunction extends ParticleFunction {
             if (isSmartFill() &&
                     previousParticle != null &&
                     previousParticle.distance(at) >= smartFillThreshold &&
-                    (Math.abs(fValue - previousFValue) < Math.max(smartFillMaxThreshold, smartFillMaxThreshold * amplitude))) {
+                    Math.abs(fValue - previousFValue) < Math.max(smartFillMaxThreshold, smartFillMaxThreshold * amplitude)) {
                 smartFillLocations(previousParticle, at);
             }
 

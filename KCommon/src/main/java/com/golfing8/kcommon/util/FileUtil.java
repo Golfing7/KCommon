@@ -12,6 +12,9 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Contains utility methods for files
+ */
 @UtilityClass
 public final class FileUtil {
 

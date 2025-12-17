@@ -7,6 +7,9 @@ import org.bukkit.Location;
 
 import java.util.UUID;
 
+/**
+ * A hologram provider implementation for DecentHolograms
+ */
 public class DHProvider implements HologramProvider {
     @Override
     public Hologram createHologram(Location location) {

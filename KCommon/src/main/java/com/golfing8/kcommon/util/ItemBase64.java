@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.util;
 
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -12,6 +13,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * Contains utility methods for encoding/decoding items to/from base64
+ */
+@UtilityClass
 public class ItemBase64 {
 
     /**
@@ -19,7 +24,7 @@ public class ItemBase64 {
      *
      * @param playerInventory to turn into an array of strings.
      * @return Array of strings: [ main content, armor content ]
-     * @throws IllegalStateException
+     * @throws IllegalStateException if the items cannot be saved
      */
     public static String[] playerInventoryToBase64(PlayerInventory playerInventory) throws IllegalStateException {
         //get the main content part, this doesn't return the armor
@@ -37,7 +42,7 @@ public class ItemBase64 {
      *
      * @param items to turn into a Base64 String.
      * @return Base64 string of the items.
-     * @throws IllegalStateException
+     * @throws IllegalStateException if the item array cannot be encoded
      */
     public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
         try {
@@ -48,15 +53,15 @@ public class ItemBase64 {
             dataOutput.writeInt(items.length);
 
             // Save every element in the list
-            for (int i = 0; i < items.length; i++) {
-                dataOutput.writeObject(items[i]);
+            for (ItemStack item : items) {
+                dataOutput.writeObject(item);
             }
 
             // Serialize that array
             dataOutput.close();
             return Base64Coder.encodeLines(outputStream.toByteArray());
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to save .item stacks.", e);
+            throw new IllegalStateException("Unable to save item stacks.", e);
         }
     }
 
@@ -70,7 +75,7 @@ public class ItemBase64 {
      *
      * @param inventory to serialize
      * @return Base64 string of the provided inventory
-     * @throws IllegalStateException
+     * @throws IllegalStateException if the inventory cannot be encoded
      */
     public static String toBase64(Inventory inventory) throws IllegalStateException {
         try {
@@ -89,10 +94,17 @@ public class ItemBase64 {
             dataOutput.close();
             return Base64Coder.encodeLines(outputStream.toByteArray());
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to save .item stacks.", e);
+            throw new IllegalStateException("Unable to save item stacks.", e);
         }
     }
 
+    /**
+     * Encodes the given item into a base64 string
+     *
+     * @param itemStack the item
+     * @return the base64 string
+     * @throws IllegalStateException if the item cannot be encoded
+     */
     public static String toBase64(ItemStack itemStack) throws IllegalStateException {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -104,7 +116,7 @@ public class ItemBase64 {
             dataOutput.close();
             return Base64Coder.encodeLines(outputStream.toByteArray());
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to save .item stacks.", e);
+            throw new IllegalStateException("Unable to save item stacks.", e);
         }
     }
 
@@ -121,7 +133,7 @@ public class ItemBase64 {
      *
      * @param data Base64 string of data containing an inventory.
      * @return Inventory created from the Base64 string.
-     * @throws IOException
+     * @throws IOException if the inventory cannot be decoded
      */
     public static Inventory fromBase64(String data) throws IOException {
         try {
@@ -141,6 +153,13 @@ public class ItemBase64 {
         }
     }
 
+    /**
+     * Constructs an item from the given base64 data
+     *
+     * @param data the data
+     * @return the item
+     * @throws IOException if the item cannot be decoded
+     */
     public static ItemStack itemStackFromBase64(String data) throws IOException {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
@@ -164,7 +183,7 @@ public class ItemBase64 {
      *
      * @param data Base64 string to convert to ItemStack array.
      * @return ItemStack array created from the Base64 string.
-     * @throws IOException
+     * @throws IOException if the class cannot be found
      */
     public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
         try {

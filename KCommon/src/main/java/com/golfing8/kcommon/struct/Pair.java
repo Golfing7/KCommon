@@ -1,33 +1,17 @@
 package com.golfing8.kcommon.struct;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * A pair of objects.
  *
  * @param <A> the left type.
  * @param <B> the right type.
  */
+@Getter @Setter @AllArgsConstructor
 public class Pair<A, B> {
     private A a;
     private B b;
-
-    public Pair(A a, B b) {
-        this.a = a;
-        this.b = b;
-    }
-
-    public A getA() {
-        return a;
-    }
-
-    public B getB() {
-        return b;
-    }
-
-    public void setA(A a) {
-        this.a = a;
-    }
-
-    public void setB(B b) {
-        this.b = b;
-    }
 }

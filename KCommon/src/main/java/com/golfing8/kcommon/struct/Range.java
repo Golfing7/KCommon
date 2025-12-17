@@ -78,6 +78,11 @@ public class Range {
         return ThreadLocalRandom.current().nextDouble(min, max + EPSILON);
     }
 
+    /**
+     * Converts the min/max into a string in the format {@code min-max}
+     *
+     * @return the string
+     */
     public String toString() {
         if (this.max == this.min)
             return String.valueOf(this.min);
@@ -85,6 +90,11 @@ public class Range {
         return this.min + "-" + this.max;
     }
 
+    /**
+     * Converts the min/max into ints then into a string in the format {@code min-max}
+     *
+     * @return the string
+     */
     public String toIntString() {
         long min = (long) this.min;
         long max = (long) this.max;

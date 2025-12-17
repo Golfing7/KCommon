@@ -183,8 +183,8 @@ public class Message implements MessageContainer {
      */
     public boolean isSimple() {
         return (this.sounds == null || this.sounds.isEmpty()) &&
-                (this.title == null) &&
-                (this.actionBar == null) &&
+                this.title == null &&
+                this.actionBar == null &&
                 !this.isPaged() &&
                 Objects.equals(PagedMessage.DEFAULT_PAGE_HEIGHT, pageHeight) &&
                 Objects.equals(PagedMessage.DEFAULT_PAGE_HEADER, pageHeader) &&

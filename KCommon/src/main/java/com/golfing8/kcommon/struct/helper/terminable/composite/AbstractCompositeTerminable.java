@@ -33,6 +33,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+/**
+ * The implementation of the composite terminable interface
+ */
 public class AbstractCompositeTerminable implements CompositeTerminable {
     private final Deque<AutoCloseable> closeables = new ConcurrentLinkedDeque<>();
     private boolean closed = false;
@@ -51,7 +54,7 @@ public class AbstractCompositeTerminable implements CompositeTerminable {
     @Override
     public void close() throws CompositeClosingException {
         List<Exception> caught = new ArrayList<>();
-        for (AutoCloseable ac; (ac = this.closeables.poll()) != null; ) {
+        for (AutoCloseable ac; (ac = this.closeables.poll()) != null;) {
             try {
                 ac.close();
             } catch (Exception e) {

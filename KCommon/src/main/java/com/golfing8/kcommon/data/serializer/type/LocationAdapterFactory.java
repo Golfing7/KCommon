@@ -24,10 +24,13 @@ public enum LocationAdapterFactory implements TypeAdapterFactory {
         if (!Location.class.isAssignableFrom(typeToken.getRawType()))
             return null;
 
-        return (TypeAdapter<T>) new TypeAdapterWorld();
+        return (TypeAdapter<T>) new TypeAdapterLocation();
     }
 
-    public static class TypeAdapterWorld extends TypeAdapter<Location> {
+    /**
+     * A type adapter for bukkit {@link org.bukkit.Location} instances
+     */
+    public static class TypeAdapterLocation extends TypeAdapter<Location> {
         @Override
         public void write(JsonWriter jsonWriter, Location location) throws IOException {
             if (location == null) {

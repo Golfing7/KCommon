@@ -26,6 +26,9 @@ public class ItemPatch implements CASerializable {
     private @Nullable Patch namePatch;
     private @Nullable Patch lorePatch;
 
+    /**
+     * A type of patch applied to an item
+     */
     @Getter
     @NoArgsConstructor
     public static class Patch implements CASerializable {
@@ -36,6 +39,11 @@ public class ItemPatch implements CASerializable {
          */
         private transient Pattern compiledPattern;
 
+        /**
+         * Gets the compiled pattern to match
+         *
+         * @return the pattern
+         */
         public Pattern getCompiledPattern() {
             return compiledPattern == null ? compiledPattern = Pattern.compile(pattern) : compiledPattern;
         }

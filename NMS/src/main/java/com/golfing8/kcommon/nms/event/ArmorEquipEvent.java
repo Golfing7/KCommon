@@ -5,6 +5,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Called when a player is equipping a piece of armor
+ */
 public class ArmorEquipEvent extends PlayerEvent {
 
     private static final HandlerList handlers = new HandlerList();
@@ -80,6 +83,9 @@ public class ArmorEquipEvent extends PlayerEvent {
         return equipType;
     }
 
+    /**
+     * The method the player used to equip the armor
+     */
     public enum EquipMethod {// These have got to be the worst documentations ever.
         /**
          * When you shift click an armor piece to equip or unequip

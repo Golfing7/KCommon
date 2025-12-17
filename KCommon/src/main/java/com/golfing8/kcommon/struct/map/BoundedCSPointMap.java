@@ -20,6 +20,7 @@ import java.util.Set;
  *
  * @param <V>
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class BoundedCSPointMap<V> implements ChunkStylePointMap<V> {
     private final CuboidRegion region;
 

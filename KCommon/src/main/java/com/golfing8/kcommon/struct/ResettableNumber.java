@@ -2,6 +2,9 @@ package com.golfing8.kcommon.struct;
 
 import lombok.Data;
 
+/**
+ * Represents a number that can be set and reset
+ */
 @Data
 public class ResettableNumber {
 
@@ -13,6 +16,9 @@ public class ResettableNumber {
         currentValue = value;
     }
 
+    /**
+     * Resets the number back to its held value
+     */
     public void reset() {
         currentValue = heldValue;
     }

@@ -16,6 +16,12 @@ public class ParticleCircle extends Particle {
     @Getter
     protected double radius = 1.0;
 
+    /**
+     * Sets the radius of the circle to display
+     *
+     * @param radius the circle radius
+     * @return this
+     */
     public ParticleCircle radius(double radius) {
         this.radius = radius;
         return this;

@@ -25,6 +25,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 import de.tr7zw.changeme.nbtapi.NBT;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.iface.ReadableNBT;
 import dev.lone.itemsadder.api.CustomStack;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -46,6 +47,7 @@ import java.util.*;
  */
 @Getter
 public final class ItemStackBuilder {
+    /** Used to store the item stack ID */
     public static final String ITEMSTACK_ID = "kcommon_id";
     /**
      * A string ID to use in reference to this item.
@@ -56,10 +58,20 @@ public final class ItemStackBuilder {
      */
     private String itemType;
 
+    /**
+     * Gets the item type as an XMaterial instance
+     *
+     * @return the item type
+     */
     public XMaterial getItemType() {
         return XMaterial.matchXMaterial(itemType).orElse(null);
     }
 
+    /**
+     * Gets the item type string
+     *
+     * @return the item type string
+     */
     public String getItemTypeString() {
         return this.itemType;
     }
@@ -79,7 +91,7 @@ public final class ItemStackBuilder {
     /**
      * An amount for the item, will override {@link #amount} if set.
      */
-    private Range variableAmount;
+    private @Nullable Range variableAmount;
 
     private int newAmount() {
         return variableAmount == null ? amount : variableAmount.getRandomI();
@@ -100,7 +112,7 @@ public final class ItemStackBuilder {
     /**
      * The name of the item.
      */
-    private String itemName;
+    private @Nullable String itemName;
     /**
      * The lore of the item.
      */
@@ -158,7 +170,9 @@ public final class ItemStackBuilder {
     /**
      * Default constructor useful for building.
      */
-    public ItemStackBuilder() {/*Intentionally empty*/}
+    public ItemStackBuilder() {
+        /*Intentionally empty*/
+    }
 
     /**
      * Generates an instance from the given bukkit item stack.
@@ -175,11 +189,16 @@ public final class ItemStackBuilder {
         this.itemLore = itemMeta.hasLore() ? itemMeta.getLore() : new ArrayList<>();
         Map<Enchantment, Integer> enchants = itemMeta.getEnchants();
         for (Map.Entry<Enchantment, Integer> enchant : enchants.entrySet()) {
-            this.enchant(XEnchantment.matchXEnchantment(enchant.getKey()), enchant.getValue());
+            this.enchant(XEnchantment.of(enchant.getKey()), enchant.getValue());
         }
         this.itemFlags = itemMeta.getItemFlags();
     }
 
+    /**
+     * Creates a copy of the given item stack builder
+     *
+     * @param toCopy the builder to copy
+     */
     public ItemStackBuilder(ItemStackBuilder toCopy) {
         this.itemID = toCopy.itemID;
         this.itemType = toCopy.itemType;
@@ -197,10 +216,13 @@ public final class ItemStackBuilder {
         this.placeholders = new ArrayList<>(toCopy.placeholders);
         this.multiLinePlaceholders = new ArrayList<>(toCopy.multiLinePlaceholders);
         this.skullB64 = toCopy.skullB64;
+        this.skullOwner = toCopy.skullOwner;
         this.extraData = new HashMap<>(toCopy.extraData);
         this.components = new HashMap<>(toCopy.components);
         this.potionData = toCopy.potionData;
         this.glowing = toCopy.glowing;
+        this.unstackable = toCopy.unstackable;
+        this.attributeModifierMap = new HashMap<>(toCopy.attributeModifierMap);
     }
 
     /**
@@ -271,85 +293,193 @@ public final class ItemStackBuilder {
     Builder methods for the above fields.
      */
 
-    public ItemStackBuilder skullB64(String b64) {
+    /**
+     * Sets the base64 texture of the skull
+     *
+     * @param b64 the base64 texture
+     * @return this
+     */
+    public ItemStackBuilder skullB64(@Nullable String b64) {
         this.skullB64 = b64;
         return this;
     }
 
-    public ItemStackBuilder skullOwner(UUID skullOwner) {
+    /**
+     * Sets the owner of the skull
+     *
+     * @param skullOwner the skull owner
+     * @return this
+     */
+    public ItemStackBuilder skullOwner(@Nullable UUID skullOwner) {
         this.skullOwner = skullOwner;
         return this;
     }
 
+    /**
+     * Sets the internal item id of the item
+     *
+     * @param id the id
+     * @return this
+     */
     public ItemStackBuilder itemID(String id) {
         this.itemID = id;
         return this;
     }
 
+    /**
+     * Sets the material/item reference for the item type
+     * <p>
+     * This supports items from ItemsAdder
+     * </p>
+     *
+     * @param materialOrItemReference the type
+     * @return this
+     */
     public ItemStackBuilder itemType(String materialOrItemReference) {
         this.itemType = materialOrItemReference;
         return this;
     }
 
+    /**
+     * Sets the item type to the given material
+     *
+     * @param material the material
+     * @return this
+     */
     public ItemStackBuilder material(XMaterial material) {
         this.itemType = material.name();
         return this;
     }
 
+    /**
+     * Sets the amount of this item
+     *
+     * @param amount the amount
+     * @return this
+     */
     public ItemStackBuilder amount(int amount) {
         this.amount = amount;
         return this;
     }
 
-    public ItemStackBuilder variableAmount(Range range) {
+    /**
+     * Sets the variable amount of this item
+     *
+     * @param range the range of amounts that can be produced
+     * @return this
+     */
+    public ItemStackBuilder variableAmount(@Nullable Range range) {
         this.variableAmount = range;
         return this;
     }
 
+    /**
+     * Sets if this builder will produce unbreakable items
+     *
+     * @param unbreakable if the item is unbreakable
+     * @return this
+     */
     public ItemStackBuilder unbreakable(boolean unbreakable) {
         this.unbreakable = unbreakable;
         return this;
     }
 
+    /**
+     * Sets if this builder will produce glowing items
+     *
+     * @param glowing if the item is glowing
+     * @return this
+     */
     public ItemStackBuilder glowing(boolean glowing) {
         this.glowing = glowing;
         return this;
     }
 
+    /**
+     * Sets if this builder is unstackable
+     *
+     * @param unstackable if the item is unstackable
+     * @return this
+     */
     public ItemStackBuilder unstackable(boolean unstackable) {
         this.unstackable = unstackable;
         return this;
     }
 
+    /**
+     * Sets the display name of this builder
+     *
+     * @param name the name
+     * @return this
+     */
     public ItemStackBuilder name(String name) {
         this.itemName = name;
         return this;
     }
 
+    /**
+     * Sets the potion data for this builder.
+     * This will be applied if the item is a potion.
+     *
+     * @param data the potion data
+     * @return this
+     */
     public ItemStackBuilder potionData(PotionData data) {
         this.potionData = data;
         return this;
     }
 
+    /**
+     * Sets the attribute modifier map for this item
+     *
+     * @param attributeMap the map of attributes
+     * @return this
+     */
     public ItemStackBuilder attributeModifierMap(Map<EntityAttribute, Set<EntityAttributeModifier>> attributeMap) {
         this.attributeModifierMap = attributeMap;
         return this;
     }
 
+    /**
+     * Sets the lore of this builder
+     *
+     * @param lore the lore
+     * @return this
+     */
     public ItemStackBuilder lore(String... lore) {
         this.itemLore = lore == null ? Collections.emptyList() : Arrays.asList(lore);
         return this;
     }
 
+    /**
+     * Sets the lore of this builder
+     *
+     * @param lore the lore
+     * @return this
+     */
     public ItemStackBuilder lore(Collection<String> lore) {
         this.itemLore = lore == null ? Collections.emptyList() : new ArrayList<>(lore);
         return this;
     }
 
+    /**
+     * Inserts lore at the given index
+     *
+     * @param index the index
+     * @param lore the lore
+     * @return this
+     */
     public ItemStackBuilder insertLore(int index, Collection<String> lore) {
         return this.insertLore(index, lore.toArray(new String[0]));
     }
 
+    /**
+     * Inserts lore at the given index
+     *
+     * @param index the index
+     * @param lore the lore
+     * @return this
+     */
     public ItemStackBuilder insertLore(int index, String... lore) {
         if (this.itemLore == null) {
             this.itemLore = new ArrayList<>();
@@ -360,6 +490,12 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    /**
+     * Adds lore to this item builder
+     *
+     * @param lore the lore
+     * @return this
+     */
     public ItemStackBuilder addLore(String... lore) {
         if (this.itemLore == null) {
             this.itemLore = new ArrayList<>();
@@ -368,6 +504,12 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    /**
+     * Adds lore to this item builder
+     *
+     * @param lore the lore
+     * @return this
+     */
     public ItemStackBuilder addLore(Collection<String> lore) {
         if (this.itemLore == null) {
             this.itemLore = new ArrayList<>();
@@ -376,41 +518,90 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    /**
+     * Sets the item durability for this item
+     *
+     * @param dura the durability
+     * @return this
+     */
     public ItemStackBuilder durability(short dura) {
         this.itemDurability = dura;
         return this;
     }
 
+    /**
+     * Sets the custom model data int for this builder
+     *
+     * @param customModelData the custom model data
+     * @return this
+     */
     public ItemStackBuilder customModelData(int customModelData) {
         this.customModelData = customModelData;
         return this;
     }
 
+    /**
+     * Sets a single enchant level of enchantment for this builder
+     *
+     * @param enchantment the enchantment type
+     * @param level the level
+     * @return this
+     */
     public ItemStackBuilder enchant(XEnchantment enchantment, int level) {
         this.enchantments.put(enchantment, level);
         return this;
     }
 
+    /**
+     * Sets the enchantments for this builder
+     *
+     * @param enchantments the enchantments
+     * @return this
+     */
     public ItemStackBuilder enchants(Map<XEnchantment, Integer> enchantments) {
-        this.enchantments = enchantments == null ? Collections.emptyMap() : enchantments;
+        this.enchantments = enchantments == null ? new HashMap<>() : enchantments;
         return this;
     }
 
+    /**
+     * Sets the item flags for this builder
+     *
+     * @param flags the item flags
+     * @return this
+     */
     public ItemStackBuilder flags(ItemFlag... flags) {
-        this.itemFlags = flags == null ? Collections.emptySet() : Sets.newHashSet(flags);
+        this.itemFlags = flags == null ? new HashSet<>() : Sets.newHashSet(flags);
         return this;
     }
 
+    /**
+     * Sets the placeholders to use on this item
+     *
+     * @param placeholders the placeholders
+     * @return this
+     */
     public ItemStackBuilder placeholders(Placeholder... placeholders) {
         this.placeholders = Lists.newArrayList(placeholders);
         return this;
     }
 
+    /**
+     * Sets the placeholders to use on this item
+     *
+     * @param placeholders the placeholders
+     * @return this
+     */
     public ItemStackBuilder placeholders(Collection<Placeholder> placeholders) {
         this.placeholders = new ArrayList<>(placeholders);
         return this;
     }
 
+    /**
+     * Adds placeholders to use on this item
+     *
+     * @param placeholders the placeholders
+     * @return this
+     */
     public ItemStackBuilder addPlaceholders(Placeholder... placeholders) {
         if (this.placeholders == null) {
             this.placeholders = Lists.newArrayList(placeholders);
@@ -420,6 +611,12 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    /**
+     * Adds placeholders to use on this item
+     *
+     * @param placeholders the placeholders
+     * @return this
+     */
     public ItemStackBuilder addPlaceholders(Collection<Placeholder> placeholders) {
         if (this.placeholders == null) {
             this.placeholders = Lists.newArrayList(placeholders);
@@ -429,31 +626,68 @@ public final class ItemStackBuilder {
         return this;
     }
 
+    /**
+     * Sets the multiline placeholders to use on this item
+     *
+     * @param placeholders the placeholders
+     * @return this
+     */
     public ItemStackBuilder multiLinePlaceholders(MultiLinePlaceholder... placeholders) {
         this.multiLinePlaceholders = Lists.newArrayList(placeholders);
         return this;
     }
 
+    /**
+     * Sets the multiline placeholders to use on this item
+     *
+     * @param placeholders the placeholders
+     * @return this
+     */
     public ItemStackBuilder multiLinePlaceholders(Collection<MultiLinePlaceholder> placeholders) {
         this.multiLinePlaceholders = new ArrayList<>(placeholders);
         return this;
     }
 
+    /**
+     * Sets a single key of extra (custom component data) for this item builder
+     *
+     * @param key the key
+     * @param value the value
+     * @return this
+     */
     public ItemStackBuilder extraData(String key, String value) {
         this.extraData.put(key, value);
         return this;
     }
 
+    /**
+     * Sets the extra (custom component data) for this item builder
+     *
+     * @param data the data
+     * @return this
+     */
     public ItemStackBuilder extraData(Map<String, Object> data) {
-        this.extraData = data == null ? Collections.emptyMap() : new HashMap<>(data);
+        this.extraData = data == null ? new HashMap<>() : new HashMap<>(data);
         return this;
     }
 
+    /**
+     * Sets the component data for this item builder
+     *
+     * @param data the component data
+     * @return this
+     */
     public ItemStackBuilder components(Map<String, Object> data) {
-        this.components = data == null ? Collections.emptyMap() : new HashMap<>(data);
+        this.components = data == null ? new HashMap<>() : new HashMap<>(data);
         return this;
     }
 
+    /**
+     * Sets the item model of this item builder
+     *
+     * @param itemModel the model
+     * @return this
+     */
     public ItemStackBuilder itemModel(@Nullable String itemModel) {
         this.itemModel = itemModel;
         return this;
@@ -643,10 +877,10 @@ public final class ItemStackBuilder {
         if (stack == null || !stack.hasItemMeta())
             return null;
 
-        NBTItem nbtItem = new NBTItem(stack);
-        if (!nbtItem.hasTag(ITEMSTACK_ID))
+        ReadableNBT readableNBT = NBT.readNbt(stack);
+        if (!readableNBT.hasTag(ITEMSTACK_ID))
             return null;
 
-        return nbtItem.getString(ITEMSTACK_ID);
+        return readableNBT.getString(ITEMSTACK_ID);
     }
 }

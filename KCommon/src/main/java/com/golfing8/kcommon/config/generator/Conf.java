@@ -21,7 +21,17 @@ public @interface Conf {
      */
     String[] value() default {};
 
+    /**
+     * The label for the value in the config
+     *
+     * @return the label
+     */
     String label() default "";
 
+    /**
+     * The config to map to. This is only used in Module contexts
+     *
+     * @return the config
+     */
     String config() default DEFAULT_CONF;
 }

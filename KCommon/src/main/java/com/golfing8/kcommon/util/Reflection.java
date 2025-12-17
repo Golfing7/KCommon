@@ -4,6 +4,7 @@ import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -18,10 +19,12 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 
 /**
  * Contains useful reflection utilities.
  */
+@UtilityClass
 public final class Reflection {
 
     /**
@@ -54,14 +57,13 @@ public final class Reflection {
                             classes.add((Class<? extends Module>) initializedClass);
                         }
                     } catch (ClassNotFoundException exc) {
-                        KCommon.getInstance().getLogger().warning(String.format("Failed to load class %s!", entry.getName()));
-                        exc.printStackTrace();
+                        KCommon.getInstance().getLogger().log(Level.WARNING, String.format("Failed to load class %s!", entry.getName()), exc);
                     } catch (Throwable ignored) {
                         // Class file version error ? Either way, wasn't supposed to be loaded so let it pass.
                     }
                 }
             } catch (IOException | URISyntaxException exc) {
-                exc.printStackTrace();
+                KCommon.getInstance().getLogger().log(Level.WARNING, String.format("Failed to open jar file %s!", url), exc);
             }
         }
         return classes;
@@ -313,6 +315,14 @@ public final class Reflection {
         }
     }
 
+    /**
+     * Invokes the given method handle quietly
+     *
+     * @param methodHandle the method handle to invoke
+     * @param arguments the arguments for the method handle
+     * @return the value returned
+     * @param <T> the return type
+     */
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public static <T> T invokeQuietly(MethodHandle methodHandle, Object... arguments) {

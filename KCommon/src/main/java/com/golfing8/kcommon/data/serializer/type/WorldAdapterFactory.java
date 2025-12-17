@@ -28,6 +28,9 @@ public enum WorldAdapterFactory implements TypeAdapterFactory {
         return (TypeAdapter<T>) new TypeAdapterWorld();
     }
 
+    /**
+     * A type adapter for bukkit {@link org.bukkit.World} instances
+     */
     public static class TypeAdapterWorld extends TypeAdapter<World> {
         @Override
         public void write(JsonWriter jsonWriter, World world) throws IOException {

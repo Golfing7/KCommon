@@ -7,8 +7,9 @@ import com.cryptomorin.xseries.XMaterial;
  */
 public enum ArmorTier {
     LEATHER,
-    CHAIN,
+    COPPER,
     GOLD,
+    CHAIN,
     IRON,
     DIAMOND,
     NETHERITE,

@@ -20,6 +20,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * An abstract type of particle display.
+ * <p>
+ * The purpose of this class is to allow for complex particle shapes
+ * and designs.
+ * </p>
+ */
 public abstract class Particle {
     public static final double ROOT_2 = Math.sqrt(2);
     public static final double ROOT_3 = Math.sqrt(3);
@@ -30,16 +37,40 @@ public abstract class Particle {
     @Getter
     private double pitch, yaw, roll;
 
+    /**
+     * Set the pitch of this particle display
+     *
+     * @param pitch the pitch
+     * @return this
+     * @param <T> the type of particle
+     */
+    @SuppressWarnings("unchecked")
     public <T extends Particle> T pitch(double pitch) {
         this.pitch = pitch;
         return (T) this;
     }
 
+    /**
+     * Set the yaw of this particle display
+     *
+     * @param yaw the yaw
+     * @return this
+     * @param <T> the type of particle
+     */
+    @SuppressWarnings("unchecked")
     public <T extends Particle> T yaw(double yaw) {
         this.yaw = yaw;
         return (T) this;
     }
 
+    /**
+     * Set the roll of this particle display
+     *
+     * @param roll the roll
+     * @return this
+     * @param <T> the type of particle
+     */
+    @SuppressWarnings("unchecked")
     public <T extends Particle> T roll(double roll) {
         this.roll = roll;
         return (T) this;
@@ -48,6 +79,15 @@ public abstract class Particle {
     @Getter
     private double particleSize = 1.0D;
 
+    /**
+     * Set the size of this particle display
+     * This refers to the size of each individual particle
+     *
+     * @param size the size
+     * @return this
+     * @param <T> the type of particle
+     */
+    @SuppressWarnings("unchecked")
     public <T extends Particle> T particleSize(double size) {
         this.particleSize = size;
         return (T) this;
@@ -60,11 +100,27 @@ public abstract class Particle {
     //ParticleCircle circle = ...
     //circle = circle.from(Color.WHITE)
     //without recasting.
+    /**
+     * Set the 'from' color for a color transitioning particle
+     *
+     * @param from the color 'from'
+     * @return this
+     * @param <T> the type of particle
+     */
+    @SuppressWarnings("unchecked")
     public <T extends Particle> T from(Color from) {
         this.from = from;
         return (T) this;
     }
 
+    /**
+     * Set the 'to' color for a color transitioning particle
+     *
+     * @param to the color 'to'
+     * @return this
+     * @param <T> the type of particle
+     */
+    @SuppressWarnings("unchecked")
     public <T extends Particle> T to(Color to) {
         this.to = to;
         return (T) this;
@@ -82,6 +138,7 @@ public abstract class Particle {
     }
 
     public Particle() {
+        /*Intentionally empty*/
     }
 
     public Particle(double pitch, double yaw, double roll) {
@@ -101,8 +158,18 @@ public abstract class Particle {
         this.particleSize = section.getDouble("particle-size", 1.0D);
     }
 
+    /**
+     * Gets the associated {@link ParticleType} with this instance
+     *
+     * @return the type
+     */
     public abstract ParticleType getParticleType();
 
+    /**
+     * Converts this particle to a primitive map
+     *
+     * @return the map
+     */
     public Map<String, Object> toPrimitive() {
         Map<String, Object> primitive = new HashMap<>();
         primitive.put("pitch", pitch);

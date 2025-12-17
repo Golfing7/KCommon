@@ -32,6 +32,12 @@ package com.golfing8.kcommon.struct.helper.interfaces;
  */
 public interface Delegate<T> {
 
+    /**
+     * Gets the delegate that the object points to
+     *
+     * @param obj the object
+     * @return the delegated object
+     */
     static Object resolve(Object obj) {
         while (obj instanceof Delegate<?>) {
             Delegate<?> delegate = (Delegate<?>) obj;

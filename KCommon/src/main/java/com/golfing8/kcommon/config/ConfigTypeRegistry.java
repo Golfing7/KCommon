@@ -7,6 +7,7 @@ import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.common.base.Preconditions;
+import lombok.experimental.UtilityClass;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 /**
  * Represents common things for configurations across the plugin.
  */
+@UtilityClass
 public class ConfigTypeRegistry {
     private static final String DELEGATE_PREFIX = "!delegate!";
     /**
