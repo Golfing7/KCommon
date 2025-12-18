@@ -3,10 +3,8 @@ package com.golfing8.kcommon;
 import com.golfing8.kcommon.nms.access.NMSAccess;
 import lombok.Getter;
 import lombok.var;
-import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.PluginClassLoader;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -50,6 +48,11 @@ public final class NMS {
     @Getter
     private static NMSVersion serverVersion;
 
+    /**
+     * Initializes NMS access using the given plugin
+     *
+     * @param plugin the plugin
+     */
     public static void initialize(Plugin plugin) {
         if (theNMS != null)
             throw new IllegalStateException("NMS is already initialized!");

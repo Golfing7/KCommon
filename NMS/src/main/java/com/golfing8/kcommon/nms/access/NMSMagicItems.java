@@ -1,7 +1,5 @@
 package com.golfing8.kcommon.nms.access;
 
-import com.golfing8.kcommon.NMS;
-import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
@@ -9,8 +7,6 @@ import com.golfing8.kcommon.nms.struct.Hand;
 import com.golfing8.kcommon.nms.struct.PotionData;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
-import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
@@ -21,14 +17,14 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * NMS access for items
+ */
 public interface NMSMagicItems {
     EntityType getSpawnerType(ItemStack stack);
 

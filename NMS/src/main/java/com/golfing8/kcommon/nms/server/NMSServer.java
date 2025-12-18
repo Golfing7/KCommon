@@ -2,6 +2,14 @@ package com.golfing8.kcommon.nms.server;
 
 import com.golfing8.kcommon.nms.NMSObject;
 
+/**
+ * NMS access for the server
+ */
 public interface NMSServer extends NMSObject {
-    public Object getSessionService();
+    /**
+     * Gets the session service object
+     *
+     * @return the session service
+     */
+    Object getSessionService();
 }

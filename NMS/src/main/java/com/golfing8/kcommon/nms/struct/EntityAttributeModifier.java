@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+/**
+ * A version agnostic entity attribute modifier.
+ */
 @Getter
 public class EntityAttributeModifier {
     private final UUID uuid;

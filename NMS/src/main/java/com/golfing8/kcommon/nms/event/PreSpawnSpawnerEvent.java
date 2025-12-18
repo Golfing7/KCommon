@@ -8,6 +8,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
 
+/**
+ * Called when an entity is about to spawn from a spawner
+ */
 public class PreSpawnSpawnerEvent extends BlockEvent implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 

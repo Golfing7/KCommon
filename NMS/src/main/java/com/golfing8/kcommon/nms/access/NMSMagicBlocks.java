@@ -5,6 +5,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 
+/**
+ * NMS access for blocks
+ */
 public interface NMSMagicBlocks {
     /**
      * Sets the owner of the given skull block.

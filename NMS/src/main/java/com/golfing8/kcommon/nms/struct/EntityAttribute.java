@@ -4,6 +4,9 @@ import com.google.common.collect.Sets;
 
 import java.util.Set;
 
+/**
+ * Version agnostic entity attributes
+ */
 public enum EntityAttribute {
     GENERIC_MAX_HEALTH("MAX_HEALTH", "generic.maxHealth"),
     GENERIC_FOLLOW_RANGE("FOLLOW_RANGE", "generic.followRange"),

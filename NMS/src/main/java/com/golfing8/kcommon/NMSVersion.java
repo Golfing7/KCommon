@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * A wrapper for the server version
+ */
 @Getter
 public class NMSVersion implements Comparable<NMSVersion> {
     public static final NMSVersion UNKNOWN = new NMSVersion(-1, -1),
@@ -36,6 +39,12 @@ public class NMSVersion implements Comparable<NMSVersion> {
         this.minor = minor;
     }
 
+    /**
+     * Checks if the major version is equal
+     *
+     * @param version the other version
+     * @return true if equal
+     */
     public boolean majorEquals(NMSVersion version) {
         if (version == null)
             return false;
@@ -56,6 +65,12 @@ public class NMSVersion implements Comparable<NMSVersion> {
         return Objects.hash(major, minor);
     }
 
+    /**
+     * Checks if this version is as new or newer than the other version
+     *
+     * @param version the version
+     * @return true if as new or newer
+     */
     public boolean isAtOrAfter(NMSVersion version) {
         if (this.major == version.major) {
             if (this.minor == -1 || version.minor == -1)
@@ -67,6 +82,12 @@ public class NMSVersion implements Comparable<NMSVersion> {
         return this.major >= version.major;
     }
 
+    /**
+     * Checks if this version is as old or older than the other version
+     *
+     * @param version the version
+     * @return true if as old or older
+     */
     public boolean isAtOrBefore(NMSVersion version) {
         if (this.major == version.major) {
             if (this.minor == -1 || version.minor == -1)
@@ -90,6 +111,11 @@ public class NMSVersion implements Comparable<NMSVersion> {
         return major == o.major ? minor - o.minor : major - o.major;
     }
 
+    /**
+     * Loads the version of the server
+     *
+     * @return the version
+     */
     public static NMSVersion loadVersion() {
         String bukkitVersion = Bukkit.getBukkitVersion();
         String version = bukkitVersion.substring(0, bukkitVersion.indexOf("-"));

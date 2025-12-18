@@ -30,11 +30,19 @@ public interface WorldEditHook {
     @NotNull
     Selection getSelection(Player player);
 
+    /**
+     * A selection that a player has made
+     */
     @Data
     final class Selection {
         private final @Nullable Location pos1;
         private final @Nullable Location pos2;
 
+        /**
+         * Checks if the selection is complete
+         *
+         * @return true if complete
+         */
         public boolean isComplete() {
             return pos1 != null && pos2 != null;
         }

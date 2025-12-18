@@ -1,5 +1,6 @@
 package com.golfing8.kcommon;
 
+import lombok.experimental.UtilityClass;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -15,15 +16,19 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Contains utilities for interfacing with components
+ */
+@UtilityClass
 public class ComponentUtils {
 
     private static final MiniMessage miniMessage;
     private static final Pattern AMPERSAND_RGB_3 = Pattern.compile("&#([\\da-fA-F]{3})");
     private static final Pattern AMPERSAND_RGB_6 = Pattern.compile("&#([\\da-fA-F]{6})");
     private static final Pattern AMPERSAND_RGB_SPIGOT = Pattern.compile("&x(&[\\da-fA-F]){6}");
-    private static final Pattern SECTION_RGB_3 = Pattern.compile("\u00A7#([\\da-fA-F]{3})");
-    private static final Pattern SECTION_RGB_6 = Pattern.compile("\u00A7#([\\da-fA-F]{6})");
-    private static final Pattern SECTION_RGB_SPIGOT = Pattern.compile("\u00A7x(\u00A7[\\da-fA-F]){6}");
+    private static final Pattern SECTION_RGB_3 = Pattern.compile("§#([\\da-fA-F]{3})");
+    private static final Pattern SECTION_RGB_6 = Pattern.compile("§#([\\da-fA-F]{6})");
+    private static final Pattern SECTION_RGB_SPIGOT = Pattern.compile("§x(§[\\da-fA-F]){6}");
     private static final Map<String, String> legacyColorMap = new HashMap<>();
     private static final int CENTER_PX = 154;
     public static final BukkitAudiences bukkitAudiences = BukkitAudiences.create(Bukkit.getPluginManager().getPlugin("KCommon"));
@@ -68,11 +73,17 @@ public class ComponentUtils {
         return miniMessage.deserialize(processLine(message)).decoration(TextDecoration.ITALIC, false);
     }
 
+    /**
+     * Processes the given line
+     *
+     * @param str the string
+     * @return the processed string
+     */
     public static String processLine(String str) {
         str = replaceLegacyColors(str, '&');
-        str = replaceLegacyColors(str, '\u00A7');
+        str = replaceLegacyColors(str, '§');
         str = replaceColors(str, '&');
-        str = replaceColors(str, '\u00A7');
+        str = replaceColors(str, '§');
         str = StringEscapeUtils.unescapeJava(str);
         str = maybeCenter(str);
         return str;

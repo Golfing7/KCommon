@@ -8,6 +8,9 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * An event for when a crafting result is prepared
+ */
 public class PrepareResultEvent extends InventoryEvent {
     private static final HandlerList HANDLER_LIST = new HandlerList();
 

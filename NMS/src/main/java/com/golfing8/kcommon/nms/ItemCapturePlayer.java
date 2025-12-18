@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * A wrapper of a player and item hooks for item capturing
+ */
 @Getter
 public class ItemCapturePlayer {
     private final Player player;
@@ -18,6 +21,11 @@ public class ItemCapturePlayer {
         this.inventoryItemHooks = new ArrayList<>();
     }
 
+    /**
+     * Add an item hook
+     *
+     * @param hook the hook
+     */
     public void add(Consumer<ItemStack> hook) {
         this.inventoryItemHooks.add(hook);
     }
