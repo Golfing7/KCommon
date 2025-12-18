@@ -8,6 +8,9 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * NMS 1.8 block place packet
+ */
 public class InBlockPlaceV1_8 implements NMSInBlockPlace {
     private final PacketPlayInBlockPlace packet;
 

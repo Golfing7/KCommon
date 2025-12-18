@@ -26,22 +26,77 @@ import java.util.UUID;
  * NMS access for items
  */
 public interface NMSMagicItems {
+    /**
+     * Gets the spawner type from the given item
+     *
+     * @param stack the stack
+     * @return the entity type
+     */
     EntityType getSpawnerType(ItemStack stack);
 
+    /**
+     * Gets the remaining durability on the item
+     *
+     * @param stack the stack
+     * @return the durability
+     */
     int getRemainingItemDurability(ItemStack stack);
 
+    /**
+     * Sets the remaining durability on the item
+     *
+     * @param stack the stack
+     * @param amount the amount
+     * @return true if success
+     */
     boolean setRemainingItemDurability(ItemStack stack, int amount);
 
+    /**
+     * Checks if the given meta has the unbreakable flag set
+     *
+     * @param meta the meta
+     * @return true if unbreakable
+     */
     boolean isUnbreakable(ItemMeta meta);
 
+    /**
+     * Sets the unbreakable flag on the given item meta
+     *
+     * @param meta the meta
+     * @param value the unbreakable flag
+     */
     void setUnbreakable(ItemMeta meta, boolean value);
 
-    void setAttributeModifiers(ItemStack meta, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
+    /**
+     * Sets the attribute modifiers on the item
+     *
+     * @param stack the item
+     * @param modifiers the modifiers
+     */
+    void setAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
 
-    void setExtraAttributeModifiers(ItemStack meta, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
+    /**
+     * Sets the attribute modifiers on the item
+     *
+     * @param stack the item
+     * @param modifiers the modifiers
+     */
+    void setExtraAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers);
 
+    /**
+     * Sets the skull owning player of the skull meta
+     *
+     * @param meta the meta
+     * @param offlinePlayer the player owner
+     */
     void setSkullOwningPlayer(SkullMeta meta, OfflinePlayer offlinePlayer);
 
+    /**
+     * Sets the skull texture of the meta
+     *
+     * @param meta the meta
+     * @param base64Texture the base64 texture
+     */
     void setSkullTexture(SkullMeta meta, String base64Texture);
 
     /**
@@ -151,6 +206,13 @@ public interface NMSMagicItems {
      */
     void setCustomModelData(ItemMeta meta, int modelData);
 
+    /**
+     * Sets the item in the player's hand
+     *
+     * @param player the player
+     * @param hand the hand
+     * @param stack the item
+     */
     default void setItemInHand(Player player, Hand hand, ItemStack stack) {
         switch (hand) {
             case MAIN:
@@ -158,9 +220,17 @@ public interface NMSMagicItems {
                 return;
             case OFF_HAND:
                 player.getInventory().setItemInOffHand(stack);
+                break;
         }
     }
 
+    /**
+     * Gets the item in the player's hand
+     *
+     * @param player the player
+     * @param hand the hand
+     * @return the item
+     */
     default ItemStack getItemInHand(Player player, Hand hand) {
         switch (hand) {
             case MAIN:
@@ -179,6 +249,12 @@ public interface NMSMagicItems {
      */
     NMSItemStack wrapItemStack(ItemStack itemStack);
 
+    /**
+     * Sets the item as unbreakable
+     *
+     * @param itemStack the item
+     * @param value the value
+     */
     default void setUnbreakable(ItemStack itemStack, boolean value) {
         if (itemStack == null || !itemStack.hasItemMeta())
             return;
@@ -186,8 +262,20 @@ public interface NMSMagicItems {
         setUnbreakable(itemStack.getItemMeta(), value);
     }
 
+    /**
+     * Sets the item as unstackable
+     *
+     * @param itemStack the item
+     * @param value the value
+     */
     void setUnstackable(ItemStack itemStack, boolean value);
 
+    /**
+     * Makes a gameprofile with the given base64
+     *
+     * @param b64 the base64
+     * @return the profile
+     */
     static GameProfile makeProfile(String b64) {
         // random uuid based on the b64 string
         UUID id = new UUID(

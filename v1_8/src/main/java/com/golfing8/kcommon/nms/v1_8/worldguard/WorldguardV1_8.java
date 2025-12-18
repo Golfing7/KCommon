@@ -12,6 +12,9 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
+/**
+ * Legacy (6.x) worldguard bindings
+ */
 public class WorldguardV1_8 implements WorldguardHook {
 
     private final WorldGuardPlugin plugin;

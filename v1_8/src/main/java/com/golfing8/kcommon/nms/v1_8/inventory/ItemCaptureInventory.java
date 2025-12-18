@@ -7,6 +7,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
+/**
+ * NMS 1.8 item capture inventory
+ */
 public class ItemCaptureInventory extends CraftInventoryPlayer {
     private final ItemCapturePlayer player;
 

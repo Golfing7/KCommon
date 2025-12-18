@@ -6,6 +6,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+/**
+ * API agnostic pre spawn event
+ */
 public class PreSpawnSpawnerAdapter implements Listener {
 
     @EventHandler

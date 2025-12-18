@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.PacketPlayOutBlockBreakAnimation;
 
+/**
+ * NMS 1.8 break animation packet
+ */
 @AllArgsConstructor
 public class OutBreakAnimationV1_8 implements NMSOutBreakAnimation {
     private static final FieldHandle<Integer> ID_HANDLE = FieldHandles.getHandle("a", PacketPlayOutBlockBreakAnimation.class);

@@ -23,6 +23,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
+/**
+ * NMS 1.8 entity access
+ */
 public class MagicEntitiesV1_8 implements NMSMagicEntities {
     @Override
     public GameProfile getGameProfile(Player player) {
@@ -61,6 +64,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         return (Giant) giantZombie.getBukkitEntity();
     }
 
+    @Override
     public Slime spawnSlimeWithSize(Location location, int size, double health) {
         EntitySlime entitySlime = new EntitySlime(((CraftWorld) location.getWorld()).getHandle());
 
@@ -75,6 +79,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         return (Slime) entitySlime.getBukkitEntity();
     }
 
+    @Override
     public Monster spawnWitherSkeleton(Location location) {
         EntitySkeleton entitySkeleton = new EntitySkeleton(((CraftWorld) location.getWorld()).getHandle());
 
@@ -89,6 +94,7 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         return (Skeleton) entitySkeleton.getBukkitEntity();
     }
 
+    @Override
     public Guardian spawnElderGuardian(Location location) {
         EntityGuardian entityGuardian = new EntityGuardian(((CraftWorld) location.getWorld()).getHandle());
 

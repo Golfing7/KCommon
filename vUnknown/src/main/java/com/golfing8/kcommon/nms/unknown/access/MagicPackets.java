@@ -9,6 +9,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+/**
+ * API agnostic packet access
+ * No methods are supported for this version
+ */
 public class MagicPackets implements NMSMagicPackets {
     @Override
     public NMSPacket createDestroyPacket(int... ints) {

@@ -6,6 +6,9 @@ import com.golfing8.kcommon.nms.struct.Position;
 import com.golfing8.kcommon.nms.world.NMSWorld;
 import org.bukkit.block.Dispenser;
 
+/**
+ * API agnostic dispenser implementation
+ */
 public class BlockDispenser extends Block implements NMSDispenser {
     public BlockDispenser(Dispenser dispenser) {
         super(dispenser.getBlockData());

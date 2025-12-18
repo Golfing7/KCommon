@@ -9,6 +9,9 @@ import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.SourceBlock;
 import net.minecraft.server.v1_8_R3.World;
 
+/**
+ * NMS 1.8 dispenser block
+ */
 public class BlockDispenserV1_8 extends BlockV1_8 implements NMSDispenser {
     public BlockDispenserV1_8(BlockDispenser dispenser) {
         super(dispenser);

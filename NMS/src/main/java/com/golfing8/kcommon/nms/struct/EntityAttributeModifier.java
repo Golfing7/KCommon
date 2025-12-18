@@ -38,12 +38,12 @@ public class EntityAttributeModifier {
         this.slot = slot;
     }
 
-    public static enum Operation {
+    /**
+     * The operation of the attribute
+     */
+    public enum Operation {
         ADD_NUMBER,
         ADD_SCALAR,
         MULTIPLY_SCALAR_1;
-
-        private Operation() {
-        }
     }
 }

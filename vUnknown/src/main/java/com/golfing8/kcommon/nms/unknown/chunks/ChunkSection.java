@@ -3,6 +3,9 @@ package com.golfing8.kcommon.nms.unknown.chunks;
 import com.golfing8.kcommon.nms.chunks.NMSChunkSection;
 import org.bukkit.Material;
 
+/**
+ * API agnostic chunk section
+ */
 public class ChunkSection implements NMSChunkSection {
     private final org.bukkit.Chunk section;
     private final int yShift;

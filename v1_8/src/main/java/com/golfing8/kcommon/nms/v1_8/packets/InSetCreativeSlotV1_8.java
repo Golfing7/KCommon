@@ -6,6 +6,9 @@ import net.minecraft.server.v1_8_R3.PacketPlayInSetCreativeSlot;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * NMS 1.8 set creative slot packet
+ */
 @AllArgsConstructor
 public class InSetCreativeSlotV1_8 implements NMSInSetCreativeSlot {
     private final PacketPlayInSetCreativeSlot packet;

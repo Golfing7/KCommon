@@ -35,6 +35,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * NMS 1.8 item access
+ */
 public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
     public EntityType getSpawnerType(ItemStack stack) {
@@ -161,7 +164,7 @@ public class MagicItemsV1_8 implements NMSMagicItems {
 
     @Override
     public void setAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
-        NBT.modify(stack, (nbt) -> {
+        NBT.modify(stack, nbt -> {
             // First clear the list
             if (modifiers == null) {
                 nbt.removeKey("AttributeModifiers");
@@ -217,7 +220,7 @@ public class MagicItemsV1_8 implements NMSMagicItems {
         }
         Map<EntityAttribute, Set<EntityAttributeModifier>> newModifiers = modifiers == null ? new HashMap<>() : new HashMap<>(modifiers);
         for (Map.Entry<String, AttributeModifier> attributeEntry : defaultAttributes.entries()) {
-            newModifiers.computeIfAbsent(EntityAttribute.byName(attributeEntry.getKey()), (k) -> new HashSet<>())
+            newModifiers.computeIfAbsent(EntityAttribute.byName(attributeEntry.getKey()), k -> new HashSet<>())
                     .add(new EntityAttributeModifier(attributeEntry.getValue().a(), attributeEntry.getValue().b(), attributeEntry.getValue().d(), EntityAttributeModifier.Operation.values()[attributeEntry.getValue().c()]));
         }
         setAttributeModifiers(stack, newModifiers);
@@ -295,7 +298,7 @@ public class MagicItemsV1_8 implements NMSMagicItems {
 
     @Override
     public void setUnstackable(ItemStack itemStack, boolean value) {
-        NBT.modify(itemStack, (nbt) -> {
+        NBT.modify(itemStack, nbt -> {
             if (value) {
                 nbt.setString("unstackable", UUID.randomUUID().toString());
             } else {
@@ -304,6 +307,12 @@ public class MagicItemsV1_8 implements NMSMagicItems {
         });
     }
 
+    /**
+     * Translates the given NMS type to a real entity type
+     *
+     * @param nmsType the type
+     * @return the entity type
+     */
     public static EntityType translateNMSTypes(String nmsType) {
         switch (nmsType.toLowerCase()) {
             case "pigzombie":

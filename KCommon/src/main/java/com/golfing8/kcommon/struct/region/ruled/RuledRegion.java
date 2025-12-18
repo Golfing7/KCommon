@@ -157,7 +157,7 @@ public class RuledRegion implements Region {
     /**
      * The listener used to control all
      */
-    private static class RegionListener implements Listener {
+    private static final class RegionListener implements Listener {
 
     }
 }

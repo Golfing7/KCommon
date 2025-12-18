@@ -6,6 +6,9 @@ import com.golfing8.kcommon.nms.item.NMSItemStack;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
+/**
+ * API agnostic item access
+ */
 public class Item implements NMSItem {
     private final Material item;
 

@@ -2,7 +2,6 @@ package com.golfing8.kcommon.nms.access;
 
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 
 /**

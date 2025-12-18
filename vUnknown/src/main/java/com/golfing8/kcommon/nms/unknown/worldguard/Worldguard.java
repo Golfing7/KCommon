@@ -14,6 +14,9 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
+/**
+ * Modern (7.x+) worldguard bindings
+ */
 public class Worldguard implements WorldguardHook {
     @Override
     public List<String> getRegions(Location location) {

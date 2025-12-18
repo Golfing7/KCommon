@@ -11,7 +11,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Tests item filters
+ */
 public class ItemFilterTest {
+    /**
+     * Runs a simple test on item filters
+     */
     @Test
     public void testSimpleFilter() {
         FakeServer.getServer();

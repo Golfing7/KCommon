@@ -4,6 +4,9 @@ import com.golfing8.kcommon.nms.chunks.NMSChunk;
 import com.golfing8.kcommon.nms.chunks.NMSChunkSection;
 import net.minecraft.server.v1_8_R3.Chunk;
 
+/**
+ * NMS 1.8 chunk
+ */
 public class ChunkV1_8 implements NMSChunk {
     private final Chunk chunk;
 

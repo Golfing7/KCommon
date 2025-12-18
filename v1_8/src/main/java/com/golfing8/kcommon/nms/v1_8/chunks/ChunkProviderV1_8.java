@@ -5,6 +5,9 @@ import com.golfing8.kcommon.nms.chunks.NMSChunkProvider;
 import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.ChunkProviderServer;
 
+/**
+ * NMS 1.8 chunk provider
+ */
 public class ChunkProviderV1_8 implements NMSChunkProvider {
     private final ChunkProviderServer handle;
 

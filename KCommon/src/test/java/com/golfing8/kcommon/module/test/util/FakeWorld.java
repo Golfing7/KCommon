@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * A fake world implementation for unit tests
+ */
 public class FakeWorld implements World {
     private final String name;
     private final Environment env;
@@ -107,7 +110,6 @@ public class FakeWorld implements World {
     public Chunk getChunkAt(Block block) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
 
     @Override
     public void getChunkAtAsync(int i, int i1, ChunkLoadCallback chunkLoadCallback) {

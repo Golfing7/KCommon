@@ -4,6 +4,9 @@ import com.golfing8.kcommon.nms.chunks.NMSChunk;
 import com.golfing8.kcommon.nms.chunks.NMSChunkProvider;
 import org.bukkit.World;
 
+/**
+ * API agnostic chunk provider
+ */
 public class ChunkProvider implements NMSChunkProvider {
     private final World handle;
 

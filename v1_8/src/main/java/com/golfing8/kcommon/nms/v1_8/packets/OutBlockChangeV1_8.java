@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.PacketPlayOutBlockChange;
 
+/**
+ * NMS 1.8 block change packet
+ */
 @AllArgsConstructor
 public class OutBlockChangeV1_8 implements NMSOutBlockChange {
     private static final FieldHandle<BlockPosition> POSITION_FIELD = FieldHandles.getHandle("a", PacketPlayOutBlockChange.class);

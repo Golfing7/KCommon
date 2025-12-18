@@ -4,6 +4,9 @@ import com.golfing8.kcommon.nms.tileentities.NMSMobSpawner;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 
+/**
+ * API agnostic mob spawner
+ */
 public class MobSpawner extends TileEntity implements NMSMobSpawner {
     private final CreatureSpawner handle;
 

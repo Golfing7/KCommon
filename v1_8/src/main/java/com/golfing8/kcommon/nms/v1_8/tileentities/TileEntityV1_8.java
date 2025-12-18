@@ -6,6 +6,9 @@ import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import net.minecraft.server.v1_8_R3.TileEntity;
 
+/**
+ * NMS 1.8 tile entity
+ */
 public class TileEntityV1_8 implements NMSTileEntity {
     private final TileEntity tileEntity;
 

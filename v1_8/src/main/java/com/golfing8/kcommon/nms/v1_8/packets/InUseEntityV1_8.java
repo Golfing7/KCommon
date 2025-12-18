@@ -6,6 +6,9 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Entity;
 
+/**
+ * NMS 1.8 use entity packet
+ */
 public class InUseEntityV1_8 implements NMSInUseEntity {
     private final PacketPlayInUseEntity packet;
 

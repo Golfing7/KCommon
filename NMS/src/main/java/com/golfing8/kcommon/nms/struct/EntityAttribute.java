@@ -43,17 +43,23 @@ public enum EntityAttribute {
     GRAVITY,
     ;
 
-    Set<String> oldNames;
+    final Set<String> oldNames;
 
     EntityAttribute(String... names) {
         this.oldNames = Sets.newHashSet(names);
     }
 
+    /**
+     * Gets an entity attribute by its name
+     *
+     * @param name the name
+     * @return the attribute
+     */
     public static EntityAttribute byName(String name) {
-        for (EntityAttribute value : values()) {
-            try {
-                return EntityAttribute.valueOf(name);
-            } catch (IllegalArgumentException exc) {
+        try {
+            return EntityAttribute.valueOf(name);
+        } catch (IllegalArgumentException exc) {
+            for (EntityAttribute value : values()) {
                 if (value.oldNames.contains(name))
                     return value;
             }

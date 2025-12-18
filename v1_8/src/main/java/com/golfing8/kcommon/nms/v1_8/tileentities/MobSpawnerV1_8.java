@@ -7,6 +7,9 @@ import com.golfing8.kcommon.nms.v1_8.block.BlockV1_8;
 import net.minecraft.server.v1_8_R3.TileEntityMobSpawner;
 import org.bukkit.entity.EntityType;
 
+/**
+ * NMS 1.8 mob spawner
+ */
 public class MobSpawnerV1_8 implements NMSMobSpawner {
     private final TileEntityMobSpawner handle;
 

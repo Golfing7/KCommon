@@ -8,6 +8,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for {@link StringFilter}
+ */
 public class StringFilterTest {
     private static String randomString(int min, int max) {
         int length = ThreadLocalRandom.current().nextInt(min, max);
@@ -18,6 +21,9 @@ public class StringFilterTest {
         return new String(chars);
     }
 
+    /**
+     * Tests a simple string filter
+     */
     @Test
     public void testSimpleFilter() {
         String pattern = randomString(10, 15);

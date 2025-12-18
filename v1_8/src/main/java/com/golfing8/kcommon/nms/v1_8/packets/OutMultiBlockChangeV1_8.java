@@ -11,6 +11,9 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutMultiBlockChange;
 
 import java.util.List;
 
+/**
+ * NMS 1.8 multi block change packet
+ */
 @AllArgsConstructor
 public class OutMultiBlockChangeV1_8 implements NMSOutMultiBlockChange {
     private static final FieldHandle<ChunkCoordIntPair> CC_FIELD = FieldHandles.getHandle("a", PacketPlayOutMultiBlockChange.class);

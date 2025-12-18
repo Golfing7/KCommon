@@ -16,6 +16,9 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.VoxelShape;
 
+/**
+ * API agnostic entity access
+ */
 public class MagicEntities implements NMSMagicEntities {
 
     @Override
@@ -29,6 +32,7 @@ public class MagicEntities implements NMSMagicEntities {
         return location.getWorld().spawn(location, Giant.class);
     }
 
+    @Override
     public Slime spawnSlimeWithSize(Location location, int size, double health) {
         Slime slime = location.getWorld().spawn(location, Slime.class);
         slime.setSize(size);
@@ -36,17 +40,19 @@ public class MagicEntities implements NMSMagicEntities {
         return slime;
     }
 
+    @Override
     public Monster spawnWitherSkeleton(Location location) {
         return location.getWorld().spawn(location, WitherSkeleton.class);
     }
 
+    @Override
     public Guardian spawnElderGuardian(Location location) {
         return location.getWorld().spawn(location, ElderGuardian.class);
     }
 
     @Override
     public <T extends Entity> T spawnEntity(World world, Location loc, EntityData data, boolean randomizeData) {
-        return (T) world.spawn(loc, data.getEntityType().getEntityClass(), randomizeData, (spawned) -> {
+        return (T) world.spawn(loc, data.getEntityType().getEntityClass(), randomizeData, spawned -> {
             if (data.isCreeperCharged())
                 ((Creeper) spawned).setPowered(true);
         });
@@ -155,6 +161,7 @@ public class MagicEntities implements NMSMagicEntities {
                 Attribute attr = getAttributeWithNameContaining(attribute.toString());
                 if (attr != null)
                     instance = entity.getAttribute(attr);
+                break;
         }
 
         if (instance != null)

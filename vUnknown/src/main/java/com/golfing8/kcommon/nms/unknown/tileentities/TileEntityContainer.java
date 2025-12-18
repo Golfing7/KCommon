@@ -4,6 +4,9 @@ import com.golfing8.kcommon.nms.tileentities.NMSTileEntityContainer;
 import org.bukkit.block.Container;
 import org.bukkit.inventory.Inventory;
 
+/**
+ * API agnostic container tile entity
+ */
 public class TileEntityContainer extends TileEntity implements NMSTileEntityContainer {
     private final Container tileEntity;
 

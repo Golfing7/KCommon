@@ -14,6 +14,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+/**
+ * NMS 1.8 packet access
+ */
 public class MagicPacketsV1_8 implements NMSMagicPackets {
     @Override
     public NMSPacket createDestroyPacket(int... ints) {

@@ -133,7 +133,6 @@ public interface Hologram {
      */
     void setLines(List<String> lines);
 
-
     /**
      * The length, in lines, of this hologram
      *

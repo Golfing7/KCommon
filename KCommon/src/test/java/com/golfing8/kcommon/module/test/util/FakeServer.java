@@ -42,6 +42,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 
+/**
+ * A fake server implementation for running certain unit tests
+ */
 @SuppressWarnings({"NullableProblems"})
 public final class FakeServer implements Server {
     private final List<World> worlds = new ArrayList<>();
@@ -52,6 +55,11 @@ public final class FakeServer implements Server {
         createWorld("testWorld", Environment.NORMAL);
     }
 
+    /**
+     * Gets the server instance
+     *
+     * @return the server
+     */
     public static FakeServer getServer() {
         if (Bukkit.getServer() == null) {
             Bukkit.setServer(new FakeServer());
@@ -382,6 +390,13 @@ public final class FakeServer implements Server {
         return worlds;
     }
 
+    /**
+     * Creates a world with the name and environment
+     *
+     * @param string the name
+     * @param e the environment
+     * @return the world
+     */
     public World createWorld(final String string, final Environment e) {
         final World w = new FakeWorld(string, e);
         worlds.add(w);
@@ -481,6 +496,12 @@ public final class FakeServer implements Server {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * Gets a map view with the id
+     *
+     * @param id the id
+     * @return the map
+     */
     public MapView getMap(final int id) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -998,7 +1019,6 @@ public final class FakeServer implements Server {
         return null;
     }
 
-
     @Override
     public BanList getBanList(final BanList.Type arg0) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -1112,7 +1132,6 @@ public final class FakeServer implements Server {
         public void disablePlugin(final Plugin plugin) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
-
 
         @Override
         public Permission getPermission(final String name) {

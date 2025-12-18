@@ -12,7 +12,6 @@ import org.bukkit.event.Listener;
  */
 public class WineSpigotArmorEquipListener implements Listener {
 
-
     @EventHandler
     public void onArmorEquip(com.golfing8.winespigot.armorequip.ArmorEquipEvent event) {
         //It's awfully convenient for me to do this as the event in wine is essentially a copy of the cookies listener.

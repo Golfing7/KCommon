@@ -5,6 +5,9 @@ import net.minecraft.server.v1_8_R3.ChunkSection;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 
+/**
+ * NMS 1.8 chunk section
+ */
 public class ChunkSectionV1_8 implements NMSChunkSection {
     private final ChunkSection section;
 

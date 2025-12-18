@@ -23,6 +23,9 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 
+/**
+ * NMS 1.8 world
+ */
 public class WorldV1_8 implements NMSWorld {
     private final WorldServer worldServer;
 
@@ -45,6 +48,7 @@ public class WorldV1_8 implements NMSWorld {
         return 0;
     }
 
+    @Override
     public NMSTileEntity getTileEntity(Position position) {
         BlockPosition blockPosition = new BlockPosition(position.getX(), position.getY(), position.getZ());
 

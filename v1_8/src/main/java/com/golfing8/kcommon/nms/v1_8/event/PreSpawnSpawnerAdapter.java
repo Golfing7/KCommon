@@ -6,6 +6,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+/**
+ * NMS 1.8 pre spawn event
+ */
 public class PreSpawnSpawnerAdapter implements Listener {
 
     @EventHandler

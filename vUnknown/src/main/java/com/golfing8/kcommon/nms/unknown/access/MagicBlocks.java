@@ -5,6 +5,9 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Skull;
 
+/**
+ * API agnostic block access
+ */
 public class MagicBlocks implements NMSMagicBlocks {
     @Override
     public void setSkullOwner(Skull skull, OfflinePlayer offlinePlayer) {

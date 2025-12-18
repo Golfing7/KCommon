@@ -5,6 +5,9 @@ import com.golfing8.kcommon.nms.chunks.NMSChunkSection;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 
+/**
+ * API agnostic chunk
+ */
 public class Chunk implements NMSChunk {
     private final org.bukkit.Chunk chunk;
 

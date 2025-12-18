@@ -8,6 +8,9 @@ class TestSource implements ConfigClassSource {
 
 }
 
+/**
+ * A test implementation of a {@link Module}
+ */
 @ModuleInfo(
         name = "test",
         configSources = TestSource.class

@@ -48,6 +48,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * NMS 1.8 parent NMS controller
+ */
 public class NMS implements NMSAccess {
     private final BukkitAudiences audiences;
     private final MagicBlocksV1_8 magicBlocksV1_8;

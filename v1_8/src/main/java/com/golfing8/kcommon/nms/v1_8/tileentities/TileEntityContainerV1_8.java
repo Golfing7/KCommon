@@ -4,6 +4,9 @@ import com.golfing8.kcommon.nms.tileentities.NMSTileEntityContainer;
 import net.minecraft.server.v1_8_R3.TileEntityContainer;
 import org.bukkit.inventory.Inventory;
 
+/**
+ * NMS 1.8 container tile entity
+ */
 public class TileEntityContainerV1_8 extends TileEntityV1_8 implements NMSTileEntityContainer {
     private final TileEntityContainer tileEntity;
 

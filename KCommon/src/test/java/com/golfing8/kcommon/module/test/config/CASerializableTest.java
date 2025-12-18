@@ -11,15 +11,20 @@ import com.golfing8.kcommon.config.generator.ConfigClassWrapper;
 import com.golfing8.kcommon.struct.drop.DropTable;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Tests the CASerializable class
+ */
 public class CASerializableTest {
 
+    /**
+     * A test config to load from
+     */
     public static class Config extends ConfigClass {
         @Conf("Some thing as a comment")
         public int item1;
@@ -31,18 +36,24 @@ public class CASerializableTest {
         public int item4 = 523;
     }
 
+    /**
+     * A polymorphic CASerializable instance
+     */
     @CASerializable.Options(
             typeResolverEnum = PolymorphicEnum.class
     )
     public interface PolymorphicSerializable extends CASerializable {
     }
 
+    /**
+     * The enum deciding types for the polymorphic CASerializable instance
+     */
     public enum PolymorphicEnum implements CASerializable.TypeResolver {
         TYPE_1(Type1Serializable.class),
         TYPE_2(Type2Serializable.class),
         ;
 
-        Class<? extends CASerializable> type;
+        final Class<? extends CASerializable> type;
 
         PolymorphicEnum(Class<? extends CASerializable> type) {
             this.type = type;
@@ -54,6 +65,9 @@ public class CASerializableTest {
         }
     }
 
+    /**
+     * The first type of polymorphic config serializable instance
+     */
     public static class Type1Serializable implements PolymorphicSerializable {
         int data1 = 20;
         int data2 = 10;
@@ -72,6 +86,9 @@ public class CASerializableTest {
         }
     }
 
+    /**
+     * The second type of polymorphic config serializable instance
+     */
     public static class Type2Serializable implements PolymorphicSerializable {
         String string1 = "Hello World!";
         String string2 = "Bye World!";
@@ -90,6 +107,9 @@ public class CASerializableTest {
         }
     }
 
+    /**
+     * A basic CASerializable type
+     */
     @CASerializable.Options(canDelegate = true)
     public static class SimpleSerializableConf implements CASerializable {
         public int thing1 = 5;
@@ -109,8 +129,11 @@ public class CASerializableTest {
         }
     }
 
+    /**
+     * Tests simple serializable instance
+     */
     @Test
-    public void testSerializableSimple() throws IOException {
+    public void testSerializableSimple() {
         Path path = Paths.get(getClass().getSimpleName() + "_testSerializableSimple.yml");
         Configuration configuration = new Configuration(path);
         if (path.toFile().exists()) {
@@ -130,6 +153,9 @@ public class CASerializableTest {
         assertEquals(config.confItem, loadedItem);
     }
 
+    /**
+     * Tests a delegated value
+     */
     @Test
     public void testDelegatedValue() {
         final String delegatedConfig =
@@ -151,8 +177,11 @@ public class CASerializableTest {
         assertEquals(12, config.thing2);
     }
 
+    /**
+     * Tests drop table serialization
+     */
     @Test
-    public void testDropTableSerialization() throws IOException {
+    public void testDropTableSerialization() {
         Path path = Paths.get("drop-tables.yml");
         Configuration configuration = new Configuration(path);
         if (path.toFile().exists()) {
@@ -161,6 +190,9 @@ public class CASerializableTest {
         ConfigTypeRegistry.getFromType(new ConfigEntry(configuration, "drop-tables"), DropTable.class);
     }
 
+    /**
+     * Tests polymorphic serialization
+     */
     @Test
     public void testPolymorphicSerialization() {
         Type1Serializable type1Real = new Type1Serializable();

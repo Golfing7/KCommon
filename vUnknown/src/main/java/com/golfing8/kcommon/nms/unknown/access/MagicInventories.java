@@ -5,6 +5,9 @@ import com.golfing8.kcommon.nms.access.NMSMagicInventories;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+/**
+ * API agnostic inventory access
+ */
 public class MagicInventories implements NMSMagicInventories, Listener {
 
     @EventHandler

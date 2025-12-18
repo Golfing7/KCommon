@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests some internals of timestamps
  */
 public class TimestampTest {
+    /**
+     * Tests timestamp differences
+     */
     @Test
     public void testTimestampDifferences() {
         Timestamp past = Timestamp.parse("12:00:00");

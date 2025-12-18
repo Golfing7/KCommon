@@ -7,6 +7,9 @@ import com.golfing8.kcommon.nms.event.DelegatedArmorListener;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 
+/**
+ * API agnostic armor equip listener
+ */
 public class NewArmorEquipListener implements DelegatedArmorListener {
 
     @EventHandler

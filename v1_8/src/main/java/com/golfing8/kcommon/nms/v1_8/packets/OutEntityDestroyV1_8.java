@@ -6,6 +6,9 @@ import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import lombok.AllArgsConstructor;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
 
+/**
+ * NMS 1.8 entity destroy packet
+ */
 @AllArgsConstructor
 public class OutEntityDestroyV1_8 implements NMSOutEntityDestroy {
     //Raw because primitive array -> wrapper array

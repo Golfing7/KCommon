@@ -18,6 +18,9 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
+/**
+ * API agnostic world
+ */
 public class World implements NMSWorld {
     private final org.bukkit.World world;
 
@@ -40,6 +43,7 @@ public class World implements NMSWorld {
         return world.getMinHeight();
     }
 
+    @Override
     public NMSTileEntity getTileEntity(Position position) {
         throw new UnsupportedOperationException();
     }

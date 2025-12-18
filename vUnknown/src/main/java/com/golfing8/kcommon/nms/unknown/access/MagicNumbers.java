@@ -10,6 +10,9 @@ import com.golfing8.kcommon.nms.unknown.item.Item;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
+/**
+ * API agnostic number access
+ */
 public class MagicNumbers implements NMSMagicNumberAccess {
     @Override
     public NMSItem getItem(Material material) {

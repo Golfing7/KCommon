@@ -6,6 +6,9 @@ import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.unknown.block.Block;
 import org.bukkit.block.TileState;
 
+/**
+ * API agnostic tile entity
+ */
 public class TileEntity implements NMSTileEntity {
     private final TileState tileEntity;
 

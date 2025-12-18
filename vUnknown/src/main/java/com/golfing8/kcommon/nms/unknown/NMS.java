@@ -48,6 +48,9 @@ import org.bukkit.plugin.Plugin;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * API agnostic NMS parent class
+ */
 public class NMS implements NMSAccess {
     private final Server server;
     private final WorldguardHook wgHook;
@@ -66,7 +69,6 @@ public class NMS implements NMSAccess {
     private FieldHandle<CraftInventoryPlayer> inventoryHandle;
     private FieldHandle<ThreadLocal<ExecutionContext<CommandSourceStack>>> executionContextHandle;
 
-    @SuppressWarnings("unchecked")
     public NMS(Plugin plugin) {
         this.server = new Server();
 

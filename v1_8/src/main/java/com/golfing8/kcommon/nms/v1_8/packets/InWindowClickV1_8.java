@@ -3,6 +3,9 @@ package com.golfing8.kcommon.nms.v1_8.packets;
 import com.golfing8.kcommon.nms.packets.NMSInWindowClick;
 import net.minecraft.server.v1_8_R3.PacketPlayInWindowClick;
 
+/**
+ * NMS 1.8 window click packet
+ */
 public class InWindowClickV1_8 implements NMSInWindowClick {
     private final PacketPlayInWindowClick packet;
 

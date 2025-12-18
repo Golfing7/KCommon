@@ -7,6 +7,9 @@ import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.Item;
 import net.minecraft.server.v1_8_R3.ItemStack;
 
+/**
+ * NMS 1.8 item access
+ */
 public class ItemV1_8 implements NMSItem {
     private final Item item;
 

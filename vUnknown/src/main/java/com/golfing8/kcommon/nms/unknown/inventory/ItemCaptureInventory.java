@@ -8,6 +8,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
+/**
+ * API agnostic item capture player
+ */
 public class ItemCaptureInventory extends CraftInventoryPlayer {
     private final ItemCapturePlayer player;
 

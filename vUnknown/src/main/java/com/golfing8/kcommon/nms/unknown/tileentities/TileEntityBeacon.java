@@ -3,6 +3,9 @@ package com.golfing8.kcommon.nms.unknown.tileentities;
 import com.golfing8.kcommon.nms.tileentities.NMSTileEntityBeacon;
 import org.bukkit.block.Beacon;
 
+/**
+ * API agnostic beacon tile entity
+ */
 public class TileEntityBeacon extends TileEntity implements NMSTileEntityBeacon {
     private final Beacon tileEntity;
 

@@ -4,6 +4,9 @@ import com.golfing8.kcommon.nms.packets.NMSInBlockDig;
 import com.golfing8.kcommon.nms.struct.Position;
 import net.minecraft.server.v1_8_R3.PacketPlayInBlockDig;
 
+/**
+ * NMS 1.8 block dig packet
+ */
 public class InBlockDigV1_8 implements NMSInBlockDig {
     private final PacketPlayInBlockDig packet;
 

@@ -8,6 +8,9 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutEntityStatus;
 import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.entity.Entity;
 
+/**
+ * NMS 1.8 entity status packet
+ */
 public class OutEntityStatusV1_8 implements NMSOutEntityStatus {
     private static final FieldHandle<Integer> entityHandle = FieldHandles.getHandle("a", PacketPlayOutEntityStatus.class);
 

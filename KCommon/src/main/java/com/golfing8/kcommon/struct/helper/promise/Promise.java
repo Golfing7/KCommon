@@ -1462,7 +1462,6 @@ public interface Promise<V> extends Future<V>, Terminable {
     @Nonnull
     Promise<V> exceptionallyDelayedAsync(@Nonnull Function<Throwable, ? extends V> fn, long delay, @Nonnull TimeUnit unit);
 
-
     /**
      * Returns a {@link CompletableFuture} maintaining the same
      * completion properties as this Promise.

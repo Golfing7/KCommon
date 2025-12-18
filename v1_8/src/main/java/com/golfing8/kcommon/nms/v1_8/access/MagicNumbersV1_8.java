@@ -11,6 +11,9 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 
+/**
+ * NMS 1.8 number access
+ */
 public class MagicNumbersV1_8 implements NMSMagicNumberAccess {
     @Override
     public NMSItem getItem(Material material) {

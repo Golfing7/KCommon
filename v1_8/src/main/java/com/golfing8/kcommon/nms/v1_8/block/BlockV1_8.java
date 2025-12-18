@@ -4,6 +4,9 @@ import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.block.NMSBlockData;
 import net.minecraft.server.v1_8_R3.Block;
 
+/**
+ * NMS 1.8 block
+ */
 public class BlockV1_8 implements NMSBlock {
     protected final Block block;
 

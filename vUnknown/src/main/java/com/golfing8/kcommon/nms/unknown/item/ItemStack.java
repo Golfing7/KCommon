@@ -2,6 +2,9 @@ package com.golfing8.kcommon.nms.unknown.item;
 
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 
+/**
+ * API agnostic item stack
+ */
 public class ItemStack implements NMSItemStack {
     private final org.bukkit.inventory.ItemStack stack;
 
