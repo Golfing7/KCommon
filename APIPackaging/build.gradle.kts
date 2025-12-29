@@ -33,16 +33,17 @@ tasks.getByName<Test>("test") {
 dependencies {
     implementation(parent!!)
 
-    implementation("de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT") //For items.
-    implementation("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
-    implementation("net.jodah:expiringmap:0.5.11")
+    implementation(rootProject.libs.itemnbtapi)
+    implementation(rootProject.libs.exp4j)
+    implementation(rootProject.libs.expiringmap)
 
-    implementation("net.kyori:adventure-platform-bukkit:4.4.1")
-    implementation("net.kyori:adventure-text-minimessage:4.24.0")
-    implementation("com.github.cryptomorin:XSeries:13.5.1") {
+    implementation(rootProject.libs.adventure.platform)
+    implementation(rootProject.libs.adventure.libraries)
+    implementation(rootProject.libs.xseries) {
         isTransitive = false
-    } //For XSeries
-    implementation("org.mongodb:mongodb-driver-sync:5.0.1")
+    }
+
+    implementation(rootProject.libs.mongo.sync)
 }
 
 // Javadoc module detection requires project evaluation (so api module is detected)

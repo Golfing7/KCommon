@@ -1,8 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.utils.toSetOrEmpty
 
 plugins {
     id("java")
     id("com.gradleup.shadow") version ("8.3.6")
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.3"
+    id("net.kyori.blossom") version "2.2.0"
     id("maven-publish")
     kotlin("jvm")
 }
@@ -34,19 +37,19 @@ tasks {
 
 dependencies {
     testImplementation("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-    testRuntimeOnly("net.kyori:adventure-platform-bukkit:4.4.1")
+    testImplementation(rootProject.libs.junit.jupiter.api)
+    testRuntimeOnly(rootProject.libs.junit.jupiter.engine)
+    testRuntimeOnly(rootProject.libs.adventure.platform)
     testImplementation(kotlin("test"))
     testImplementation(project(":NMS"))
-    testImplementation("org.mongodb:mongodb-driver-sync:5.0.1")
-    testImplementation("com.github.cryptomorin:XSeries:13.5.1")
+    testImplementation(rootProject.libs.mongo.sync)
+    testImplementation(rootProject.libs.xseries)
 
     compileOnly("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
-    compileOnly("net.objecthunter:exp4j:0.4.8") //For evaluating expressions.
-    compileOnly("com.github.cryptomorin:XSeries:13.5.1") //For XSeries
-    compileOnly("org.mongodb:mongodb-driver-sync:5.0.1")
-    implementation("de.tr7zw:item-nbt-api:2.15.2-SNAPSHOT") //For items.
+    compileOnly(rootProject.libs.exp4j)
+    compileOnly(rootProject.libs.xseries)
+    compileOnly(rootProject.libs.mongo.sync)
+    implementation(rootProject.libs.itemnbtapi)
     implementation("me.lucko:jar-relocator:1.7")
 
     compileOnly(project(":NMS"))
@@ -55,6 +58,26 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") //Vault
     compileOnly("dev.lone:api-itemsadder:4.0.10")
+}
+
+sourceSets {
+    main {
+        blossom {
+            javaSources {
+                setOf(
+                    rootProject.libs.versions.xseries to "xseries",
+                    rootProject.libs.versions.mongo to "mongo",
+                    rootProject.libs.versions.exp4j to "exp4j",
+                    rootProject.libs.versions.expiringmap to "expiringmap",
+                    rootProject.libs.versions.adventure.platform to "adventureplatform",
+                    rootProject.libs.versions.adventure.libraries to "adventurelibraries",
+                    rootProject.libs.versions.itemnbtapi to "itemnbtapi"
+                ).forEach {
+                    property("version_${it.second}", it.first.get())
+                }
+            }
+        }
+    }
 }
 
 tasks.getByName<Test>("test") {

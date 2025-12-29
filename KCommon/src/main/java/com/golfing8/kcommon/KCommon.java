@@ -61,31 +61,31 @@ public class KCommon extends KPlugin {
         libraryLoader.addRelocation("com,cryptomorin,xseries", "com,golfing8,shade,com,cryptomorin,xseries");
 
         List<LibraryDefinition> libraries = Lists.newArrayList(
-                new LibraryDefinition("net,objecthunter", "exp4j", "0.4.8"),
-                new LibraryDefinition("com,github,cryptomorin", "XSeries", "13.5.1"),
-                new LibraryDefinition("net,jodah", "expiringmap", "0.5.11"),
+                new LibraryDefinition("net,objecthunter", "exp4j", BuildParameters.VERSION_EXP4J),
+                new LibraryDefinition("com,github,cryptomorin", "XSeries", BuildParameters.VERSION_XSERIES),
+                new LibraryDefinition("net,jodah", "expiringmap", BuildParameters.VERSION_EXPIRING_MAP),
                 // For Mongo
-                new LibraryDefinition("org,mongodb", "mongodb-driver-core", "5.0.1"),
-                new LibraryDefinition("org,mongodb", "mongodb-driver-sync", "5.0.1"),
-                new LibraryDefinition("org,mongodb", "bson", "5.0.1")
+                new LibraryDefinition("org,mongodb", "mongodb-driver-core", BuildParameters.VERSION_MONGO),
+                new LibraryDefinition("org,mongodb", "mongodb-driver-sync", BuildParameters.VERSION_MONGO),
+                new LibraryDefinition("org,mongodb", "bson", BuildParameters.VERSION_MONGO)
         );
 
         libraries.add(new LibraryDefinition("net,kyori", "option", "1.1.0"));
         libraries.add(new LibraryDefinition("net,kyori", "examination-string", "1.3.0"));
         libraries.add(new LibraryDefinition("net,kyori", "examination-api", "1.3.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-key", "4.24.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-api", "4.24.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-nbt", "4.24.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-commons", "4.24.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-legacy", "4.24.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-json", "4.24.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-json-legacy-impl", "4.24.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-gson", "4.24.0"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-api", "4.4.1"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-viaversion", "4.4.1"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-facet", "4.4.1"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-bukkit", "4.4.1"));
-        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-minimessage", "4.24.0"));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-key", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-api", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-nbt", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-commons", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-legacy", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-json", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-json-legacy-impl", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-serializer-gson", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-api", BuildParameters.VERSION_ADVENTURE_PLATFORM));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-viaversion", BuildParameters.VERSION_ADVENTURE_PLATFORM));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-facet", BuildParameters.VERSION_ADVENTURE_PLATFORM));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-platform-bukkit", BuildParameters.VERSION_ADVENTURE_PLATFORM));
+        libraries.add(new LibraryDefinition("net,kyori", "adventure-text-minimessage", BuildParameters.VERSION_ADVENTURE_LIBRARIES));
 
         getLogger().info("Loading libraries...");
         libraryLoader.loadAllLibraries(libraries);
