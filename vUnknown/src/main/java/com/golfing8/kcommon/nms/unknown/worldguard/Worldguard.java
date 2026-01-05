@@ -2,10 +2,14 @@ package com.golfing8.kcommon.nms.unknown.worldguard;
 
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
 import com.google.common.collect.Lists;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.BukkitPlayer;
 import com.sk89q.worldguard.bukkit.ProtectionQuery;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -55,10 +59,8 @@ public class Worldguard implements WorldguardHook {
         StateFlag invincibleFlag = (StateFlag) WorldGuard.getInstance().getFlagRegistry().get("invincible");
         StateFlag pvpFlag = (StateFlag) WorldGuard.getInstance().getFlagRegistry().get("pvp");
 
-        for (ProtectedRegion region : regionManager.getApplicableRegions(BlockVector3.at(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()))) {
-            if (region.getFlag(invincibleFlag) == StateFlag.State.ALLOW || region.getFlag(pvpFlag) == StateFlag.State.DENY)
-                return false;
-        }
-        return true;
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+        ApplicableRegionSet applicableRegions = regionManager.getApplicableRegions(BlockVector3.at(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ()));
+        return applicableRegions.queryState(localPlayer, invincibleFlag) != StateFlag.State.ALLOW && applicableRegions.queryState(localPlayer, pvpFlag) != StateFlag.State.DENY;
     }
 }
