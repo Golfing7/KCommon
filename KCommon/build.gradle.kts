@@ -65,16 +65,20 @@ sourceSets {
         blossom {
             javaSources {
                 setOf(
-                    rootProject.libs.versions.xseries to "xseries",
-                    rootProject.libs.versions.mongo to "mongo",
-                    rootProject.libs.versions.exp4j to "exp4j",
-                    rootProject.libs.versions.expiringmap to "expiringmap",
-                    rootProject.libs.versions.adventure.platform to "adventureplatform",
-                    rootProject.libs.versions.adventure.libraries to "adventurelibraries",
-                    rootProject.libs.versions.itemnbtapi to "itemnbtapi"
+                    rootProject.libs.versions.xseries.get() to "xseries",
+                    rootProject.libs.versions.mongo.get() to "mongo",
+                    rootProject.libs.versions.exp4j.get() to "exp4j",
+                    rootProject.libs.versions.expiringmap.get() to "expiringmap",
+                    rootProject.libs.versions.adventure.platform.get() to "adventureplatform",
+                    rootProject.libs.versions.adventure.libraries.get() to "adventurelibraries",
+                    rootProject.libs.versions.itemnbtapi.get() to "itemnbtapi",
+                    rootProject.version.toString() to "kcommon"
                 ).forEach {
-                    property("version_${it.second}", it.first.get())
+                    property("version_${it.second}", it.first)
                 }
+            }
+            resources {
+                property("version_kcommon", rootProject.version.toString())
             }
         }
     }
