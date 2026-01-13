@@ -291,5 +291,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CATimeLength());
         registerAdapter(new CACraftingRecipe());
         registerAdapter(new CADuration());
+        registerAdapter(new CAEntityTypeAdaptable());
     }
 }

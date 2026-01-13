@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.entity;
 
+import com.cryptomorin.xseries.XEntityType;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.adapter.CASerializable;
@@ -41,7 +42,7 @@ public class EntityDefinition implements CASerializable {
      * The entity type/data that defines the entity
      */
     @Builder.Default
-    private EntityData entityType = EntityData.fromType(EntityType.PIG);
+    private EntityTypeAdaptable entityType = new EntityTypeAdaptable(XEntityType.PIG);
     /**
      * The display name of this entity
      */
@@ -110,7 +111,7 @@ public class EntityDefinition implements CASerializable {
 
     private Entity spawnEntity(Location location, UUID spawnID) {
         Entity spawnedVehicle = vehicle != null ? vehicle.spawnEntity(location, spawnID) : null;
-        Entity selfSpawned = NMS.getTheNMS().getMagicEntities().spawnEntity(location.getWorld(), location, entityType, randomizeData);
+        Entity selfSpawned = entityType.spawn(location, randomizeData);
         Entity spawnedPassenger = passenger != null ? passenger.spawnEntity(location, spawnID) : null;
 
         applyToEntity(selfSpawned);

@@ -27,6 +27,11 @@ repositories {
         name = "matteodev"
         url = uri("https://maven.devs.beer/")
     }
+
+    maven {
+        name = "Lumine"
+        url = uri("https://mvn.lumine.io/repository/maven-public/")
+    }
 }
 
 tasks {
@@ -49,6 +54,7 @@ dependencies {
     compileOnly(rootProject.libs.exp4j)
     compileOnly(rootProject.libs.xseries)
     compileOnly(rootProject.libs.mongo.sync)
+    compileOnly(rootProject.libs.mythicmobs)
     implementation(rootProject.libs.itemnbtapi)
     implementation("me.lucko:jar-relocator:1.7")
 
