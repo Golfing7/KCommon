@@ -995,7 +995,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         }
 
         //Loop over the arguments to match.
-        if (args.length > this.commandArguments.size() + this.subcommands.size())
+        if (args.length > this.commandArguments.size() + this.subcommands.size() && this.longNameMappedCommandFlags.isEmpty())
             return Collections.emptyList();
 
         //Get the raw completions.
