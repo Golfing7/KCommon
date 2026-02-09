@@ -76,6 +76,10 @@ public class LinkedEntityListener implements Listener {
         if (event instanceof EntityDamageByEntityEvent)
             return;
 
+        // Apply damage across the entire mob.
+        if (!event.getEntity().getPersistentDataContainer().has(key, PersistentDataType.STRING))
+            return;
+
         try {
             entityDamage_listen.set(false);
             EntityUtil.applyToAllVehiclesAndPassengers(event.getEntity(), entity -> {
