@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -36,9 +37,9 @@ public class FieldType {
     private final List<Type> genericTypes;
 
     public FieldType(Class<?> type) {
-        this.annotations = new ArrayList<>();
+        this.annotations = Collections.emptyList();
         this.type = type;
-        this.genericTypes = new ArrayList<>();
+        this.genericTypes = Collections.emptyList();
     }
 
     public FieldType(Field field) {
@@ -49,7 +50,11 @@ public class FieldType {
 
     public FieldType(Type type) {
         Preconditions.checkArgument(type instanceof Class<?> || type instanceof ParameterizedType);
-        this.annotations = new ArrayList<>();
+        if (type instanceof AnnotatedElement) {
+            this.annotations = Arrays.asList(((AnnotatedElement) type).getAnnotations());
+        } else {
+            this.annotations = Collections.emptyList();
+        }
         if (type instanceof Class<?>) {
             this.type = (Class<?>) type;
             this.genericTypes = Collections.emptyList();
@@ -68,7 +73,13 @@ public class FieldType {
      */
     public static FieldType extractFrom(TypeToken<?> token) {
         ParameterizedType foundType = (ParameterizedType) token.getType();
-        return new FieldType(new ArrayList<>(), (Class<?>) foundType.getRawType(),
+        List<Annotation> annotations;
+        if (token.getType() instanceof AnnotatedElement) {
+            annotations = Arrays.asList(((AnnotatedElement) token.getType()).getAnnotations());
+        } else {
+            annotations = Collections.emptyList();
+        }
+        return new FieldType(annotations, (Class<?>) foundType.getRawType(),
                 Lists.newArrayList(foundType.getActualTypeArguments()));
     }
 }
