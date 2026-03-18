@@ -115,8 +115,8 @@ public final class CommandManager {
             Class<?> craftServer = Bukkit.getServer().getClass();
             Method syncCommandsMethod = craftServer.getDeclaredMethod("syncCommands");
             syncCommandsMethod.invoke(Bukkit.getServer());
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            KCommon.getInstance().getLogger().log(Level.SEVERE, "Failed to sync commands", e);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
+
         }
     }
 
