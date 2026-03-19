@@ -10,6 +10,7 @@ import com.golfing8.kcommon.command.requirement.Requirement;
 import com.golfing8.kcommon.command.requirement.RequirementPlayer;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.Message;
+import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.helper.function.Numbers;
 import com.golfing8.kcommon.struct.permission.PermissionContext;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
@@ -463,11 +464,12 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
             return null;
         }
 
-        List<String> builtArguments = buildArguments(sender, label, args, true, verbose);
-        if (builtArguments == null)
+        var builtArgumentsPair = buildArguments(sender, label, args, true, verbose);
+        if (builtArgumentsPair == null)
             return null;
+        var builtArguments = builtArgumentsPair.getA();
 
-        Map<CommandFlag, TriState> flagStates = args.length > builtArguments.size() ? buildFlagStates(Arrays.copyOfRange(args, builtArguments.size(), args.length), false) : Collections.emptyMap();
+        Map<CommandFlag, TriState> flagStates = args.length > builtArgumentsPair.getB() ? buildFlagStates(Arrays.copyOfRange(args, builtArgumentsPair.getB(), args.length), false) : Collections.emptyMap();
         if (flagStates == null)
             return null;
 
@@ -538,9 +540,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * @param label   the label.
      * @param args    the args.
      * @param verbose verbose mode
-     * @return the built arguments
+     * @return the built arguments paired with the number of arguments that were not autofilled
      */
-    private List<String> buildArguments(CommandSender sender, String label, String[] args, boolean autoFill, boolean verbose) {
+    private Pair<List<String>, Integer> buildArguments(CommandSender sender, String label, String[] args, boolean autoFill, boolean verbose) {
         List<String> builtArguments = new ArrayList<>();
         List<String> allArguments = new ArrayList<>(Arrays.asList(args));
         for (int i = 0; i < args.length; i++) {
@@ -573,7 +575,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
                     }
                 }
 
-                builtArguments.add(Objects.toString(builtCommandArgument.autoComplete.apply(sender), null));
+                if (builtCommandArgument.autoComplete != null) {
+                    builtArguments.add(Objects.toString(builtCommandArgument.autoComplete.apply(sender), null));
+                }
                 // If we fail the 'can see' check once, make sure all remaining arguments are auto completed.
                 break;
             }
@@ -582,6 +586,13 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
             //Create the argument context and test it.
             ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(allArguments), i);
             if (!commandArgument.getPredicate().test(context)) {
+                // Last ditch attempt try to match the argument as a flag.
+                if (builtCommandArgument.autoComplete != null) {
+                    var flagStates = matchArgumentForFlags(stringArgument, false);
+                    if (flagStates != null)
+                        continue;
+                }
+
                 // Handle the argument as invalid.
                 if (verbose) {
                     handleInvalidArgument(sender, builtCommandArgument, stringArgument);
@@ -594,8 +605,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
 
         //Try to fill in the 'autofill' arguments.
         if (!autoFill)
-            return builtArguments;
+            return new Pair<>(builtArguments, builtArguments.size());
 
+        int nonAutoFilled = builtArguments.size();
         for (int i = builtArguments.size(); i < this.commandArguments.size(); i++) {
             BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
             Function<CommandSender, Object> autofill = builtCommandArgument.getAutoComplete();
@@ -622,7 +634,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
             //Create the argument context and test it.
             builtArguments.add(Objects.toString(autofill.apply(sender), null));
         }
-        return builtArguments;
+        return new Pair<>(builtArguments, nonAutoFilled);
     }
 
     /**
@@ -1000,10 +1012,11 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
 
         //Get the raw completions.
         String[] previousArgs = Arrays.copyOf(args, args.length - 1);
-        List<String> builtArguments = buildArguments(sender, label, previousArgs, false, false);
+        var builtArgumentsPair = buildArguments(sender, label, previousArgs, false, false);
         List<String> completions = new ArrayList<>();
         String stringArgument = args[args.length - 1];
-        if (builtArguments != null) {
+        if (builtArgumentsPair != null) {
+            var builtArguments = builtArgumentsPair.getA();
             if (this.commandArguments.size() > args.length - 1) {
                 CommandArgument<?> argument = this.commandArguments.get(args.length - 1).getArgument();
                 ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(builtArguments), args.length - 1);
