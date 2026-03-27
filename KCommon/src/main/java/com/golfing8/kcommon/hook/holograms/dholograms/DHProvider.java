@@ -5,6 +5,7 @@ import com.golfing8.kcommon.hook.holograms.HologramProvider;
 import eu.decentsoftware.holograms.api.DHAPI;
 import org.bukkit.Location;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -14,5 +15,20 @@ public class DHProvider implements HologramProvider {
     @Override
     public Hologram createHologram(Location location) {
         return new DHHologram(DHAPI.createHologram(UUID.randomUUID().toString(), location));
+    }
+
+    @Override
+    public Hologram createHologram(Location location, String id) {
+        return new DHHologram(DHAPI.createHologram(id, location));
+    }
+
+    @Override
+    public Optional<Hologram> getById(String id) {
+        eu.decentsoftware.holograms.api.holograms.Hologram hologram = DHAPI.getHologram(id);
+        if (hologram == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new DHHologram(hologram));
     }
 }

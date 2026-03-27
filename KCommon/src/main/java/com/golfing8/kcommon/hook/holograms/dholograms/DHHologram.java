@@ -18,6 +18,11 @@ public class DHHologram implements Hologram {
     private final eu.decentsoftware.holograms.api.holograms.Hologram backingHologram;
 
     @Override
+    public String getId() {
+        return backingHologram.getId();
+    }
+
+    @Override
     public boolean isVisibleByDefault() {
         return backingHologram.isDefaultVisibleState();
     }

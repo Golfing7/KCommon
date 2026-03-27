@@ -10,6 +10,11 @@ import java.util.List;
  */
 public class EmptyHologram implements Hologram {
     @Override
+    public String getId() {
+        return "";
+    }
+
+    @Override
     public boolean isVisibleByDefault() {
         return false;
     }

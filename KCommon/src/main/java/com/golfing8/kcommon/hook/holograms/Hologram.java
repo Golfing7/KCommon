@@ -11,6 +11,13 @@ import java.util.List;
 public interface Hologram {
 
     /**
+     * Gets the string id of this hologram
+     *
+     * @return the id
+     */
+    String getId();
+
+    /**
      * True if this hologram is visible by default
      *
      * @return value

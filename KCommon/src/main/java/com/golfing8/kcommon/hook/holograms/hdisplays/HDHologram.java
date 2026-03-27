@@ -20,6 +20,11 @@ public class HDHologram implements Hologram {
     private final com.gmail.filoghost.holographicdisplays.api.Hologram backingHologram;
 
     @Override
+    public String getId() {
+        return "";
+    }
+
+    @Override
     public boolean isVisibleByDefault() {
         throw new UnsupportedOperationException();
     }
