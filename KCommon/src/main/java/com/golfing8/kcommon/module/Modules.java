@@ -12,7 +12,6 @@ import java.util.*;
 /**
  * A class to manage the instances of the {@link Module} class. This is used in place of the
  * main {@link KPlugin} class to ensure that other plugins can register modules.
- * (Potential future functionality)
  */
 @UtilityClass
 public final class Modules {

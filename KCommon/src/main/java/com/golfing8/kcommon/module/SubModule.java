@@ -25,7 +25,7 @@ import java.util.logging.Level;
  * {@link Conf} and {@link LangConf} annotations still work as expected.
  * </p>
  * <p>
- * Note that the {@link #module} reference is may be null until {@link #onEnable()} is called.
+ * Note that the {@link #module} reference may be null until {@link #onEnable()} is called.
  * </p>
  *
  * @param <T>

@@ -168,7 +168,7 @@ public class NMS implements NMSAccess {
 
     @Override
     public OfflinePlayer getOfflinePlayerIfCached(String str) {
-        return Bukkit.getOfflinePlayerIfCached(str);
+        return Bukkit.getOfflinePlayer(str);
     }
 
     @Override
