@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -330,6 +331,20 @@ public final class MS {
     }
 
     /**
+     * Passes the message to the given receivers
+     *
+     * @param receivers the receivers of the message
+     * @param message the message
+     * @param placeholders the placeholders
+     */
+    public static void pass(Collection<? extends CommandSender> receivers, String message, Object... placeholders) {
+        Component component = toComponent(message, placeholders);
+        for (CommandSender sender : receivers) {
+            ComponentUtils.bukkitAudiences.sender(sender).sendMessage(component);
+        }
+    }
+
+    /**
      * Passes the message to the given sender
      *
      * @param sender the sender
@@ -342,5 +357,19 @@ public final class MS {
             return;
 
         ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
+    }
+
+    /**
+     * Passes the message to the given receivers
+     *
+     * @param receivers the receivers of the message
+     * @param message the message
+     * @param placeholders the placeholders
+     */
+    public static void pass(Collection<? extends CommandSender> receivers, List<String> message, Object... placeholders) {
+        Component component = toComponent(message, placeholders);
+        for (CommandSender sender : receivers) {
+            ComponentUtils.bukkitAudiences.sender(sender).sendMessage(component);
+        }
     }
 }

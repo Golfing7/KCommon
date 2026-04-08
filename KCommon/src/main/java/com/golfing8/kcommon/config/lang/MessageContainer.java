@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -133,6 +134,45 @@ public interface MessageContainer {
             getMessage().getSounds().forEach(sound -> {
                 sound.send((Player) sender);
             });
+        }
+    }
+
+    /**
+     * Sends the message to the collection of command senders
+     *
+     * @param receivers the receivers
+     * @param placeholders the placeholders
+     */
+    default void send(Collection<? extends CommandSender> receivers, Object... placeholders) {
+        PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
+        if (getMessage().getMessages() != null && !getMessage().getMessages().isEmpty()) {
+            if (getMessage().isPaged()) {
+                // Paged messages are tracked individually, this hack is necessary.
+                for (CommandSender sender : receivers) {
+                    toPagedMessage(container).displayTo(sender, 1, placeholders);
+                }
+            } else {
+                MS.pass(receivers, getMessage().getMessages(), container);
+            }
+        }
+
+        for (CommandSender sender : receivers) {
+            if (!(sender instanceof Player))
+                continue;
+
+            if (getMessage().getTitle() != null) {
+                MS.sendTitle((Player) sender, getMessage().getTitle(), container);
+            }
+
+            if (getMessage().getActionBar() != null) {
+                MS.sendActionBar((Player) sender, getMessage().getActionBar(), container);
+            }
+
+            if (getMessage().getSounds() != null) {
+                getMessage().getSounds().forEach(sound -> {
+                    sound.send((Player) sender);
+                });
+            }
         }
     }
 }
