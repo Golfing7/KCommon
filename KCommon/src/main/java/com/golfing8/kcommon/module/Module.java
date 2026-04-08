@@ -221,7 +221,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
     protected Module() {
         ModuleInfo info = this.getClass().getAnnotation(ModuleInfo.class);
         if (info == null)
-            throw new IllegalArgumentException("Module info missing!");
+            throw new IllegalArgumentException("Module info missing for class " + getClass().getName() + "!");
 
         this.plugin = (KPlugin) JavaPlugin.getProvidingPlugin(this.getClass());
         this.moduleName = info.name();
@@ -321,7 +321,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         // Add placeholder hook
         this.plugin.getPlaceholderAPIHook().registerProvider(this);
 
-        //We should save the language config once more as it's possible the commands this feature registered added constants.
+        // We should save the language config once more as it's possible the commands this feature registered added constants.
         this.langConfig.save();
         this.enabled = true;
         return true;

@@ -9,7 +9,6 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Represents a collection of elements that can be randomly chosen, each with their own weights.
  */
-
 public class WeightedCollection<T> {
     /**
      * Maps a given object to its chance to appear.
