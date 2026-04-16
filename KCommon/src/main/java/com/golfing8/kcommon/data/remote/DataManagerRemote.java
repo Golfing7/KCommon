@@ -119,7 +119,17 @@ public class DataManagerRemote<T extends DataSerializable> extends DataManagerAb
     }
 
     @Override
+    public Promise<T> getObjectAsync(@NotNull String key) {
+        return Promise.supplyingAsync(() -> getObject(key));
+    }
+
+    @Override
     public List<T> getWhere(String field, Object value, Object... keyValues) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Promise<List<T>> getWhereAsync(String field, Object value, Object... keyValues) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

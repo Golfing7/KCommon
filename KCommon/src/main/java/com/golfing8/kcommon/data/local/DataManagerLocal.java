@@ -143,8 +143,18 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
     }
 
     @Override
+    public Promise<T> getObjectAsync(@NotNull String key) {
+        return Promise.supplyingAsync(() -> getObject(key));
+    }
+
+    @Override
     public synchronized List<T> getWhere(String field, Object value, Object... keyValues) {
         return fieldIndexer.getWhere(field, value, keyValues);
+    }
+
+    @Override
+    public Promise<List<T>> getWhereAsync(String field, Object value, Object... keyValues) {
+        return Promise.supplyingAsync(() -> getWhere(field, value, keyValues));
     }
 
     @Override
