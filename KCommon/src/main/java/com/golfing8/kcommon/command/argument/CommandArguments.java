@@ -139,7 +139,7 @@ public final class CommandArguments {
     /**
      * A command argument to auto-complete doubles.
      */
-    public static final CommandArgument<Double> DOUBLE = new CommandArgument<>("A non negative number", context -> {
+    public static final CommandArgument<Double> DOUBLE = new CommandArgument<>("A number", context -> {
         return Collections.emptyList();
     }, context -> {
         try {
@@ -150,6 +150,20 @@ public final class CommandArguments {
             return false;
         }
     }, ctx -> Double.parseDouble(ctx.getArgument()));
+
+    /**
+     * A command argument for integers.
+     */
+    public static final CommandArgument<Integer> INTEGER = new CommandArgument<>("An integer", context -> {
+        return Collections.emptyList();
+    }, context -> {
+        try {
+            Integer.parseInt(context.getArgument());
+            return true;
+        } catch (NumberFormatException exc) {
+            return false;
+        }
+    }, ctx -> Integer.parseInt(ctx.getArgument()));
 
     /**
      * A command argument to auto-complete non-negative integers.
@@ -254,4 +268,10 @@ public final class CommandArguments {
     }, context -> {
         return Bukkit.getWorld(context.getArgument()) != null;
     }, ctx -> Bukkit.getWorld(ctx.getArgument()));
+
+    public static final CommandArgument<IntegerOperation> INTEGER_OPERATION = new CommandArgument<>("operation", context -> {
+        return Arrays.stream(IntegerOperation.values()).map(IntegerOperation::getStringRepresentation).collect(Collectors.toSet());
+    }, context -> {
+        return IntegerOperation.getFromStringRepresentation(context.getArgument()) != null;
+    }, ctx -> IntegerOperation.getFromStringRepresentation(ctx.getArgument()));
 }
