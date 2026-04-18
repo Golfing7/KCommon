@@ -707,6 +707,8 @@ public final class MenuBuilder {
 
             //Add the item to the GUI.
             guiItem.getSlots().forEach(coordinate -> {
+                if (coordinate == null)
+                    throw new NullPointerException("Coordinate is null for special item with key " + key + "! Did you forget to set its slot in the config?");
                 int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, coordinate.getX(), coordinate.getY());
                 this.addAction(slot, specialBinding.getValue());
                 this.setAt(slot,
