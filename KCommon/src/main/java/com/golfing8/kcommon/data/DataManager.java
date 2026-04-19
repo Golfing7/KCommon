@@ -70,6 +70,16 @@ public interface DataManager<T extends DataSerializable> {
     T getObject(@NotNull String key);
 
     /**
+     * Gets the object from the data manager, or null if it doesn't exist.
+     * <br>
+     * If the object did exist, it is saved in the cache.
+     *
+     * @param key the key
+     * @return the object
+     */
+    Promise<@Nullable T> getObjectAsync(@NotNull String key);
+
+    /**
      * Gets all objects that have field values equal to the provided parameters.
      *
      * @param field     the first field to get an object with.
@@ -78,6 +88,16 @@ public interface DataManager<T extends DataSerializable> {
      * @return all objects that have those values.
      */
     List<T> getWhere(String field, Object value, Object... keyValues);
+
+    /**
+     * Gets all objects that have field values equal to the provided parameters.
+     *
+     * @param field     the first field to get an object with.
+     * @param value     the value of the first field.
+     * @param keyValues more field/value pairs.
+     * @return all objects that have those values.
+     */
+    Promise<List<T>> getWhereAsync(String field, Object value, Object... keyValues);
 
     /**
      * Shuts this data manager down, saving all cached objects.
