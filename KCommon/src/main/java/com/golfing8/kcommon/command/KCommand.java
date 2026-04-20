@@ -468,6 +468,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         if (builtArgumentsPair == null)
             return null;
         var builtArguments = builtArgumentsPair.getA();
+        // If we didn't fill all arguments, stop.
+        if (builtArguments.size() < commandArguments.size())
+            return null;
 
         Map<CommandFlag, TriState> flagStates = args.length > builtArgumentsPair.getB() ? buildFlagStates(Arrays.copyOfRange(args, builtArgumentsPair.getB(), args.length), false) : Collections.emptyMap();
         if (flagStates == null)
