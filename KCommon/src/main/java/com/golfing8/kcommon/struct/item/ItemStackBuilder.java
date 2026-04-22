@@ -713,8 +713,12 @@ public final class ItemStackBuilder {
         int commandItemAmount = 0;
         if (this.itemType.startsWith("/")) {
             // The command might apply a different amount of items, so we should respect that.
-            newCopy = ItemUtil.getItemFromCommand(Placeholders.parseFully(this.itemType.substring(1), "PLAYER", NMSAccess.ITEM_CAPTURE_NAME)).orElse(XMaterial.AIR.parseItem());
+            String command = Placeholders.parseFully(this.itemType.substring(1), "PLAYER", NMSAccess.ITEM_CAPTURE_NAME);
+            newCopy = ItemUtil.getItemFromCommand(command).orElse(XMaterial.AIR.parseItem());
             commandItemAmount = newCopy != null ? newCopy.getAmount() : 0;
+            if (newCopy == null || newCopy.getType() == XMaterial.AIR.get()) {
+                KCommon.getInstance().getLogger().warning("Command ItemStackBuilder with command \"" + command + "\" returned AIR or null!");
+            }
         }
 
         if (newCopy == null) {
