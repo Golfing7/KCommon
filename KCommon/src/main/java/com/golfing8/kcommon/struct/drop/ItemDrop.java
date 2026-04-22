@@ -1,12 +1,14 @@
 package com.golfing8.kcommon.struct.drop;
 
 import com.cryptomorin.xseries.XEnchantment;
+import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.struct.item.FancyItemDrop;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.util.MathExpressions;
 import com.golfing8.kcommon.util.MathUtil;
 import com.golfing8.kcommon.util.PlayerUtil;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -68,6 +70,9 @@ public class ItemDrop extends Drop<ItemStack> {
         double effectiveBoost = Math.min(boost, getMaxBoost());
         return items.values().stream().map(builder -> {
             ItemStack itemStack = builder.buildFromTemplate();
+            if (itemStack.getType() == XMaterial.AIR.get()) {
+                Bukkit.getLogger().warning("ItemDrop under key " + get_key() + " returned AIR for item " + builder.getItemTypeString());
+            }
             if (effectiveBoost != 1.0D && boostQuantity) {
                 itemStack.setAmount(MathUtil.roundRandomly(itemStack.getAmount() * effectiveBoost));
             }
