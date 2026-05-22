@@ -8,6 +8,7 @@ import com.golfing8.kcommon.db.MongoConnector;
 import com.golfing8.kcommon.library.LibraryDefinition;
 import com.golfing8.kcommon.listener.LinkedEntityListener;
 import com.golfing8.kcommon.listener.PlayerDataListener;
+import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandle;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.List;
@@ -126,6 +128,17 @@ public class KCommon extends KPlugin {
         if (NMS.getTheNMS().supportsPersistentDataContainers())
             getServer().getPluginManager().registerEvents(new LinkedEntityListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDataListener(), this);
+
+        // Try to load our DialogMenu API
+        if (serverVersion.isAtOrAfter(new NMSVersion(21, 6))) {
+            Reflection.forNameOptional("com.golfing8.kcommon.dialogs.DialogMenu").ifPresent(clazz -> {
+                MethodHandle initialize = Reflection.findMethodHandle(clazz, "initialize", KCommon.class);
+                if (initialize == null)
+                    throw new NullPointerException("Initialize method not present!");
+
+                Reflection.invokeQuietly(initialize, this);
+            });
+        }
     }
 
     private boolean trySetupMongo() {

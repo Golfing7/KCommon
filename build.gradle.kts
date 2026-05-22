@@ -107,6 +107,7 @@ dependencies {
     implementation(project(":NMS"))
     implementation(project(":v1_8"))
     implementation(project(":vUnknown"))
+    implementation(project(":DialogMenus"))
 }
 
 tasks.getByName<Test>("test") {

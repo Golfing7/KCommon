@@ -26,7 +26,8 @@ public class NMSVersion implements Comparable<NMSVersion> {
             v1_18 = new NMSVersion(18, -1),
             v1_19 = new NMSVersion(19, -1),
             v1_20 = new NMSVersion(20, -1),
-            v1_21 = new NMSVersion(21, -1);
+            v1_21 = new NMSVersion(21, -1),
+            v26_1 = new NMSVersion(26, -1);
 
     private final int major;
     /**
@@ -120,8 +121,14 @@ public class NMSVersion implements Comparable<NMSVersion> {
         String bukkitVersion = Bukkit.getBukkitVersion();
         String version = bukkitVersion.substring(0, bukkitVersion.indexOf("-"));
         String[] split = version.split("\\.");
-        int major = Integer.parseInt(String.valueOf(split[1]));
-        int minor = split.length > 2 ? Integer.parseInt(String.valueOf(split[2])) : 0;
+        int major, minor;
+        if (split[0].equals("1")) {
+            major = Integer.parseInt(String.valueOf(split[1]));
+            minor = split.length > 2 ? Integer.parseInt(String.valueOf(split[2])) : 0;
+        } else {
+            major = Integer.parseInt(split[0]);
+            minor = split.length > 1 ? Integer.parseInt(String.valueOf(split[1])) : 0;
+        }
 
         try {
             return new NMSVersion(major, minor);
