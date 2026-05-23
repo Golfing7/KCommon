@@ -314,27 +314,30 @@ public class WrappedConfigurationSection implements KConfigurationSection {
 
     @Override
     public void ensureExists(String path) {
-        if (!this.contains(path)) {
-            if (this.wrapped == null || !this.wrapped.contains(path))
-                throw new ConfigException(this, "Config entry at path " + getCurrentPath() + "." + path + " doesn't exist!");
+        if (this.contains(path))
+            return;
 
-            this.set(path, this.wrapped.get(path));
-            if (this.wrapped instanceof KConfig) {
-                ((KConfig) this.wrapped).save();
-            }
-        }
+        String fullPath = getCurrentPath() + "." + path;
+        if (this.originalConfig == null || !this.originalConfig.getSource().contains(fullPath))
+            throw new ConfigException(this, "Config entry at path " + getCurrentPath() + "." + path + " doesn't exist!");
+
+        Object value = this.originalConfig.getSource().get(fullPath);
+        this.set(path, value);
+        this.originalConfig.set(fullPath, value);
+        this.originalConfig.save();
     }
 
     @Override
     public boolean tryLoadFromSource(String path) {
         if (!this.contains(path)) {
-            if (this.wrapped == null || !this.wrapped.contains(path))
+            String fullPath = getCurrentPath() + "." + path;
+            if (this.originalConfig == null || !this.originalConfig.getSource().contains(fullPath))
                 return false;
 
-            this.set(path, this.wrapped.get(path));
-            if (this.wrapped instanceof KConfig) {
-                ((KConfig) this.wrapped).save();
-            }
+            Object value = this.originalConfig.getSource().get(fullPath);
+            this.set(path, value);
+            this.originalConfig.set(fullPath, value);
+            this.originalConfig.save();
         }
         return true;
     }
