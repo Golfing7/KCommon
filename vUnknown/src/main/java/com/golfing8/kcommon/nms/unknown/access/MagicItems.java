@@ -22,6 +22,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.Damageable;
@@ -104,14 +105,13 @@ public class MagicItems implements NMSMagicItems {
         if (modifiers != null) {
             Multimap<Attribute, AttributeModifier> tlModifiers = HashMultimap.create();
             for (var entry : modifiers.entrySet()) {
-                Attribute attribute = Attribute.valueOf(entry.getKey().name());
+                Attribute attribute = MagicEntities.translateAttribute(entry.getKey());
                 for (EntityAttributeModifier modifier : entry.getValue()) {
                     tlModifiers.put(attribute, new AttributeModifier(
-                            modifier.getUuid(),
-                            modifier.getName(),
+                            NamespacedKey.fromString(modifier.getUuid().toString()),
                             modifier.getAmount(),
                             AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
-                            modifier.getSlot())
+                            modifier.getSlot() == null ? EquipmentSlotGroup.ANY : modifier.getSlot().getGroup())
                     );
                 }
             }
@@ -129,14 +129,13 @@ public class MagicItems implements NMSMagicItems {
         Multimap<Attribute, AttributeModifier> defaultAttributes = originalAttributes == null ? HashMultimap.create() : HashMultimap.create(originalAttributes);
         if (modifiers != null) {
             for (var entry : modifiers.entrySet()) {
-                Attribute attribute = Attribute.valueOf(entry.getKey().name());
+                Attribute attribute = MagicEntities.translateAttribute(entry.getKey());
                 for (EntityAttributeModifier modifier : entry.getValue()) {
                     defaultAttributes.put(attribute, new AttributeModifier(
-                            modifier.getUuid(),
-                            modifier.getName(),
+                            NamespacedKey.fromString(modifier.getUuid().toString()),
                             modifier.getAmount(),
                             AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
-                            modifier.getSlot())
+                            modifier.getSlot() == null ? EquipmentSlotGroup.ANY : modifier.getSlot().getGroup())
                     );
                 }
             }

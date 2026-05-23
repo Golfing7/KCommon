@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.nms.access;
 
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.EntityData;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Location;
@@ -8,6 +9,8 @@ import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.function.Consumer;
 
 /**
  * NMS method access for entities
@@ -134,6 +137,24 @@ public interface NMSMagicEntities {
     void setAttribute(LivingEntity entity, EntityAttribute attribute, double value);
 
     /**
+     * Adds an attribute modifier to the given entity
+     *
+     * @param entity the entity
+     * @param attribute the attribute
+     * @param modifier the modifier
+     */
+    void addAttributeModifier(LivingEntity entity, EntityAttribute attribute, EntityAttributeModifier modifier);
+
+    /**
+     * Removes the attribute modifier from the given entity
+     *
+     * @param entity the entity
+     * @param attribute the attribute
+     * @param modifier the modifier
+     */
+    void removeAttributeModifier(LivingEntity entity, EntityAttribute attribute, EntityAttributeModifier modifier);
+
+    /**
      * Sets the entity's noclip flag
      *
      * @param entity entity
@@ -156,6 +177,14 @@ public interface NMSMagicEntities {
      * @param value if it has AI
      */
     void setMobAI(Entity entity, boolean value);
+
+    /**
+     * Sets if the mob has gravity
+     *
+     * @param entity the entity
+     * @param value if it has gravity
+     */
+    void setGravity(Entity entity, boolean value);
 
     /**
      * Sets if the entity forcefully loads chunks
@@ -228,4 +257,14 @@ public interface NMSMagicEntities {
      * @param <T> the entity type
      */
     <T extends Entity> T spawnEntity(World world, Location loc, Class<T> clazz, CreatureSpawnEvent.SpawnReason reason);
+
+    /**
+     * Spawns the entity at the given location
+     *
+     * @param location the location
+     * @param clazz the entity class
+     * @param spawnConsumer the spawn consumer that is run before the entity is added to the world
+     * @return the spawned entity
+     */
+    <T extends Entity> T spawn(Location location, Class<T> clazz, Consumer<? super T> spawnConsumer);
 }

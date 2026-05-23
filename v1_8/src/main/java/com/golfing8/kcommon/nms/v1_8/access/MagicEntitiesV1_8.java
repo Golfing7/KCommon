@@ -3,6 +3,7 @@ package com.golfing8.kcommon.nms.v1_8.access;
 import com.golfing8.kcommon.nms.WineSpigot;
 import com.golfing8.kcommon.nms.access.NMSMagicEntities;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.EntityData;
 import com.mojang.authlib.GameProfile;
 import de.tr7zw.changeme.nbtapi.NBTCompoundList;
@@ -22,6 +23,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * NMS 1.8 entity access
@@ -154,6 +156,17 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public <T extends Entity> T spawn(Location location, Class<T> clazz, Consumer<? super T> spawnConsumer) {
+        net.minecraft.server.v1_8_R3.Entity entity = ((CraftWorld) location.getWorld()).createEntity(location, clazz);
+
+        spawnConsumer.accept((T) entity.getBukkitEntity());
+        ((CraftWorld) location.getWorld()).getHandle().addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+        return (T) entity.getBukkitEntity();
+    }
+
+    @Override
     public void setLoadChunks(Entity entity, boolean value) {
         ((CraftEntity) entity).getHandle().loadChunks = value;
     }
@@ -242,6 +255,58 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
         }
     }
 
+    private AttributeInstance getAttributeInstance(LivingEntity entity, EntityAttribute attribute) {
+        EntityLiving entityLiving = ((CraftLivingEntity) entity).getHandle();
+        IAttribute iAttribute = null;
+        switch (attribute) {
+            case GENERIC_ATTACK_DAMAGE:
+                iAttribute = GenericAttributes.ATTACK_DAMAGE;
+                break;
+            case GENERIC_KNOCKBACK_RESISTANCE:
+                iAttribute = GenericAttributes.c;
+                break;
+            case GENERIC_MOVEMENT_SPEED:
+                iAttribute = GenericAttributes.MOVEMENT_SPEED;
+                break;
+            default:
+                return null;
+        }
+        return entityLiving.getAttributeInstance(iAttribute);
+    }
+
+    @Override
+    public void addAttributeModifier(LivingEntity entity, EntityAttribute attribute, EntityAttributeModifier modifier) {
+        AttributeInstance instance = getAttributeInstance(entity, attribute);
+        if (instance == null)
+            return;
+
+        AttributeModifier attributeModifier = new AttributeModifier(
+                modifier.getUuid(),
+                modifier.getName(),
+                modifier.getAmount(),
+                modifier.getOperation().ordinal()
+        );
+        // Remove
+        instance.c(attributeModifier);
+        // Add back
+        instance.b(attributeModifier);
+    }
+
+    @Override
+    public void removeAttributeModifier(LivingEntity entity, EntityAttribute attribute, EntityAttributeModifier modifier) {
+        AttributeInstance instance = getAttributeInstance(entity, attribute);
+        if (instance == null)
+            return;
+
+        AttributeModifier attributeModifier = new AttributeModifier(
+                modifier.getUuid(),
+                modifier.getName(),
+                modifier.getAmount(),
+                modifier.getOperation().ordinal()
+        );
+        instance.c(attributeModifier);
+    }
+
     @Override
     public void setNoClip(Entity entity, boolean value) {
         ((CraftEntity) entity).getHandle().noclip = value;
@@ -255,5 +320,10 @@ public class MagicEntitiesV1_8 implements NMSMagicEntities {
     @Override
     public void setMobAI(Entity entity, boolean value) {
         setFromSpawner(entity, !value);
+    }
+
+    @Override
+    public void setGravity(Entity entity, boolean value) {
+        // No way to do this in 1.8
     }
 }

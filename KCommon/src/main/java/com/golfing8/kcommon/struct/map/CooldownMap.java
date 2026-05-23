@@ -2,6 +2,7 @@ package com.golfing8.kcommon.struct.map;
 
 import com.golfing8.kcommon.KCommon;
 import com.google.common.base.Preconditions;
+import lombok.Setter;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +11,7 @@ import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * Stores cooldown information for unique IDs.
@@ -19,6 +21,11 @@ public class CooldownMap<T> {
      * The map we store cooldowns in
      */
     private final ConcurrentHashMap<T, Long> backingMap;
+    /**
+     * A consumer for items finishing cooldown. Ran off thread.
+     */
+    @Setter
+    private Consumer<T> exitConsumer;
 
     /**
      * Creates a new cooldown map with no expiry task.
@@ -34,6 +41,7 @@ public class CooldownMap<T> {
      */
     public CooldownMap(Map<T, Long> backingMap) {
         this(KCommon.getInstance());
+        this.backingMap.putAll(backingMap);
     }
 
     /**
@@ -59,6 +67,9 @@ public class CooldownMap<T> {
 
         if (backingMap.get(id) <= System.currentTimeMillis()) {
             backingMap.remove(id);
+            if (exitConsumer != null) {
+                exitConsumer.accept(id);
+            }
             return false;
         }
         return true;
@@ -73,7 +84,11 @@ public class CooldownMap<T> {
     public boolean clearCooldown(@NotNull T id) {
         Preconditions.checkNotNull(id, "ID cannot be null");
         Long cooldownTime = backingMap.remove(id);
-        return cooldownTime != null && cooldownTime > System.currentTimeMillis();
+        boolean cleared = cooldownTime != null && cooldownTime > System.currentTimeMillis();
+        if (cleared && exitConsumer != null) {
+            exitConsumer.accept(id);
+        }
+        return cleared;
     }
 
     /**
@@ -101,6 +116,10 @@ public class CooldownMap<T> {
         Preconditions.checkNotNull(id, "ID cannot be null");
         Preconditions.checkArgument(durationMillis >= 0, "Duration must be non-negative");
 
+        // If the ID was on cooldown but currently isn't, run the exit consumer.
+        if (exitConsumer != null && backingMap.containsKey(id) && !isOnCooldown(id)) {
+            exitConsumer.accept(id);
+        }
         backingMap.put(id, System.currentTimeMillis() + durationMillis);
     }
 
@@ -142,7 +161,15 @@ public class CooldownMap<T> {
      * Purges all cooldowns that have expired.
      */
     public void purgeStaleCooldowns() {
-        this.backingMap.entrySet().removeIf(next -> System.currentTimeMillis() >= next.getValue());
+        this.backingMap.entrySet().removeIf(next -> {
+            if (System.currentTimeMillis() >= next.getValue()) {
+                if (this.exitConsumer != null) {
+                    this.exitConsumer.accept(next.getKey());
+                }
+                return true;
+            }
+            return false;
+        });
     }
 
     /**

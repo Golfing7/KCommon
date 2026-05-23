@@ -11,7 +11,6 @@ import io.papermc.paper.registry.data.dialog.action.DialogAction;
 @SuppressWarnings("UnstableApiUsage")
 public class KDialogAction {
 
-
     /**
      * Creates a dialog action instance from this KDialogAction instance
      *

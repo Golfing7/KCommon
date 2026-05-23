@@ -3,18 +3,24 @@ package com.golfing8.kcommon.nms.unknown.access;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.golfing8.kcommon.nms.access.NMSMagicEntities;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
+import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.EntityData;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.VoxelShape;
+
+import java.util.function.Consumer;
 
 /**
  * API agnostic entity access
@@ -69,6 +75,11 @@ public class MagicEntities implements NMSMagicEntities {
     }
 
     @Override
+    public <T extends Entity> T spawn(Location location, Class<T> clazz, Consumer<? super T> spawnConsumer) {
+        return location.getWorld().spawn(location, clazz, spawnConsumer);
+    }
+
+    @Override
     public void setLoadChunks(Entity entity, boolean value) {
         //Couldn't find any field to match the v1_8 equivalent :/
     }
@@ -101,6 +112,68 @@ public class MagicEntities implements NMSMagicEntities {
         return true;
     }
 
+    /**
+     * Translates the KCommon EntityAttribute to a bukkit attribute
+     *
+     * @param entityAttribute the entity attribute
+     * @return the attribute
+     */
+    public static Attribute translateAttribute(EntityAttribute entityAttribute) {
+        Attribute instance = null;
+        switch (entityAttribute) {
+            case GENERIC_ATTACK_DAMAGE:
+                instance = getAttributeWithNameContaining("attack_damage");
+                break;
+            case GENERIC_MOVEMENT_SPEED:
+                instance = getAttributeWithNameContaining("movement_speed");
+                break;
+            case GENERIC_KNOCKBACK_RESISTANCE:
+                instance = getAttributeWithNameContaining("knockback_resistance");
+                break;
+            case GENERIC_MAX_HEALTH:
+                instance = getAttributeWithNameContaining("max_health");
+                break;
+            case GENERIC_LUCK:
+                instance = getAttributeWithNameContaining("luck");
+                break;
+            case GENERIC_ARMOR:
+                instance = getAttributeWithNameEnding("armor");
+                break;
+            case GENERIC_ATTACK_SPEED:
+                instance = getAttributeWithNameContaining("attack_speed");
+                break;
+            case GENERIC_FLYING_SPEED:
+                instance = getAttributeWithNameContaining("flying_speed");
+                break;
+            case GENERIC_FOLLOW_RANGE:
+                instance = getAttributeWithNameContaining("follow_range");
+                break;
+            case GENERIC_ARMOR_TOUGHNESS:
+                instance = getAttributeWithNameContaining("armor_toughness");
+                break;
+            case GENERIC_ATTACK_KNOCKBACK:
+                instance = getAttributeWithNameContaining("attack_knockback");
+                break;
+            case HORSE_JUMP_STRENGTH:
+                instance = getAttributeWithNameContaining("jump_strength");
+                break;
+            case ZOMBIE_SPAWN_REINFORCEMENTS:
+                instance = getAttributeWithNameContaining("spawn_reinforcements");
+                break;
+            case GRAVITY:
+                instance = getAttributeWithNameContaining("gravity");
+                break;
+            default:
+                for (String name : entityAttribute.getOldNames()) {
+                    instance = getAttributeWithNameContaining(name);
+                    if (instance != null)
+                        break;
+                }
+                break;
+        }
+        return instance;
+    }
+
     private static Attribute getAttributeWithNameContaining(String key) {
         String lcKey = key.toLowerCase();
         return Registry.ATTRIBUTE.stream().filter(attr -> attr.getKey().getKey().toLowerCase().contains(lcKey)).findFirst().orElse(null);
@@ -113,59 +186,41 @@ public class MagicEntities implements NMSMagicEntities {
 
     @Override
     public void setAttribute(LivingEntity entity, EntityAttribute attribute, double value) {
-        AttributeInstance instance = null;
-        switch (attribute) {
-            case GENERIC_ATTACK_DAMAGE:
-                instance = entity.getAttribute(getAttributeWithNameContaining("attack_damage"));
-                break;
-            case GENERIC_MOVEMENT_SPEED:
-                instance = entity.getAttribute(getAttributeWithNameContaining("movement_speed"));
-                break;
-            case GENERIC_KNOCKBACK_RESISTANCE:
-                instance = entity.getAttribute(getAttributeWithNameContaining("knockback_resistance"));
-                break;
-            case GENERIC_MAX_HEALTH:
-                instance = entity.getAttribute(getAttributeWithNameContaining("max_health"));
-                break;
-            case GENERIC_LUCK:
-                instance = entity.getAttribute(getAttributeWithNameContaining("luck"));
-                break;
-            case GENERIC_ARMOR:
-                instance = entity.getAttribute(getAttributeWithNameEnding("armor"));
-                break;
-            case GENERIC_ATTACK_SPEED:
-                instance = entity.getAttribute(getAttributeWithNameContaining("attack_speed"));
-                break;
-            case GENERIC_FLYING_SPEED:
-                instance = entity.getAttribute(getAttributeWithNameContaining("flying_speed"));
-                break;
-            case GENERIC_FOLLOW_RANGE:
-                instance = entity.getAttribute(getAttributeWithNameContaining("follow_range"));
-                break;
-            case GENERIC_ARMOR_TOUGHNESS:
-                instance = entity.getAttribute(getAttributeWithNameContaining("armor_toughness"));
-                break;
-            case GENERIC_ATTACK_KNOCKBACK:
-                instance = entity.getAttribute(getAttributeWithNameContaining("attack_knockback"));
-                break;
-            case HORSE_JUMP_STRENGTH:
-                instance = entity.getAttribute(getAttributeWithNameContaining("jump_strength"));
-                break;
-            case ZOMBIE_SPAWN_REINFORCEMENTS:
-                instance = entity.getAttribute(getAttributeWithNameContaining("spawn_reinforcements"));
-                break;
-            case GRAVITY:
-                instance = entity.getAttribute(getAttributeWithNameContaining("gravity"));
-                break;
-            default:
-                Attribute attr = getAttributeWithNameContaining(attribute.toString());
-                if (attr != null)
-                    instance = entity.getAttribute(attr);
-                break;
-        }
+        AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
 
         if (instance != null)
             instance.setBaseValue(value);
+    }
+
+    @Override
+    public void addAttributeModifier(LivingEntity entity, EntityAttribute attribute, EntityAttributeModifier modifier) {
+        AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
+
+        if (instance != null) {
+            AttributeModifier attributeModifier = new AttributeModifier(
+                    NamespacedKey.fromString(modifier.getUuid().toString()),
+                    modifier.getAmount(),
+                    AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
+                    modifier.getSlot() == null ? EquipmentSlotGroup.ANY : modifier.getSlot().getGroup()
+            );
+            instance.removeModifier(attributeModifier);
+            instance.addTransientModifier(attributeModifier);
+        }
+    }
+
+    @Override
+    public void removeAttributeModifier(LivingEntity entity, EntityAttribute attribute, EntityAttributeModifier modifier) {
+        AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
+
+        if (instance != null) {
+            AttributeModifier attributeModifier = new AttributeModifier(
+                    NamespacedKey.fromString(modifier.getUuid().toString()),
+                    modifier.getAmount(),
+                    AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
+                    modifier.getSlot() == null ? EquipmentSlotGroup.ANY : modifier.getSlot().getGroup()
+            );
+            instance.removeModifier(attributeModifier);
+        }
     }
 
     @Override
@@ -192,5 +247,10 @@ public class MagicEntities implements NMSMagicEntities {
     public void setMobAI(Entity entity, boolean value) {
         Mob mob = (Mob) entity;
         mob.setAware(value);
+    }
+
+    @Override
+    public void setGravity(Entity entity, boolean value) {
+        entity.setGravity(value);
     }
 }

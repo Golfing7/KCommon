@@ -56,7 +56,6 @@ gradle.projectsEvaluated {
     //   They are excluded to avoid Javadoc errors due to NMS references that javadoc can't handle
     val exportedProjects = listOf(
         project(":KCommon"),
-        project(":DialogMenus"),
         project(":NMS"),
     )
 

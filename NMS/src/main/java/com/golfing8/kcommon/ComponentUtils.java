@@ -70,7 +70,7 @@ public class ComponentUtils {
         if (message == null)
             return null;
 
-        return miniMessage.deserialize(processLine(message)).decoration(TextDecoration.ITALIC, false);
+        return miniMessage.deserialize(processLine(message));
     }
 
     /**

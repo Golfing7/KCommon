@@ -7,6 +7,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * A config type adapter for Component objects.
+ */
 public class CAComponent implements ConfigAdapter<Component> {
     @Override
     public Class<Component> getAdaptType() {
