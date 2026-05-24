@@ -661,6 +661,8 @@ public final class MenuBuilder {
         for (Pair<MenuLayoutShape, List<ChancedReference<ItemStack>>> shapeListPair : shapeCreation) {
             for (MenuCoordinate coordinate : shapeListPair.getA().getInRange()) {
                 int slot = MenuUtils.getSlotFromCartCoords(this.menuShapeType, coordinate.getX(), coordinate.getY());
+                if (slot < 0)
+                    continue;
 
                 ItemStack found = null;
                 while (found == null) {
@@ -684,7 +686,11 @@ public final class MenuBuilder {
 
         otherGUIItems.forEach((key, item) -> {
             item.getSlots().forEach(coordinate -> {
-                menu.setItemAt(coordinate.getX(), coordinate.getY(), item.getItem().buildFromTemplate(placeholderTarget));
+                int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, coordinate.getX(), coordinate.getY());
+                if (slot < 0)
+                    return;
+
+                menu.setItemAt(slot, item.getItem().buildFromTemplate(placeholderTarget));
             });
         });
 
@@ -710,6 +716,9 @@ public final class MenuBuilder {
                 if (coordinate == null)
                     throw new NullPointerException("Coordinate is null for special item with key " + key + "! Did you forget to set its slot in the config?");
                 int slot = MenuUtils.getSlotFromCartCoords(menuShapeType, coordinate.getX(), coordinate.getY());
+                if (slot < 0)
+                    return;
+
                 this.addAction(slot, specialBinding.getValue());
                 this.setAt(slot,
                         guiItem.getItem().buildFromTemplate(placeholderTarget));
@@ -718,6 +727,9 @@ public final class MenuBuilder {
         }
 
         for (Map.Entry<Integer, ItemStack> items : specificItems.entrySet()) {
+            if (items.getKey() < 0)
+                continue;
+
             menu.setItemAt(items.getKey(), items.getValue());
         }
     }

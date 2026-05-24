@@ -257,6 +257,9 @@ public abstract class MenuAbstract implements Menu {
 
         item.getSlots().forEach(coordinate -> {
             int slot = MenuUtils.getSlotFromCartCoords(getMenuShape().getType(), coordinate.getX(), coordinate.getY());
+            if (slot < 0)
+                return;
+
             this.setItemAt(slot, item.getItem().buildFromTemplate());
         });
     }
