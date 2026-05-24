@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * An abstract plugin that uses this library.
@@ -264,6 +265,10 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
                     } catch (Throwable ex) {
                         throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), ex);
                     }
+                } catch (Throwable thr) {
+                    // If the module fails to initialize, just skip it.
+                    getLogger().log(Level.SEVERE, "Failed to initialize module " + info.name() + "! It will be skipped!", thr);
+                    return;
                 }
             }
 
