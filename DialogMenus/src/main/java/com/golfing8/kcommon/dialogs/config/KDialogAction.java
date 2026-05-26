@@ -1,6 +1,9 @@
 package com.golfing8.kcommon.dialogs.config;
 
+import com.golfing8.kcommon.config.adapter.CASerializable;
+import com.golfing8.kcommon.dialogs.KDialogElement;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An adapter for working with {@link io.papermc.paper.registry.data.dialog.action.DialogAction} in KCommon.
@@ -9,14 +12,11 @@ import io.papermc.paper.registry.data.dialog.action.DialogAction;
  * </p>
  */
 @SuppressWarnings("UnstableApiUsage")
-public class KDialogAction {
+public class KDialogAction implements CASerializable, KDialogElement<DialogAction> {
+    private @Nullable String commandTemplate;
 
-    /**
-     * Creates a dialog action instance from this KDialogAction instance
-     *
-     * @return the instance
-     */
-    public DialogAction toDialogAction() {
+    @Override
+    public DialogAction toComponent() {
         return null;
     }
 }
