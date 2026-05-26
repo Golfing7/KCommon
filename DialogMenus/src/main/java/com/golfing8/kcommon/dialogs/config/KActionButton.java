@@ -1,7 +1,11 @@
 package com.golfing8.kcommon.dialogs.config;
 
 import com.golfing8.kcommon.config.adapter.CASerializable;
+import com.golfing8.kcommon.dialogs.KDialogElement;
 import io.papermc.paper.registry.data.dialog.ActionButton;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,18 +16,17 @@ import org.jetbrains.annotations.Nullable;
  * </p>
  */
 @SuppressWarnings("UnstableApiUsage")
-public class KActionButton implements CASerializable {
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class KActionButton implements CASerializable, KDialogElement<ActionButton> {
     private Component label;
     private @Nullable Component tooltip;
     private int width = 1;
     private @Nullable KDialogAction dialogAction;
 
-    /**
-     * Builds an action button instance from this KActionButton instance
-     *
-     * @return the built action button
-     */
-    public ActionButton toActionButton() {
-        return ActionButton.create(label, tooltip, width, dialogAction != null ? dialogAction.toDialogAction() : null);
+    @Override
+    public ActionButton toComponent() {
+        return ActionButton.create(label, tooltip, width, dialogAction != null ? dialogAction.toComponent() : null);
     }
 }

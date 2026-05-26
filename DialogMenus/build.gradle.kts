@@ -15,6 +15,7 @@ repositories {
 
 dependencies {
     compileOnly(project(":KCommon"))
+    compileOnly(project(":NMS"))
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 }
 

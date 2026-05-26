@@ -2,6 +2,9 @@ package com.golfing8.kcommon.dialogs.config;
 
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.dialogs.KDialogElement;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -11,6 +14,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A KCommon object representing a click event
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class KClickEvent implements CASerializable, KDialogElement<ClickEvent> {
     private @Nullable String url;
     private @Nullable String file;
@@ -18,8 +24,6 @@ public class KClickEvent implements CASerializable, KDialogElement<ClickEvent> {
     private @Nullable String runCommand;
     private @Nullable String suggestCommand;
     private int page = -1;
-    @Setter
-    private transient ClickCallback<Player> callback;
 
     @Override
     public ClickEvent toComponent() {
@@ -35,6 +39,8 @@ public class KClickEvent implements CASerializable, KDialogElement<ClickEvent> {
             return ClickEvent.runCommand(runCommand);
         } else if (suggestCommand != null) {
             return ClickEvent.suggestCommand(suggestCommand);
+        } else {
+            throw new IllegalStateException("No selected action!");
         }
     }
 }
