@@ -1,8 +1,6 @@
 package com.golfing8.kcommon.dialogs;
 
 import com.golfing8.kcommon.KCommon;
-import io.papermc.paper.dialog.Dialog;
-import io.papermc.paper.registry.keys.DialogKeys;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.ApiStatus;
 

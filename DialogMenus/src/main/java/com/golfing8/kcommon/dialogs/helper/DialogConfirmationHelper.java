@@ -7,7 +7,6 @@ import com.golfing8.kcommon.dialogs.config.KDialog;
 import com.golfing8.kcommon.dialogs.config.KDialogAction;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
 import io.papermc.paper.dialog.Dialog;
-import io.papermc.paper.registry.data.dialog.ActionButton;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
@@ -33,6 +32,14 @@ public class DialogConfirmationHelper {
         return confirmation(player, DEFAULT_YES, DEFAULT_NO);
     }
 
+    /**
+     * Creates a confirmation promise for the player
+     *
+     * @param player the player
+     * @param yes the 'yes' title
+     * @param no the 'no' title
+     * @return the promise
+     */
     public static Promise<Boolean> confirmation(Player player, Component yes, Component no) {
         Promise<Boolean> result = Promise.empty();
         KActionButton yesAction = new KActionButton(

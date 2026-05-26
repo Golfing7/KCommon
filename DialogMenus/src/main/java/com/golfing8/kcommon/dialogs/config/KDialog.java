@@ -5,7 +5,6 @@ import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.dialogs.KDialogElement;
 import io.papermc.paper.dialog.Dialog;
 import io.papermc.paper.registry.RegistryKey;
-import io.papermc.paper.registry.data.dialog.ActionButton;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import io.papermc.paper.registry.keys.DialogKeys;
 import io.papermc.paper.registry.set.RegistrySet;
@@ -59,6 +58,9 @@ public class KDialog implements CASerializable, KDialogElement<Dialog> {
         });
     }
 
+    /**
+     * A wrapper for a multi action dialog
+     */
     @Getter
     @Data
     @NoArgsConstructor
@@ -69,6 +71,9 @@ public class KDialog implements CASerializable, KDialogElement<Dialog> {
         private int columns = 1;
     }
 
+    /**
+     * A wrapper for a confirmation dialog
+     */
     @Getter
     @Data
     @NoArgsConstructor

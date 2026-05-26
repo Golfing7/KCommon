@@ -5,10 +5,7 @@ import com.golfing8.kcommon.dialogs.KDialogElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.event.ClickEvent;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 /**
