@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.dialogs.config;
 
+import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.dialogs.KDialogElement;
@@ -13,8 +14,10 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,30 +29,25 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 public class KDialog implements CASerializable, KDialogElement<Dialog> {
-    private NamespacedKey key;
+    private @NotNull KDialogBase base = new KDialogBase(ComponentUtils.toComponent("KCommon Dialog"), null, true, Collections.emptyList());
     private @Nullable KActionButton notice;
     private @Nullable List<KDialog> dialogs;
     private @Nullable MultiAction multiAction;
     private @Nullable Confirmation confirmation;
 
     @Override
-    public void onDeserialize() {
-        if (key == null) {
-            key = new NamespacedKey(KCommon.getInstance(), UUID.randomUUID().toString());
-        }
-    }
-
-    @Override
     public Dialog toComponent() {
         return Dialog.create(factory -> {
-            var builder = factory.copyFrom(DialogKeys.create(key));
+            var builder = factory.empty();
+            builder.base(base.toComponent());
             if (notice != null) {
                 builder.type(DialogType.notice(notice.toComponent()));
             } else if (dialogs != null) {
                 builder.type(DialogType.dialogList(RegistrySet.keySetFromValues(RegistryKey.DIALOG, dialogs.stream().map(KDialog::toComponent).toList())).build());
             } else if (multiAction != null) {
                 builder.type(DialogType.multiAction(multiAction.getActions().stream().map(KActionButton::toComponent).toList(),
-                        multiAction.getExitButton().toComponent(), multiAction.getColumns()));
+                        multiAction.getExitButton() != null ? multiAction.getExitButton().toComponent() : null,
+                        multiAction.getColumns()));
             } else if (confirmation != null) {
                 builder.type(DialogType.confirmation(confirmation.getYes().toComponent(), confirmation.getNo().toComponent()));
             } else {
@@ -61,7 +59,6 @@ public class KDialog implements CASerializable, KDialogElement<Dialog> {
     /**
      * A wrapper for a multi action dialog
      */
-    @Getter
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -74,7 +71,6 @@ public class KDialog implements CASerializable, KDialogElement<Dialog> {
     /**
      * A wrapper for a confirmation dialog
      */
-    @Getter
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

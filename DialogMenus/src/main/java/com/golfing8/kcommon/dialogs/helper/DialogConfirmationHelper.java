@@ -5,6 +5,7 @@ import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.dialogs.config.KActionButton;
 import com.golfing8.kcommon.dialogs.config.KDialog;
 import com.golfing8.kcommon.dialogs.config.KDialogAction;
+import com.golfing8.kcommon.dialogs.config.KDialogBase;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
 import io.papermc.paper.dialog.Dialog;
 import lombok.experimental.UtilityClass;
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
 import java.util.UUID;
 
 /**
@@ -28,8 +30,8 @@ public class DialogConfirmationHelper {
      * @param player the player
      * @return the promise of completion
      */
-    public static Promise<Boolean> confirmation(Player player) {
-        return confirmation(player, DEFAULT_YES, DEFAULT_NO);
+    public static Promise<Boolean> confirmation(Player player, Component menuTitle) {
+        return confirmation(player, menuTitle, DEFAULT_YES, DEFAULT_NO);
     }
 
     /**
@@ -40,7 +42,7 @@ public class DialogConfirmationHelper {
      * @param no the 'no' title
      * @return the promise
      */
-    public static Promise<Boolean> confirmation(Player player, Component yes, Component no) {
+    public static Promise<Boolean> confirmation(Player player, Component menuTitle, Component yes, Component no) {
         Promise<Boolean> result = Promise.empty();
         KActionButton yesAction = new KActionButton(
                 yes,
@@ -56,7 +58,8 @@ public class DialogConfirmationHelper {
                 new KDialogAction(null, null, (response, audience) -> result.supply(false))
         );
 
-        KDialog kDialog = new KDialog(new NamespacedKey(KCommon.getInstance(), UUID.randomUUID().toString()), null, null, null, new KDialog.Confirmation(yesAction, noAction));
+        KDialogBase dialogBase = new KDialogBase(menuTitle, null, true, Collections.emptyList());
+        KDialog kDialog = new KDialog(dialogBase, null, null, null, new KDialog.Confirmation(yesAction, noAction));
         Dialog dialog = kDialog.toComponent();
         player.showDialog(dialog);
         return result;
