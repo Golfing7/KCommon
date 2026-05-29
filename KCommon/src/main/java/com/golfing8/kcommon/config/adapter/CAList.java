@@ -28,14 +28,25 @@ public class CAList implements ConfigAdapter<List> {
         Type actualType = type.getGenericTypes().get(0);
         ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(actualType);
         List toReturn = Reflection.instantiateOrGet(type.getType(), ArrayList::new);
-        List primitive = entry.unwrap();
-        if (adapter != null) {
-            for (Object val : primitive) {
-                toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(val), new FieldType(actualType)));
+        Object obj = entry.unwrap();
+        if (obj instanceof List) {
+            List primitive = (List) obj;
+            if (adapter != null) {
+                for (Object val : primitive) {
+                    toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(val), new FieldType(actualType)));
+                }
+            } else {
+                toReturn.addAll(primitive);
             }
         } else {
-            toReturn.addAll(primitive);
+            // Maybe the item is singleton?
+            if (adapter != null) {
+                toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(obj), new FieldType(actualType)));
+            } else {
+                toReturn.add(obj);
+            }
         }
+
         return toReturn;
     }
 

@@ -26,19 +26,33 @@ public class CASet implements ConfigAdapter<Set> {
         Type actualType = type.getGenericTypes().get(0);
         ConfigAdapter adapter = ConfigTypeRegistry.findAdapter(actualType);
         Set toReturn = Reflection.instantiateOrGet(type.getType(), HashSet::new);
+        Object obj = entry.unwrap();
         if (adapter != null) {
             // Perform useful macros.
-            List primitive = entry.unwrap();
-            if (actualType instanceof Class && ((Class) actualType).isEnum() && !primitive.isEmpty() && primitive.get(0).toString().equals("@universe")) {
-                toReturn.addAll(Arrays.asList(((Class) actualType).getEnumConstants()));
+            if (obj instanceof List) {
+                List primitive = (List) obj;
+                if (actualType instanceof Class && ((Class) actualType).isEnum() && !primitive.isEmpty() && primitive.get(0).toString().equals("@universe")) {
+                    toReturn.addAll(Arrays.asList(((Class) actualType).getEnumConstants()));
+                } else {
+                    for (Object val : primitive) {
+                        toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(val), new FieldType(actualType)));
+                    }
+                }
             } else {
-                for (Object val : primitive) {
-                    toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(val), new FieldType(actualType)));
+                if (actualType instanceof Class && ((Class) actualType).isEnum() && obj.toString().equals("@universe")) {
+                    toReturn.addAll(Arrays.asList(((Class) actualType).getEnumConstants()));
+                } else {
+                    toReturn.add(adapter.toPOJO(ConfigPrimitive.ofTrusted(obj), new FieldType(actualType)));
                 }
             }
             return toReturn;
+        } else {
+            if (obj instanceof List) {
+                toReturn.addAll((List) obj);
+            } else {
+                toReturn.add(obj);
+            }
         }
-        toReturn.addAll((List) entry.getPrimitive());
         return toReturn;
     }
 
