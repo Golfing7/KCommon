@@ -1,25 +1,20 @@
 package com.golfing8.kcommon.dialogs.config;
 
 import com.golfing8.kcommon.ComponentUtils;
-import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.dialogs.KDialogElement;
 import io.papermc.paper.dialog.Dialog;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
-import io.papermc.paper.registry.keys.DialogKeys;
 import io.papermc.paper.registry.set.RegistrySet;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * A KCommon object representing an Adventure dialog.

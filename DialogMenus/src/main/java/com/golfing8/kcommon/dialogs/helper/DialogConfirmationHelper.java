@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.dialogs.helper;
 
 import com.golfing8.kcommon.ComponentUtils;
-import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.dialogs.config.KActionButton;
 import com.golfing8.kcommon.dialogs.config.KDialog;
 import com.golfing8.kcommon.dialogs.config.KDialogAction;
@@ -10,11 +9,9 @@ import com.golfing8.kcommon.struct.helper.promise.Promise;
 import io.papermc.paper.dialog.Dialog;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
-import java.util.UUID;
 
 /**
  * A simple utility class for a player

@@ -25,6 +25,7 @@ public class KDialogBody implements CASerializable, KDialogElement<DialogBody> {
     private boolean tooltip = false;
     private int width = 64;
     private int height = 64;
+
     @Override
     public DialogBody toComponent() {
         if (item != null) {
