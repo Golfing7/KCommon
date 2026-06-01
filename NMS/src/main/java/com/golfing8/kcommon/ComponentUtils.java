@@ -3,6 +3,7 @@ package com.golfing8.kcommon;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -33,22 +34,23 @@ public class ComponentUtils {
     public static final BukkitAudiences bukkitAudiences = BukkitAudiences.create(Bukkit.getPluginManager().getPlugin("KCommon"));
 
     static {
-        legacyColorMap.put("0", "<reset><black>");
-        legacyColorMap.put("1", "<reset><dark_blue>");
-        legacyColorMap.put("2", "<reset><dark_green>");
-        legacyColorMap.put("3", "<reset><dark_aqua>");
-        legacyColorMap.put("4", "<reset><dark_red>");
-        legacyColorMap.put("5", "<reset><dark_purple>");
-        legacyColorMap.put("6", "<reset><gold>");
-        legacyColorMap.put("7", "<reset><gray>");
-        legacyColorMap.put("8", "<reset><dark_gray>");
-        legacyColorMap.put("9", "<reset><blue>");
-        legacyColorMap.put("a", "<reset><green>");
-        legacyColorMap.put("b", "<reset><aqua>");
-        legacyColorMap.put("c", "<reset><red>");
-        legacyColorMap.put("d", "<reset><light_purple>");
-        legacyColorMap.put("e", "<reset><yellow>");
-        legacyColorMap.put("f", "<reset><white>");
+        String resetFormat = "<!bold><!italic><!underlined><!strikethrough><!obfuscated>";
+        legacyColorMap.put("0", resetFormat + "<black>");
+        legacyColorMap.put("1", resetFormat + "<dark_blue>");
+        legacyColorMap.put("2", resetFormat + "<dark_green>");
+        legacyColorMap.put("3", resetFormat + "<dark_aqua>");
+        legacyColorMap.put("4", resetFormat + "<dark_red>");
+        legacyColorMap.put("5", resetFormat + "<dark_purple>");
+        legacyColorMap.put("6", resetFormat + "<gold>");
+        legacyColorMap.put("7", resetFormat + "<gray>");
+        legacyColorMap.put("8", resetFormat + "<dark_gray>");
+        legacyColorMap.put("9", resetFormat + "<blue>");
+        legacyColorMap.put("a", resetFormat + "<green>");
+        legacyColorMap.put("b", resetFormat + "<aqua>");
+        legacyColorMap.put("c", resetFormat + "<red>");
+        legacyColorMap.put("d", resetFormat + "<light_purple>");
+        legacyColorMap.put("e", resetFormat + "<yellow>");
+        legacyColorMap.put("f", resetFormat + "<white>");
         legacyColorMap.put("n", "<underlined>");
         legacyColorMap.put("m", "<strikethrough>");
         legacyColorMap.put("k", "<obfuscated>");
@@ -69,7 +71,11 @@ public class ComponentUtils {
         if (message == null)
             return null;
 
-        return miniMessage.deserialize(processLine(message));
+        Component deserialize = miniMessage.deserialize(processLine(message));
+        if (!deserialize.hasDecoration(TextDecoration.ITALIC)) {
+            return deserialize.decoration(TextDecoration.ITALIC, false);
+        }
+        return deserialize;
     }
 
     /**
