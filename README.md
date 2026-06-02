@@ -8,6 +8,7 @@ The purpose of this core is to provide an easy-to-use module based plugin struct
 Modules are the foundation of the KCommon library.
 Each module should represent a distinct feature of a plugin.
 In fact, each module could be thought of as its *own* plugin.
+Read more about modules in [Module Documentation](KCommon/src/main/java/com/golfing8/kcommon/module/README.md).
 
 ## Building
 
