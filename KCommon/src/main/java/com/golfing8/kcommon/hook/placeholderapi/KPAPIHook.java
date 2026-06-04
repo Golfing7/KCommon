@@ -9,7 +9,6 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ public class KPAPIHook extends PlaceholderExpansion implements Relational {
      *
      * @param provider the provider to register.
      */
-    public void registerProvider(@Nonnull PlaceholderProvider provider) {
+    public void registerProvider(@NotNull PlaceholderProvider provider) {
         this.providerMap.put(provider.getPlaceholderKey(), provider);
     }
 
@@ -42,7 +41,7 @@ public class KPAPIHook extends PlaceholderExpansion implements Relational {
      *
      * @param provider the provider to unregister.
      */
-    public void unregisterProvider(@Nonnull PlaceholderProvider provider) {
+    public void unregisterProvider(@NotNull PlaceholderProvider provider) {
         this.providerMap.remove(provider.getPlaceholderKey());
     }
 

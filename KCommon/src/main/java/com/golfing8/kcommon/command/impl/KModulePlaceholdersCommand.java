@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
         aliases = "placeholder",
         description = "See available placeholders"
 )
-public class KModulePlaceholders extends KCommand {
+public class KModulePlaceholdersCommand extends KCommand {
     @Override
     protected void onRegister() {
         KCommon.getInstance().getLangConfig().addLanguageConstant("placeholders-command-none",

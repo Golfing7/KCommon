@@ -17,6 +17,8 @@ import com.golfing8.kcommon.struct.helper.terminable.TerminableConsumer;
 import com.golfing8.kcommon.struct.helper.terminable.composite.CompositeClosingException;
 import com.golfing8.kcommon.struct.helper.terminable.composite.CompositeTerminable;
 import com.golfing8.kcommon.struct.permission.PermissionContext;
+import com.golfing8.kcommon.struct.profiler.HighLowAverageProfiler;
+import com.golfing8.kcommon.struct.profiler.IMethodProfiler;
 import com.golfing8.kcommon.util.FileUtil;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
@@ -177,7 +179,13 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * destroyed after this module is disabled. This means that the module should register commands
      * every time {@link #onEnable()} is called.
      */
+    @Getter
     private final List<MCommand<?>> moduleCommands;
+    /**
+     * The module's profiler
+     */
+    @Getter
+    private final IMethodProfiler profiler;
     /**
      * Stores simple placeholders registered to this module.
      */
@@ -205,6 +213,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.logger = new ModuleLogger(this);
         this.permissionPrefix = plugin.getName() + "." + this.moduleName;
         this.moduleInfo = null;
+        this.profiler = new HighLowAverageProfiler(this.moduleName);
 
         // Try to register this module to the registry.
         if (Modules.moduleExists(this.getNamespacedKey())) {
@@ -238,6 +247,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         this.logger = new ModuleLogger(this);
         this.permissionPrefix = plugin.getName() + "." + this.moduleName;
         this.moduleInfo = info;
+        this.profiler = new HighLowAverageProfiler(this.moduleName);
 
         // Try to register this module to the registry.
         if (Modules.moduleExists(this.getNamespacedKey())) {
@@ -271,6 +281,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Initializes the module and begins the startup process for it.
      */
     public final void initialize() {
+        profiler.start("initialize");
         Modules.registerModule(this);
         if (getPlugin().getManifest().loadModule(this)) {
             if (!enable()) {
@@ -281,6 +292,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         } else {
             getLogger().info("Loaded and disabled module.");
         }
+        profiler.stop("initialize");
     }
 
     /**
@@ -295,36 +307,47 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             return false;
 
         try {
-            this.loadConfigs();
-            this.loadContainer();
-        } catch (Throwable thr) {
-            getLogger().log(Level.SEVERE, "Failed to load due to config error!", thr);
-            return false;
+            profiler.start("enable");
+            try {
+                profiler.start("loadConfigs");
+                this.loadConfigs();
+                profiler.stop("loadConfigs");
+                profiler.start("loadContainer");
+                this.loadContainer();
+                profiler.stop("loadContainer");
+            } catch (Throwable thr) {
+                getLogger().log(Level.SEVERE, "Failed to load due to config error!", thr);
+                return false;
+            }
+
+            //Register this module as a listener.
+            this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
+
+            this.prematureDisable = false;
+            try {
+                profiler.start("onEnable");
+                this.onEnable();
+                profiler.stop("onEnable");
+            } catch (Throwable thr) {
+                getLogger().log(Level.SEVERE, "Module failed to enable!", thr);
+                return false;
+            }
+
+            // It's possible that the implementation of onEnable called disable()
+            if (this.prematureDisable) {
+                return false;
+            }
+
+            // Add placeholder hook
+            this.plugin.getPlaceholderAPIHook().registerProvider(this);
+
+            // We should save the language config once more as it's possible the commands this feature registered added constants.
+            this.langConfig.save();
+            this.enabled = true;
+            return true;
+        } finally {
+            profiler.stop("enable");
         }
-
-        //Register this module as a listener.
-        this.getPlugin().getServer().getPluginManager().registerEvents(this, this.getPlugin());
-
-        this.prematureDisable = false;
-        try {
-            this.onEnable();
-        } catch (Throwable thr) {
-            getLogger().log(Level.SEVERE, "Module failed to enable!", thr);
-            return false;
-        }
-
-        // It's possible that the implementation of onEnable called disable()
-        if (this.prematureDisable) {
-            return false;
-        }
-
-        // Add placeholder hook
-        this.plugin.getPlaceholderAPIHook().registerProvider(this);
-
-        // We should save the language config once more as it's possible the commands this feature registered added constants.
-        this.langConfig.save();
-        this.enabled = true;
-        return true;
     }
 
     /**
@@ -350,62 +373,67 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
             return;
         }
 
-        //Save the lang config.
-        this.langConfig.save();
-
         try {
-            this.terminable.close();
-        } catch (CompositeClosingException exc) {
-            getLogger().log(Level.SEVERE, "Failed to close terminable!", exc);
-        }
-        try {
-            this.onDisable();
-        } catch (Throwable thr) {
-            getLogger().log(Level.SEVERE, "Module failed to disable!", thr);
-            return;
-        }
-        // If this module supports data managers, shut them down.
-        if (this instanceof DataManagerContainer) {
-            ((DataManagerContainer) this).shutdownDataManagers();
-        }
-        HandlerList.unregisterAll(this);
-
-        //Unregister all commands associated with this module.
-        this.moduleCommands.forEach(MCommand::unregister);
-        this.moduleCommands.clear();
-
-        //Unregister tasks, clone for concurrency.
-        new ArrayList<>(moduleTasks).forEach(runnable -> {
-            if (!runnable.isStarted())
-                return;
+            profiler.start("disable");
+            //Save the lang config.
+            this.langConfig.save();
 
             try {
-                runnable.cancel();
-            } catch (IllegalStateException ignored) {
-            } // Can be thrown if the runnable wasn't scheduled yet
-        });
+                this.terminable.close();
+            } catch (CompositeClosingException exc) {
+                getLogger().log(Level.SEVERE, "Failed to close terminable!", exc);
+            }
+            try {
+                this.onDisable();
+            } catch (Throwable thr) {
+                getLogger().log(Level.SEVERE, "Module failed to disable!", thr);
+                return;
+            }
+            // If this module supports data managers, shut them down.
+            if (this instanceof DataManagerContainer) {
+                ((DataManagerContainer) this).shutdownDataManagers();
+            }
+            HandlerList.unregisterAll(this);
 
-        //Unregister sub listeners.
-        this.subListeners.forEach(HandlerList::unregisterAll);
+            //Unregister all commands associated with this module.
+            this.moduleCommands.forEach(MCommand::unregister);
+            this.moduleCommands.clear();
 
-        //Unregister sub modules.
-        for (SubModule<?> module : new HashSet<>(this.subModules)) {
-            module.unregister();
+            //Unregister tasks, clone for concurrency.
+            new ArrayList<>(moduleTasks).forEach(runnable -> {
+                if (!runnable.isStarted())
+                    return;
+
+                try {
+                    runnable.cancel();
+                } catch (IllegalStateException ignored) {
+                } // Can be thrown if the runnable wasn't scheduled yet
+            });
+
+            //Unregister sub listeners.
+            this.subListeners.forEach(HandlerList::unregisterAll);
+
+            //Unregister sub modules.
+            for (SubModule<?> module : new HashSet<>(this.subModules)) {
+                module.unregister();
+            }
+
+            // Remove placeholder hook
+            this.plugin.getPlaceholderAPIHook().unregisterProvider(this);
+
+            //Clear some data structures.
+            this.subModules.clear();
+            this.subListeners.clear();
+            this.moduleTasks.clear();
+            this.moduleCommands.clear();
+            this.configWrapper.unregister();
+            this.relationalPlaceholders.clear();
+            this.placeholders.clear();
+            this.configs.clear();
+            this.enabled = false;
+        } finally {
+            profiler.stop("disable");
         }
-
-        // Remove placeholder hook
-        this.plugin.getPlaceholderAPIHook().unregisterProvider(this);
-
-        //Clear some data structures.
-        this.subModules.clear();
-        this.subListeners.clear();
-        this.moduleTasks.clear();
-        this.moduleCommands.clear();
-        this.configWrapper.unregister();
-        this.relationalPlaceholders.clear();
-        this.placeholders.clear();
-        this.configs.clear();
-        this.enabled = false;
     }
 
     /**
@@ -528,61 +556,66 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * @param loadValues if values should be loaded as well.
      */
     private MConfiguration loadConfig(Path configPath, boolean loadValues) {
-        YamlConfiguration source = new YamlConfiguration();
-
-        //Create the parent directory.
-        try {
-            Files.createDirectories(configPath.getParent());
-        } catch (IOException exc) {
-            throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
-        }
-
-        boolean defaultConfig = configPath.endsWith("config.yml");
-        // Test the new location for the resource, otherwise fallback on the old one.
         String resourcePath = "/" + getModuleName() + "/" + configPath.getFileName().toString();
-        if (this.plugin.getClass().getResource(resourcePath) == null) {
-            resourcePath = "/" + (defaultConfig ? moduleName + ".yml" : configPath.getFileName().toString());
-        }
+        try {
+            profiler.start("loadConfig_" + resourcePath);
+            YamlConfiguration source = new YamlConfiguration();
 
-        try (InputStream resource = this.plugin.getClass().getResourceAsStream(resourcePath)) {
-            ByteArrayOutputStream streamCloner = new ByteArrayOutputStream();
+            //Create the parent directory.
+            try {
+                Files.createDirectories(configPath.getParent());
+            } catch (IOException exc) {
+                throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
+            }
 
-            //Check that the resource exists
-            if (resource == null) {
-                if (Files.notExists(configPath))
-                    Files.createFile(configPath);
-            } else {
-                IOUtils.copy(resource, streamCloner);
-                if (Files.notExists(configPath)) {
-                    Files.write(configPath, streamCloner.toByteArray(), StandardOpenOption.CREATE);
+            boolean defaultConfig = configPath.endsWith("config.yml");
+            // Test the new location for the resource, otherwise fallback on the old one.
+            if (this.plugin.getClass().getResource(resourcePath) == null) {
+                resourcePath = "/" + (defaultConfig ? moduleName + ".yml" : configPath.getFileName().toString());
+            }
+
+            try (InputStream resource = this.plugin.getClass().getResourceAsStream(resourcePath)) {
+                ByteArrayOutputStream streamCloner = new ByteArrayOutputStream();
+
+                //Check that the resource exists
+                if (resource == null) {
+                    if (Files.notExists(configPath))
+                        Files.createFile(configPath);
+                } else {
+                    IOUtils.copy(resource, streamCloner);
+                    if (Files.notExists(configPath)) {
+                        Files.write(configPath, streamCloner.toByteArray(), StandardOpenOption.CREATE);
+                    }
+
+                    try {
+                        source.load(new InputStreamReader(new ByteArrayInputStream(streamCloner.toByteArray())));
+                    } catch (InvalidConfigurationException exc) {
+                        getLogger().log(Level.WARNING, String.format("Failed to load source config %s for module.",
+                                configPath.getFileName().toString()), exc);
+                    }
                 }
+            } catch (IOException exc) {
+                throw new RuntimeException(String.format("Failed to load config %s for module %s. Is it missing? (Checked under plugin %s)",
+                        configPath.getFileName().toString(),
+                        getModuleName(),
+                        getPlugin().getName()), exc);
+            }
 
-                try {
-                    source.load(new InputStreamReader(new ByteArrayInputStream(streamCloner.toByteArray())));
-                } catch (InvalidConfigurationException exc) {
-                    getLogger().log(Level.WARNING, String.format("Failed to load source config %s for module.",
-                            configPath.getFileName().toString()), exc);
+            MConfiguration toReturn = new MConfiguration(configPath, this);
+            toReturn.setSource(source);
+            toReturn.load();
+
+            if (loadValues) {
+                // Load with the config wrapper.
+                boolean modded = this.configWrapper.loadValues(toReturn);
+                if (modded) {
+                    toReturn.save();
                 }
             }
-        } catch (IOException exc) {
-            throw new RuntimeException(String.format("Failed to load config %s for module %s. Is it missing? (Checked under plugin %s)",
-                    configPath.getFileName().toString(),
-                    getModuleName(),
-                    getPlugin().getName()), exc);
+            return toReturn;
+        } finally {
+            profiler.stop("loadConfig_" + resourcePath);
         }
-
-        MConfiguration toReturn = new MConfiguration(configPath, this);
-        toReturn.setSource(source);
-        toReturn.load();
-
-        if (loadValues) {
-            // Load with the config wrapper.
-            boolean modded = this.configWrapper.loadValues(toReturn);
-            if (modded) {
-                toReturn.save();
-            }
-        }
-        return toReturn;
     }
 
     /**

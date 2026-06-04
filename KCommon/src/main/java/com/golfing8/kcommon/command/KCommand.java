@@ -15,6 +15,8 @@ import com.golfing8.kcommon.struct.helper.function.Numbers;
 import com.golfing8.kcommon.struct.permission.PermissionContext;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.struct.profiler.HighLowAverageProfiler;
+import com.golfing8.kcommon.struct.profiler.IMethodProfiler;
 import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.MapUtil;
 import com.golfing8.kcommon.util.StringUtil;
@@ -194,6 +196,11 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * A cached version of {@link #isExecutionImplemented()}
      */
     private Boolean executionImplemented;
+    /**
+     * The profiler of the command
+     */
+    @Getter
+    private IMethodProfiler profiler;
 
     /**
      * A constructor to initialize all fields with the {}
@@ -352,6 +359,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
             }
         }
 
+        this.profiler = new HighLowAverageProfiler("/" + getFullCommandChain());
         this.setupPermission();
         this.internalOnRegister();
     }
@@ -464,7 +472,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
             return null;
         }
 
+        profiler.start("buildArguments");
         var builtArgumentsPair = buildArguments(sender, label, args, true, verbose);
+        profiler.stop("buildArguments");
         if (builtArgumentsPair == null)
             return null;
         var builtArguments = builtArgumentsPair.getA();
@@ -472,7 +482,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         if (builtArguments.size() < commandArguments.size())
             return null;
 
+        profiler.start("buildFlagStates");
         Map<CommandFlag, TriState> flagStates = args.length > builtArgumentsPair.getB() ? buildFlagStates(Arrays.copyOfRange(args, builtArgumentsPair.getB(), args.length), false) : Collections.emptyMap();
+        profiler.stop("buildFlagStates");
         if (flagStates == null)
             return null;
 
@@ -807,7 +819,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * @param sender       the sender.
      * @param lastArgument the last argument provided in the command.
      */
-    private void handleHelpMessage(CommandSender sender, String lastArgument, int page) {
+    public void handleHelpMessage(CommandSender sender, String lastArgument, int page) {
         if (!canSee(sender)) {
             return;
         }
@@ -933,7 +945,9 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         }
 
         //Check for the command context.
+        profiler.start("buildContext");
         CommandContext builtContext = buildContext(sender, label, args, true);
+        profiler.stop("buildContext");
         if (builtContext == null) {
             return;
         }
@@ -943,7 +957,10 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         }
 
         this.lastExecutionTime = System.currentTimeMillis();
+
+        profiler.start("execute");
         this.execute(builtContext);
+        profiler.stop("execute");
     }
 
     /**
