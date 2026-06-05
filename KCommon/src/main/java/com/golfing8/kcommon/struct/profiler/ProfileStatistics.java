@@ -1,14 +1,21 @@
 package com.golfing8.kcommon.struct.profiler;
 
+import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.longs.LongList;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
+/**
+ * Contains the collected statistics for a profiler
+ */
 @Data
 public class ProfileStatistics {
+    private static final DecimalFormat NUM_FORMAT = new DecimalFormat("#.####");
     private final long samples;
     private final double average;
     private final long max;
@@ -21,6 +28,11 @@ public class ProfileStatistics {
     private final double stdDev;
     private final long[] data;
 
+    /**
+     * Gets a summary json of this object
+     *
+     * @return the summary
+     */
     public JsonObject getSummaryJson() {
         JsonObject object = new JsonObject();
         object.addProperty("samples", samples);
@@ -36,6 +48,32 @@ public class ProfileStatistics {
         return object;
     }
 
+    /**
+     * Converts the statistics into a placeholder container for use in a message
+     *
+     * @return the placeholder container
+     */
+    public PlaceholderContainer toPlaceholderContainer() {
+        return PlaceholderContainer.compileTrusted(
+                "SAMPLES", samples,
+                "AVERAGE", NUM_FORMAT.format(average),
+                "MAX", max,
+                "MIN", min,
+                "SUM", sum,
+                "AVERAGE_95", NUM_FORMAT.format(average95),
+                "MAX_95", max95,
+                "MIN_95", min95,
+                "SUM_95", sum95,
+                "STD_DEV", NUM_FORMAT.format(stdDev)
+        );
+    }
+
+    /**
+     * Constructs statistics based on the list of samples
+     *
+     * @param samples the samples
+     * @return the statistics
+     */
     public static ProfileStatistics construct(LongList samples) {
         long sum = 0L;
         long min = Long.MAX_VALUE, max = Long.MIN_VALUE;

@@ -38,6 +38,11 @@ public class HighLowAverageProfiler implements IMethodProfiler {
         data.clear();
     }
 
+    @Override
+    public void resetData(String key) {
+        data.remove(key);
+    }
+
     private void dumpTo(Consumer<String> consumer) {
         for (String key : data.keySet()) {
             LongList values = data.get(key);

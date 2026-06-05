@@ -19,6 +19,12 @@ public interface IMethodProfiler {
     void resetData();
 
     /**
+     * Resets profiler data
+     * @param key the key to reset
+     */
+    void resetData(String key);
+
+    /**
      * Starts a profiler on a string key
      * @param key The key to start a profile on
      */
