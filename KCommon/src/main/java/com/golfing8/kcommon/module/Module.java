@@ -478,7 +478,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
 
         this.configWrapper.setConfigMappingEnabled(true);
         this.configWrapper.setRequireAnnotation(true);
+        profiler.start("initConfig");
         this.configWrapper.initConfig();
+        profiler.stop("initConfig");
 
         //Create the parent directory.
         this.dataFolder = Paths.get(plugin.getDataFolder().getPath(), moduleName);
@@ -535,14 +537,18 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         }
 
         //First, load the language config.
+        profiler.start("loadLangConfig");
         Path langPath = Paths.get(plugin.getDataFolder().getPath(), moduleName, "lang.yml");
         this.langConfig = new LangConfig(langPath);
         this.langConfig.load();
+        profiler.stop("loadLangConfig");
 
         // Load extra lang sources.
         if (this.moduleInfo != null) {
             for (Class<? extends LangConfigEnum> source : this.moduleInfo.langSources()) {
+                profiler.start("loadLangEnum");
                 this.loadLangEnum(source);
+                profiler.stop("loadLangEnum");
             }
         }
 
@@ -557,65 +563,66 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      */
     private MConfiguration loadConfig(Path configPath, boolean loadValues) {
         String resourcePath = "/" + getModuleName() + "/" + configPath.getFileName().toString();
+        profiler.start("loadConfig_" + resourcePath);
+        YamlConfiguration source = new YamlConfiguration();
+
+        //Create the parent directory.
         try {
-            profiler.start("loadConfig_" + resourcePath);
-            YamlConfiguration source = new YamlConfiguration();
-
-            //Create the parent directory.
-            try {
-                Files.createDirectories(configPath.getParent());
-            } catch (IOException exc) {
-                throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
-            }
-
-            boolean defaultConfig = configPath.endsWith("config.yml");
-            // Test the new location for the resource, otherwise fallback on the old one.
-            if (this.plugin.getClass().getResource(resourcePath) == null) {
-                resourcePath = "/" + (defaultConfig ? moduleName + ".yml" : configPath.getFileName().toString());
-            }
-
-            try (InputStream resource = this.plugin.getClass().getResourceAsStream(resourcePath)) {
-                ByteArrayOutputStream streamCloner = new ByteArrayOutputStream();
-
-                //Check that the resource exists
-                if (resource == null) {
-                    if (Files.notExists(configPath))
-                        Files.createFile(configPath);
-                } else {
-                    IOUtils.copy(resource, streamCloner);
-                    if (Files.notExists(configPath)) {
-                        Files.write(configPath, streamCloner.toByteArray(), StandardOpenOption.CREATE);
-                    }
-
-                    try {
-                        source.load(new InputStreamReader(new ByteArrayInputStream(streamCloner.toByteArray())));
-                    } catch (InvalidConfigurationException exc) {
-                        getLogger().log(Level.WARNING, String.format("Failed to load source config %s for module.",
-                                configPath.getFileName().toString()), exc);
-                    }
-                }
-            } catch (IOException exc) {
-                throw new RuntimeException(String.format("Failed to load config %s for module %s. Is it missing? (Checked under plugin %s)",
-                        configPath.getFileName().toString(),
-                        getModuleName(),
-                        getPlugin().getName()), exc);
-            }
-
-            MConfiguration toReturn = new MConfiguration(configPath, this);
-            toReturn.setSource(source);
-            toReturn.load();
-
-            if (loadValues) {
-                // Load with the config wrapper.
-                boolean modded = this.configWrapper.loadValues(toReturn);
-                if (modded) {
-                    toReturn.save();
-                }
-            }
-            return toReturn;
-        } finally {
-            profiler.stop("loadConfig_" + resourcePath);
+            Files.createDirectories(configPath.getParent());
+        } catch (IOException exc) {
+            throw new RuntimeException(String.format("Failed to create parent directory for config file in module %s!", getModuleName()), exc);
         }
+
+        boolean defaultConfig = configPath.endsWith("config.yml");
+        // Test the new location for the resource, otherwise fallback on the old one.
+        if (this.plugin.getClass().getResource(resourcePath) == null) {
+            resourcePath = "/" + (defaultConfig ? moduleName + ".yml" : configPath.getFileName().toString());
+        }
+
+        try (InputStream resource = this.plugin.getClass().getResourceAsStream(resourcePath)) {
+            ByteArrayOutputStream streamCloner = new ByteArrayOutputStream();
+
+            //Check that the resource exists
+            if (resource == null) {
+                if (Files.notExists(configPath))
+                    Files.createFile(configPath);
+            } else {
+                IOUtils.copy(resource, streamCloner);
+                if (Files.notExists(configPath)) {
+                    Files.write(configPath, streamCloner.toByteArray(), StandardOpenOption.CREATE);
+                }
+
+                try {
+                    source.load(new InputStreamReader(new ByteArrayInputStream(streamCloner.toByteArray())));
+                } catch (InvalidConfigurationException exc) {
+                    getLogger().log(Level.WARNING, String.format("Failed to load source config %s for module.",
+                            configPath.getFileName().toString()), exc);
+                }
+            }
+        } catch (IOException exc) {
+            throw new RuntimeException(String.format("Failed to load config %s for module %s. Is it missing? (Checked under plugin %s)",
+                    configPath.getFileName().toString(),
+                    getModuleName(),
+                    getPlugin().getName()), exc);
+        }
+
+        MConfiguration toReturn = new MConfiguration(configPath, this);
+        toReturn.setSource(source);
+        profiler.start("loadConfig_" + resourcePath + "_load");
+        toReturn.load();
+        profiler.stop("loadConfig_" + resourcePath + "_load");
+
+        if (loadValues) {
+            // Load with the config wrapper.
+            profiler.start("loadConfig_" + resourcePath + "_loadValues");
+            boolean modded = this.configWrapper.loadValues(toReturn);
+            profiler.stop("loadConfig_" + resourcePath + "_loadValues");
+            if (modded) {
+                toReturn.save();
+            }
+        }
+        profiler.stop("loadConfig_" + resourcePath);
+        return toReturn;
     }
 
     /**
