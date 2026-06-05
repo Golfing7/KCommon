@@ -8,7 +8,6 @@ import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -24,6 +23,7 @@ public class HighLowAverageProfiler implements IMethodProfiler {
     private final Map<String, LongList> data = new HashMap<>();
     private final Map<String, Long> currentlyProfiling = new HashMap<>();
     private final String key;
+
     public HighLowAverageProfiler(String key) {
         this.key = key;
     }
@@ -112,7 +112,7 @@ public class HighLowAverageProfiler implements IMethodProfiler {
     }
 
     private void putValue(String key, long start, long end) {
-        LongList longs = this.data.computeIfAbsent(key, (k) -> new LongArrayList());
+        LongList longs = this.data.computeIfAbsent(key, k -> new LongArrayList());
         if (longs.size() > MAX_VALUES_TRACKED)
             return;
 

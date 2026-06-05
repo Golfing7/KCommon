@@ -56,8 +56,7 @@ public interface IMethodProfiler {
      *
      * @return the profiler
      */
-    static IMethodProfiler getDefaultProfiler()
-    {
+    static IMethodProfiler getDefaultProfiler() {
         return HighLowAverageProfiler.INSTANCE;
     }
 }

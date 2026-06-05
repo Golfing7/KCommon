@@ -8,10 +8,9 @@ import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.command.flag.CommandFlag;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.struct.profiler.ProfileStatistics;
+import lombok.var;
 import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collection;
 
 /**
  * A command that lets you view the profiler timings of different aspects of KCommon plugins
@@ -26,23 +25,24 @@ public class KTimingsCommand extends KCommand {
     protected void onRegister() {
         KCommon.getInstance().addLanguageConstant("timings-command-no-data", "&cThere is no data!");
         KCommon.getInstance().addLanguageConstant("timings-command-key-data-verbose",
-                "&e{KEY} &aProfile Data: (All/95%)",
-                " &7- &aSamples: &e{SAMPLES}",
-                " &7- &aAverage: &e({AVERAGE}/{AVERAGE_95})",
-                " &7- &aMax: &e({MAX}/{MAX_95})",
-                " &7- &aMin: &e({MIN}/{MIN_95})",
-                " &7- &aSum: &e({SUM}/{SUM_95})",
-                " &7- &aStandard Deviation: &e({STD_DEV})"
+                "&e{KEY} &aProfile Data: (All/95%) (nanoseconds)",
+                " &7- &aSamples: &e$commas{{SAMPLES}}",
+                " &7- &aAverage: &e($commas{{AVERAGE}}/$commas{{AVERAGE_95}})",
+                " &7- &aMax: &e($commas{{MAX}}/$commas{{MAX_95}})",
+                " &7- &aMin: &e($commas{{MIN}}/$commas{{MIN_95}})",
+                " &7- &aSum: &e($commas{{SUM}}/$commas{{SUM_95}})",
+                " &7- &aStandard Deviation: &e($commas{{STD_DEV}})"
         );
         KCommon.getInstance().addLanguageConstant("timings-command-key-data",
-                "&e{KEY} &aProfile Data: (All/95%)",
-                " &7- &aAverage: &e({AVERAGE}/{AVERAGE_95})",
-                " &7- &aMax: &e({MAX}/{MAX_95})",
-                " &7- &aMin: &e({MIN}/{MIN_95})"
+                "&e{KEY} &aProfile Data: (All/95%) (nanoseconds)",
+                " &7- &aAverage: &e($commas{{AVERAGE}}/$commas{{AVERAGE_95}})",
+                " &7- &aMax: &e($commas{{MAX}}/$commas{{MAX_95}})",
+                " &7- &aMin: &e($commas{{MIN}}/$commas{{MIN_95}})"
         );
 
         addArgument("module", CommandArguments.MODULE);
-        addArgument("key", CommandArguments.ALPHANUMERIC_STRING, (k) -> null);
+        addArgument("key", CommandArguments.ALPHANUMERIC_STRING, k -> null);
+        setAcceptExtraArguments(true);
 
         addFlag(new CommandFlag('v', "verbose"));
         addFlag(new CommandFlag('r', "reset"));
@@ -56,15 +56,15 @@ public class KTimingsCommand extends KCommand {
         boolean reset = context.getFlagState('r') == TriState.TRUE;
         String messageKey = verbose ? "timings-command-key-data-verbose" : "timings-command-key-data";
 
-        if (key == null) {
-            Collection<ProfileStatistics> values = module.getProfiler().getStatistics().values();
-            if (values.isEmpty()) {
+        if (key == null || key.equals("null")) {
+            var entries = module.getProfiler().getStatistics().entrySet();
+            if (entries.isEmpty()) {
                 KCommon.getInstance().sendConfigMessage(context.getSender(), "timings-command-no-data");
                 return;
             }
 
-            for (ProfileStatistics statistics : values) {
-                KCommon.getInstance().sendConfigMessage(context.getSender(), messageKey, statistics.toPlaceholderContainer());
+            for (var statEntry : entries) {
+                KCommon.getInstance().sendConfigMessage(context.getSender(), messageKey, statEntry.getValue().toPlaceholderContainer(), "KEY", statEntry.getKey());
             }
 
             if (reset) {

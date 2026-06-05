@@ -8,7 +8,6 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 /**
  * Contains the collected statistics for a profiler
