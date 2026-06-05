@@ -51,7 +51,7 @@ public class KTimingsCommand extends KCommand {
     @Override
     protected void execute(@NotNull CommandContext context) {
         Module module = context.next();
-        String key = context.next();
+        String key = context.joinRemainingToString();
         boolean verbose = context.getFlagState('v') == TriState.TRUE;
         boolean reset = context.getFlagState('r') == TriState.TRUE;
         String messageKey = verbose ? "timings-command-key-data-verbose" : "timings-command-key-data";
