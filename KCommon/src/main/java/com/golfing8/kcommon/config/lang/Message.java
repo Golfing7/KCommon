@@ -149,6 +149,16 @@ public class Message implements MessageContainer {
                 this.pageHeader = (String) section.getOrDefault("page-header", PagedMessage.DEFAULT_PAGE_HEADER);
                 this.pageFooter = (String) section.getOrDefault("page-footer", PagedMessage.DEFAULT_PAGE_FOOTER);
             }
+        } else if (message instanceof MessageContainer) {
+            Message otherMessage = ((MessageContainer) message).getMessage();
+            this.messages = otherMessage.messages != null ? new ArrayList<>(otherMessage.messages) : null;
+            this.sounds = otherMessage.sounds != null ? new ArrayList<>(otherMessage.sounds) : null;
+            this.title = otherMessage.title;
+            this.actionBar = otherMessage.actionBar;
+            this.paged = otherMessage.paged;
+            this.pageHeight = otherMessage.pageHeight;
+            this.pageHeader = otherMessage.pageHeader;
+            this.pageFooter = otherMessage.pageFooter;
         } else {
             throw new IllegalArgumentException(String.format("Message %s is not a string or a list!", message));
         }

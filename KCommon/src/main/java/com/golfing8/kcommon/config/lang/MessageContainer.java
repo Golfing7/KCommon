@@ -6,10 +6,13 @@ import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.struct.title.Title;
 import com.golfing8.kcommon.util.MS;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,6 +72,67 @@ public interface MessageContainer {
             newSounds = getMessage().getSounds().stream().map(SoundWrapper::new).collect(Collectors.toList());
         }
         return new Message(newMessages, newSounds, newTitle, newActionBar, getMessage().isPaged(), getMessage().getPageHeight(), MS.parseSingle(getMessage().getPageHeader(), placeholders), MS.parseSingle(getMessage().getPageFooter(), placeholders));
+    }
+
+    /**
+     * Appends the given message to this message returns the result as a new message
+     * <p>
+     * This method will always return a new copy of a message
+     * </p>
+     *
+     * @param message the message
+     * @param separator the separator to apply between the messages
+     * @return the new wrapper
+     */
+    default Message append(@Nullable MessageContainer message, @Nullable String separator) {
+        if (message == null) {
+            return new Message(this);
+        }
+
+        List<String> newMessages;
+        List<String> messages = this.getMessage().getMessages();
+        List<String> appendedMessages = message.getMessage().getMessages();
+        if (messages == null) {
+            newMessages = appendedMessages;
+        } else if (appendedMessages == null) {
+            newMessages = messages;
+        } else {
+            String usedSeparator = separator == null ? "" : separator;
+            List<String> newLines = new ArrayList<>();
+            int size = Math.min(messages.size(), appendedMessages.size());
+            for (int i = 0; i < size; i++) {
+                newLines.add(messages.get(i) + usedSeparator + appendedMessages.get(i));
+            }
+            newMessages = newLines;
+        }
+
+        List<SoundWrapper> newSounds = new ArrayList<>();
+        if (getMessage().getSounds() != null) {
+            newSounds.addAll(getMessage().getSounds());
+        }
+        if (message.getMessage().getSounds() != null) {
+            newSounds.addAll(message.getMessage().getSounds());
+        }
+
+        String newActionBar = StringUtils.join(new String[] { getMessage().getActionBar(), message.getMessage().getActionBar() }, ' ');
+
+        Title newTitle;
+        if (getMessage().getTitle() == null) {
+            newTitle = message.getMessage().getTitle();
+        } else if (message.getMessage().getTitle() == null) {
+            newTitle = getMessage().getTitle();
+        } else {
+            String newTitleString = StringUtils.join(new String[] {
+                    getMessage().getTitle().getTitle(),
+                    message.getMessage().getTitle().getTitle()
+            }, ' ');
+            String newSubtitleString = StringUtils.join(new String[] {
+                    getMessage().getTitle().getSubtitle(),
+                    message.getMessage().getTitle().getSubtitle()
+            }, ' ');
+            newTitle = new Title(newTitleString, newSubtitleString, getMessage().getTitle().getIn(), getMessage().getTitle().getStay(), getMessage().getTitle().getOut());
+        }
+        return new Message(newMessages, newSounds, newTitle, newActionBar);
     }
 
     /**
