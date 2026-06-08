@@ -125,11 +125,11 @@ public interface MessageContainer {
             String newTitleString = StringUtils.join(new String[] {
                     getMessage().getTitle().getTitle(),
                     message.getMessage().getTitle().getTitle()
-            }, ' ');
+            }, separator);
             String newSubtitleString = StringUtils.join(new String[] {
                     getMessage().getTitle().getSubtitle(),
                     message.getMessage().getTitle().getSubtitle()
-            }, ' ');
+            }, separator);
             newTitle = new Title(newTitleString, newSubtitleString, getMessage().getTitle().getIn(), getMessage().getTitle().getStay(), getMessage().getTitle().getOut());
         }
         return new Message(newMessages, newSounds, newTitle, newActionBar);
