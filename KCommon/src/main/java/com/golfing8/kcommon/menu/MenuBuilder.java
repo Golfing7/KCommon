@@ -41,7 +41,9 @@ public final class MenuBuilder {
     @Getter
     private int size = 27;
     private @Nullable Player placeholderTarget;
-    private boolean canExpire = true, clickable;
+    private boolean canExpire = true;
+    private boolean clickable = false;
+    private boolean draggable = false;
     @Getter
     private String title = "&cKCommon GUI";
     private Map<Integer, List<ClickAction>> clickActions = new LinkedHashMap<>();
@@ -120,6 +122,7 @@ public final class MenuBuilder {
         this.size = other.size;
         this.canExpire = other.canExpire;
         this.clickable = other.clickable;
+        this.draggable = other.draggable;
         this.title = other.title;
         this.clickActions = new HashMap<>(other.clickActions);
         this.shapeCreation = new ArrayList<>(other.shapeCreation);
@@ -319,6 +322,28 @@ public final class MenuBuilder {
     }
 
     /**
+     * Adds locked slots to the menu
+     *
+     * @param slots the slots
+     * @return this
+     */
+    public MenuBuilder lockedSlots(Collection<Integer> slots) {
+        this.lockedSlots.clear();
+        return addLockedSlots(slots);
+    }
+
+    /**
+     * Adds locked slots to the menu
+     *
+     * @param slots the slots
+     * @return this
+     */
+    public MenuBuilder addLockedSlots(Collection<Integer> slots) {
+        this.lockedSlots.addAll(slots);
+        return this;
+    }
+
+    /**
      * Sets global multiline placeholders that will be parsed on this menu
      * and the items within it
      *
@@ -476,6 +501,17 @@ public final class MenuBuilder {
      */
     public MenuBuilder clickable(boolean clickable) {
         this.clickable = clickable;
+        return this;
+    }
+
+    /**
+     * Sets if this menu allows inventory drag actions
+     *
+     * @param draggable if draggable
+     * @return this
+     */
+    public MenuBuilder draggable(boolean draggable) {
+        this.draggable = draggable;
         return this;
     }
 
@@ -680,6 +716,7 @@ public final class MenuBuilder {
         menu.setTopClickAction(this.topClickEvent);
         menu.setTickRunnable(this.tickRunnable);
         menu.setLockedSlots(this.lockedSlots);
+        menu.setDraggable(this.draggable);
         menu.onClose(this.closeRunnable);
         menu.onPostClose(this.postCloseRunnable);
         menu.setBottomClickAction(this.bottomClickEvent);

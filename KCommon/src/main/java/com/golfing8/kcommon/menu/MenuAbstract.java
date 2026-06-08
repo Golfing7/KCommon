@@ -59,6 +59,8 @@ public abstract class MenuAbstract implements Menu {
     private boolean canExpire;
     private int size;
     private boolean clickable;
+    @Getter @Setter
+    private boolean draggable;
     private boolean valid;
     @Getter
     @Setter
@@ -401,14 +403,14 @@ public abstract class MenuAbstract implements Menu {
 
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
+        if (!isThisInventory(event.getInventory()))
+            return;
+
         // Never allow inventory dragging if this menu is not clickable
-        if (!clickable) {
+        if (!clickable || !draggable) {
             event.setCancelled(true);
             return;
         }
-
-        if (!isThisInventory(event.getInventory()))
-            return;
 
         for (int slot : event.getInventorySlots()) {
             // Are any of those slots locked?
