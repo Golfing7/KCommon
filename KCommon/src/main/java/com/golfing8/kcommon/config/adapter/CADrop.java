@@ -34,10 +34,10 @@ public class CADrop implements ConfigAdapter<Drop> {
         Map<String, Object> primitive = entry.unwrap();
         String displayName = primitive.containsKey("display-name") ? primitive.get("display-name").toString() : null;
         double chance = primitive.containsKey("chance") ?
-                (double) ConfigPrimitive.coerceObjectToBoxed(primitive.get("chance"), Double.class) :
+                ConfigPrimitive.coerceObjectToBoxed(primitive.get("chance"), Double.class) :
                 100.0D;
         double maxBoost = primitive.containsKey("max-boost") ?
-                (double) ConfigPrimitive.coerceObjectToBoxed(primitive.get("max-boost"), Double.class) :
+                ConfigPrimitive.coerceObjectToBoxed(primitive.get("max-boost"), Double.class) :
                 1.0D;
         Drop<?> drop = null;
         if (primitive.containsKey("items") || primitive.containsKey("item")) {

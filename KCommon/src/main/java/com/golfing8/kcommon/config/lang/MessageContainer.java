@@ -114,7 +114,7 @@ public interface MessageContainer {
             newSounds.addAll(message.getMessage().getSounds());
         }
 
-        String newActionBar = StringUtils.join(new String[] { getMessage().getActionBar(), message.getMessage().getActionBar() }, ' ');
+        String newActionBar = StringUtils.join(new String[] {getMessage().getActionBar(), message.getMessage().getActionBar()}, ' ');
 
         Title newTitle;
         if (getMessage().getTitle() == null) {

@@ -292,5 +292,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CACraftingRecipe());
         registerAdapter(new CADuration());
         registerAdapter(new CAComponent());
+        registerAdapter(new CACurrency());
     }
 }

@@ -20,6 +20,35 @@ public class SetExpFix {
     }
 
     /**
+     * Adds experience to the given player
+     *
+     * @param player the player
+     * @param exp the exp to add
+     */
+    public static void addTotalExperience(final Player player, final int exp) {
+        int currentXp = getTotalExperience(player);
+        setTotalExperience(player, exp + currentXp);
+    }
+
+    /**
+     * Takes the given amount of total experience from the player
+     *
+     * @param player the player
+     * @param exp the exp to take
+     * @return true if all of it could be taken, false if the exp was too much and the player's xp was set to 0
+     */
+    public static boolean takeTotalExperience(final Player player, final int exp) {
+        int currentXp = getTotalExperience(player);
+        if (exp > currentXp) {
+            setTotalExperience(player, 0);
+            return false;
+        } else {
+            setTotalExperience(player, currentXp - exp);
+            return true;
+        }
+    }
+
+    /**
      * Sets the total experience of the given player
      *
      * @param player the player

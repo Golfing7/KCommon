@@ -343,23 +343,27 @@ public final class ConfigPrimitive {
      * @param boxedType the boxed type of object
      * @return the boxed object.
      */
-    public static Object coerceObjectToBoxed(Object val, Class<?> boxedType) {
+    @SuppressWarnings("unchecked")
+    public static <T> T coerceObjectToBoxed(Object val, Class<T> boxedType) {
+        if (boxedType.isAssignableFrom(val.getClass())) {
+            return (T) val;
+        }
         if (boxedType == Integer.class) {
-            return Integer.parseInt(val.toString());
+            return (T) (Integer) Integer.parseInt(val.toString());
         } else if (boxedType == Short.class) {
-            return Short.parseShort(val.toString());
+            return (T) (Short) Short.parseShort(val.toString());
         } else if (boxedType == Byte.class) {
-            return Byte.parseByte(val.toString());
+            return (T) (Byte) Byte.parseByte(val.toString());
         } else if (boxedType == Long.class) {
-            return Long.parseLong(val.toString());
+            return (T) (Long) Long.parseLong(val.toString());
         } else if (boxedType == Double.class) {
-            return Double.parseDouble(val.toString().replace(",", "."));
+            return (T) (Double) Double.parseDouble(val.toString().replace(",", "."));
         } else if (boxedType == Float.class) {
-            return Float.parseFloat(val.toString().replace(",", "."));
+            return (T) (Float) Float.parseFloat(val.toString().replace(",", "."));
         } else if (boxedType == Boolean.class) {
-            return Boolean.parseBoolean(val.toString());
+            return (T) (Boolean) Boolean.parseBoolean(val.toString());
         } else {
-            return val;
+            return (T) val;
         }
     }
 }
