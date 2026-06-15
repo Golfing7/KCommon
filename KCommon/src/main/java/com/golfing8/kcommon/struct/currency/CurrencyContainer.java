@@ -35,6 +35,17 @@ public final class CurrencyContainer implements Iterable<Pair<EconomyType, Curre
         this.currencies = new HashMap<>(container);
     }
 
+    public CurrencyContainer(Iterable<Currency> currencies) {
+        this();
+        for (Currency currency : currencies) {
+            this.currencies.put(currency.getEconomyType(), currency);
+        }
+    }
+
+    public CurrencyContainer(Currency... currencies) {
+        this(Arrays.asList(currencies));
+    }
+
     /**
      * Gets the amount of currency stored under the given type.
      *
@@ -135,7 +146,7 @@ public final class CurrencyContainer implements Iterable<Pair<EconomyType, Curre
             currencies.sort(mode.comparator);
         for (Pair<EconomyType, Currency> currencyEntry : currencies) {
             formattedList.add(MS.parseSingle(format,
-                    "CURRENCY_FORMATTED", currencyEntry.getValue()));
+                    "CURRENCY_FORMATTED", currencyEntry.getValue().format(1)));
         }
         return MultiLinePlaceholder.percentTrusted("CURRENCY_AMOUNTS", formattedList);
     }
@@ -177,11 +188,7 @@ public final class CurrencyContainer implements Iterable<Pair<EconomyType, Curre
 
     @Override
     public CurrencyContainer clone() {
-        try {
-            return (CurrencyContainer) super.clone();
-        } catch (CloneNotSupportedException exc) {
-            throw new RuntimeException(exc);
-        }
+        return new CurrencyContainer(new HashMap<>(this.currencies));
     }
 
     @Override
