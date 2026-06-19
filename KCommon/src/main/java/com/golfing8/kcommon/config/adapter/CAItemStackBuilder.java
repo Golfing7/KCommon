@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.cryptomorin.xseries.XEnchantment;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.nms.struct.BookData;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.PotionData;
@@ -60,6 +61,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             builder.components((Map<String, Object>) primitiveValue.get("components"));
         if (primitiveValue.containsKey("potion-data"))
             builder.potionData(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue.get("potion-data")), new FieldType(PotionData.class)));
+        if (primitiveValue.containsKey("book-data"))
+            builder.bookData(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofTrusted(primitiveValue.get("book-data")), new FieldType(BookData.class)));
         if (primitiveValue.containsKey("glowing"))
             builder.glowing((Boolean) primitiveValue.get("glowing"));
         if (primitiveValue.containsKey("skull-texture"))
@@ -114,6 +117,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("components", builder.getComponents());
         if (builder.getPotionData() != null)
             objects.put("potion-data", ConfigTypeRegistry.toPrimitive(builder.getPotionData()).unwrap());
+        if (builder.getBookData() != null)
+            objects.put("book-data", ConfigTypeRegistry.toPrimitive(builder.getBookData()).unwrap());
         if (builder.getCustomModelData() != 0)
             objects.put("custom-model-data", builder.getCustomModelData());
         if (builder.getItemModel() != null)

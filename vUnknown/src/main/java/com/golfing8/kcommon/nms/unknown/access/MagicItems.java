@@ -5,6 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
+import com.golfing8.kcommon.nms.struct.BookData;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.google.common.collect.HashMultimap;
@@ -24,16 +25,10 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * API agnostic item access
@@ -75,6 +70,13 @@ public class MagicItems implements NMSMagicItems {
         } else {
             return LegacyComponentSerializer.legacyAmpersand().serialize(display);
         }
+    }
+
+    @Override
+    public void setBookData(BookMeta meta, BookData bookData) {
+        meta.pages(bookData.getPages() != null ? bookData.getPages() : Collections.emptyList());
+        meta.title(bookData.getTitle());
+        meta.author(bookData.getAuthor());
     }
 
     @Override

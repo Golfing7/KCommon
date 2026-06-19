@@ -293,5 +293,6 @@ public class ConfigTypeRegistry {
         registerAdapter(new CADuration());
         registerAdapter(new CAComponent());
         registerAdapter(new CACurrency());
+        registerAdapter(new CABookData());
     }
 }

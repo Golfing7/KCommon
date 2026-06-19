@@ -10,6 +10,7 @@ import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.exc.ImproperlyConfiguredValueException;
 import com.golfing8.kcommon.nms.access.NMSAccess;
+import com.golfing8.kcommon.nms.struct.BookData;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.PotionData;
@@ -35,6 +36,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.Nullable;
@@ -129,6 +131,10 @@ public final class ItemStackBuilder {
      */
     private PotionData potionData;
     /**
+     * The text of the book
+     */
+    private BookData bookData;
+    /**
      * Stores attributes modifiers for the item
      */
     private Map<EntityAttribute, Set<EntityAttributeModifier>> attributeModifierMap = new HashMap<>();
@@ -219,6 +225,7 @@ public final class ItemStackBuilder {
         this.extraData = new HashMap<>(toCopy.extraData);
         this.components = new HashMap<>(toCopy.components);
         this.potionData = toCopy.potionData;
+        this.bookData = toCopy.bookData;
         this.glowing = toCopy.glowing;
         this.unstackable = toCopy.unstackable;
         this.attributeModifierMap = new HashMap<>(toCopy.attributeModifierMap);
@@ -247,6 +254,9 @@ public final class ItemStackBuilder {
         this.itemLore = section.contains("lore") ? section.getStringList("lore") : null;
         this.amount = Math.max(section.getInt("amount", 1), 1);
         this.unstackable = section.getBoolean("unstackable", false);
+        if (section.contains("book-data")) {
+            this.bookData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "book-data"), BookData.class);
+        }
         if (section.contains("nbt-data")) {
             this.extraData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "nbt-data"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {
             }));
@@ -257,6 +267,9 @@ public final class ItemStackBuilder {
         }
         if (section.contains("variable-amount")) {
             this.variableAmount = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "variable-amount"), Range.class);
+        }
+        if (section.contains("potion-data")) {
+            this.potionData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "potion-data"), PotionData.class);
         }
 
         //Load the enchantments.
@@ -425,6 +438,17 @@ public final class ItemStackBuilder {
      */
     public ItemStackBuilder potionData(PotionData data) {
         this.potionData = data;
+        return this;
+    }
+
+    /**
+     * Sets the book data of this builder.
+     *
+     * @param bookData the data
+     * @return this
+     */
+    public ItemStackBuilder bookData(BookData bookData) {
+        this.bookData = bookData;
         return this;
     }
 
@@ -789,6 +813,11 @@ public final class ItemStackBuilder {
         if (meta instanceof PotionMeta && potionData != null) {
             PotionMeta potionMeta = (PotionMeta) meta;
             NMS.getTheNMS().getMagicItems().setBaseEffect(potionMeta, potionData);
+        }
+
+        if (meta instanceof BookMeta && bookData != null) {
+            BookMeta bookMeta = (BookMeta) meta;
+            NMS.getTheNMS().getMagicItems().setBookData(bookMeta, bookData);
         }
 
         //Next, apply item flags

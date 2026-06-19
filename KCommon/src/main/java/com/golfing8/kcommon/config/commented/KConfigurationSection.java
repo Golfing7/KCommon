@@ -119,6 +119,21 @@ public interface KConfigurationSection extends ConfigurationSection {
     }
 
     /**
+     * Gets the value under the given path with the given type
+     *
+     * @param path the path
+     * @param type the type
+     * @return the value
+     */
+    default <T> Optional<T> get(String path, Class<T> type) {
+        if (!this.contains(path)) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), type));
+    }
+
+    /**
      * Gets or loads the value under the given path with the given type.
      *
      * @param path the path

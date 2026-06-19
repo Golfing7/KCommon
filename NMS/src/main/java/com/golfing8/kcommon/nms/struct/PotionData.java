@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.nms.struct;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bukkit.potion.PotionType;
@@ -9,6 +10,7 @@ import org.bukkit.potion.PotionType;
  * A wrapper class for potion data.
  */
 @Getter
+@Builder
 @AllArgsConstructor
 @EqualsAndHashCode
 public class PotionData {

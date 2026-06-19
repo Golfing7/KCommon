@@ -89,6 +89,17 @@ public class ConfigPath {
         return enumerate(configuration);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if (moduleName != null)
+            builder.append(moduleName).append(":");
+        if (configName != null)
+            builder.append(configName).append(":");
+        builder.append(path);
+        return builder.toString();
+    }
+
     /**
      * Parses a config path with the given context.
      *

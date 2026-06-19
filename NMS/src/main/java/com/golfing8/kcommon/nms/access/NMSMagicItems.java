@@ -1,10 +1,7 @@
 package com.golfing8.kcommon.nms.access;
 
 import com.golfing8.kcommon.nms.item.NMSItemStack;
-import com.golfing8.kcommon.nms.struct.EntityAttribute;
-import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
-import com.golfing8.kcommon.nms.struct.Hand;
-import com.golfing8.kcommon.nms.struct.PotionData;
+import com.golfing8.kcommon.nms.struct.*;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.kyori.adventure.text.Component;
@@ -12,6 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -186,6 +184,8 @@ public interface NMSMagicItems {
     default void setBaseEffect(PotionMeta meta, PotionData potionData) {
         meta.setBasePotionData(new org.bukkit.potion.PotionData(potionData.getPotionType(), potionData.isExtended(), potionData.isAmplified()));
     }
+
+    void setBookData(BookMeta meta, BookData bookData);
 
     /**
      * Gets the base potion effect of the given potion meta.

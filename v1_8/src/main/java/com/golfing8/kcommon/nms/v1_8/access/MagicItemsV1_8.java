@@ -5,10 +5,7 @@ import com.golfing8.kcommon.nms.access.NMSMagicItems;
 import com.golfing8.kcommon.nms.item.NMSItemStack;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
-import com.golfing8.kcommon.nms.struct.EntityAttribute;
-import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
-import com.golfing8.kcommon.nms.struct.Hand;
-import com.golfing8.kcommon.nms.struct.PotionData;
+import com.golfing8.kcommon.nms.struct.*;
 import com.golfing8.kcommon.nms.v1_8.item.ItemStackV1_8;
 import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
@@ -27,6 +24,7 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -263,6 +261,17 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     @Override
     public void setBaseEffect(PotionMeta meta, PotionData data) {
         throw new UnsupportedOperationException("1.8 does not support potion data types."); // TODO Maybe try to find a way?
+    }
+
+    @Override
+    public void setBookData(BookMeta meta, BookData bookData) {
+        meta.setAuthor(bookData.getAuthor() != null ? LegacyComponentSerializer.legacySection().serialize(bookData.getAuthor()) : null);
+        meta.setTitle(bookData.getTitle() != null ? LegacyComponentSerializer.legacySection().serialize(bookData.getTitle()) : null);
+        if (bookData.getPages() == null) {
+            meta.setPages();
+        } else {
+            meta.setPages(bookData.getPages().stream().map(LegacyComponentSerializer.legacySection()::serialize).collect(Collectors.toList()));
+        }
     }
 
     @Override

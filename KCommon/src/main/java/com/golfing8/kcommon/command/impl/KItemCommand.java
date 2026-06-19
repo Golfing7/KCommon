@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * A command for giving custom items
@@ -53,6 +54,7 @@ public class KItemCommand extends KCommand {
         } catch (Exception exc) {
             // Failed to parse the item
             KCommon.getInstance().sendConfigMessage(context.getSender(), "kitem-command.item-not-defined-properly");
+            KCommon.getInstance().getLogger().log(Level.WARNING, "Failed to get item at path " + configPath, exc);
             return;
         }
         if (builder == null) {
