@@ -5,6 +5,7 @@ import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.dialogs.KDialogElement;
 import io.papermc.paper.dialog.Dialog;
 import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.data.dialog.type.DialogListType;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import io.papermc.paper.registry.set.RegistrySet;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ import java.util.List;
 public class KDialog implements CASerializable, KDialogElement<Dialog> {
     private @NotNull KDialogBase base = new KDialogBase(ComponentUtils.toComponent("KCommon Dialog"), null, true, Collections.emptyList());
     private @Nullable KActionButton notice;
-    private @Nullable List<KDialog> dialogs;
+    private @Nullable DialogList dialogList;
     private @Nullable MultiAction multiAction;
     private @Nullable Confirmation confirmation;
 
@@ -37,8 +38,16 @@ public class KDialog implements CASerializable, KDialogElement<Dialog> {
             builder.base(base.toComponent());
             if (notice != null) {
                 builder.type(DialogType.notice(notice.toComponent()));
-            } else if (dialogs != null) {
-                builder.type(DialogType.dialogList(RegistrySet.keySetFromValues(RegistryKey.DIALOG, dialogs.stream().map(KDialog::toComponent).toList())).build());
+            } else if (dialogList != null) {
+                DialogListType.Builder listBuilder = DialogType.dialogList(RegistrySet.keySetFromValues(RegistryKey.DIALOG, dialogList.getDialogs().stream().map(KDialog::toComponent).toList()));
+                if (dialogList.buttonWidth > 0)
+                    listBuilder.buttonWidth(dialogList.buttonWidth);
+                if (dialogList.exitButton != null)
+                    listBuilder.exitAction(dialogList.exitButton.toComponent());
+                if (dialogList.columns > 0)
+                    listBuilder.columns(dialogList.columns);
+
+                builder.type(listBuilder.build());
             } else if (multiAction != null) {
                 builder.type(DialogType.multiAction(multiAction.getActions().stream().map(KActionButton::toComponent).toList(),
                         multiAction.getExitButton() != null ? multiAction.getExitButton().toComponent() : null,
@@ -49,6 +58,19 @@ public class KDialog implements CASerializable, KDialogElement<Dialog> {
                 throw new IllegalStateException("No dialog type selected!");
             }
         });
+    }
+
+    /**
+     * A wrapper for a dialog list
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DialogList implements CASerializable {
+        private List<KDialog> dialogs;
+        private @Nullable KActionButton exitButton;
+        private int columns = 1;
+        private int buttonWidth = 1;
     }
 
     /**
