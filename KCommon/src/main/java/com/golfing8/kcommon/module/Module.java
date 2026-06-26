@@ -382,6 +382,7 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
                 this.terminable.close();
             } catch (CompositeClosingException exc) {
                 getLogger().log(Level.SEVERE, "Failed to close terminable!", exc);
+                exc.printAllStackTraces();
             }
             try {
                 this.onDisable();

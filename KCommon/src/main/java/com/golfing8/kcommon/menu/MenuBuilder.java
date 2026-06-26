@@ -73,6 +73,10 @@ public final class MenuBuilder {
      */
     private Map<String, ClickAction> specialBindings = new LinkedHashMap<>();
     /**
+     * A map containing special materials for each special item.
+     */
+    private Map<String, Supplier<XMaterial>> specialMaterials = new LinkedHashMap<>();
+    /**
      * A map containing placeholders for each special item.
      */
     private Map<String, Supplier<Collection<Placeholder>>> specialPlaceholders = new LinkedHashMap<>();
@@ -131,6 +135,7 @@ public final class MenuBuilder {
         this.topClickEvent = other.topClickEvent;
         this.specialGUIItems = new HashMap<>(other.specialGUIItems);
         this.specialBindings = new HashMap<>(other.specialBindings);
+        this.specialMaterials = new HashMap<>(other.specialMaterials);
         this.specialPlaceholders = new HashMap<>(other.specialPlaceholders);
         this.specialMPlaceholders = new HashMap<>(other.specialMPlaceholders);
         this.globalPlaceholders = new ArrayList<>(other.globalPlaceholders);
@@ -441,6 +446,18 @@ public final class MenuBuilder {
     }
 
     /**
+     * Sets the special material tied to a special item
+     *
+     * @param special the special item to bind to
+     * @param materialSupplier the material
+     * @return this
+     */
+    public MenuBuilder specialMaterial(String special, Supplier<XMaterial> materialSupplier) {
+        this.specialMaterials.put(special, materialSupplier);
+        return this;
+    }
+
+    /**
      * Binds a {@link ClickRunnable} to a given special item.
      *
      * @param special the special item
@@ -727,7 +744,7 @@ public final class MenuBuilder {
                 if (slot < 0)
                     return;
 
-                menu.setItemAt(slot, item.getItem().buildFromTemplate(placeholderTarget));
+                menu.setItemAt(slot, item.buildFromTemplate(placeholderTarget));
             });
         });
 
@@ -743,10 +760,10 @@ public final class MenuBuilder {
                     this.specialPlaceholders.getOrDefault(key, Collections::emptyList);
             Supplier<Collection<MultiLinePlaceholder>> mPlaceholders =
                     this.specialMPlaceholders.getOrDefault(key, Collections::emptyList);
+            Supplier<XMaterial> material = this.specialMaterials.get(key);
             guiItem.setSpecialPlaceholders(placeholders);
             guiItem.setSpecialMPlaceholders(mPlaceholders);
-            guiItem.getItem().placeholders(placeholders.get().toArray(new Placeholder[0]));
-            guiItem.getItem().multiLinePlaceholders(mPlaceholders.get().toArray(new MultiLinePlaceholder[0]));
+            guiItem.setSpecialMaterial(material);
 
             //Add the item to the GUI.
             guiItem.getSlots().forEach(coordinate -> {
@@ -758,7 +775,7 @@ public final class MenuBuilder {
 
                 this.addAction(slot, specialBinding.getValue());
                 this.setAt(slot,
-                        guiItem.getItem().buildFromTemplate(placeholderTarget));
+                        guiItem.buildFromTemplate(placeholderTarget));
             });
             menu.addSpecialItem(key, guiItem);
         }

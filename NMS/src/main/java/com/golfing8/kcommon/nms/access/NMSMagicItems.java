@@ -185,6 +185,12 @@ public interface NMSMagicItems {
         meta.setBasePotionData(new org.bukkit.potion.PotionData(potionData.getPotionType(), potionData.isExtended(), potionData.isAmplified()));
     }
 
+    /**
+     * Sets the book data applied to the given meta
+     *
+     * @param meta the meta
+     * @param bookData the book data
+     */
     void setBookData(BookMeta meta, BookData bookData);
 
     /**

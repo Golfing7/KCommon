@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.menu;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
@@ -13,6 +14,8 @@ import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -42,6 +45,10 @@ public class SimpleGUIItem {
     /** The defining config section */
     @Getter @Nullable
     private ConfigurationSection configSection;
+
+    /** The special material to use for building the item */
+    @Getter @Setter
+    private @Nullable Supplier<XMaterial> specialMaterial;
 
     /**
      * A supplier of the special placeholders.
@@ -76,5 +83,36 @@ public class SimpleGUIItem {
             this.slots = Sets.newHashSet(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slot"), MenuCoordinate.class));
         }
         this.configSection = section;
+    }
+
+    /**
+     * Builds the item from the template
+     *
+     * @return the item
+     */
+    public ItemStack buildFromTemplate() {
+        return buildFromTemplate(null);
+    }
+
+    /**
+     * Builds the item from the template
+     *
+     * @param player the player
+     * @return the item
+     */
+    public ItemStack buildFromTemplate(@Nullable Player player) {
+        if (specialMaterial != null) {
+            XMaterial material = specialMaterial.get();
+            if (material != null) {
+                this.item.material(material);
+            }
+        }
+        if (specialPlaceholders != null) {
+            this.item.placeholders(specialPlaceholders.get());
+        }
+        if (specialMPlaceholders != null) {
+            this.item.multiLinePlaceholders(specialMPlaceholders.get());
+        }
+        return this.item.buildFromTemplate(player);
     }
 }

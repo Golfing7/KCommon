@@ -340,6 +340,10 @@ public final class MS {
     public static void pass(Collection<? extends CommandSender> receivers, String message, Object... placeholders) {
         Component component = toComponent(message, placeholders);
         for (CommandSender sender : receivers) {
+            // Don't send messages to the item capture player.
+            if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+                return;
+
             ComponentUtils.bukkitAudiences.sender(sender).sendMessage(component);
         }
     }
@@ -369,6 +373,10 @@ public final class MS {
     public static void pass(Collection<? extends CommandSender> receivers, List<String> message, Object... placeholders) {
         Component component = toComponent(message, placeholders);
         for (CommandSender sender : receivers) {
+            // Don't send messages to the item capture player.
+            if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+                return;
+
             ComponentUtils.bukkitAudiences.sender(sender).sendMessage(component);
         }
     }

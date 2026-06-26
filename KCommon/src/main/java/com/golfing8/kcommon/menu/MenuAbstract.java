@@ -5,7 +5,6 @@ import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.menu.action.ClickAction;
 import com.golfing8.kcommon.menu.action.CloseRunnable;
 import com.golfing8.kcommon.menu.marker.MenuClickHolder;
-import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.util.ItemUtil;
@@ -248,21 +247,13 @@ public abstract class MenuAbstract implements Menu {
     }
 
     private void refreshSpecialItem(SimpleGUIItem item) {
-        ItemStackBuilder builder = item.getItem();
-
-        //Add both placeholders.
-        if (item.getSpecialMPlaceholders() != null)
-            builder.multiLinePlaceholders(
-                    item.getSpecialMPlaceholders().get().toArray(new MultiLinePlaceholder[0]));
-        if (item.getSpecialPlaceholders() != null)
-            builder.placeholders(item.getSpecialPlaceholders().get().toArray(new Placeholder[0]));
-
+        ItemStack built = item.buildFromTemplate();
         item.getSlots().forEach(coordinate -> {
             int slot = MenuUtils.getSlotFromCartCoords(getMenuShape().getType(), coordinate.getX(), coordinate.getY());
             if (slot < 0)
                 return;
 
-            this.setItemAt(slot, item.getItem().buildFromTemplate());
+            this.setItemAt(slot, built);
         });
     }
 

@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * A config adapter for book data
+ */
 public class CABookData implements ConfigAdapter<BookData> {
     @Override
     public Class<BookData> getAdaptType() {

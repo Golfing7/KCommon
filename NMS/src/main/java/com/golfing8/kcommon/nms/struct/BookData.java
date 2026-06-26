@@ -9,6 +9,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * A class representing book data
+ */
 @Getter
 @Builder
 @AllArgsConstructor
