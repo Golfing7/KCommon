@@ -15,11 +15,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
  * Captures block selection for a player.
  */
 @Getter
-public class BlockSelectionHelper implements Listener {
+public class BlockSelectionHelper implements Listener, Closeable {
     private final Promise<@Nullable Location> resultPromise;
     private final Player player;
     private final @Nullable BukkitTask timeoutTask;
@@ -61,6 +64,11 @@ public class BlockSelectionHelper implements Listener {
 
         complete(event.getClickedBlock().getLocation());
         event.setCancelled(true);
+    }
+
+    @Override
+    public void close() throws IOException {
+        complete(null);
     }
 
     private void complete(@Nullable Location input) {

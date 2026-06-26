@@ -15,6 +15,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Used to capture chat input for use.
  */
 @Getter
-public class ChatInputHelper implements Listener {
+public class ChatInputHelper implements Listener, Closeable {
     private static final Map<Player, ChatInputHelper> HELPERS = new ConcurrentHashMap<>();
     /**
      * The future of input. Completed with null if the player times out or disconnects
@@ -88,6 +90,11 @@ public class ChatInputHelper implements Listener {
         String message = event.getMessage();
         event.setCancelled(true);
         complete(message);
+    }
+
+    @Override
+    public void close() {
+        complete(null);
     }
 
     private void complete(@Nullable String input) {
