@@ -92,6 +92,11 @@ public class MagicItems implements NMSMagicItems {
     }
 
     @Override
+    public int getMaxStack(ItemStack itemStack) {
+        return itemStack.getMaxStackSize();
+    }
+
+    @Override
     public boolean isUnbreakable(ItemMeta meta) {
         return meta.isUnbreakable();
     }

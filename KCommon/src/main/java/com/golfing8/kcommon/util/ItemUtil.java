@@ -15,9 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -234,5 +232,33 @@ public final class ItemUtil {
         } else if (value instanceof Boolean) {
             nbt.setBoolean(key, (Boolean) value);
         }
+    }
+
+    /**
+     * Flattens the items if they are overstacked into a new list
+     * <p>
+     * All items will be cloned.
+     * </p>
+     *
+     * @param items the items
+     * @return the new collection of items
+     */
+    public static List<ItemStack> flattenItems(Collection<ItemStack> items) {
+        List<ItemStack> newItems = new ArrayList<>();
+        for (ItemStack itemStack : items) {
+            if (itemStack == null || itemStack.getAmount() <= 0 || itemStack.getType() == XMaterial.AIR.get())
+                continue;
+
+            int maxStack = NMS.getTheNMS().getMagicItems().getMaxStack(itemStack);
+            int stackSize = itemStack.getAmount();
+            while (stackSize > 0) {
+                ItemStack clone = itemStack.clone();
+                int toAdd = Math.min(stackSize, maxStack);
+                clone.setAmount(toAdd);
+                newItems.add(clone);
+                stackSize -= toAdd;
+            }
+        }
+        return newItems;
     }
 }

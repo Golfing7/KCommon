@@ -151,6 +151,11 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     }
 
     @Override
+    public int getMaxStack(ItemStack itemStack) {
+        return itemStack.getType().getMaxStackSize();
+    }
+
+    @Override
     public boolean isUnbreakable(ItemMeta meta) {
         return meta.spigot().isUnbreakable();
     }

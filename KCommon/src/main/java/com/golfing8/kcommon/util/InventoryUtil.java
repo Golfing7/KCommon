@@ -25,7 +25,7 @@ public final class InventoryUtil {
     public static int countItems(Inventory inventory, Predicate<@NotNull ItemStack> predicate) {
         int count = 0;
         for (ItemStack itemStack : inventory.getContents()) {
-            if (itemStack == null || itemStack.getType() == XMaterial.AIR.parseMaterial() || itemStack.getAmount() <= 0)
+            if (itemStack == null || itemStack.getType() == XMaterial.AIR.get() || itemStack.getAmount() <= 0)
                 continue;
 
             if (predicate.test(itemStack)) {
@@ -54,7 +54,7 @@ public final class InventoryUtil {
     public static int countEmptySlots(ItemStack[] items) {
         int count = 0;
         for (ItemStack itemStack : items) {
-            if (itemStack == null || itemStack.getType() == XMaterial.AIR.parseMaterial())
+            if (itemStack == null || itemStack.getType() == XMaterial.AIR.get())
                 count++;
         }
         return count;
@@ -72,7 +72,7 @@ public final class InventoryUtil {
         ItemStack[] contents = inventory.getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack itemStack = contents[i];
-            if (itemStack == null || itemStack.getType() == XMaterial.AIR.parseMaterial() || itemStack.getAmount() <= 0)
+            if (itemStack == null || itemStack.getType() == XMaterial.AIR.get() || itemStack.getAmount() <= 0)
                 continue;
 
             contents[i] = itemFunction.apply(itemStack);
@@ -94,7 +94,7 @@ public final class InventoryUtil {
         ItemStack[] contents = inventory.getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack itemStack = contents[i];
-            if (itemStack == null || itemStack.getType() == XMaterial.AIR.parseMaterial() || itemStack.getAmount() <= 0)
+            if (itemStack == null || itemStack.getType() == XMaterial.AIR.get() || itemStack.getAmount() <= 0)
                 continue;
 
             int toRemove = Math.min(itemStack.getAmount(), amount - count);

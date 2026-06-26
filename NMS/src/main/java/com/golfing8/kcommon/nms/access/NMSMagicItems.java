@@ -50,6 +50,14 @@ public interface NMSMagicItems {
     boolean setRemainingItemDurability(ItemStack stack, int amount);
 
     /**
+     * Gets the maximum stack size for the given item
+     *
+     * @param itemStack the item
+     * @return the max stack
+     */
+    int getMaxStack(ItemStack itemStack);
+
+    /**
      * Checks if the given meta has the unbreakable flag set
      *
      * @param meta the meta
