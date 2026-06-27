@@ -2,6 +2,7 @@ package com.golfing8.kcommon.util.chat;
 
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
+import com.golfing8.kcommon.struct.helper.terminable.Terminable;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Used to capture chat input for use.
  */
 @Getter
-public class ChatInputHelper implements Listener, Closeable {
+public class ChatInputHelper implements Listener, Terminable {
     private static final Map<Player, ChatInputHelper> HELPERS = new ConcurrentHashMap<>();
     /**
      * The future of input. Completed with null if the player times out or disconnects

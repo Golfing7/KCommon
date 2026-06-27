@@ -2,6 +2,7 @@ package com.golfing8.kcommon.util.block;
 
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
+import com.golfing8.kcommon.struct.helper.terminable.Terminable;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,7 +23,7 @@ import java.io.IOException;
  * Captures block selection for a player.
  */
 @Getter
-public class BlockSelectionHelper implements Listener, Closeable {
+public class BlockSelectionHelper implements Listener, Terminable {
     private final Promise<@Nullable Location> resultPromise;
     private final Player player;
     private final @Nullable BukkitTask timeoutTask;
@@ -67,7 +68,7 @@ public class BlockSelectionHelper implements Listener, Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         complete(null);
     }
 

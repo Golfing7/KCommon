@@ -173,7 +173,7 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
      * @deprecated Use {@link #curlyTrusted(String, Object)}
      */
     @Deprecated
-    public static Placeholder curly(@Nonnull String label, @Nonnull String value) {
+    public static Placeholder curly(@Nonnull String label, @Nullable String value) {
         String trueLabel = "{" + label.toUpperCase() + "}";
         return new Placeholder(trueLabel, value, true);
     }
@@ -186,9 +186,9 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
      * @return the placeholder generated.
      */
     @Deprecated
-    public static Placeholder curly(@Nonnull String label, @Nonnull Object value) {
+    public static Placeholder curly(@Nonnull String label, @Nullable Object value) {
         String trueLabel = "{" + label.toUpperCase() + "}";
-        return new Placeholder(trueLabel, value.toString(), true);
+        return new Placeholder(trueLabel, Objects.toString(value), true);
     }
 
     /**
@@ -198,7 +198,7 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
      * @param value the value to replace it with.
      * @return the placeholder generated.
      */
-    public static Placeholder curlyTrusted(@Nonnull String label, @Nonnull Object value) {
+    public static Placeholder curlyTrusted(@Nonnull String label, @Nullable Object value) {
         return curlyTrustedArg(label, value, true);
     }
 
@@ -209,7 +209,7 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
      * @param value the value to replace it with.
      * @return the placeholder generated.
      */
-    public static Placeholder curlyUntrusted(@Nonnull String label, @Nonnull Object value) {
+    public static Placeholder curlyUntrusted(@Nonnull String label, @Nullable Object value) {
         return curlyTrustedArg(label, value, false);
     }
 
@@ -221,8 +221,8 @@ public class Placeholder extends PlaceholderAbstract<String, String> {
      * @param trusted if the placeholder is trusted.
      * @return the placeholder generated.
      */
-    public static Placeholder curlyTrustedArg(@Nonnull String label, @Nonnull Object value, boolean trusted) {
+    public static Placeholder curlyTrustedArg(@Nonnull String label, @Nullable Object value, boolean trusted) {
         String trueLabel = "{" + label.toUpperCase() + "}";
-        return new Placeholder(trueLabel, value.toString(), trusted);
+        return new Placeholder(trueLabel, Objects.toString(value), trusted);
     }
 }
