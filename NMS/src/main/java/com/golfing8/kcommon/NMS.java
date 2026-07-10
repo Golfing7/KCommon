@@ -68,6 +68,7 @@ public final class NMS {
             Constructor<?> cons = mainClass.getConstructor(Plugin.class);
 
             theNMS = (NMSAccess) cons.newInstance(plugin);
+            plugin.getLogger().log(Level.INFO, "Initialized " + packageName.getValue() + " NMS!");
         } catch (RuntimeException | InvocationTargetException exc) {
             plugin.getLogger().log(Level.SEVERE, "Failed to initialize NMS!", exc);
             Bukkit.getPluginManager().disablePlugin(plugin);
@@ -78,6 +79,7 @@ public final class NMS {
                 Constructor<?> cons = mainClass.getConstructor(Plugin.class);
 
                 theNMS = (NMSAccess) cons.newInstance(plugin);
+                plugin.getLogger().log(Level.INFO, "Initialized Modern NMS!");
             } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException |
                      IllegalAccessException |
                      InstantiationException e2) {

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -81,31 +82,43 @@ public interface MessageContainer {
      * </p>
      *
      * @param message the message
+     * @return the new wrapper
+     */
+    default Message append(@Nullable MessageContainer message) {
+        return append(message, " ");
+    }
+
+    /**
+     * Appends the given message to this message returns the result as a new message
+     * <p>
+     * This method will always return a new copy of a message
+     * </p>
+     *
+     * @param message the message
      * @param separator the separator to apply between the messages
      * @return the new wrapper
      */
     default Message append(@Nullable MessageContainer message, @Nullable String separator) {
+        return append(message, AppendMode.END_OF_LINE, separator);
+    }
+
+    /**
+     * Appends the given message to this message returns the result as a new message
+     * <p>
+     * This method will always return a new copy of a message
+     * </p>
+     *
+     * @param message the message
+     * @param appendMode the appending mode
+     * @param separator the separator to apply between the messages
+     * @return the new wrapper
+     */
+    default Message append(@Nullable MessageContainer message, @NotNull AppendMode appendMode, @Nullable String separator) {
         if (message == null) {
             return new Message(this);
         }
 
-        List<String> newMessages;
-        List<String> messages = this.getMessage().getMessages();
-        List<String> appendedMessages = message.getMessage().getMessages();
-        if (messages == null) {
-            newMessages = appendedMessages;
-        } else if (appendedMessages == null) {
-            newMessages = messages;
-        } else {
-            String usedSeparator = separator == null ? "" : separator;
-            List<String> newLines = new ArrayList<>();
-            int size = Math.min(messages.size(), appendedMessages.size());
-            for (int i = 0; i < size; i++) {
-                newLines.add(messages.get(i) + usedSeparator + appendedMessages.get(i));
-            }
-            newMessages = newLines;
-        }
-
+        List<String> newMessages = appendMessages(message, appendMode, separator);
         List<SoundWrapper> newSounds = new ArrayList<>();
         if (getMessage().getSounds() != null) {
             newSounds.addAll(getMessage().getSounds());
@@ -115,7 +128,6 @@ public interface MessageContainer {
         }
 
         String newActionBar = StringUtils.join(new String[] {getMessage().getActionBar(), message.getMessage().getActionBar()}, ' ');
-
         Title newTitle;
         if (getMessage().getTitle() == null) {
             newTitle = message.getMessage().getTitle();
@@ -133,6 +145,53 @@ public interface MessageContainer {
             newTitle = new Title(newTitleString, newSubtitleString, getMessage().getTitle().getIn(), getMessage().getTitle().getStay(), getMessage().getTitle().getOut());
         }
         return new Message(newMessages, newSounds, newTitle, newActionBar);
+    }
+
+    /**
+     * Appends the messages only for this and that message container
+     *
+     * @param message the message
+     * @param appendMode the append mode
+     * @param separator the separator to use
+     * @return the appended messages
+     */
+    default @Nullable List<String> appendMessages(@NotNull MessageContainer message, @NotNull AppendMode appendMode, @Nullable String separator) {
+        List<String> newMessages;
+        List<String> messages = this.getMessage().getMessages();
+        List<String> appendedMessages = message.getMessage().getMessages();
+        if (messages == null) {
+            newMessages = appendedMessages;
+        } else if (appendedMessages == null) {
+            newMessages = messages;
+        } else {
+            String usedSeparator = separator == null ? "" : separator;
+            if (appendMode == AppendMode.END_OF_LINE) {
+                List<String> newLines = new ArrayList<>();
+                int size = Math.min(messages.size(), appendedMessages.size());
+                for (int i = 0; i < size; i++) {
+                    newLines.add(messages.get(i) + usedSeparator + appendedMessages.get(i));
+                }
+                newMessages = newLines;
+            } else if (appendMode == AppendMode.INTERLEAVE) {
+                List<String> newLines = new ArrayList<>();
+                int size = Math.max(messages.size(), appendedMessages.size());
+                for (int i = 0; i < size; i++) {
+                    if (i < messages.size()) {
+                        newLines.add(messages.get(i));
+                    }
+                    if (i < appendedMessages.size()) {
+                        newLines.add(appendedMessages.get(i));
+                    }
+                }
+                newMessages = newLines;
+            } else if (appendMode == AppendMode.AFTER) {
+                newMessages = new ArrayList<>(messages);
+                newMessages.addAll(appendedMessages);
+            } else {
+                throw new IllegalArgumentException("Unknown append mode: " + appendMode);
+            }
+        }
+        return newMessages;
     }
 
     /**
@@ -238,5 +297,62 @@ public interface MessageContainer {
                 });
             }
         }
+    }
+
+    /**
+     * The type of append mode to use for appending messages.
+     * <p>
+     * Note that all action bars and titles are always <code>END_OF_LINE</code>.
+     * </p>
+     */
+    enum AppendMode {
+        /**
+         * All messages will be appended after all other messages from message 1.
+         * <ol>
+         *     <li>Message1: line1, line2, line3</li>
+         *     <li>Message2: line4, line5, line6</li>
+         * </ol>
+         * Result:
+         * <ol>
+         *     <li>line1</li>
+         *     <li>line2</li>
+         *     <li>line3</li>
+         *     <li>line4</li>
+         *     <li>line5</li>
+         *     <li>line6</li>
+         * </ol>
+         */
+        AFTER,
+        /**
+         * All messages will be interleaved with the other message.
+         * <ol>
+         *     <li>Message1: line1, line2, line3</li>
+         *     <li>Message2: line4, line5, line6</li>
+         * </ol>
+         * Result:
+         * <ol>
+         *     <li>line1</li>
+         *     <li>line4</li>
+         *     <li>line2</li>
+         *     <li>line5</li>
+         *     <li>line3</li>
+         *     <li>line6</li>
+         * </ol>
+         */
+        INTERLEAVE,
+        /**
+         * All messages will be appended at the end of the line with a space separator between the messages
+         * <ol>
+         *     <li>Message1: line1, line2, line3</li>
+         *     <li>Message2: line4, line5, line6</li>
+         * </ol>
+         * Result:
+         * <ol>
+         *     <li>line1 line4</li>
+         *     <li>line2 line5</li>
+         *     <li>line3 line6</li>
+         * </ol>
+         */
+        END_OF_LINE,
     }
 }
