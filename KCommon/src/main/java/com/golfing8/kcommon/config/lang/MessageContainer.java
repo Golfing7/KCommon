@@ -127,7 +127,8 @@ public interface MessageContainer {
             newSounds.addAll(message.getMessage().getSounds());
         }
 
-        String newActionBar = StringUtils.join(new String[] {getMessage().getActionBar(), message.getMessage().getActionBar()}, ' ');
+        String actualSeparator = separator == null ? " " : separator;
+        String newActionBar = StringUtils.join(new String[] {getMessage().getActionBar(), message.getMessage().getActionBar()}, actualSeparator);
         Title newTitle;
         if (getMessage().getTitle() == null) {
             newTitle = message.getMessage().getTitle();
@@ -137,11 +138,11 @@ public interface MessageContainer {
             String newTitleString = StringUtils.join(new String[] {
                     getMessage().getTitle().getTitle(),
                     message.getMessage().getTitle().getTitle()
-            }, separator);
+            }, actualSeparator);
             String newSubtitleString = StringUtils.join(new String[] {
                     getMessage().getTitle().getSubtitle(),
                     message.getMessage().getTitle().getSubtitle()
-            }, separator);
+            }, actualSeparator);
             newTitle = new Title(newTitleString, newSubtitleString, getMessage().getTitle().getIn(), getMessage().getTitle().getStay(), getMessage().getTitle().getOut());
         }
         return new Message(newMessages, newSounds, newTitle, newActionBar);
