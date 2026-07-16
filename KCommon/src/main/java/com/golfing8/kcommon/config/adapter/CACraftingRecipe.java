@@ -30,8 +30,15 @@ public class CACraftingRecipe implements ConfigAdapter<Recipe> {
     private final MethodHandle getKeyHandle = Reflection.forNameOptional("org.bukkit.inventory.CraftingRecipe").map(clazz -> Reflection.findMethodHandle(clazz, "getKey")).orElse(null);
     private final MethodHandle setItemIngredientHandle = Reflection.findMethodHandle(ShapedRecipe.class, "setIngredient", char.class, ItemStack.class);
     private final MethodHandle addItemIngredientHandle = Reflection.findMethodHandle(ShapelessRecipe.class, "addIngredient", ItemStack.class);
-    private final MethodHandle newShapelessRecipeConstructor = Reflection.findConstructor(ShapelessRecipe.class, NamespacedKey.class, ItemStack.class);
-    private final MethodHandle newShapedRecipeConstructor = Reflection.findConstructor(ShapedRecipe.class, NamespacedKey.class, ItemStack.class);
+    private MethodHandle newShapelessRecipeConstructor;
+    private MethodHandle newShapedRecipeConstructor;
+
+    public CACraftingRecipe() {
+        try {
+            newShapelessRecipeConstructor = Reflection.findConstructor(ShapelessRecipe.class, NamespacedKey.class, ItemStack.class);
+            newShapedRecipeConstructor = Reflection.findConstructor(ShapedRecipe.class, NamespacedKey.class, ItemStack.class);
+        } catch (NoClassDefFoundError ignored) {}
+    }
 
     @Override
     public Class<Recipe> getAdaptType() {

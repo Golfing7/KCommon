@@ -31,6 +31,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -38,6 +39,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.jetbrains.annotations.Nullable;
 
@@ -167,6 +169,10 @@ public final class ItemStackBuilder {
      */
     private boolean unstackable;
     /**
+     * The color of the item if applicable.
+     */
+    private Color color;
+    /**
      * The last built itemstack for this builder.
      */
     @Getter(AccessLevel.PRIVATE)
@@ -225,6 +231,7 @@ public final class ItemStackBuilder {
         this.extraData = new HashMap<>(toCopy.extraData);
         this.components = new HashMap<>(toCopy.components);
         this.potionData = toCopy.potionData;
+        this.color = toCopy.color;
         this.bookData = toCopy.bookData;
         this.glowing = toCopy.glowing;
         this.unstackable = toCopy.unstackable;
@@ -270,6 +277,9 @@ public final class ItemStackBuilder {
         }
         if (section.contains("potion-data")) {
             this.potionData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "potion-data"), PotionData.class);
+        }
+        if (section.contains("color")) {
+            this.color = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "color"), Color.class);
         }
 
         //Load the enchantments.
@@ -415,6 +425,17 @@ public final class ItemStackBuilder {
      */
     public ItemStackBuilder unstackable(boolean unstackable) {
         this.unstackable = unstackable;
+        return this;
+    }
+
+    /**
+     * Sets the color of the item
+     *
+     * @param color the color
+     * @return the item
+     */
+    public ItemStackBuilder color(Color color) {
+        this.color = color;
         return this;
     }
 
@@ -818,6 +839,11 @@ public final class ItemStackBuilder {
         if (meta instanceof BookMeta && bookData != null) {
             BookMeta bookMeta = (BookMeta) meta;
             NMS.getTheNMS().getMagicItems().setBookData(bookMeta, bookData);
+        }
+
+        if (meta instanceof LeatherArmorMeta && color != null) {
+            LeatherArmorMeta armorMeta = (LeatherArmorMeta) meta;
+            armorMeta.setColor(color);
         }
 
         //Next, apply item flags

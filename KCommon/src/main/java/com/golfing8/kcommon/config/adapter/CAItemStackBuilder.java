@@ -11,6 +11,7 @@ import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.gson.reflect.TypeToken;
 import lombok.var;
+import org.bukkit.Color;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
@@ -94,6 +95,10 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
         if (primitiveValue.containsKey("unstackable")) {
             builder.unstackable((boolean) primitiveValue.get("unstackable"));
         }
+        if (primitiveValue.containsKey("color")) {
+            ConfigPrimitive subValue = entry.getSubValue("color");
+            builder.color(ConfigTypeRegistry.getFromType(subValue, Color.class));
+        }
 
         return builder;
     }
@@ -144,6 +149,8 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
             objects.put("attribute-modifiers", ConfigTypeRegistry.toPrimitive(builder.getAttributeModifierMap()).unwrap());
         if (builder.isUnstackable())
             objects.put("unstackable", true);
+        if (builder.getColor() != null)
+            objects.put("color", ConfigTypeRegistry.toPrimitive(builder.getColor()).unwrap());
         return ConfigPrimitive.ofMap(objects);
     }
 }

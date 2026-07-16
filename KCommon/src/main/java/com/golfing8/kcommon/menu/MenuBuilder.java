@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -251,6 +252,18 @@ public final class MenuBuilder {
      */
     public SimpleGUIItem getSpecialItem(String key) {
         return specialGUIItems.get(key);
+    }
+
+    /**
+     * Modifies the special item if it exists under the given key
+     *
+     * @param key the key
+     * @param modifier the modifier
+     */
+    public void modifySpecialItem(String key, Consumer<SimpleGUIItem> modifier) {
+        if (specialGUIItems.containsKey(key)) {
+            modifier.accept(specialGUIItems.get(key));
+        }
     }
 
     /**
