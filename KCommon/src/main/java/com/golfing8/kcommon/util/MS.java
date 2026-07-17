@@ -42,7 +42,7 @@ public final class MS {
 
         //Try hex coloring, if we're on a version which supports it.
         TRANSFORMERS.add(string -> {
-            if (KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_16))
+            if (KCommon.getInstance() == null || KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_16))
                 return RGBUtils.INSTANCE.hexColor(string);
             return string;
         });
@@ -202,10 +202,6 @@ public final class MS {
      */
     @Contract(pure = true)
     public static @NotNull String applyTransformers(@NotNull String str) {
-        // If the string doesn't contain the marker character, don't parse.
-        if (!str.contains("$"))
-            return str;
-
         for (Function<String, String> func : TRANSFORMERS) {
             str = func.apply(str);
         }

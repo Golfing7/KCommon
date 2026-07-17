@@ -139,5 +139,18 @@ gradle.projectsEvaluated {
                 }
             }
         }
+
+        repositories {
+            maven {
+                // Pick release or snapshot URL depending on your setup
+                url = uri(if (version.toString().endsWith("SNAPSHOT"))
+                    "https://maven.mckore.com/snapshots/" else "https://maven.mckore.com/releases/")
+
+                credentials {
+                    username = project.findProperty("koreDevUsername")?.toString() ?: ""
+                    password = project.findProperty("koreDevPassword")?.toString() ?: ""
+                }
+            }
+        }
     }
 }
