@@ -52,6 +52,12 @@ public class Configuration extends YamlConfiguration implements KConfig {
     @Setter
     private YamlConfiguration source;
 
+    /**
+     * Tracks if this config has been modified since it was last saved.
+     */
+    @Getter @Setter
+    private boolean modified = false;
+
     public Configuration(Path configPath) {
         this.configPath = configPath;
         this.comments = new HashMap<>();
@@ -129,8 +135,10 @@ public class Configuration extends YamlConfiguration implements KConfig {
     /**
      * Saves this configuration, including the comments.
      */
+    @Override
     public void save() {
         try {
+            modified = false;
             Files.write(configPath, saveToString().getBytes(StandardCharsets.UTF_8));
         } catch (IOException exc) {
             throw new RuntimeException(String.format("Failed to save config at path %s!", this.configPath), exc);
@@ -396,6 +404,7 @@ public class Configuration extends YamlConfiguration implements KConfig {
     @Override
     public void set(String path, Object value) {
         ConfigTypeRegistry.setInConfig(wrapped, path, value);
+        modified = true;
     }
 
     @Override

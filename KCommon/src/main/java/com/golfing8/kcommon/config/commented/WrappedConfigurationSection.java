@@ -297,6 +297,7 @@ public class WrappedConfigurationSection implements KConfigurationSection {
     @Override
     public void set(String path, Object value) {
         ConfigTypeRegistry.setInConfig(wrapped, path, value);
+        originalConfig.setModified(true);
     }
 
     @Override
@@ -340,6 +341,11 @@ public class WrappedConfigurationSection implements KConfigurationSection {
             this.originalConfig.save();
         }
         return true;
+    }
+
+    @Override
+    public boolean isModified() {
+        return originalConfig.isModified();
     }
 
     @Override

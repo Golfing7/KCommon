@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
+import com.golfing8.kcommon.config.commented.KConfigurationSection;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;
@@ -46,6 +47,8 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
         // Get the options of the serializable.
         CASerializable.Options options = type.getType().getAnnotation(CASerializable.Options.class);
+        CASerializable.Required classRequiredAnnotation = type.getType().getAnnotation(CASerializable.Required.class);
+        boolean classRequired = classRequiredAnnotation != null && classRequiredAnnotation.value();
         if (options != null && options.canDelegate() && entry.getPrimitive() instanceof String && entry.getSource() != null) {
             String delegatePath = (String) entry.getPrimitive();
             ConfigurationSection root = entry.getSource().getRoot();
@@ -117,13 +120,24 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
             // Don't override default values if the value is not present at all.
             String key = StringUtil.camelToYaml(fieldEntry.getKey());
-            if (!primitives.containsKey(key))
-                continue;
+            if (!primitives.containsKey(key)) {
+                CASerializable.Required requiredAnnotation = handle.getField().getAnnotation(CASerializable.Required.class);
+                boolean required = requiredAnnotation != null ? requiredAnnotation.value() : classRequired;
+                if (!required || entry.getSource() == null)
+                    continue;
 
-            Object primitiveValue = primitives.get(key);
-            if (primitiveValue == null) {
-                handle.set(instance, null);
-                continue;
+                // Make sure the config has the required field.
+                Object defaultValue = handle.get(instance);
+                if (defaultValue == null)
+                    continue;
+
+                ConfigTypeRegistry.setInConfig(entry.getSource(), key, defaultValue);
+            } else {
+                Object primitiveValue = primitives.get(key);
+                if (primitiveValue == null) {
+                    handle.set(instance, null);
+                    continue;
+                }
             }
 
             var fieldType = new FieldType(handle.getField());

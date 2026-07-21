@@ -40,6 +40,22 @@ public interface CASerializable {
     }
 
     /**
+     * An annotation for if the field or all fields in a class should be required in the config.
+     * If present, any new field (or class) this is applied to will be populated into the config if it is missing.
+     * Typically, this should be used for configs as their options need to be visible to the user.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.FIELD})
+    @interface Required {
+        /**
+         * If the field is required.
+         *
+         * @return true/false
+         */
+        boolean value() default true;
+    }
+
+    /**
      * An annotation for defining options on classes implementing {@link CASerializable}
      */
     @Retention(RetentionPolicy.RUNTIME)
@@ -74,6 +90,14 @@ public interface CASerializable {
          * @return if the type can delegate.
          */
         boolean canDelegate() default false;
+
+        /**
+         * If set to true, this class will be treated as a config class and all fields will be populated in the config.
+         * Normally, new fields added
+         *
+         * @return true if config mode.
+         */
+        boolean config() default false;
 
         /**
          * The type resolver enum finds the correct type to deserialize from a special {@code type: ENUM} key.

@@ -47,6 +47,13 @@ public interface KConfigurationSection extends ConfigurationSection {
     boolean tryLoadFromSource(String path);
 
     /**
+     * Checks if this config tied to this configuration section has been modified
+     *
+     * @return true if modified
+     */
+    boolean isModified();
+
+    /**
      * Gets the KConfigurationSection under the given path
      *
      * @param path the path

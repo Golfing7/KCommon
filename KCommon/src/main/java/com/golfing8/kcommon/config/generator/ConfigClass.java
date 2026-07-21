@@ -190,6 +190,9 @@ public abstract class ConfigClass {
         for (ConfigClass child : children.values()) {
             modified |= child.loadValues(source);
         }
+        if (source instanceof KConfigurationSection) {
+            modified |= ((KConfigurationSection) source).isModified();
+        }
         return modified;
     }
 
