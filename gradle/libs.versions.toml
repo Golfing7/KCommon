@@ -1,13 +1,13 @@
 [versions]
-lombok = "1.18.42"
+lombok = "1.18.46"
 adventure-libraries = "4.24.0"
 adventure-platform = "4.4.1"
 expiringmap = "0.5.11"
 exp4j = "0.4.8"
-itemnbtapi = "2.15.5"
+itemnbtapi = "2.15.7"
 annotations = "24.1.0"
 junit-jupiter = "5.9.0"
-xseries = "13.6.0"
+xseries = "13.7.1"
 mongo = "5.0.1"
 
 [libraries]
