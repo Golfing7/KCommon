@@ -9,6 +9,7 @@ annotations = "24.1.0"
 junit-jupiter = "5.9.0"
 xseries = "13.7.1"
 mongo = "5.0.1"
+triehard = "1.0"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
@@ -20,5 +21,6 @@ exp4j = { module = "net.objecthunter:exp4j", version.ref = "exp4j" }
 annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
 xseries = { module = "com.github.cryptomorin:XSeries", version.ref = "xseries" }
 mongo-sync = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongo" }
+triehard = { module = "org.magnos.trie:TrieHard", version.ref = "triehard" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }

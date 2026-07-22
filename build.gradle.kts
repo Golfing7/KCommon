@@ -18,6 +18,15 @@ java {
 repositories {
     mavenCentral()
 
+    maven {
+        name = "koredevReleases"
+        url = uri("https://maven.mckore.com/releases")
+        metadataSources {
+            mavenPom()
+            artifact() // Tells Gradle it's okay to fallback directly to the .jar
+        }
+    }
+
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
     maven {
         name = "CodeMC"
@@ -85,6 +94,15 @@ subprojects {
 
     repositories {
         mavenCentral()
+
+        maven {
+            name = "koredevReleases"
+            url = uri("https://maven.mckore.com/releases")
+            metadataSources {
+                mavenPom()
+                artifact() // Tells Gradle it's okay to fallback directly to the .jar
+            }
+        }
 
         maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
         maven {

@@ -200,5 +200,6 @@ class StringMacrosTest {
         // Assert 100k parses execute in under 500ms (Adjust threshold based on target hardware)
         assertTrue(totalTimeMillis < 500.0,
                 String.format("Parsing took too long: %.2f ms for %d runs", totalTimeMillis, iterations));
+        System.out.printf("Parsing took %.2f for %d runs%n", totalTimeMillis, iterations);
     }
 }

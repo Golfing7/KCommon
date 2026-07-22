@@ -6,10 +6,7 @@ import com.golfing8.kcommon.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -146,6 +143,7 @@ public class StringMacros {
 
         StringBuilder result = new StringBuilder();
         int i = begin;
+        int copyStart = begin;
 
         while (i < end) {
             if (inputCh[i] == '$') {
@@ -162,22 +160,29 @@ public class StringMacros {
                 MacroFunction macroFunction;
                 if (!symbol.isEmpty() && (macroFunction = macroRegistry.get(symbol)) != null) {
                     int curr = symbolEnd;
-                    List<String> args = new ArrayList<>();
+                    List<String> args = Collections.emptyList();
 
                     // 2. Parse zero or more optional arguments in parentheses: (arg1)(arg2)
-                    while (curr < end && inputCh[curr] == '(') {
-                        int argEnd = findMatchingCloser(inputCh, curr, '(', ')');
-                        if (argEnd == -1) break; // Unmatched parenthesis
+                    if (curr < end && inputCh[curr] == '(') {
+                        args = new ArrayList<>(2);
+                        while (curr < end && inputCh[curr] == '(') {
+                            int argEnd = findMatchingCloser(inputCh, curr, '(', ')');
+                            if (argEnd == -1) break;
 
-                        // Recursively parse macros inside arguments
-                        args.add(parse(inputCh, curr + 1, argEnd));
-                        curr = argEnd + 1;
+                            args.add(parse(inputCh, curr + 1, argEnd));
+                            curr = argEnd + 1;
+                        }
                     }
 
                     // 3. Parse required content body in curly braces: {content}
                     if (curr < end && inputCh[curr] == '{') {
                         int contentEnd = findMatchingCloser(inputCh, curr, '{', '}');
                         if (contentEnd != -1) {
+                            // Bulk-append buffered plain text before macro output
+                            if (i > copyStart) {
+                                result.append(inputCh, copyStart, i - copyStart);
+                            }
+
                             // Process nested macros inside the body content first
                             String evaluatedContent = parse(inputCh, curr + 1, contentEnd);
 
@@ -185,15 +190,18 @@ public class StringMacros {
                             result.append(macroFunction.apply(args, evaluatedContent));
 
                             i = contentEnd + 1;
+                            copyStart = i; // Move copy index past the macro
                             continue;
                         }
                     }
                 }
             }
-
-            // Normal character or unparsed macro pattern
-            result.append(inputCh[i]);
             i++;
+        }
+
+        // Bulk-append remaining plain text
+        if (i > copyStart) {
+            result.append(inputCh, copyStart, i - copyStart);
         }
 
         return result.toString();
