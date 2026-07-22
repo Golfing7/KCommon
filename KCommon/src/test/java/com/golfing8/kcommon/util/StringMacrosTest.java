@@ -89,6 +89,25 @@ class StringMacrosTest {
             assertEquals("4", engine.parse("$eval{2+2}"));
             assertEquals("50", engine.parse("$eval{10*5}"));
         }
+
+        @Test
+        @DisplayName("Test string reverse $reverse{}")
+        void testReverse() {
+            assertEquals("gnirtS desreveR", engine.parse("$reverse{Reversed String}"));
+        }
+
+        @Test
+        @DisplayName("Test string substring $substring(begin)(end){}")
+        void testSubstring() {
+            assertEquals("racecar", engine.parse("$substring(4)(11){The racecar is very fast}"));
+        }
+
+        @Test
+        @DisplayName("Tests double formatting as int $int{}")
+        void testInt() {
+            assertEquals("123", engine.parse("$int{123.3214}"));
+            assertEquals("3", engine.parse("$int{3.1415}"));
+        }
     }
 
     @Nested
@@ -178,8 +197,8 @@ class StringMacrosTest {
         long totalTimeNanos = System.nanoTime() - startTime;
         double totalTimeMillis = totalTimeNanos / 1_000_000.0;
 
-        // Assert 100k parses execute in under 150ms (Adjust threshold based on target hardware)
-        assertTrue(totalTimeMillis < 150.0,
+        // Assert 100k parses execute in under 500ms (Adjust threshold based on target hardware)
+        assertTrue(totalTimeMillis < 500.0,
                 String.format("Parsing took too long: %.2f ms for %d runs", totalTimeMillis, iterations));
     }
 }

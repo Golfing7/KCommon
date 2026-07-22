@@ -89,6 +89,9 @@ public class StringMacros {
             int end = Numbers.parseInteger(args.get(1)).orElse(string.length());
             return string.substring(begin, end);
         });
+        DEFAULT.registerMacro("int", (args, string) -> {
+            return Numbers.parseDoubleOpt(string).map(StringUtil::formatInteger).orElse(string);
+        });
     }
 
     /**
@@ -222,9 +225,9 @@ public class StringMacros {
      * @return true if part of a macro
      */
     private static boolean isFastMacroSymbolPart(char c) {
-        return (c >= 'a' && c <= 'z') ||
-                (c >= 'A' && c <= 'Z') ||
-                (c >= '0' && c <= '9') ||
+        return c >= 'a' && c <= 'z' ||
+                c >= 'A' && c <= 'Z' ||
+                c >= '0' && c <= '9' ||
                 c == '_' || c == '$';
     }
 }

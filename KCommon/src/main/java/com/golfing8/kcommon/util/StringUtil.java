@@ -19,7 +19,8 @@ public class StringUtil {
 
     private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###.##");
     private static final DecimalFormat COMMA_FORMAT = new DecimalFormat("###,###,###,###,###");
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#########.#########");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###################.#########");
+    private static final DecimalFormat INTEGER_FORMAT = new DecimalFormat("###################");
 
     /**
      * Contains font information for the default MC font
@@ -287,8 +288,24 @@ public class StringUtil {
         return sb + message;
     }
 
+    /**
+     * Formats the number using the default decimal format {@link #DECIMAL_FORMAT}
+     *
+     * @param number the number
+     * @return the formatted number
+     */
     public static String formatDecimal(double number) {
         return DECIMAL_FORMAT.format(number);
+    }
+
+    /**
+     * Formats the number using the decimal format {@link #INTEGER_FORMAT}
+     *
+     * @param number the number
+     * @return the formatted number
+     */
+    public static String formatInteger(double number) {
+        return INTEGER_FORMAT.format(number);
     }
 
     /**
