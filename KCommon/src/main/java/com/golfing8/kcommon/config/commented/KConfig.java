@@ -33,6 +33,13 @@ public interface KConfig extends org.bukkit.configuration.Configuration, KConfig
     void save();
 
     /**
+     * Sets if the config has been modified
+     *
+     * @param modified true if modified
+     */
+    void setModified(boolean modified);
+
+    /**
      * Gets the value at the path with the given type.
      *
      * @param path the path.

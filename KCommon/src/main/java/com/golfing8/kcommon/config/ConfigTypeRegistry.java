@@ -3,6 +3,7 @@ package com.golfing8.kcommon.config;
 import com.golfing8.kcommon.config.adapter.*;
 import com.golfing8.kcommon.config.adapter.xseries.*;
 import com.golfing8.kcommon.config.commented.Configuration;
+import com.golfing8.kcommon.config.commented.KConfigurationSection;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.struct.reflection.FieldType;
@@ -218,6 +219,27 @@ public class ConfigTypeRegistry {
             return;
         }
         section.set(path, toPrimitive(value).unwrap());
+    }
+
+    /**
+     * Sets the value at the given configuration section.
+     *
+     * @param section  the section.
+     * @param path     the path of the value.
+     * @param value    the value.
+     * @param comments the comments to add.
+     */
+    public static void setInConfig(ConfigurationSection section, String path, Object value, String... comments) {
+        if (section instanceof KConfigurationSection) {
+            KConfigurationSection ksection = (KConfigurationSection) section;
+            if (value instanceof ConfigurationSection) {
+                ksection.set(path, value, comments);
+            } else {
+                ksection.set(path, toPrimitive(value), comments);
+            }
+        } else {
+            setInConfig(section, path, value);
+        }
     }
 
     /**

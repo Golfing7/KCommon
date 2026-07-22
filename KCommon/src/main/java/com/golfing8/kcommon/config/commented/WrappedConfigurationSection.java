@@ -18,7 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class WrappedConfigurationSection implements KConfigurationSection {
     private final ConfigurationSection wrapped;
-    private final com.golfing8.kcommon.config.commented.Configuration originalConfig;
+    private final KConfig originalConfig;
 
     @Override
     public Object get(String path) {
