@@ -3,8 +3,6 @@ package com.golfing8.kcommon.config.adapter;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.config.commented.KConfigurationSection;
-import com.golfing8.kcommon.config.generator.Conf;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;

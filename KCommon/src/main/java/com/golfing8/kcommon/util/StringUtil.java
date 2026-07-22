@@ -19,6 +19,7 @@ public class StringUtil {
 
     private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("###,###,###,###,###.##");
     private static final DecimalFormat COMMA_FORMAT = new DecimalFormat("###,###,###,###,###");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#########.#########");
 
     /**
      * Contains font information for the default MC font
@@ -284,6 +285,10 @@ public class StringUtil {
             compensated += spaceLength;
         }
         return sb + message;
+    }
+
+    public static String formatDecimal(double number) {
+        return DECIMAL_FORMAT.format(number);
     }
 
     /**

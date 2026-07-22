@@ -45,6 +45,7 @@ dependencies {
     testImplementation(project(":NMS"))
     testImplementation(rootProject.libs.mongo.sync)
     testImplementation(rootProject.libs.xseries)
+    testImplementation(rootProject.libs.exp4j)
 
     compileOnly("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     compileOnly(rootProject.libs.exp4j)
