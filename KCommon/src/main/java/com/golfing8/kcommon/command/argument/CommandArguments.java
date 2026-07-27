@@ -9,6 +9,7 @@ import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.struct.KNamespacedKey;
 import com.golfing8.kcommon.struct.time.TimeLength;
 import com.golfing8.kcommon.util.MapUtil;
+import com.google.common.collect.Lists;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -17,6 +18,8 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
@@ -200,6 +203,23 @@ public final class CommandArguments {
     }, context -> {
         return TimeLength.parseTime(context.getArgument()) != null;
     }, ctx -> TimeLength.parseTime(ctx.getArgument()));
+
+    /**
+     * A command argument to auto-complete local date times.
+     */
+    public static final CommandArgument<LocalDateTime> LOCAL_DATE_TIME = new CommandArgument<>("A local date time", context -> {
+        return Lists.newArrayList(
+                "2007-12-03T10:15:30",
+                "2020-12-03T10:15:30"
+        );
+    }, context -> {
+        try {
+            LocalDateTime.parse(context.getArgument());
+            return true;
+        } catch (DateTimeParseException ignored) {
+            return false;
+        }
+    }, ctx -> LocalDateTime.parse(ctx.getArgument()));
 
     /**
      * A command argument for all modules.
