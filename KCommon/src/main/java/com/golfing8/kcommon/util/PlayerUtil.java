@@ -5,8 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Stores utility classes pertaining to players.
@@ -76,25 +75,19 @@ public final class PlayerUtil {
      * @param silent     if the overflow message should be sent
      */
     public static void givePlayerItemsSafe(Player player, Collection<ItemStack> itemStacks, boolean silent) {
-        boolean notify = false;
-        for (ItemStack itemStack : itemStacks) {
-            int total = itemStack.getAmount();
+        List<ItemStack> safeItems = ItemUtil.flattenItems(itemStacks);
 
-            for (int z = 0; z < total; z += 64) {
-                int toGiveThisTime = Math.min(64, total - z);
+        // Try to give the player as many of the items as possible.
+        Map<Integer, ItemStack> leftover = player.getInventory().addItem(safeItems.toArray(new ItemStack[0]));
+        safeItems = new ArrayList<>(leftover.values());
+        if (safeItems.isEmpty())
+            return;
 
-                itemStack.setAmount(toGiveThisTime);
-
-                if (player.getInventory().firstEmpty() == -1) {
-                    player.getWorld().dropItem(player.getLocation(), itemStack.clone());
-                    if (!silent)
-                        notify = true;
-                } else {
-                    player.getInventory().addItem(itemStack.clone());
-                }
-            }
+        for (ItemStack itemStack : safeItems) {
+            player.getWorld().dropItem(player.getLocation(), itemStack.clone());
         }
-        if (notify)
+        if (!silent) {
             player.sendMessage(MS.parseSingle("&cYour inventory was full. Check your feet!"));
+        }
     }
 }
