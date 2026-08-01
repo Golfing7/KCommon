@@ -672,7 +672,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         for (KCommand subcommand : this.subcommands) {
             if (subcommand.labelMatches(newLabel)) {
                 if (subcommand.async) {
-                    Bukkit.getScheduler().runTaskAsynchronously(this.getPlugin(), () -> this.pass(sender, newLabel, newArgs));
+                    Bukkit.getScheduler().runTaskAsynchronously(this.getPlugin(), () -> subcommand.pass(sender, newLabel, newArgs));
                 } else {
                     subcommand.pass(sender, newLabel, newArgs);
                 }
