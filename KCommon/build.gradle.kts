@@ -52,6 +52,7 @@ dependencies {
     compileOnly(rootProject.libs.mongo.sync)
     implementation(rootProject.libs.itemnbtapi)
     implementation("me.lucko:jar-relocator:1.7")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
 
     compileOnly(project(":NMS"))
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0")

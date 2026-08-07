@@ -112,7 +112,7 @@ public class Range {
      * @return the created range.
      */
     public static Range fromString(String string) {
-        String[] split = string.split("[:;|]");
+        String[] split = string.split("[:;|-], 2");
 
         if (split.length == 1) {
             split = new String[]{split[0], split[0]};

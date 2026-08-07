@@ -56,6 +56,7 @@ tasks {
         relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")
         relocate("com.cryptomorin.xseries", "com.golfing8.shade.com.cryptomorin.xseries")
         relocate("org.objectweb.asm", "com.golfing8.shade.org.objectweb.asm")
+        relocate("org.bstats", project.group.toString())
         exclude("kotlin-*.jar")
     }
 

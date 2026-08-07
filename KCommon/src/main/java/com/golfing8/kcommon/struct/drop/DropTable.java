@@ -86,6 +86,8 @@ public class DropTable implements CASerializable {
 
     @Override
     public void onDeserialize(ConfigPrimitive primitive) {
+        if (table == null)
+            table = new HashMap<>();
         if (groupings == null)
             groupings = new HashMap<>();
 

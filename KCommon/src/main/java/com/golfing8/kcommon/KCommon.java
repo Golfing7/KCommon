@@ -10,6 +10,7 @@ import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +24,7 @@ import java.util.List;
  * A plugin implementation of {@link KPlugin} so this commons library can be loaded as a standalone.
  */
 public class KCommon extends KPlugin {
+    private static final int BSTATS_ID = 33143;
     @Getter
     private static KCommon instance;
     /**
@@ -37,7 +39,7 @@ public class KCommon extends KPlugin {
     private ZoneId timeZone;
     @Getter
     private boolean debug;
-    /**
+    /**33143
      * The version this server is running.
      */
     @Getter
@@ -53,6 +55,8 @@ public class KCommon extends KPlugin {
      */
     @Getter
     private Thread mainThread;
+
+    private Metrics metrics;
 
     @Override
     public void onLoadInner() {
@@ -127,6 +131,7 @@ public class KCommon extends KPlugin {
             getServer().getPluginManager().registerEvents(new LinkedEntityListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDataListener(), this);
 
+        this.metrics = new Metrics(this, BSTATS_ID);
         // Try to load our DialogMenu API
         if (serverVersion.isAtOrAfter(new NMSVersion(21, 6))) {
             Reflection.forNameOptional("com.golfing8.kcommon.dialogs.DialogMenu").ifPresent(clazz -> {
@@ -136,6 +141,13 @@ public class KCommon extends KPlugin {
 
                 Reflection.invokeQuietly(initialize, this);
             });
+        }
+    }
+
+    @Override
+    public void onDisableInner() {
+        if (this.metrics != null) {
+            this.metrics.shutdown();
         }
     }
 
