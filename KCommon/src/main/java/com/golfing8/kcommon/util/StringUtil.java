@@ -325,7 +325,9 @@ public class StringUtil {
 
         StringBuilder toReturn = new StringBuilder();
 
-        if (string.length() < 4) return string;
+        if (string.length() < 4) {
+            return string + appendAtEnd;
+        }
 
         for (int z = 0; z < string.length(); z++) {
             if (z % 3 == 0 && z != 0) {

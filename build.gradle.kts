@@ -11,10 +11,6 @@ val commonsVersion = "1.2-SNAPSHOT"
 group = "com.golfing8"
 version = commonsVersion
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
-
 repositories {
     mavenCentral()
 

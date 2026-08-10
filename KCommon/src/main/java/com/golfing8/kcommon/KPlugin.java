@@ -94,10 +94,11 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             return;
 
         try {
-            this.reflectivelySetupModules();
+            Reflection.reflectivelySetupModules((PluginClassLoader) getClassLoader(), module -> {
+                this.placeholderAPIHook.registerProvider(module);
+            });
         } catch (RuntimeException e) {
-            this.getLogger().warning("Failed to reflectively initialize modules! Shutting down...");
-            e.printStackTrace();
+            this.getLogger().log(Level.SEVERE, "Failed to reflectively initialize modules! Shutting down...", e);
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -119,8 +120,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             try {
                 module.shutdown();
             } catch (Throwable thr) {
-                getLogger().severe(String.format("Experienced uncaught error while shutting down module %s!", module.getModuleName()));
-                thr.printStackTrace();
+                getLogger().log(Level.SEVERE, String.format("Experienced uncaught error while shutting down module %s!", module.getModuleName()), thr);
             }
         }
 
@@ -170,8 +170,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             DataSerializer.getGSONBase().toJson(this.manifest, writer);
             writer.close();
         } catch (IOException e) {
-            getLogger().warning("Failed to save module-manifest.json!");
-            e.printStackTrace();
+            getLogger().log(Level.SEVERE, "Failed to save module-manifest.json!", e);
         }
     }
 
@@ -186,8 +185,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             try {
                 Files.createFile(path);
             } catch (IOException exc) {
-                getLogger().warning("Failed to save default module-manifest.json!");
-                exc.printStackTrace();
+                getLogger().log(Level.SEVERE, "Failed to save default module-manifest.json!", exc);
             }
             return;
         }
@@ -197,172 +195,8 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             ModuleManifest loadedManifest = gsonBase.fromJson(Files.newBufferedReader(path), ModuleManifest.class);
             this.manifest = loadedManifest == null || loadedManifest.getModuleStates() == null ? new ModuleManifest() : loadedManifest;
         } catch (IOException exc) {
-            getLogger().warning("Failed to read module-manifest.json! Loading default manifest...");
-            exc.printStackTrace();
+            getLogger().log(Level.SEVERE, "Failed to read module-manifest.json! Loading default manifest...", exc);
             this.manifest = new ModuleManifest();
-        }
-    }
-
-    /**
-     * Uses reflection to detect all present module classes and instantiate them.
-     */
-    private void reflectivelySetupModules() {
-        //A map storing module classes to their dependencies in graph like formation
-        Map<Class<?>, List<Class<?>>> classToClassDependencyGraph = new HashMap<>();
-        Map<Class<?>, Module> instances = new HashMap<>();
-        BiMap<String, Class<?>> nameModuleMap = HashBiMap.create();
-
-        NMSVersion serverVersion = KCommon.getInstance().getServerVersion();
-        Reflection.discoverModules((PluginClassLoader) getClassLoader()).forEach(mClass -> {
-            //We only want to work on our own modules, not other plugins
-            if (!mClass.getPackage().getName().startsWith(this.getClass().getPackage().getName()))
-                return;
-
-            if (!mClass.isAnnotationPresent(ModuleInfo.class))
-                return;
-
-            //Instantiate the module with the given information
-            ModuleInfo info = mClass.getAnnotation(ModuleInfo.class);
-
-            // We can filter modules that are missing plugin dependencies at this point.
-            for (String depend : info.pluginDependencies()) {
-                if (!Bukkit.getPluginManager().isPluginEnabled(depend)) {
-                    return;
-                }
-            }
-
-            // Check if the module is running on the proper server version.
-            if (info.minimumMajorVersion() > 0 && serverVersion.getMajor() < info.minimumMajorVersion()) {
-                return;
-            }
-            if (info.maximumMajorVersion() > 0 && serverVersion.getMajor() > info.maximumMajorVersion()) {
-                return;
-            }
-            if (info.minimumMinorVersion() > 0 && serverVersion.getMinor() < info.minimumMajorVersion()) {
-                return;
-            }
-            if (info.maximumMinorVersion() > 0 && serverVersion.getMinor() > info.maximumMinorVersion()) {
-                return;
-            }
-
-            Module instance;
-            // Is the module already registered?
-            // If so, don't re-register it!
-            // This can happen with Kotlin 'object' declarations.
-            KNamespacedKey namespace = new KNamespacedKey(this, info.name());
-            if ((instance = Modules.getModule(namespace)) == null) {
-                try {
-                    Constructor<? extends Module> constructor = mClass.getConstructor();
-                    instance = constructor.newInstance();
-                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                         InvocationTargetException e) {
-                    // Check for the 'INSTANCE' field which Kotlin objects use.
-                    try {
-                        Field field = mClass.getDeclaredField("INSTANCE");
-                        instance = (Module) field.get(null);
-                    } catch (NoSuchFieldException ignored) {
-                        throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), e);
-                    } catch (Throwable ex) {
-                        throw new RuntimeException(String.format("Failed to instantiate module %s!", info.name()), ex);
-                    }
-                } catch (Throwable thr) {
-                    // If the module fails to initialize, just skip it.
-                    getLogger().log(Level.SEVERE, "Failed to initialize module " + info.name() + "! It will be skipped!", thr);
-                    return;
-                }
-            }
-
-            instances.put(mClass, instance);
-            nameModuleMap.put(info.name(), mClass);
-        });
-
-        // Build the dependency graph and filter classes that are missing module dependencies
-        instances.entrySet().removeIf(entry -> {
-            List<Class<?>> classDepends = new ArrayList<>();
-            for (String mdepend : entry.getValue().getModuleDependencies()) {
-                if (!nameModuleMap.containsKey(mdepend) && !Modules.moduleExists(mdepend)) {
-                    nameModuleMap.remove(entry.getValue().getModuleName());
-                    return true;
-                }
-
-                classDepends.add(nameModuleMap.containsKey(mdepend) ? nameModuleMap.get(mdepend) : Modules.getModule(mdepend).getClass());
-            }
-            classToClassDependencyGraph.put(entry.getKey(), classDepends);
-            return false;
-        });
-
-        //Loop through to detect cycles.
-        Set<Class<?>> traversed = new HashSet<>();
-        Queue<Class<?>> nextUp = new ArrayDeque<>();
-        for (Map.Entry<Class<?>, List<Class<?>>> entry : classToClassDependencyGraph.entrySet()) {
-            traversed.clear();
-            nextUp.add(entry.getKey());
-            traversed.add(entry.getKey());
-
-            //Do a breadth first walk to properly detect cycles.
-            while (!nextUp.isEmpty()) {
-                Class<?> type = nextUp.poll();
-
-                // Skip over classes that aren't in our graph, we don't need to worry about them.
-                if (!classToClassDependencyGraph.containsKey(type))
-                    continue;
-
-                for (Class<?> value : classToClassDependencyGraph.get(type)) {
-                    //If this is the case, we've detected a cycle.
-                    if (!traversed.add(value)) {
-                        getLogger().severe(String.format("Detected cycle in dependencies for module '%s'!", entry.getKey().getSimpleName()));
-                        getServer().getPluginManager().disablePlugin(this);
-                        return;
-                    }
-
-                    nextUp.add(value);
-                }
-            }
-        }
-
-        //Do a depth first walk to enable all modules, at this point we know there's no cycles.
-        Set<Class<?>> enabled = new HashSet<>();
-        Stack<Class<?>> dependencies = new Stack<>();
-        for (Map.Entry<Class<?>, List<Class<?>>> entry : classToClassDependencyGraph.entrySet()) {
-            if (enabled.contains(entry.getKey()))
-                continue;
-
-            dependencies.addAll(entry.getValue());
-
-            //Enable all dependencies.
-            while (!dependencies.isEmpty()) {
-                //Get the dependency.
-                Class<?> currDepend = dependencies.peek();
-
-                // If the class isn't in our graph, it's not our job to enable it.
-                if (!classToClassDependencyGraph.containsKey(currDepend)) {
-                    dependencies.pop();
-                    continue;
-                }
-
-                List<Class<?>> depends = classToClassDependencyGraph.get(currDepend);
-
-                //Does it have any dependencies? If so, enable them!
-                if (!dependencies.isEmpty() && !enabled.containsAll(depends)) {
-                    dependencies.addAll(depends);
-                    continue;
-                }
-
-                //No depends! Just enable it now.
-                dependencies.pop();
-
-                //If it's already been enabled, simply skip it.
-                if (!enabled.add(currDepend))
-                    continue;
-
-                instances.get(currDepend).initialize();
-            }
-
-            enabled.add(entry.getKey());
-            Module mInstance = instances.get(entry.getKey());
-            mInstance.initialize();
-
-            this.placeholderAPIHook.registerProvider(mInstance);
         }
     }
 

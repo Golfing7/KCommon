@@ -81,7 +81,6 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
          * the remaining arguments will also be autofilled.
          * </p>
          */
-        @Setter
         private @Nullable String requiredPermissionExtension;
         /**
          * true = Only players are allowed to use the autofill for this argument.

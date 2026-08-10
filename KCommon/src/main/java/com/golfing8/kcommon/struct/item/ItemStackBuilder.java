@@ -92,6 +92,10 @@ public final class ItemStackBuilder {
      */
     private int amount = 1;
     /**
+     * If the amount has been set explicitly
+     */
+    private boolean amountSet = false;
+    /**
      * An amount for the item, will override {@link #amount} if set.
      */
     private @Nullable Range variableAmount;
@@ -381,6 +385,7 @@ public final class ItemStackBuilder {
      */
     public ItemStackBuilder amount(int amount) {
         this.amount = amount;
+        this.amountSet = true;
         return this;
     }
 
@@ -792,7 +797,7 @@ public final class ItemStackBuilder {
         }
 
         // Set the amount *after* applying the meta. This is necessary as the server can't serialize itemstacks with > 100 items in the stack.
-        if (commandItemAmount == 0) {
+        if (amountSet || commandItemAmount == 0) {
             newCopy.setAmount(newAmount());
         }
 
