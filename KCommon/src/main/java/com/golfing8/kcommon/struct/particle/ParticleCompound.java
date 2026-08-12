@@ -4,7 +4,6 @@ import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.Pair;
 import com.google.common.collect.Lists;
-import lombok.var;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -105,7 +104,7 @@ public class ParticleCompound extends Particle {
     public Map<String, Object> toPrimitive() {
         Map<String, Object> data = new HashMap<>();
         int count = 1;
-        for (var pair : this.particleOffset) {
+        for (Pair<Particle, Vector> pair : this.particleOffset) {
             Map<String, Object> particleData = ConfigTypeRegistry.toPrimitive(pair.getA()).unwrap();
             particleData.put("offset", ConfigTypeRegistry.toPrimitive(pair.getB()).getPrimitive());
             data.put("particle-" + count++, particleData);

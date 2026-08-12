@@ -3,10 +3,10 @@ package com.golfing8.kcommon.struct.time;
 import com.golfing8.kcommon.KCommon;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.var;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -123,7 +123,7 @@ public class ScheduleTask extends BukkitRunnable {
             return;
 
         TimeLength timeRemaining = new TimeLength(difference / 50);
-        var canAnnounce = this.ranTimestamps.ceilingEntry(timeRemaining);
+        Map.Entry<TimeLength, Boolean> canAnnounce = this.ranTimestamps.ceilingEntry(timeRemaining);
         if (canAnnounce == null || !canAnnounce.getValue())
             return;
 
@@ -151,7 +151,7 @@ public class ScheduleTask extends BukkitRunnable {
             return;
 
         // Reset all anticipated times.
-        for (var entry : this.ranTimestamps.entrySet()) {
+        for (Map.Entry<TimeLength, Boolean> entry : this.ranTimestamps.entrySet()) {
             entry.setValue(true);
         }
         this.action.accept(next);

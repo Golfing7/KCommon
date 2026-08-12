@@ -4,7 +4,6 @@ import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.flag.CommandFlag;
 import lombok.Getter;
-import lombok.var;
 import net.kyori.adventure.util.TriState;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -68,7 +67,7 @@ public class CommandContext {
         this.flagStates = flagStates;
         this.longNameFlagStates = new HashMap<>();
         this.shortNameFlagStates = new HashMap<>();
-        for (var entry : flagStates.entrySet()) {
+        for (Map.Entry<CommandFlag, TriState> entry : flagStates.entrySet()) {
             if (entry.getKey().getShortName() != null)
                 this.shortNameFlagStates.put(entry.getKey().getShortName(), entry.getValue());
             this.longNameFlagStates.put(entry.getKey().getFullName(), entry.getValue());

@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.hook.placeholderapi;
 
-import lombok.var;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -92,7 +91,7 @@ public interface PlaceholderProvider {
     default String onPlaceholderRequest(OfflinePlayer player, String[] parameters) {
         Map.Entry<KPlaceholderDefinition, PlaceholderFunction> bestEntry = null;
         int mostMatches = 0;
-        for (var entry : getPlaceholders().entrySet()) {
+        for (Map.Entry<KPlaceholderDefinition, PlaceholderFunction> entry : getPlaceholders().entrySet()) {
             int matchCount = entry.getKey().getMatchCount(parameters);
             if (matchCount < entry.getKey().getSplitLabel().length) // If we didn't match the full label, don't do anything.
                 continue;
@@ -123,7 +122,7 @@ public interface PlaceholderProvider {
     default String onRelationalPlaceholderRequest(Player p1, Player p2, String[] parameters) {
         Map.Entry<KPlaceholderDefinition, RelPlaceholderFunction> bestEntry = null;
         int mostMatches = 0;
-        for (var entry : getRelationalPlaceholders().entrySet()) {
+        for (Map.Entry<KPlaceholderDefinition, RelPlaceholderFunction> entry : getRelationalPlaceholders().entrySet()) {
             int matchCount = entry.getKey().getMatchCount(parameters);
             if (matchCount < entry.getKey().getSplitLabel().length) // If we didn't match the full label, don't do anything.
                 continue;

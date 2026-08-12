@@ -2,12 +2,12 @@ package com.golfing8.kcommon;
 
 import com.golfing8.kcommon.nms.access.NMSAccess;
 import lombok.Getter;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
@@ -58,7 +58,7 @@ public final class NMS {
             throw new IllegalStateException("NMS is already initialized!");
 
         serverVersion = NMSVersion.loadVersion();
-        var packageName = newVersionToPackageNumberMapping.floorEntry(serverVersion);
+        Map.Entry<NMSVersion, String> packageName = newVersionToPackageNumberMapping.floorEntry(serverVersion);
         if (packageName == null)
             throw new IllegalArgumentException(String.format("Unrecognized NMS version %s!", serverVersion.toString()));
 

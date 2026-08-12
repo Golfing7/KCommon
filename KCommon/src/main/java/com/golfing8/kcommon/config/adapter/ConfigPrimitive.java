@@ -2,7 +2,6 @@ package com.golfing8.kcommon.config.adapter;
 
 import com.golfing8.kcommon.config.ConfigEntry;
 import lombok.Getter;
-import lombok.var;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -253,10 +252,9 @@ public final class ConfigPrimitive {
      * @param map the map
      * @return the primitive
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public static ConfigPrimitive ofMap(Map<String, ?> map) {
-        Map safeValues = new LinkedHashMap();
-        for (var entry : map.entrySet()) {
+        Map<String, Object> safeValues = new LinkedHashMap<>();
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
             String realKey = stringToSafeKeyString(entry.getKey());
             safeValues.put(realKey, entry.getValue());
         }

@@ -2,7 +2,6 @@ package com.golfing8.kcommon.command.argument.type;
 
 import com.golfing8.kcommon.command.argument.CommandArgument;
 import lombok.Getter;
-import lombok.var;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,7 @@ public class BooleanCommandArgument extends CommandArgument<Boolean> {
     public BooleanCommandArgument(Map<String, Boolean> valueMap) {
         super("A boolean", context -> valueMap.keySet(), context -> valueMap.containsKey(context.getArgument().toLowerCase()), ctx -> valueMap.get(ctx.getArgument().toLowerCase()));
         Map<String, Boolean> filteredMap = new HashMap<>();
-        for (var entry : valueMap.entrySet()) {
+        for (Map.Entry<String, Boolean> entry : valueMap.entrySet()) {
             if (entry.getValue() == null)
                 throw new IllegalArgumentException("Cannot have null boolean values");
 

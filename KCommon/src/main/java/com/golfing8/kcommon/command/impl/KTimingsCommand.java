@@ -8,9 +8,11 @@ import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.command.flag.CommandFlag;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.struct.profiler.ProfileStatistics;
-import lombok.var;
 import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A command that lets you view the profiler timings of different aspects of KCommon plugins
@@ -57,13 +59,13 @@ public class KTimingsCommand extends KCommand {
         String messageKey = verbose ? "timings-command-key-data-verbose" : "timings-command-key-data";
 
         if (key == null || key.equals("null")) {
-            var entries = module.getProfiler().getStatistics().entrySet();
+            Set<Map.Entry<String, ProfileStatistics>> entries = module.getProfiler().getStatistics().entrySet();
             if (entries.isEmpty()) {
                 KCommon.getInstance().sendConfigMessage(context.getSender(), "timings-command-no-data");
                 return;
             }
 
-            for (var statEntry : entries) {
+            for (Map.Entry<String, ProfileStatistics> statEntry : entries) {
                 KCommon.getInstance().sendConfigMessage(context.getSender(), messageKey, statEntry.getValue().toPlaceholderContainer(), "KEY", statEntry.getKey());
             }
 

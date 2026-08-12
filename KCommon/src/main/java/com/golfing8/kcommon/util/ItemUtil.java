@@ -9,7 +9,6 @@ import com.google.common.collect.Lists;
 import de.tr7zw.changeme.nbtapi.NBTType;
 import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import lombok.experimental.UtilityClass;
-import lombok.var;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
@@ -133,7 +132,7 @@ public final class ItemUtil {
      * @param data the data
      */
     public static void removeInNBT(ReadWriteNBT nbt, Map<String, Object> data) {
-        for (var entry : data.entrySet()) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
             nbt.removeKey(entry.getKey());
         }
     }
@@ -176,8 +175,8 @@ public final class ItemUtil {
             if (nbtValue.equals(nbt.getString(key)))
                 nbt.removeKey(key);
         } else if (value instanceof Map && nbt.hasTag(key, NBTType.NBTTagCompound)) {
-            var subCompound = nbt.getCompound(key);
-            ((Map) value).forEach((k, v) -> {
+            ReadWriteNBT subCompound = nbt.getCompound(key);
+            ((Map<?, ?>) value).forEach((k, v) -> {
                 removeValueInNBT(subCompound, k.toString(), v);
             });
             if (subCompound.getKeys().isEmpty())
@@ -196,7 +195,7 @@ public final class ItemUtil {
      * @param data the data
      */
     public static void setInNBT(ReadWriteNBT nbt, Map<String, Object> data) {
-        for (var entry : data.entrySet()) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
             setValueInNBT(nbt, entry.getKey(), entry.getValue());
         }
     }
@@ -225,8 +224,8 @@ public final class ItemUtil {
         } else if (value instanceof String) {
             nbt.setString(key, (String) value);
         } else if (value instanceof Map) {
-            var subCompound = nbt.getOrCreateCompound(key);
-            ((Map) value).forEach((k, v) -> {
+            ReadWriteNBT subCompound = nbt.getOrCreateCompound(key);
+            ((Map<?, ?>) value).forEach((k, v) -> {
                 setValueInNBT(subCompound, k.toString(), v);
             });
         } else if (value instanceof Boolean) {

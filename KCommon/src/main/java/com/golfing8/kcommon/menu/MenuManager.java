@@ -2,16 +2,12 @@ package com.golfing8.kcommon.menu;
 
 import com.golfing8.kcommon.NMS;
 import lombok.Getter;
-import lombok.var;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -64,7 +60,7 @@ public final class MenuManager extends BukkitRunnable {
 
     @Override
     public void run() {
-        var menuIterator = allMenus.entrySet().iterator();
+        Iterator<Map.Entry<UUID, Menu>> menuIterator = allMenus.entrySet().iterator();
 
         while (menuIterator.hasNext()) {
             Menu menu = menuIterator.next().getValue();

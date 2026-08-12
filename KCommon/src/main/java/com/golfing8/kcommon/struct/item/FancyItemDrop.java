@@ -11,7 +11,6 @@ import com.golfing8.kcommon.struct.drop.ItemDrop;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -123,7 +122,7 @@ public final class FancyItemDrop extends BukkitRunnable {
                 if (preEvent.isItemConsumed())
                     return true;
 
-                var leftOver = player.getInventory().addItem(item);
+                Map<Integer, ItemStack> leftOver = player.getInventory().addItem(item);
                 if (leftOver.isEmpty())
                     return true;
 

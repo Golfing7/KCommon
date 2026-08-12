@@ -2,7 +2,6 @@ package com.golfing8.kcommon.command.argument;
 
 import com.golfing8.kcommon.util.StringUtil;
 import lombok.Data;
-import lombok.var;
 
 import java.util.*;
 import java.util.function.Function;
@@ -62,7 +61,7 @@ public class CommandArgument<A> {
      */
     public static <T> CommandArgument<T> fromMap(String typeName, Map<String, T> map) {
         Map<T, String> reverseMap = new HashMap<>();
-        for (var entry : map.entrySet()) {
+        for (Map.Entry<String, T> entry : map.entrySet()) {
             reverseMap.put(entry.getValue(), entry.getKey());
         }
         return fromCollection(typeName, map.values(), ctx -> map.get(ctx.getArgument()), reverseMap::get);

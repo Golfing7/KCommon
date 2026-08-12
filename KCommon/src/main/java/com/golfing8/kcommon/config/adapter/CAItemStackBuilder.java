@@ -10,15 +10,11 @@ import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.google.gson.reflect.TypeToken;
-import lombok.var;
 import org.bukkit.Color;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -75,7 +71,7 @@ public class CAItemStackBuilder implements ConfigAdapter<ItemStackBuilder> {
         if (primitiveValue.containsKey("enchantments")) {
             Map<String, Object> enchantments = (Map<String, Object>) primitiveValue.get("enchantments");
             for (Map.Entry<String, Object> enchant : enchantments.entrySet()) {
-                var enchantment = XEnchantment.matchXEnchantment(enchant.getKey());
+                Optional<XEnchantment> enchantment = XEnchantment.matchXEnchantment(enchant.getKey());
                 if (!enchantment.isPresent())
                     continue;
 

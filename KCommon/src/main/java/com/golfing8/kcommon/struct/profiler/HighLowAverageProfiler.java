@@ -2,7 +2,6 @@ package com.golfing8.kcommon.struct.profiler;
 
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;
@@ -105,7 +104,7 @@ public class HighLowAverageProfiler implements IMethodProfiler {
     @Override
     public Map<String, ProfileStatistics> getStatistics() {
         Map<String, ProfileStatistics> map = new HashMap<>();
-        for (var entry : data.entrySet()) {
+        for (Map.Entry<String, LongList> entry : data.entrySet()) {
             map.put(entry.getKey(), ProfileStatistics.construct(entry.getValue()));
         }
         return map;

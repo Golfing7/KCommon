@@ -7,7 +7,6 @@ import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import com.golfing8.kcommon.util.Reflection;
 import com.golfing8.kcommon.util.StringUtil;
-import lombok.var;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +24,6 @@ import java.util.Objects;
  * The adapter will map a class' fields and load them to/from the config reflectively.
  * </p>
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class CAReflective implements ConfigAdapter<CASerializable> {
     private static final String TYPE_FIELD_NAME = "type";
     private static final String KEY_FIELD_NAME = "_key";
@@ -72,7 +70,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
 
         Class<?> parentClass = getParentSerializableClass(type.getType());
         Class<?> deserializationType = typeResolver != null ? typeResolver.getType() : type.getType();
-        var fieldHandles = typeFieldCache.containsKey(deserializationType) ?
+        Map<String, FieldHandle<?>> fieldHandles = typeFieldCache.containsKey(deserializationType) ?
                 typeFieldCache.get(deserializationType) :
                 Reflection.getAllFieldHandlesUpToIncluding(deserializationType, parentClass);
 
@@ -96,8 +94,8 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
         boolean flatten = options != null && options.flatten();
 
         Map<String, FieldHandle<?>> serializableFields = new HashMap<>();
-        for (var fieldEntry : fieldHandles.entrySet()) {
-            var handle = fieldEntry.getValue();
+        for (Map.Entry<String, FieldHandle<?>> fieldEntry : fieldHandles.entrySet()) {
+            FieldHandle<?> handle = fieldEntry.getValue();
             if (!handle.shouldSerialize())
                 continue;
 
@@ -108,10 +106,10 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             serializableFields.put(fieldEntry.getKey(), fieldEntry.getValue());
         }
 
-        for (var fieldEntry : serializableFields.entrySet()) {
-            var handle = fieldEntry.getValue();
+        for (Map.Entry<String, FieldHandle<?>> fieldEntry : serializableFields.entrySet()) {
+            FieldHandle<?> handle = fieldEntry.getValue();
             if (flatten && serializableFields.size() == 1) {
-                var fieldType = new FieldType(handle.getField());
+                FieldType fieldType = new FieldType(handle.getField());
                 Object deserialized = ConfigTypeRegistry.getFromType(entry, fieldType);
                 handle.set(instance, deserialized);
                 continue;
@@ -139,7 +137,7 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
                 }
             }
 
-            var fieldType = new FieldType(handle.getField());
+            FieldType fieldType = new FieldType(handle.getField());
             Object deserialized = ConfigTypeRegistry.getFromType(entry.getSubValue(key), fieldType);
             handle.set(instance, deserialized);
         }
@@ -157,15 +155,15 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
         Class<?> parentClass = getParentSerializableClass(object.getClass());
         CASerializable.Options options = parentClass.getAnnotation(CASerializable.Options.class);
         boolean flatten = options != null && options.flatten();
-        var fieldHandles = typeFieldCache.containsKey(object.getClass()) ?
+        Map<String, FieldHandle<?>> fieldHandles = typeFieldCache.containsKey(object.getClass()) ?
                 typeFieldCache.get(object.getClass()) :
                 Reflection.getAllFieldHandlesUpToIncluding(object.getClass(), parentClass);
 
         // Load and serialize all fields...
         Map<String, Object> primitives = new HashMap<>();
 
-        for (var fieldEntry : fieldHandles.entrySet()) {
-            var handle = fieldEntry.getValue();
+        for (Map.Entry<String, FieldHandle<?>> fieldEntry : fieldHandles.entrySet()) {
+            FieldHandle<?> handle = fieldEntry.getValue();
             if (!handle.shouldSerialize())
                 continue;
 

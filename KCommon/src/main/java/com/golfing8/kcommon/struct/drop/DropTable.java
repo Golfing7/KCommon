@@ -12,7 +12,6 @@ import com.golfing8.kcommon.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.var;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -125,7 +124,7 @@ public class DropTable implements CASerializable {
             return;
 
         Set<String> allDrops = new HashSet<>(table.keySet());
-        for (var entry : groupings.entrySet()) {
+        for (Map.Entry<String, DropGroup> entry : groupings.entrySet()) {
             entry.getValue().getDrops().forEach(allDrops::remove);
         }
         groupings.put(DEFAULT_GROUP, new DropGroup(DEFAULT_GROUP, new ArrayList<>(allDrops), dropRange, maxTries));
@@ -149,7 +148,7 @@ public class DropTable implements CASerializable {
     public List<Drop<?>> generateDrops(@NotNull DropContext context) {
         List<Drop<?>> drops = new ArrayList<>();
         group:
-        for (var groupEntry : groupings.entrySet()) {
+        for (Map.Entry<String, DropGroup> groupEntry : groupings.entrySet()) {
             List<String> dropKeys = new ArrayList<>(groupEntry.getValue().getDrops());
             int dropTarget = groupEntry.getValue().getDropTarget();
             int collectedDrops = 0;
