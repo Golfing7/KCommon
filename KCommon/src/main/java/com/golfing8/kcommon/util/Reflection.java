@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.util;
 
 import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.NMSVersion;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.ModuleInfo;
@@ -17,6 +16,7 @@ import org.bukkit.plugin.java.PluginClassLoader;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -36,6 +36,8 @@ import java.util.logging.Level;
  */
 @UtilityClass
 public final class Reflection {
+
+    private static final Map<Class<?>, Set<Class<?>>> IMPLEMENTORS_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * Discovers all classes that extend module except for {@link Module}.
@@ -254,6 +256,128 @@ public final class Reflection {
     }
 
     /**
+     * Gets all direct or indirect implementors of the given class
+     *
+     * @param clazz the class
+     * @return the set of implementors, NOT including the base class.
+     * @param <T> the type T
+     */
+    public static <T> Set<Class<? extends T>> getAllImplementors(Class<T> clazz) {
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        Set<Class<? extends T>> cached = (Set) IMPLEMENTORS_CACHE.get(clazz);
+        if (cached != null)
+            return new HashSet<>(cached);
+
+        Set<Class<? extends T>> classes = new HashSet<>();
+        ClassLoader loader = clazz.getClassLoader();
+        if (!(loader instanceof URLClassLoader)) {
+            IMPLEMENTORS_CACHE.put(clazz, new HashSet<>(classes));
+            return classes;
+        }
+
+        for (URL url : ((URLClassLoader) loader).getURLs()) {
+            try {
+                File file = new File(url.toURI());
+                if (file.isDirectory()) {
+                    Deque<File> stack = new ArrayDeque<>();
+                    stack.push(file);
+                    while (!stack.isEmpty()) {
+                        File current = stack.pop();
+                        File[] children = current.listFiles();
+                        if (children == null)
+                            continue;
+
+                        for (File child : children) {
+                            if (child.isDirectory()) {
+                                stack.push(child);
+                                continue;
+                            }
+
+                            if (!child.getName().endsWith(".class"))
+                                continue;
+
+                            String relativePath = file.toPath().relativize(child.toPath()).toString();
+                            String className = relativePath.replace(File.separatorChar, '.').replaceAll("\\.class$", "");
+                            try {
+                                getAllImplementorsNested(clazz, classes, loader, className);
+                            } catch (ClassNotFoundException | NoClassDefFoundError ignored) {
+                                // Skip classes that cannot be loaded in this context.
+                            }
+                        }
+                    }
+                    continue;
+                }
+
+                try (JarFile fileJar = new JarFile(file)) {
+                    Enumeration<JarEntry> entries = fileJar.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        if (!entry.getName().endsWith(".class"))
+                            continue;
+
+                        try {
+                            String className = entry.getName().replace("/", ".").replaceAll("\\.class$", "");
+                            getAllImplementorsNested(clazz, classes, loader, className);
+                        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {
+                            // Skip classes that cannot be loaded in this context.
+                        }
+                    }
+                }
+            } catch (IOException | URISyntaxException ignored) {
+                // Skip malformed or unreadable classpath entries.
+            }
+        }
+
+        IMPLEMENTORS_CACHE.put(clazz, new HashSet<>(classes));
+        return classes;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void getAllImplementorsNested(Class<T> clazz, Set<Class<? extends T>> classes, ClassLoader loader, String className) throws ClassNotFoundException {
+        Class<?> candidate = Class.forName(className, false, loader);
+        if (candidate == clazz || candidate.isInterface() || Modifier.isAbstract(candidate.getModifiers()))
+            return;
+
+        if (clazz.isAssignableFrom(candidate)) {
+            classes.add((Class<? extends T>) candidate);
+        }
+    }
+
+    /**
+     * Finds a getter for the given field on the given class
+     *
+     * @param clazz the class
+     * @param name the name of the field
+     * @return the getter method handle
+     */
+    public static @Nullable MethodHandle findGetter(Class<?> clazz, String name) {
+        try {
+            Field field = clazz.getDeclaredField(name);
+            field.setAccessible(true);
+            return MethodHandles.lookup().unreflectGetter(field);
+        } catch (NoSuchFieldException | IllegalAccessException exc) {
+            return null;
+        }
+    }
+
+    /**
+     * Finds a setter for the given field on the given class
+     *
+     * @param clazz the class
+     * @param name the name of the field
+     * @return the setter method handle
+     */
+    public static @Nullable MethodHandle findSetter(Class<?> clazz, String name) {
+        try {
+            Field field = clazz.getDeclaredField(name);
+            field.setAccessible(true);
+            return MethodHandles.lookup().unreflectSetter(field);
+        } catch (NoSuchFieldException | IllegalAccessException exc) {
+            return null;
+        }
+    }
+
+    /**
      * Gets a method handle for the given information.
      *
      * @param clazz          the class
@@ -317,10 +441,10 @@ public final class Reflection {
             Constructor<?> constructor = clazz.getDeclaredConstructor();
             constructor.setAccessible(true);
 
-            return (T) clazz.newInstance();
+            return (T) constructor.newInstance();
         } catch (NoSuchMethodException e) {
             return supplier.get();
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Failed to instantiate " + clazz, e);
         }
     }

@@ -1,7 +1,13 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow") version ("8.3.6")
+    id("com.gradleup.shadow") version ("9.3.0")
     id("maven-publish")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+
+    withSourcesJar()
 }
 
 val artifactName = parent!!.name
@@ -31,7 +37,11 @@ tasks.getByName<Test>("test") {
 }
 
 dependencies {
-    implementation(parent!!)
+    implementation(project(":KCommon"))
+    implementation(project(":NMS"))
+    implementation(project(":v1_8"))
+    implementation(project(":vUnknown"))
+    implementation(project(":DialogMenus"))
 
     implementation(rootProject.libs.itemnbtapi)
     implementation(rootProject.libs.exp4j)

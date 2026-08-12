@@ -1,12 +1,10 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    id("com.gradleup.shadow") version ("8.3.6")
+    id("com.gradleup.shadow") version ("9.3.0")
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.3"
     id("net.kyori.blossom") version "2.2.0"
     id("maven-publish")
-    kotlin("jvm")
 }
 
 repositories {
@@ -38,9 +36,9 @@ dependencies {
     testImplementation("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     testImplementation("org.mockito:mockito-inline:4.11.0")
     testImplementation(rootProject.libs.junit.jupiter.api)
+    testImplementation(rootProject.libs.junit.platform.launcher)
     testRuntimeOnly(rootProject.libs.junit.jupiter.engine)
     testRuntimeOnly(rootProject.libs.adventure.platform)
-    testImplementation(kotlin("test"))
     testImplementation(project(":NMS"))
     testImplementation(rootProject.libs.mongo.sync)
     testImplementation(rootProject.libs.xseries)
@@ -88,12 +86,4 @@ sourceSets {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
-}
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
 }

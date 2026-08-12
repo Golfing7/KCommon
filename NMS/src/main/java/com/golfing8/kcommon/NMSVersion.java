@@ -113,6 +113,25 @@ public class NMSVersion implements Comparable<NMSVersion> {
     }
 
     /**
+     * Checks if the given min/max major/minor versions are in range of this version
+     *
+     * @param minMajor the min major
+     * @param maxMajor the max major
+     * @param minMinor the min minor
+     * @param maxMinor the max minor
+     * @return true if this version is in that range.
+     */
+    public boolean isInRange(int minMajor, int maxMajor, int minMinor, int maxMinor) {
+        if (major > 0 && (major < minMajor || major > maxMajor)) {
+            return false;
+        }
+        if (minor > 0) {
+            return minor >= minMinor && minor <= maxMinor;
+        }
+        return true;
+    }
+
+    /**
      * Loads the version of the server
      *
      * @return the version

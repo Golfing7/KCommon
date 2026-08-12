@@ -7,6 +7,7 @@ exp4j = "0.4.8"
 itemnbtapi = "2.15.7"
 annotations = "24.1.0"
 junit-jupiter = "5.9.0"
+junit-platform = "1.14.4"
 xseries = "13.7.1"
 mongo = "5.0.1"
 triehard = "1.0"
@@ -24,3 +25,4 @@ mongo-sync = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongo"
 triehard = { module = "org.magnos.trie:TrieHard", version.ref = "triehard" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }

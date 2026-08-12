@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow") version ("8.3.6")
+    id("com.gradleup.shadow") version ("9.3.0")
     id("maven-publish")
     checkstyle
 }
@@ -36,7 +36,7 @@ repositories {
 
 tasks {
     build {
-        finalizedBy(shadowJar)
+        dependsOn(shadowJar)
     }
 
     jar {
@@ -114,6 +114,7 @@ subprojects {
 
     checkstyle {
         configDirectory = rootDir.resolve(".checkstyle")
+        toolVersion = "8.40"
     }
 }
 
