@@ -2,7 +2,7 @@
 This file acts as a top level description of how KCommon works.
 
 ## Project Management
-KCommon strictly requires Java 21 to build.
+KCommon strictly requires Java 21 and Java 8 to build.
 * Building `./gradlew jar`
 * Testing `No provided JUnit tests`
 

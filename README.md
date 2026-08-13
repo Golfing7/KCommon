@@ -3,6 +3,12 @@
 KCommon is a standard plugin library, initially written for PrisonKore.
 The purpose of this core is to provide an easy-to-use module based plugin structure as well as some useful utilities.
 
+## Documentation
+
+Read the [KCommon plugin development guide](https://golfing7.github.io/KCommon/)
+for setup, modules, configuration, commands, menus, persistence, and
+PlaceholderAPI integration.
+
 ## Modules
 
 Modules are the foundation of the KCommon library.
@@ -17,5 +23,4 @@ To create a copy of this plugin, clone the repository and run
     ./gradlew build
 
 This will create a built jar in /build/libs/
-
 
