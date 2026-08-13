@@ -384,3 +384,11 @@ Use these for singleton runtime data, block data, location data, or anything not
 
 ### SenderSerializable
 Used for profile data for a player. If data can be tied to a player, use a SenderSerializable instance instead of an AbstractSerializable instance.
+
+## Agent Guidance
+When editing this project:
+* Prefer existing module, menu, command, config, and persistence patterns over introducing new abstractions
+* Keep YAML structure and Java bindings synchronized
+* Treat `SomeModule`, `SomeModuleConf`, and related types in this document as templates, not literal required names
+* When replacing examples, preserve the lifecycle and framework semantics shown here
+* Favor minimal, targeted changes that fit the surrounding KCommon-based architecture
