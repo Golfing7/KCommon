@@ -68,7 +68,8 @@ For larger message sets, declare a `LangConfigEnum` in `@ModuleInfo`:
 
 ```java
 public enum GreetingsLanguage implements LangConfigEnum {
-    GREETED(new Message("&aHello!"));
+    GREETED(new Message("&aHello!")),
+    COMMANDS$RELOAD$DONE(new Message("&aReloaded greetings."));
 
     private Message message;
 
@@ -88,5 +89,7 @@ public enum GreetingsLanguage implements LangConfigEnum {
 }
 ```
 
-The enum key `GREETED` is stored as `greeted`. Add the enum to
+The enum key `GREETED` is stored as `greeted`. KCommon converts underscores to
+hyphens and `$` to nested YAML paths, so
+`COMMANDS$RELOAD$DONE` is stored as `commands.reload.done`. Add the enum to
 `langSources` so KCommon loads it during the module lifecycle.

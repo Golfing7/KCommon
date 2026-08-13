@@ -10,6 +10,7 @@ import com.golfing8.kcommon.command.CommandContext;
 import com.golfing8.kcommon.command.Cmd;
 import com.golfing8.kcommon.command.MCommand;
 import com.golfing8.kcommon.command.argument.CommandArguments;
+import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +29,11 @@ public final class GreetingsCommand extends MCommand<GreetingsModule> {
     @Override
     protected void execute(@NotNull CommandContext context) {
         Player target = context.next();
-        context.getSender().sendMessage("Hello, " + target.getName() + "!");
+        getModule().sendConfigMessage(
+                context.getSender(),
+                "greeted",
+                Placeholder.curlyTrusted("PLAYER", target.getName())
+        );
     }
 }
 ```
@@ -44,6 +49,24 @@ public void onEnable() {
 language config and permission prefix. KCommon unregisters the command when
 the module is disabled, so register it on every enable.
 
+Commands can own their validation messages with `@LangConf`, while still
+sharing the module's `lang.yml`:
+
+```java
+@LangConf
+private Message invalidTarget = new Message("&cThat player cannot be greeted.");
+
+// In execute(...)
+if (target == null) {
+    invalidTarget.send(context.getSender());
+    return;
+}
+```
+
+Use `getModule().getLogger()` for administrative or state-changing command
+actions. This keeps user feedback configurable while leaving an audit trail
+in the server log.
+
 ## Arguments and subcommands
 
 Use the built-in argument types for validation and tab completion:
@@ -57,6 +80,30 @@ addArgument("player", CommandArguments.PLAYER);
 Read arguments in declaration order with `context.next()`. The context also
 provides `getArg(index)`, `getInt(index)`, `getPlayer(index)`, and
 `joinRemainingToString()`.
+
+For choices loaded from configuration, use a map-backed argument so values
+receive validation and tab completion from the same source:
+
+```java
+addArgument("format", CommandArgument.fromMap(
+        "a greeting format",
+        GreetingsConfig.formats
+));
+```
+
+Build or validate the map before registering the command, and handle an empty
+map as a configuration error instead of exposing a command with no valid
+choices.
+
+For context-sensitive tab completion, keep the argument type reusable and
+configure the returned argument in `onRegister()`:
+
+```java
+BuiltCommandArgument amount =
+        addArgument("amount", CommandArguments.POSITIVE_INTEGER, sender -> 1);
+amount.setAutoFillPlayersOnly(true);
+amount.setRequiredPermissionExtension("admin");
+```
 
 Commands without an `execute` implementation act as directories. Add a
 subcommand from `onRegister()`:

@@ -40,6 +40,33 @@ Register placeholders again during every module enable; KCommon removes them
 when the module is disabled. Use `addRelPlaceholder` when the value depends on
 two players.
 
+## Configuration-defined placeholders
+
+For a configurable set of values, store definitions in a typed map and
+register the validated entries during `onEnable()`:
+
+```java
+for (Map.Entry<String, TimerDefinition> entry :
+        TimerConfig.timers.entrySet()) {
+    String label = entry.getKey();
+    TimerDefinition definition = entry.getValue();
+
+    if (definition == null || !definition.isValid()) {
+        getLogger().warning("Skipping invalid timer: " + label);
+        continue;
+    }
+
+    addPlaceholder(
+            new KPlaceholderDefinition(label, "Configured timer value"),
+            (player, args) -> definition.displayValue()
+    );
+}
+```
+
+Validate labels as well as values before registration. Skipping an invalid
+definition with a warning is safer than publishing a placeholder that returns
+misleading data.
+
 Check registered values from the server with:
 
 ```text

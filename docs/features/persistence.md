@@ -38,7 +38,9 @@ loading it:
 public final class GreetingsModule extends Module implements DataManagerContainer {
     @Override
     public void onEnable() {
-        addDataManager("player-profiles", PlayerProfile.class);
+        DataManager<PlayerProfile> profiles =
+                addDataManager("player-profiles", PlayerProfile.class);
+        profiles.setStrictSaving(true);
     }
 
     public PlayerProfile profile(UUID playerId) {
@@ -52,8 +54,13 @@ public final class GreetingsModule extends Module implements DataManagerContaine
 }
 ```
 
-The manager uses a local data store by default. Pass `true` as the third
-argument to `addDataManager` to request the remote Mongo-backed manager:
+The manager uses a local data store by default. Changed cached objects are
+written on the normal save cycle, and module shutdown saves the remaining
+cached objects. `setStrictSaving(true)` makes shutdown write only objects
+marked with `change()`, which is useful for larger data sets.
+
+Pass `true` as the third argument to `addDataManager` to request the remote
+Mongo-backed manager:
 
 ```java
 addDataManager("player-profiles", PlayerProfile.class, true);
@@ -76,3 +83,27 @@ deleteData(profile);
 
 Use `saveData` when an immediate write is required. Otherwise, mark changed
 objects and let the registered manager handle its normal persistence cycle.
+
+When a record is a snapshot of transient module state, capture the final state
+and call `saveData` from `onDisable()` before KCommon shuts down the data
+manager:
+
+```java
+@Override
+public void onDisable() {
+    runtimeData.capture(activeState);
+    saveData(runtimeData);
+}
+```
+
+If a persisted object owns runtime resources, reattach them after loading:
+
+```java
+for (GreetingProfile profile : getAllDataOfType(GreetingProfile.class)) {
+    profile.bind(this);
+}
+```
+
+Use `SenderSerializable` when the key is always a player UUID. If the same
+record can belong to a player, island, block, or another scope, use
+`AbstractSerializable` and assign the appropriate stable key yourself.

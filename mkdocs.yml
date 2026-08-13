@@ -49,4 +49,5 @@ nav:
       - Persistence: features/persistence.md
       - Placeholders: features/placeholders.md
       - Language and messages: features/language.md
+  - Design patterns: development/patterns.md
   - Development workflow: development/workflow.md

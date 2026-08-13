@@ -36,6 +36,48 @@ KCommon maps Java field names to YAML paths, so `greetingMessage` becomes
 `greeting-message`. The defaults are written to `config.yml` and existing
 server values are loaded into the fields.
 
+Prefer a built-in adapter when a value has a human-friendly configuration
+format:
+
+```java
+@Conf("How often the greeting cache is refreshed.")
+public static TimeLength refreshInterval = TimeLength.parseTime("30m");
+```
+
+This stores a duration such as `30m` instead of a raw tick count. Check the
+`config.adapter` package before introducing a custom representation.
+
+## Build derived state after loading
+
+Keep user-editable values in the config source, then rebuild indexes or
+lookups from those values during module enable. Unannotated fields in a module
+config source are not configuration entries, so they can hold derived state:
+
+```java
+public final class GreetingsConfig implements ConfigClassSource {
+    @Conf("Configured greeting weights.")
+    public static Map<String, Integer> weights = new HashMap<>();
+
+    public static Map<String, Integer> normalizedWeights;
+
+    public static void init() {
+        normalizedWeights = new HashMap<>();
+        weights.forEach((key, value) -> {
+            if (value < 0) {
+                throw new IllegalArgumentException("Greeting weights cannot be negative");
+            }
+            normalizedWeights.put(key.toLowerCase(Locale.ROOT), value);
+        });
+    }
+}
+```
+
+Call `GreetingsConfig.init()` from `onEnable()` after KCommon has loaded the
+config. This makes reloads deterministic and keeps derived maps from retaining
+state from a previous module instance. Validate values in the same phase and
+let invalid configuration fail module enable rather than silently substituting
+an unsafe value.
+
 The `@Conf` annotation also supports a YAML label and a separate module
 config file:
 
@@ -90,6 +132,8 @@ public final class GreetingFormat implements CASerializable {
 Custom serializable types require a no-argument constructor. Use
 `CASerializable.Options` for advanced behavior such as flattened values,
 delegated paths, config mode, or polymorphic type resolution.
+When a serializable value is a field in a module `ConfigClassSource`, that
+field still needs `@Conf` because module sources require annotations.
 
 ## Configuration rules
 

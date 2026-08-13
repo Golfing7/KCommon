@@ -23,6 +23,10 @@ greeting-menu:
       name: "&eGreet {PLAYER}"
       lore:
         - "&7Click to greet the player."
+    greet-disabled:
+      slot: 13
+      type: BARRIER
+      name: "&cGreeting unavailable"
   other-slots:
     title:
       slot: 4
@@ -49,9 +53,11 @@ import java.util.Collections;
 
 public final class GreetingMenu extends PlayerMenuContainer {
     private final GreetingsModule module = GreetingsModule.get();
+    private final GreetingProfile profile;
 
     public GreetingMenu(Player player) {
         super(player);
+        this.profile = module.profile(player.getUniqueId());
     }
 
     @Override
@@ -60,14 +66,17 @@ public final class GreetingMenu extends PlayerMenuContainer {
                 .getOrLoad("greeting-menu", MenuBuilder.class)
                 .orElseThrow(() -> new IllegalStateException("greeting-menu is missing"));
 
-        builder.bindTo("greet", event -> {
-            event.getWhoClicked().sendMessage("Hello!");
-            refresh();
-        });
-        builder.specialPlaceholders(
-                "greet",
-                Collections.singleton(Placeholder.curlyTrusted("PLAYER", getPlayer().getName()))
-        );
+        if (profile.canGreet()) {
+            builder.bindTo("greet", event -> {
+                profile.recordGreeting();
+                refresh();
+            });
+            builder.specialPlaceholders("greet", Collections.singleton(
+                    Placeholder.curlyTrusted("PLAYER", getPlayer().getName())
+            ));
+        } else {
+            builder.bindTo("greet-disabled", event -> {});
+        }
         return builder.buildSimple();
     }
 }
@@ -82,6 +91,11 @@ new GreetingMenu(player).open();
 Call `refresh()` after changing values used by item names, lore, or
 placeholders. `MenuBuilder` also supports global placeholders, locked slots,
 custom filler shapes, click actions, and dynamic menus.
+
+For menus that edit inventory contents, use `postCloseRunnable` to persist the
+final contents after the inventory closes. Keep the menu's target object as a
+constructor field, as in the example above, so every rebuild binds against the
+same state.
 
 ## Paged menus
 
@@ -162,3 +176,10 @@ public final class GreetingListMenu extends SuppliedPagedMenuContainer<String> {
 Paged menus use chest inventories. Configure
 `element-section-shape` when the items should occupy a custom set of slots;
 the default leaves the bottom row for navigation.
+
+For data supplied by another service, snapshot the current collection with
+`new ArrayList<>(items)` in the constructor. Load reusable
+`ItemStackBuilder` formats there, then use `loadMenu(MenuBuilder)` to apply
+global placeholders and build each element. Before performing a click action,
+recheck that the element is still available; a menu can remain open while the
+underlying data changes.

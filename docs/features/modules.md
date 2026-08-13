@@ -35,6 +35,53 @@ The module itself is a Bukkit listener, so its `@EventHandler` methods are
 registered automatically while it is enabled. Use `addSubListener` for a
 separate listener whose lifetime should be controlled by the module.
 
+## Register resources in one place
+
+For a feature with several moving parts, make `onEnable()` the composition
+root. A common production layout is:
+
+```java
+@Override
+public void onEnable() {
+    GreetingsConfig.init();
+
+    DataManager<GreetingProfile> profiles =
+            addDataManager("greeting-profiles", GreetingProfile.class);
+    profiles.setStrictSaving(true);
+
+    addCommand(new GreetingsCommand());
+    addSubListener(new GreetingsListener(this));
+    addTask(this::refreshCache).startTimerAsync(0, 100);
+}
+```
+
+`addTask` returns a `ModuleTask`. Prefer it over scheduling directly through
+Bukkit because KCommon cancels registered tasks when the module is disabled.
+Use synchronous tasks for Bukkit API work and asynchronous tasks only for
+work that is safe away from the server thread.
+
+If an optional integration is enabled, register its listener or task
+conditionally in the same method. `pluginDependencies` can prevent the module
+from loading when an integration is absent; add the integration to
+`softdepend` in `plugin.yml` when load order also matters.
+
+Some integrations are loaded before their data is ready. When the integration
+documents that limitation, resolve its handles in a lifecycle-managed delayed
+task instead of caching null or partially initialized objects:
+
+```java
+addTask(() -> {
+    if (!IntegrationApi.isReady()) {
+        getLogger().warning("The optional integration is not ready yet.");
+        return;
+    }
+    addSubListener(new IntegrationListener(this));
+}).startLater(1);
+```
+
+Use a bounded retry when readiness is variable, and keep the retry task
+registered with the module so a disable or reload cancels it.
+
 ## Module metadata
 
 `@ModuleInfo` supports more than a name:
