@@ -50,24 +50,18 @@ greeted-message:
 
 ## Send messages
 
-Prefer language keys over hard-coded output:
-
-```java
-sendConfigMessage(
-        context.getSender(),
-        "greeted-message",
-        Placeholder.curlyTrusted("PLAYER", target.getName())
-);
-```
+Prefer configurable messages over hard-coded output.
+The methods `sendConfigMessage` and `sendDefaultMessage` should only be used when the context of a Module's language config 
+(or a Message instance annotated with @LangConf) is unavailable.
 
 `sendDefaultMessage` is useful for one-off defaults, but
-`addLanguageConstant` or `@LangConf` makes the complete language surface
+`@LangConf` or use of the `*Lang` enum makes the complete language surface
 discoverable and editable.
 
 For larger message sets, declare a `LangConfigEnum` in `@ModuleInfo`:
 
 ```java
-public enum GreetingsLanguage implements LangConfigEnum {
+public enum GreetingsLang implements LangConfigEnum {
     GREETED(new Message("&aHello!")),
     COMMANDS$RELOAD$DONE(new Message("&aReloaded greetings."));
 
