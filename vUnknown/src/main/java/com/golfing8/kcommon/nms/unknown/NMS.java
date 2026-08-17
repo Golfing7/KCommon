@@ -150,7 +150,7 @@ public class NMS implements NMSAccess {
         if (executionContextHandle == null)
             return;
 
-        var context = executionContextHandle.get(null).get();
+        ExecutionContext<CommandSourceStack> context = executionContextHandle.get(null).get();
         if (context == null)
             return;
 

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A KCommon object adapter for dialog bases.
@@ -29,6 +30,7 @@ public class KDialogBase implements CASerializable, KDialogElement<DialogBase> {
     @Override
     public DialogBase toComponent() {
         return DialogBase.create(title, externalTitle, canCloseWithEscape, false, DialogBase.DialogAfterAction.CLOSE,
-                dialogBody != null ? dialogBody.stream().map(KDialogBody::toComponent).toList() : Collections.emptyList(), Collections.emptyList());
+                dialogBody != null ? dialogBody.stream().map(KDialogBody::toComponent).collect(Collectors.toList()) : Collections.emptyList(),
+                Collections.emptyList());
     }
 }

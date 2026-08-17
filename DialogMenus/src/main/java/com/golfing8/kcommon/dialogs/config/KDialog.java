@@ -5,6 +5,7 @@ import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.dialogs.KDialogElement;
 import io.papermc.paper.dialog.Dialog;
 import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.data.dialog.DialogRegistryEntry;
 import io.papermc.paper.registry.data.dialog.type.DialogListType;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import io.papermc.paper.registry.set.RegistrySet;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A KCommon object representing an Adventure dialog.
@@ -34,12 +36,13 @@ public class KDialog implements CASerializable, KDialogElement<Dialog> {
     @Override
     public Dialog toComponent() {
         return Dialog.create(factory -> {
-            var builder = factory.empty();
+            DialogRegistryEntry.Builder builder = factory.empty();
             builder.base(base.toComponent());
             if (notice != null) {
                 builder.type(DialogType.notice(notice.toComponent()));
             } else if (dialogList != null) {
-                DialogListType.Builder listBuilder = DialogType.dialogList(RegistrySet.keySetFromValues(RegistryKey.DIALOG, dialogList.getDialogs().stream().map(KDialog::toComponent).toList()));
+                DialogListType.Builder listBuilder = DialogType.dialogList(RegistrySet.keySetFromValues(RegistryKey.DIALOG,
+                        dialogList.getDialogs().stream().map(KDialog::toComponent).collect(Collectors.toList())));
                 if (dialogList.buttonWidth > 0)
                     listBuilder.buttonWidth(dialogList.buttonWidth);
                 if (dialogList.exitButton != null)
@@ -49,7 +52,7 @@ public class KDialog implements CASerializable, KDialogElement<Dialog> {
 
                 builder.type(listBuilder.build());
             } else if (multiAction != null) {
-                builder.type(DialogType.multiAction(multiAction.getActions().stream().map(KActionButton::toComponent).toList(),
+                builder.type(DialogType.multiAction(multiAction.getActions().stream().map(KActionButton::toComponent).collect(Collectors.toList()),
                         multiAction.getExitButton() != null ? multiAction.getExitButton().toComponent() : null,
                         multiAction.getColumns()));
             } else if (confirmation != null) {

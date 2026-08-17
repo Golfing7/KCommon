@@ -10,6 +10,21 @@ java {
     withSourcesJar()
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(8)
+}
+
+configurations.configureEach {
+    if (isCanBeConsumed) {
+        attributes {
+            attribute(
+                org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE,
+                8
+            )
+        }
+    }
+}
+
 val artifactName = parent!!.name
 
 group = parent!!.group
@@ -22,6 +37,8 @@ repositories {
 tasks {
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
+        // Mongo's record codec is Java 17-only and cannot be used by Java 8 consumers.
+        exclude("org/bson/codecs/record/**")
         relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")
         relocate("com.cryptomorin.xseries", "com.golfing8.shade.com.cryptomorin.xseries")
         relocate("org.objectweb.asm", "com.golfing8.shade.org.objectweb.asm")

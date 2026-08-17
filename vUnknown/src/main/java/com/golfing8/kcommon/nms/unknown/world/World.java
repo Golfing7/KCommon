@@ -51,7 +51,9 @@ public class World implements NMSWorld {
     private Optional<ChestBlockEntity> getChest(BlockPos pos) {
         ServerLevel level = ((CraftWorld) world).getHandle();
         BlockEntity block = level.getBlockEntity(pos);
-        return block instanceof ChestBlockEntity chest ? Optional.of(chest) : Optional.empty();
+        if (block instanceof ChestBlockEntity)
+            return Optional.of((ChestBlockEntity) block);
+        return Optional.empty();
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.bukkit.inventory.meta.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * API agnostic item access
@@ -65,7 +66,8 @@ public class MagicItems implements NMSMagicItems {
             return null;
 
         Component display = itemStack.displayName();
-        if (display instanceof TranslatableComponent translatable && translatable.args().size() == 1) {
+        if (display instanceof TranslatableComponent && ((TranslatableComponent) display).args().size() == 1) {
+            TranslatableComponent translatable = (TranslatableComponent) display;
             return LegacyComponentSerializer.legacyAmpersand().serialize(translatable.args().get(0));
         } else {
             return LegacyComponentSerializer.legacyAmpersand().serialize(display);
@@ -111,7 +113,7 @@ public class MagicItems implements NMSMagicItems {
         ItemMeta meta = stack.getItemMeta();
         if (modifiers != null) {
             Multimap<Attribute, AttributeModifier> tlModifiers = HashMultimap.create();
-            for (var entry : modifiers.entrySet()) {
+            for (Map.Entry<EntityAttribute, Set<EntityAttributeModifier>> entry : modifiers.entrySet()) {
                 Attribute attribute = MagicEntities.translateAttribute(entry.getKey());
                 for (EntityAttributeModifier modifier : entry.getValue()) {
                     tlModifiers.put(attribute, new AttributeModifier(
@@ -132,10 +134,10 @@ public class MagicItems implements NMSMagicItems {
     @Override
     public void setExtraAttributeModifiers(ItemStack stack, Map<EntityAttribute, Set<EntityAttributeModifier>> modifiers) {
         ItemMeta unmodifiedMeta = new ItemStack(stack.getType()).getItemMeta();
-        var originalAttributes = unmodifiedMeta.getAttributeModifiers();
+        Multimap<Attribute, AttributeModifier> originalAttributes = unmodifiedMeta.getAttributeModifiers();
         Multimap<Attribute, AttributeModifier> defaultAttributes = originalAttributes == null ? HashMultimap.create() : HashMultimap.create(originalAttributes);
         if (modifiers != null) {
-            for (var entry : modifiers.entrySet()) {
+            for (Map.Entry<EntityAttribute, Set<EntityAttributeModifier>> entry : modifiers.entrySet()) {
                 Attribute attribute = MagicEntities.translateAttribute(entry.getKey());
                 for (EntityAttributeModifier modifier : entry.getValue()) {
                     defaultAttributes.put(attribute, new AttributeModifier(
@@ -213,7 +215,7 @@ public class MagicItems implements NMSMagicItems {
         if (lore == null)
             return null;
 
-        return lore.stream().map(MiniMessage.miniMessage()::serialize).toList();
+        return lore.stream().map(MiniMessage.miniMessage()::serialize).collect(Collectors.toList());
     }
 
     @Override

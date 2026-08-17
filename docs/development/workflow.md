@@ -2,8 +2,9 @@
 
 ## Build KCommon
 
-Run the repository's Gradle build with JDK 21. Its subprojects compile with a
-Java 8 toolchain:
+Run the repository's Gradle build with JDK 21. Published bytecode targets Java
+8; modules that require Java 21 APIs use the Java 21 toolchain with a Java 8
+release target:
 
 ```shell
 ./gradlew jar

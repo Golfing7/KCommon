@@ -68,8 +68,9 @@ public class WorldEdit implements WorldEditHook {
         BukkitPlayer bukkitPlayer = worldEditPlugin.wrapPlayer(player);
         LocalSession session = worldEdit.getSessionManager().get(bukkitPlayer);
         RegionSelector selector = session.getRegionSelector(new BukkitWorld(player.getWorld()));
-        if (!(selector instanceof CuboidRegionSelector cuboidSelector))
+        if (!(selector instanceof CuboidRegionSelector))
             return new Selection(null, null);
+        CuboidRegionSelector cuboidSelector = (CuboidRegionSelector) selector;
 
         CuboidRegion region = cuboidSelector.getIncompleteRegion();
         Location pos1 = region.getPos1() != null ?

@@ -41,6 +41,29 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(8)
+}
+
+configurations.configureEach {
+    if (isCanBeResolved) {
+        attributes {
+            attribute(
+                org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE,
+                21
+            )
+        }
+    }
+    if (isCanBeConsumed) {
+        attributes {
+            attribute(
+                org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE,
+                8
+            )
+        }
+    }
+}
+
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
 }

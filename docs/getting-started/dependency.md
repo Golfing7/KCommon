@@ -3,8 +3,8 @@
 ## Prerequisites
 
 Run this repository's Gradle build with **JDK 21**, as required by the project
-build. The KCommon subprojects compile with a Java 8 toolchain, so a plugin that
-consumes the API can target the Java version supported by its server range.
+build. KCommon publishes Java 8-compatible bytecode, so a plugin that consumes
+the API can target the Java version supported by its server range.
 
 KCommon's runtime plugin also declares these Bukkit dependencies:
 
