@@ -5,6 +5,7 @@ import com.golfing8.kcommon.nms.access.NMSMagicEntities;
 import com.golfing8.kcommon.nms.struct.EntityAttribute;
 import com.golfing8.kcommon.nms.struct.EntityAttributeModifier;
 import com.golfing8.kcommon.nms.struct.EntityData;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -35,48 +36,50 @@ public class MagicEntities implements NMSMagicEntities {
 
     @Override
     public Giant spawnGiantWithAI(Location location) {
-        return location.getWorld().spawn(location, Giant.class);
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(location, () -> location.getWorld().spawn(location, Giant.class));
     }
 
     @Override
     public Slime spawnSlimeWithSize(Location location, int size, double health) {
-        Slime slime = location.getWorld().spawn(location, Slime.class);
-        slime.setSize(size);
-        slime.setHealth(health);
-        return slime;
-    }
-
-    @Override
-    public Monster spawnWitherSkeleton(Location location) {
-        return location.getWorld().spawn(location, WitherSkeleton.class);
-    }
-
-    @Override
-    public Guardian spawnElderGuardian(Location location) {
-        return location.getWorld().spawn(location, ElderGuardian.class);
-    }
-
-    @Override
-    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData data, boolean randomizeData) {
-        return (T) world.spawn(loc, data.getEntityType().getEntityClass(), randomizeData, spawned -> {
-            if (data.isCreeperCharged())
-                ((Creeper) spawned).setPowered(true);
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(location, () -> {
+            Slime slime = location.getWorld().spawn(location, Slime.class);
+            slime.setSize(size);
+            slime.setHealth(health);
+            return slime;
         });
     }
 
     @Override
+    public Monster spawnWitherSkeleton(Location location) {
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(location, () -> location.getWorld().spawn(location, WitherSkeleton.class));
+    }
+
+    @Override
+    public Guardian spawnElderGuardian(Location location) {
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(location, () -> location.getWorld().spawn(location, ElderGuardian.class));
+    }
+
+    @Override
+    public <T extends Entity> T spawnEntity(World world, Location loc, EntityData data, boolean randomizeData) {
+        return (T) FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(loc, () -> world.spawn(loc, data.getEntityType().getEntityClass(), randomizeData, spawned -> {
+            if (data.isCreeperCharged())
+                ((Creeper) spawned).setPowered(true);
+        }));
+    }
+
+    @Override
     public <T extends Entity> T spawnEntity(World world, Location loc, Class<T> clazz) {
-        return loc.getWorld().spawn(loc, clazz);
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(loc, () -> loc.getWorld().spawn(loc, clazz));
     }
 
     @Override
     public <T extends Entity> T spawnEntity(World world, Location loc, Class<T> clazz, CreatureSpawnEvent.SpawnReason reason) {
-        return loc.getWorld().spawn(loc, clazz, reason);
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(loc, () -> loc.getWorld().spawn(loc, clazz, reason));
     }
 
     @Override
     public <T extends Entity> T spawn(Location location, Class<T> clazz, Consumer<? super T> spawnConsumer) {
-        return location.getWorld().spawn(location, clazz, spawnConsumer);
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(location, () -> location.getWorld().spawn(location, clazz, spawnConsumer));
     }
 
     @Override
@@ -86,30 +89,32 @@ public class MagicEntities implements NMSMagicEntities {
 
     @Override
     public boolean canEntitySpawn(LivingEntity entity) {
-        return canEntityFit(entity);
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtEntityNow(entity, () -> canEntityFit(entity));
     }
 
     @Override
     public boolean canEntityFit(Entity entity, Location location) {
-        BoundingBox box = entity.getBoundingBox().shift(location.clone().subtract(entity.getLocation()));
-        int minX = (int) Math.floor(box.getMinX());
-        int minY = (int) Math.max(Math.floor(box.getMinY()) - 1, entity.getWorld().getMinHeight());
-        int minZ = (int) Math.floor(box.getMinZ());
-        int maxX = (int) Math.floor(box.getMaxX());
-        int maxY = (int) Math.min(Math.floor(box.getMaxY()), entity.getWorld().getMaxHeight());
-        int maxZ = (int) Math.floor(box.getMaxZ());
+        return FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).callAtLocationNow(location, () -> {
+            BoundingBox box = entity.getBoundingBox().shift(location.clone().subtract(entity.getLocation()));
+            int minX = (int) Math.floor(box.getMinX());
+            int minY = (int) Math.max(Math.floor(box.getMinY()) - 1, entity.getWorld().getMinHeight());
+            int minZ = (int) Math.floor(box.getMinZ());
+            int maxX = (int) Math.floor(box.getMaxX());
+            int maxY = (int) Math.min(Math.floor(box.getMaxY()), entity.getWorld().getMaxHeight());
+            int maxZ = (int) Math.floor(box.getMaxZ());
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    Block block = entity.getWorld().getBlockAt(x, y, z);
-                    VoxelShape blockShape = block.getCollisionShape();
-                    if (blockShape.overlaps(box))
-                        return false;
+            for (int x = minX; x <= maxX; x++) {
+                for (int y = minY; y <= maxY; y++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        Block block = entity.getWorld().getBlockAt(x, y, z);
+                        VoxelShape blockShape = block.getCollisionShape();
+                        if (blockShape.overlaps(box))
+                            return false;
+                    }
                 }
             }
-        }
-        return true;
+            return true;
+        });
     }
 
     /**
@@ -186,51 +191,56 @@ public class MagicEntities implements NMSMagicEntities {
 
     @Override
     public void setAttribute(LivingEntity entity, EntityAttribute attribute, double value) {
-        AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
-
-        if (instance != null)
-            instance.setBaseValue(value);
+        FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).runAtEntityNow(entity, () -> {
+            AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
+            if (instance != null)
+                instance.setBaseValue(value);
+        });
     }
 
     @Override
     public void addAttributeModifier(LivingEntity entity, EntityAttribute attribute, EntityAttributeModifier modifier) {
-        AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
+        FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).runAtEntityNow(entity, () -> {
+            AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
 
-        if (instance != null) {
-            AttributeModifier attributeModifier = new AttributeModifier(
-                    NamespacedKey.fromString(modifier.getUuid().toString()),
-                    modifier.getAmount(),
-                    AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
-                    modifier.getSlot() == null ? EquipmentSlotGroup.ANY : modifier.getSlot().getGroup()
-            );
-            instance.removeModifier(attributeModifier);
-            instance.addTransientModifier(attributeModifier);
-        }
+            if (instance != null) {
+                AttributeModifier attributeModifier = new AttributeModifier(
+                        NamespacedKey.fromString(modifier.getUuid().toString()),
+                        modifier.getAmount(),
+                        AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
+                        modifier.getSlot() == null ? EquipmentSlotGroup.ANY : modifier.getSlot().getGroup()
+                );
+                instance.removeModifier(attributeModifier);
+                instance.addTransientModifier(attributeModifier);
+            }
+        });
     }
 
     @Override
     public void removeAttributeModifier(LivingEntity entity, EntityAttribute attribute, EntityAttributeModifier modifier) {
-        AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
+        FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).runAtEntityNow(entity, () -> {
+            AttributeInstance instance = entity.getAttribute(translateAttribute(attribute));
 
-        if (instance != null) {
-            AttributeModifier attributeModifier = new AttributeModifier(
-                    NamespacedKey.fromString(modifier.getUuid().toString()),
-                    modifier.getAmount(),
-                    AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
-                    modifier.getSlot() == null ? EquipmentSlotGroup.ANY : modifier.getSlot().getGroup()
-            );
-            instance.removeModifier(attributeModifier);
-        }
+            if (instance != null) {
+                AttributeModifier attributeModifier = new AttributeModifier(
+                        NamespacedKey.fromString(modifier.getUuid().toString()),
+                        modifier.getAmount(),
+                        AttributeModifier.Operation.valueOf(modifier.getOperation().name()),
+                        modifier.getSlot() == null ? EquipmentSlotGroup.ANY : modifier.getSlot().getGroup()
+                );
+                instance.removeModifier(attributeModifier);
+            }
+        });
     }
 
     @Override
     public void setPersists(Creature entity, boolean value) {
-        entity.setPersistent(value);
+        FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).runAtEntityNow(entity, () -> entity.setPersistent(value));
     }
 
     @Override
     public void setKiller(LivingEntity entity, Player killer) {
-        entity.setKiller(killer);
+        FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).runAtEntityNow(entity, () -> entity.setKiller(killer));
     }
 
     @Override
@@ -240,17 +250,19 @@ public class MagicEntities implements NMSMagicEntities {
 
     @Override
     public void setFromSpawner(Entity entity, boolean value) {
-        setMobAI(entity, !value);
+        FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).runAtEntityNow(entity, () -> setMobAI(entity, !value));
     }
 
     @Override
     public void setMobAI(Entity entity, boolean value) {
-        Mob mob = (Mob) entity;
-        mob.setAware(value);
+        FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).runAtEntityNow(entity, () -> {
+            Mob mob = (Mob) entity;
+            mob.setAware(value);
+        });
     }
 
     @Override
     public void setGravity(Entity entity, boolean value) {
-        entity.setGravity(value);
+        FoliaSchedulers.ofProvidingPlugin(MagicEntities.class).runAtEntityNow(entity, () -> entity.setGravity(value));
     }
 }

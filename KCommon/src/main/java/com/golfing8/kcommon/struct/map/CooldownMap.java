@@ -1,10 +1,11 @@
 package com.golfing8.kcommon.struct.map;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import com.google.common.base.Preconditions;
 import lombok.Setter;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
@@ -51,7 +52,13 @@ public class CooldownMap<T> {
      */
     public CooldownMap(Plugin plugin) {
         this.backingMap = new ConcurrentHashMap<>();
-        new ExpiryTask(this).runTaskTimerAsynchronously(plugin, 0, 20);
+        ExpiryTask expiryTask = new ExpiryTask(this);
+        WrappedTask[] taskHolder = new WrappedTask[1];
+        taskHolder[0] = FoliaSchedulers.of(plugin).runTimerAsync(() -> {
+            if (!expiryTask.run()) {
+                taskHolder[0].cancel();
+            }
+        }, 0, 20);
     }
 
     /**
@@ -186,26 +193,25 @@ public class CooldownMap<T> {
      * This must be kept as a nested static class to allow the CooldownMap instance
      * it's linked to get GCed.
      */
-    private static class ExpiryTask extends BukkitRunnable {
+    private static final class ExpiryTask {
         /**
          * The cooldown map this task is linked to
          */
         private final WeakReference<CooldownMap<?>> link;
 
-        ExpiryTask(CooldownMap<?> link) {
+        private ExpiryTask(CooldownMap<?> link) {
             this.link = new WeakReference<>(link);
         }
 
-        @Override
-        public void run() {
-            CooldownMap<?> instance = link.get();
+        private boolean run() {
+            CooldownMap<?> instance = this.link.get();
             // If instance is null, it has been garbage collected. Don't do anything else with it!
             if (instance == null) {
-                cancel();
-                return;
+                return false;
             }
 
             instance.purgeStaleCooldowns();
+            return true;
         }
     }
 }

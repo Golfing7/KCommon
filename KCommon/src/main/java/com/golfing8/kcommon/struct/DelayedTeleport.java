@@ -2,11 +2,11 @@ package com.golfing8.kcommon.struct;
 
 import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,7 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
@@ -57,7 +57,7 @@ public class DelayedTeleport implements Listener {
     /** The message to send the player on failure */
     private final @Nullable Message failureMessage;
     /** The task responsible for teleporting the player */
-    private BukkitTask teleportTask;
+    private WrappedTask teleportTask;
     private boolean done;
     private final CompletableFuture<Boolean> resultFuture = new CompletableFuture<>();
 
@@ -86,7 +86,7 @@ public class DelayedTeleport implements Listener {
         if (successMessage != null)
             successMessage.send(player);
 
-        boolean teleport = player.teleport(destination);
+        boolean teleport = FoliaSchedulers.of(plugin).teleportAsync(player, destination, PlayerTeleportEvent.TeleportCause.PLUGIN).join();
         resultFuture.complete(teleport);
         return teleport;
     }
@@ -221,7 +221,7 @@ public class DelayedTeleport implements Listener {
 
             DelayedTeleport delayedTeleport = new DelayedTeleport(player, delayTicks, destination, plugin, onSuccess, onFailure, successMessage, failureMessage);
             plugin.getServer().getPluginManager().registerEvents(delayedTeleport, plugin);
-            delayedTeleport.teleportTask = Bukkit.getScheduler().runTaskLater(plugin, delayedTeleport::teleport, delayTicks);
+            delayedTeleport.teleportTask = FoliaSchedulers.of(plugin).runAtEntityLater(player, delayedTeleport::teleport, delayTicks);
             return delayedTeleport;
         }
     }

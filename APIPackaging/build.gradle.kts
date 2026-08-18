@@ -41,6 +41,7 @@ tasks {
         exclude("org/bson/codecs/record/**")
         relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")
         relocate("com.cryptomorin.xseries", "com.golfing8.shade.com.cryptomorin.xseries")
+        relocate("com.tcoded.folialib", "com.golfing8.shade.com.tcoded.folialib")
         relocate("org.objectweb.asm", "com.golfing8.shade.org.objectweb.asm")
     }
 

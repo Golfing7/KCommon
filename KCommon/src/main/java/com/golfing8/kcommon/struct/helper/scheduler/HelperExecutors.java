@@ -27,7 +27,7 @@ package com.golfing8.kcommon.struct.helper.scheduler;
 
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.struct.helper.exception.HelperExceptions;
-import org.bukkit.Bukkit;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
@@ -78,14 +78,14 @@ public final class HelperExecutors {
     private static final class BukkitSyncExecutor implements Executor {
         @Override
         public void execute(@NotNull Runnable runnable) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(KCommon.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
+            FoliaSchedulers.of(KCommon.getInstance()).runSync(HelperExceptions.wrapSchedulerTask(runnable));
         }
     }
 
     private static final class BukkitAsyncExecutor implements Executor {
         @Override
         public void execute(@NotNull Runnable runnable) {
-            Bukkit.getScheduler().runTaskAsynchronously(KCommon.getInstance(), HelperExceptions.wrapSchedulerTask(runnable));
+            FoliaSchedulers.of(KCommon.getInstance()).runAsync(HelperExceptions.wrapSchedulerTask(runnable));
         }
     }
 

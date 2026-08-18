@@ -17,6 +17,7 @@ import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.profiler.HighLowAverageProfiler;
 import com.golfing8.kcommon.struct.profiler.IMethodProfiler;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.golfing8.kcommon.util.MS;
 import com.golfing8.kcommon.util.MapUtil;
 import com.golfing8.kcommon.util.StringUtil;
@@ -24,7 +25,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.*;
 import net.kyori.adventure.util.TriState;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -671,7 +671,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
         for (KCommand subcommand : this.subcommands) {
             if (subcommand.labelMatches(newLabel)) {
                 if (subcommand.async) {
-                    Bukkit.getScheduler().runTaskAsynchronously(this.getPlugin(), () -> subcommand.pass(sender, newLabel, newArgs));
+                    FoliaSchedulers.of(this.getPlugin()).runAsync(() -> subcommand.pass(sender, newLabel, newArgs));
                 } else {
                     subcommand.pass(sender, newLabel, newArgs);
                 }
@@ -1091,7 +1091,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
     public final boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         //Immediately pass to the real handler.
         if (async) {
-            Bukkit.getScheduler().runTaskAsynchronously(this.getPlugin(), () -> this.pass(commandSender, s, strings));
+            FoliaSchedulers.of(this.getPlugin()).runAsync(() -> this.pass(commandSender, s, strings));
         } else {
             this.pass(commandSender, s, strings);
         }

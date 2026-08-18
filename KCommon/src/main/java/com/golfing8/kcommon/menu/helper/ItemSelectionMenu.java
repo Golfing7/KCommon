@@ -8,9 +8,9 @@ import com.golfing8.kcommon.menu.MenuShapeType;
 import com.golfing8.kcommon.menu.PlayerMenuContainer;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.golfing8.kcommon.util.ItemUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -74,10 +74,10 @@ public class ItemSelectionMenu extends PlayerMenuContainer {
                 return;
 
             answering = true;
-            Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
+            FoliaSchedulers.of(KCommon.getInstance()).runAtEntityLater(getPlayer(), () -> {
                 event.getWhoClicked().closeInventory();
                 promise.supply(clicked);
-            });
+            }, 1L);
         });
 
         return builder.buildSimple();

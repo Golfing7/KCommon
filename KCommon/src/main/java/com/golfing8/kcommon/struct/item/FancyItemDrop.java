@@ -8,6 +8,8 @@ import com.golfing8.kcommon.hook.holograms.Hologram;
 import com.golfing8.kcommon.hook.holograms.HologramProvider;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.drop.ItemDrop;
+import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +18,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -28,7 +29,7 @@ import java.util.*;
  * </p>
  */
 @Getter
-public final class FancyItemDrop extends BukkitRunnable {
+public final class FancyItemDrop {
     private final Location location;
     private final Collection<ItemStack> items;
     private final ItemStack icon;
@@ -53,6 +54,7 @@ public final class FancyItemDrop extends BukkitRunnable {
     @Setter
     private long pickupDelayTicks = 20L;
     private boolean valid;
+    private final WrappedTask task;
 
     private FancyItemDrop(Location location, Collection<ItemStack> items, ItemStack icon) {
         if (items.isEmpty())
@@ -72,7 +74,7 @@ public final class FancyItemDrop extends BukkitRunnable {
 
         this.valid = true;
 
-        this.runTaskTimer(KCommon.getInstance(), 0L, 1L);
+        this.task = FoliaSchedulers.of(KCommon.getInstance()).runAtLocationTimer(location, this::run, 0L, 1L);
     }
 
     /**
@@ -82,9 +84,13 @@ public final class FancyItemDrop extends BukkitRunnable {
         cancel();
     }
 
-    @Override
+    /**
+     * Cancels the active ticker and deletes the backing hologram.
+     *
+     * @throws IllegalStateException if the underlying scheduler rejects cancellation
+     */
     public synchronized void cancel() throws IllegalStateException {
-        super.cancel();
+        this.task.cancel();
 
         if (!this.valid)
             return;
@@ -93,7 +99,9 @@ public final class FancyItemDrop extends BukkitRunnable {
         this.valid = false;
     }
 
-    @Override
+    /**
+     * Executes one pickup/expiry tick for this drop.
+     */
     public void run() {
         if (this.expiryTicks-- < 0L || this.items.isEmpty()) {
             remove();

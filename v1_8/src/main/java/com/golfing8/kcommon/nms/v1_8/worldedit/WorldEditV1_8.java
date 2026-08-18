@@ -4,6 +4,7 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.golfing8.kcommon.nms.chunks.NMSChunkProvider;
 import com.golfing8.kcommon.nms.v1_8.NMS;
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
@@ -15,7 +16,6 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -53,22 +53,19 @@ public class WorldEditV1_8 implements WorldEditHook {
 
             schematic.paste((com.sk89q.worldedit.world.World) world, Vector.toBlockPoint(location.getX(), location.getY(), location.getZ()));
 
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    NMSChunkProvider provider = nms.getWorld(location.getWorld()).getChunkProvider();
+            FoliaSchedulers.of(nms.getPlugin()).runAtLocationLater(location, () -> {
+                NMSChunkProvider provider = nms.getWorld(location.getWorld()).getChunkProvider();
 
-                    provider.setForceChunkLoad(true);
+                provider.setForceChunkLoad(true);
 
-                    for (int x = schematic.getClipboard().getMinimumPoint().getBlockX() >> 4; x <= schematic.getClipboard().getMaximumPoint().getBlockX() >> 4; x++) {
-                        for (int z = schematic.getClipboard().getMinimumPoint().getBlockZ() >> 4; z <= schematic.getClipboard().getMaximumPoint().getBlockZ() >> 4; z++) {
-                            location.getWorld().refreshChunk(x, z);
-                        }
+                for (int x = schematic.getClipboard().getMinimumPoint().getBlockX() >> 4; x <= schematic.getClipboard().getMaximumPoint().getBlockX() >> 4; x++) {
+                    for (int z = schematic.getClipboard().getMinimumPoint().getBlockZ() >> 4; z <= schematic.getClipboard().getMaximumPoint().getBlockZ() >> 4; z++) {
+                        location.getWorld().refreshChunk(x, z);
                     }
-
-                    provider.setForceChunkLoad(false);
                 }
-            }.runTask(nms.getPlugin());
+
+                provider.setForceChunkLoad(false);
+            }, 0L);
         } catch (IOException e) {
             e.printStackTrace();
         }

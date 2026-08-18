@@ -7,6 +7,7 @@ import com.golfing8.kcommon.menu.action.CloseRunnable;
 import com.golfing8.kcommon.menu.marker.MenuClickHolder;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.golfing8.kcommon.util.ItemUtil;
 import com.golfing8.kcommon.util.MS;
 import com.google.common.collect.Lists;
@@ -461,7 +462,11 @@ public abstract class MenuAbstract implements Menu {
         }
 
         if (postClose != null && wasInventory) {
-            Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> postClose.run(event));
+            if (event.getPlayer() instanceof Player) {
+                FoliaSchedulers.of(KCommon.getInstance()).runAtEntityLater((Player) event.getPlayer(), () -> postClose.run(event), 1L);
+            } else {
+                FoliaSchedulers.of(KCommon.getInstance()).runLater(() -> postClose.run(event), 0L);
+            }
         }
     }
 }

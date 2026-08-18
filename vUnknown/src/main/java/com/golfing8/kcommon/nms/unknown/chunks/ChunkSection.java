@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.nms.unknown.chunks;
 
 import com.golfing8.kcommon.nms.chunks.NMSChunkSection;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import org.bukkit.Material;
 
 /**
@@ -27,6 +28,10 @@ public class ChunkSection implements NMSChunkSection {
         if (section == null)
             return;
 
-        section.getBlock(x, y, z).setType(material, false);
+        final int adjustedY = y;
+        FoliaSchedulers.ofProvidingPlugin(ChunkSection.class).callAtChunkNow(section.getWorld(), section.getX(), section.getZ(), () -> {
+            section.getBlock(x, adjustedY, z).setType(material, false);
+            return null;
+        });
     }
 }

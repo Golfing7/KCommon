@@ -11,6 +11,7 @@ import com.golfing8.kcommon.menu.MenuManager;
 import com.golfing8.kcommon.module.Module;
 import com.golfing8.kcommon.module.ModuleManifest;
 import com.golfing8.kcommon.module.Modules;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.golfing8.kcommon.util.Reflection;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -49,6 +50,11 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
      * Dynamic library loader
      */
     protected LibraryLoader libraryLoader;
+    /**
+     * Folia scheduler bridge bound to this plugin instance.
+     */
+    @Getter
+    private FoliaSchedulers foliaSchedulers;
 
     @Override
     public final void onLoad() {
@@ -64,6 +70,7 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             this.saveDefaultConfig();
         } catch (IllegalArgumentException ignored) {
         } // Config doesn't exist
+        this.foliaSchedulers = FoliaSchedulers.initialize(this);
         this.menuManager = new MenuManager(this);
         //Setup PAPI.
         this.placeholderAPIHook = new KPAPIHook(this);
@@ -128,6 +135,8 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
             this.langConfig.save();
         }
         saveModuleManifest();
+        FoliaSchedulers.shutdown(this);
+        this.foliaSchedulers = null;
     }
 
     @Override

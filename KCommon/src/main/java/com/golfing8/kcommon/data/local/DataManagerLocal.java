@@ -7,6 +7,7 @@ import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.key.FieldIndexer;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
 import lombok.Getter;
@@ -68,7 +69,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
         this.fieldIndexer = new FieldIndexerLocal<>(this);
 
-        plugin.getServer().getScheduler().runTaskTimer(plugin, this::saveAllChanged, 0, 600L);
+        FoliaSchedulers.of(plugin).runTimer(this::saveAllChanged, 0, 600L);
     }
 
     /**
@@ -84,7 +85,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
             }
         }
 
-        getPlugin().getServer().getScheduler().runTaskAsynchronously(getPlugin(), () -> {
+        FoliaSchedulers.of(getPlugin()).runAsync(() -> {
             for (val entry : objectMap.entrySet()) {
                 try {
                     saveObject(entry.getKey(), entry.getValue());

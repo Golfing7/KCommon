@@ -2,6 +2,7 @@ package com.golfing8.kcommon.nms.unknown.chunks;
 
 import com.golfing8.kcommon.nms.chunks.NMSChunk;
 import com.golfing8.kcommon.nms.chunks.NMSChunkSection;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 
@@ -27,8 +28,11 @@ public class Chunk implements NMSChunk {
 
     @Override
     public void clearTileEntities() {
-        for (BlockState state : chunk.getTileEntities()) {
-            chunk.getBlock(state.getX(), state.getY(), state.getZ()).setType(Material.AIR);
-        }
+        FoliaSchedulers.ofProvidingPlugin(Chunk.class).callAtChunkNow(chunk.getWorld(), chunk.getX(), chunk.getZ(), () -> {
+            for (BlockState state : chunk.getTileEntities()) {
+                chunk.getBlock(state.getX(), state.getY(), state.getZ()).setType(Material.AIR);
+            }
+            return null;
+        });
     }
 }

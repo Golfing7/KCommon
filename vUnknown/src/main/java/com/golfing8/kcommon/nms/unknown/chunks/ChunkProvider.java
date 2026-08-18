@@ -2,6 +2,7 @@ package com.golfing8.kcommon.nms.unknown.chunks;
 
 import com.golfing8.kcommon.nms.chunks.NMSChunk;
 import com.golfing8.kcommon.nms.chunks.NMSChunkProvider;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import org.bukkit.World;
 
 /**
@@ -31,7 +32,7 @@ public class ChunkProvider implements NMSChunkProvider {
 
     @Override
     public NMSChunk getOrCreateChunk(int x, int z) {
-        return new Chunk(handle.getChunkAt(x, z));
+        return FoliaSchedulers.ofProvidingPlugin(ChunkProvider.class).callAtChunkNow(handle, x, z, () -> new Chunk(handle.getChunkAt(x, z)));
     }
 
     @Override

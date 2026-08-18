@@ -1,9 +1,10 @@
 package com.golfing8.kcommon.struct.time;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.function.Supplier;
  * A task that should be run based upon a given {@link Schedule}
  */
 @Getter
-public class ScheduleTask extends BukkitRunnable {
+public class ScheduleTask {
     private static final TimeLength MAX_ANTICIPATE_LENGTH = new TimeLength(100); // 5 seconds
 
     /**
@@ -49,6 +50,8 @@ public class ScheduleTask extends BukkitRunnable {
      * If the task has been started
      */
     private boolean started = false;
+    @Nullable
+    private WrappedTask wrappedTask;
 
     public ScheduleTask(Schedule schedule, Consumer<Timestamp> action, Supplier<Boolean> pauseCondition) {
         this.schedule = schedule;
@@ -86,7 +89,19 @@ public class ScheduleTask extends BukkitRunnable {
             return;
 
         started = true;
-        runTaskTimer(KCommon.getInstance(), 0, this.tickRate);
+        wrappedTask = FoliaSchedulers.of(KCommon.getInstance()).runTimer(this::run, 0, this.tickRate);
+    }
+
+    /**
+     * Cancels this schedule task.
+     */
+    public void cancel() {
+        if (wrappedTask == null) {
+            return;
+        }
+        wrappedTask.cancel();
+        wrappedTask = null;
+        started = false;
     }
 
     /**
@@ -137,7 +152,9 @@ public class ScheduleTask extends BukkitRunnable {
         this.anticipateTask.accept(canAnnounce.getKey());
     }
 
-    @Override
+    /**
+     * Performs one schedule evaluation tick.
+     */
     public void run() {
         started = true;
         if (pauseCondition.get())

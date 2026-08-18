@@ -1,10 +1,11 @@
 package com.golfing8.kcommon.menu;
 
 import com.golfing8.kcommon.NMS;
+import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
+import org.bukkit.entity.Player;
 import lombok.Getter;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -13,18 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages and garbage collects old menus
  */
-public final class MenuManager extends BukkitRunnable {
+public final class MenuManager {
 
     @Getter
     private static MenuManager instance;
 
     private final Map<UUID, Menu> allMenus;
-    private final BukkitTask managerTask;
+    private final FoliaSchedulers schedulers;
+    private final WrappedTask managerTask;
 
     public MenuManager(Plugin plugin) {
         instance = this;
 
-        this.managerTask = runTaskTimer(plugin, 0, 1);
+        this.schedulers = FoliaSchedulers.of(plugin);
+        this.managerTask = this.schedulers.runTimer(this::run, 0, 1);
 
         this.allMenus = new ConcurrentHashMap<>();
     }
@@ -58,7 +61,9 @@ public final class MenuManager extends BukkitRunnable {
         this.allMenus.put(menu.getMenuID(), menu);
     }
 
-    @Override
+    /**
+     * Performs one garbage-collection tick over tracked menus.
+     */
     public void run() {
         Iterator<Map.Entry<UUID, Menu>> menuIterator = allMenus.entrySet().iterator();
 
@@ -80,11 +85,21 @@ public final class MenuManager extends BukkitRunnable {
                 continue;
             }
 
-            menu.onTick();
-
-            if (menu instanceof MenuDynamic) {
-                ((MenuDynamic) menu).tickDynamics();
+            List<Player> viewers = menu.getViewers();
+            if (viewers.size() == 1) {
+                Player viewer = viewers.get(0);
+                this.schedulers.runAtEntityNow(viewer, () -> tickMenu(menu));
+            } else {
+                tickMenu(menu);
             }
+        }
+    }
+
+    private void tickMenu(Menu menu) {
+        menu.onTick();
+
+        if (menu instanceof MenuDynamic) {
+            ((MenuDynamic) menu).tickDynamics();
         }
     }
 }

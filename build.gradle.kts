@@ -28,6 +28,10 @@ repositories {
         name = "CodeMC"
         url = uri("https://repo.codemc.org/repository/maven-public/")
     }
+    maven {
+        name = "tcoded-releases"
+        url = uri("https://repo.tcoded.com/releases")
+    }
 
     flatDir {
         dir(rootDir.resolve(libraryFolder))
@@ -51,6 +55,7 @@ tasks {
         archiveFileName.set("${project.name}-${project.version}.jar")
         relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")
         relocate("com.cryptomorin.xseries", "com.golfing8.shade.com.cryptomorin.xseries")
+        relocate("com.tcoded.folialib", "com.golfing8.shade.com.tcoded.folialib")
         relocate("org.objectweb.asm", "com.golfing8.shade.org.objectweb.asm")
         relocate("org.bstats", project.group.toString())
         exclude("kotlin-*.jar")
@@ -105,6 +110,10 @@ subprojects {
         maven {
             name = "CodeMC"
             url = uri("https://repo.codemc.org/repository/maven-public/")
+        }
+        maven {
+            name = "tcoded-releases"
+            url = uri("https://repo.tcoded.com/releases")
         }
 
         flatDir {

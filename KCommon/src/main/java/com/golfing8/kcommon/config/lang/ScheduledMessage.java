@@ -5,10 +5,10 @@ import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.struct.helper.terminable.Terminable;
 import com.golfing8.kcommon.struct.helper.terminable.TerminableConsumer;
 import com.golfing8.kcommon.struct.time.TimeLength;
+import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +28,7 @@ public class ScheduledMessage implements CASerializable, Terminable {
     /** The consumer of the message for how it's meant to be sent */
     @Setter
     private transient @Nullable Consumer<Message> onMessageSend = Message::broadcast;
-    private transient BukkitTask task;
+    private transient WrappedTask task;
 
     public ScheduledMessage(@NotNull TimeLength delay, @NotNull TimeLength period, @Nullable Message message) {
         this.delay = delay;
@@ -65,7 +65,7 @@ public class ScheduledMessage implements CASerializable, Terminable {
      * @param consumer the consumer.
      */
     public void start(Consumer<Message> onMessageSend, TerminableConsumer consumer) {
-        task = Bukkit.getScheduler().runTaskTimer(KCommon.getInstance(), this::run, this.delay.getDurationTicks(), this.period.getDurationTicks());
+        task = FoliaSchedulers.of(KCommon.getInstance()).runTimer(this::run, this.delay.getDurationTicks(), this.period.getDurationTicks());
         this.onMessageSend = onMessageSend;
         consumer.bind(this);
     }

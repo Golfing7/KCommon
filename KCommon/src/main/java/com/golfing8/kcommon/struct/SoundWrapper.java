@@ -2,10 +2,10 @@ package com.golfing8.kcommon.struct;
 
 import com.cryptomorin.xseries.XSound;
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -35,7 +35,7 @@ public class SoundWrapper {
      */
     public void send(Player player) {
         if (delay > 0) {
-            Bukkit.getServer().getScheduler().runTaskLater(KCommon.getInstance(), () -> {
+            FoliaSchedulers.of(KCommon.getInstance()).runAtEntityLater(player, () -> {
                 player.playSound(player.getLocation(), sound.parseSound(), volume, pitch);
             }, delay);
         } else {
@@ -50,7 +50,7 @@ public class SoundWrapper {
      */
     public void send(Location location) {
         if (delay > 0) {
-            Bukkit.getServer().getScheduler().runTaskLater(KCommon.getInstance(), () -> {
+            FoliaSchedulers.of(KCommon.getInstance()).runAtLocationLater(location, () -> {
                 location.getWorld().playSound(location, sound.parseSound(), volume, pitch);
             }, delay);
         } else {

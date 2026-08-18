@@ -3,6 +3,8 @@ package com.golfing8.kcommon.util.block;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
 import com.golfing8.kcommon.struct.helper.terminable.Terminable;
+import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,7 +15,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 public class BlockSelectionHelper implements Listener, Terminable {
     private final Promise<@Nullable Location> resultPromise;
     private final Player player;
-    private final @Nullable BukkitTask timeoutTask;
+    private final @Nullable WrappedTask timeoutTask;
 
     public BlockSelectionHelper(Player player, int timeoutTicks) {
         this.player = player;
@@ -32,7 +33,7 @@ public class BlockSelectionHelper implements Listener, Terminable {
         // Register
         Bukkit.getPluginManager().registerEvents(this, KCommon.getInstance());
         if (timeoutTicks > 0) {
-            this.timeoutTask = Bukkit.getScheduler().runTaskLater(KCommon.getInstance(), () -> {
+            this.timeoutTask = FoliaSchedulers.of(KCommon.getInstance()).runAtEntityLater(player, () -> {
                 complete(null);
             }, timeoutTicks);
         } else {
@@ -74,9 +75,9 @@ public class BlockSelectionHelper implements Listener, Terminable {
             return;
 
         resultPromise.supply(input);
-        Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
+        FoliaSchedulers.of(KCommon.getInstance()).runAtEntityLater(player, () -> {
             HandlerList.unregisterAll(this);
-        });
+        }, 1L);
         if (timeoutTask != null)
             timeoutTask.cancel();
     }

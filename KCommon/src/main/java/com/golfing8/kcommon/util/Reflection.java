@@ -487,6 +487,10 @@ public final class Reflection {
             //Instantiate the module with the given information
             ModuleInfo info = mClass.getAnnotation(ModuleInfo.class);
 
+            if (!info.foliaSupported() && FoliaSchedulers.of(KCommon.getInstance()).getFoliaLib().isFolia()) {
+                return;
+            }
+
             // We can filter modules that are missing plugin dependencies at this point.
             for (String depend : info.pluginDependencies()) {
                 if (!Bukkit.getPluginManager().isPluginEnabled(depend)) {

@@ -24,6 +24,10 @@ repositories {
         name = "matteodev"
         url = uri("https://maven.devs.beer/")
     }
+    maven {
+        name = "tcoded-releases"
+        url = uri("https://repo.tcoded.com/releases")
+    }
 }
 
 tasks {
@@ -49,6 +53,7 @@ dependencies {
     compileOnly(rootProject.libs.xseries)
     compileOnly(rootProject.libs.mongo.sync)
     implementation(rootProject.libs.itemnbtapi)
+    implementation("com.tcoded:FoliaLib:0.5.2")
     implementation("me.lucko:jar-relocator:1.7")
     implementation("org.bstats:bstats-bukkit:3.2.1")
 

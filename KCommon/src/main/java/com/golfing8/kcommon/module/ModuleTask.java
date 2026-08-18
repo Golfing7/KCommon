@@ -1,16 +1,14 @@
 package com.golfing8.kcommon.module;
 
 import com.golfing8.kcommon.struct.helper.terminable.Terminable;
+import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-
 import java.util.function.Consumer;
 
 /**
- * A task that belongs to a module, extending the {@link BukkitRunnable} class to implement itself.
+ * A task that belongs to a module.
  * All ModuleTask instances are linked to a specific module and cancelled when a module is shutdown.
  */
 public class ModuleTask<T extends Module> implements Terminable {
@@ -28,9 +26,9 @@ public class ModuleTask<T extends Module> implements Terminable {
      */
     private final Consumer<Terminable> delegateTask;
     /**
-     * The running bukkit task associated with this module task
+     * The running task associated with this module task.
      */
-    private BukkitTask bukkitTask;
+    private WrappedTask wrappedTask;
     /**
      * If this task has been started/ran.
      */
@@ -91,7 +89,9 @@ public class ModuleTask<T extends Module> implements Terminable {
             return;
 
         this.module.removeTask(this);
-        this.bukkitTask.cancel();
+        if (this.wrappedTask != null) {
+            this.wrappedTask.cancel();
+        }
     }
 
     /**
@@ -171,11 +171,11 @@ public class ModuleTask<T extends Module> implements Terminable {
      * @param plugin the plugin
      * @return the generated task
      */
-    public synchronized BukkitTask runTask(Plugin plugin) {
-        this.bukkitTask = Bukkit.getScheduler().runTask(plugin, registeredTask);
+    public synchronized WrappedTask runTask(Plugin plugin) {
+        this.wrappedTask = FoliaSchedulers.of(plugin).runLater(registeredTask, 0L);
         this.module.addTask(this);
         this.started = true;
-        return bukkitTask;
+        return wrappedTask;
     }
 
     /**
@@ -184,11 +184,11 @@ public class ModuleTask<T extends Module> implements Terminable {
      * @param plugin the plugin
      * @return the generated task
      */
-    public synchronized BukkitTask runTaskAsynchronously(Plugin plugin) {
-        this.bukkitTask = Bukkit.getScheduler().runTaskAsynchronously(plugin, registeredTask);
+    public synchronized WrappedTask runTaskAsynchronously(Plugin plugin) {
+        this.wrappedTask = FoliaSchedulers.of(plugin).runLaterAsync(registeredTask, 0L);
         this.module.addTask(this);
         this.started = true;
-        return bukkitTask;
+        return wrappedTask;
     }
 
     /**
@@ -198,11 +198,11 @@ public class ModuleTask<T extends Module> implements Terminable {
      * @param delay the delay
      * @return the generated task
      */
-    public synchronized BukkitTask runTaskLater(Plugin plugin, long delay) {
-        this.bukkitTask = Bukkit.getScheduler().runTaskLater(plugin, registeredTask, delay);
+    public synchronized WrappedTask runTaskLater(Plugin plugin, long delay) {
+        this.wrappedTask = FoliaSchedulers.of(plugin).runLater(registeredTask, delay);
         this.module.addTask(this);
         this.started = true;
-        return bukkitTask;
+        return wrappedTask;
     }
 
     /**
@@ -212,11 +212,11 @@ public class ModuleTask<T extends Module> implements Terminable {
      * @param delay the delay
      * @return the generated task
      */
-    public synchronized BukkitTask runTaskLaterAsynchronously(Plugin plugin, long delay) {
-        this.bukkitTask = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, registeredTask, delay);
+    public synchronized WrappedTask runTaskLaterAsynchronously(Plugin plugin, long delay) {
+        this.wrappedTask = FoliaSchedulers.of(plugin).runLaterAsync(registeredTask, delay);
         this.module.addTask(this);
         this.started = true;
-        return bukkitTask;
+        return wrappedTask;
     }
 
     /**
@@ -227,12 +227,12 @@ public class ModuleTask<T extends Module> implements Terminable {
      * @param period the period
      * @return the generated task
      */
-    public synchronized BukkitTask runTaskTimer(Plugin plugin, long delay, long period) {
-        this.bukkitTask = Bukkit.getScheduler().runTaskTimer(plugin, registeredTask, delay, period);
+    public synchronized WrappedTask runTaskTimer(Plugin plugin, long delay, long period) {
+        this.wrappedTask = FoliaSchedulers.of(plugin).runTimer(registeredTask, delay, period);
         this.module.addTask(this);
         this.started = true;
         this.timerTask = true;
-        return bukkitTask;
+        return wrappedTask;
     }
 
     /**
@@ -243,11 +243,11 @@ public class ModuleTask<T extends Module> implements Terminable {
      * @param period the period
      * @return the generated task
      */
-    public synchronized BukkitTask runTaskTimerAsynchronously(Plugin plugin, long delay, long period) {
-        this.bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, registeredTask, delay, period);
+    public synchronized WrappedTask runTaskTimerAsynchronously(Plugin plugin, long delay, long period) {
+        this.wrappedTask = FoliaSchedulers.of(plugin).runTimerAsync(registeredTask, delay, period);
         this.module.addTask(this);
         this.started = true;
         this.timerTask = true;
-        return bukkitTask;
+        return wrappedTask;
     }
 }

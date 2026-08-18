@@ -5,6 +5,7 @@ import com.golfing8.kcommon.nms.struct.Position;
 import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.unknown.chunks.ChunkProvider;
 import com.golfing8.kcommon.nms.world.NMSWorld;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -58,11 +59,13 @@ public class World implements NMSWorld {
 
     @Override
     public void refreshChestState(Player player, Position position) {
-        // We need to flip the state to get it to animate.
-        ServerLevel level = ((CraftWorld) world).getHandle();
-        BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
-        getChest(blockPos).ifPresent(chest -> {
-            chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, chest.openersCounter.getOpenerCount());
+        FoliaSchedulers.ofProvidingPlugin(World.class).runAtEntityNow(player, () -> {
+            // We need to flip the state to get it to animate.
+            ServerLevel level = ((CraftWorld) world).getHandle();
+            BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
+            getChest(blockPos).ifPresent(chest -> {
+                chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, chest.openersCounter.getOpenerCount());
+            });
         });
     }
 
@@ -77,39 +80,47 @@ public class World implements NMSWorld {
 
     @Override
     public void forceChestOpen(Position position) {
-        ServerLevel level = ((CraftWorld) world).getHandle();
-        BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
-        getChest(blockPos).ifPresent(chest -> {
-            chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, chest.openersCounter.getOpenerCount() + 1);
-            chest.openersCounter.opened = true;
+        Location location = new Location(world, position.getX(), position.getY(), position.getZ());
+        FoliaSchedulers.ofProvidingPlugin(World.class).runAtLocationNow(location, () -> {
+            ServerLevel level = ((CraftWorld) world).getHandle();
+            BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
+            getChest(blockPos).ifPresent(chest -> {
+                chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, chest.openersCounter.getOpenerCount() + 1);
+                chest.openersCounter.opened = true;
+            });
         });
     }
 
     @Override
     public void forceChestClose(Position position) {
-        ServerLevel level = ((CraftWorld) world).getHandle();
-        BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
-        getChest(blockPos).ifPresent(chest -> {
-            chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, 0);
-            chest.openersCounter.opened = false;
+        Location location = new Location(world, position.getX(), position.getY(), position.getZ());
+        FoliaSchedulers.ofProvidingPlugin(World.class).runAtLocationNow(location, () -> {
+            ServerLevel level = ((CraftWorld) world).getHandle();
+            BlockPos blockPos = new BlockPos(position.getX(), position.getY(), position.getZ());
+            getChest(blockPos).ifPresent(chest -> {
+                chest.openersCounter.openerAPICountChanged(level, blockPos, chest.getBlockState(), 0, 0);
+                chest.openersCounter.opened = false;
+            });
         });
     }
 
     @Override
     public void playEffect(Location location, String effect, int data) {
-        try {
-            location.getWorld().playEffect(location, Effect.valueOf(effect), data);
-        } catch (IllegalArgumentException | NullPointerException exc) {
+        FoliaSchedulers.ofProvidingPlugin(World.class).runAtLocationNow(location, () -> {
             try {
-                location.getWorld().spawnParticle(Particle.valueOf(effect), location, data);
-            } catch (IllegalArgumentException | NullPointerException ignored) {
+                location.getWorld().playEffect(location, Effect.valueOf(effect), data);
+            } catch (IllegalArgumentException | NullPointerException exc) {
+                try {
+                    location.getWorld().spawnParticle(Particle.valueOf(effect), location, data);
+                } catch (IllegalArgumentException | NullPointerException ignored) {
+                }
             }
-        }
+        });
     }
 
     @Override
     public void refreshBlockAt(Player player, Position position) {
-        player.getWorld().refreshChunk(position.getX() >> 4, position.getZ() >> 4);
+        FoliaSchedulers.ofProvidingPlugin(World.class).runAtEntityNow(player, () -> player.getWorld().refreshChunk(position.getX() >> 4, position.getZ() >> 4));
     }
 
     @Override
@@ -119,6 +130,6 @@ public class World implements NMSWorld {
 
     @Override
     public void setTypeQuickly(Location location, Material material, byte b0) {
-        location.getBlock().setType(material, false);
+        FoliaSchedulers.ofProvidingPlugin(World.class).runAtLocationNow(location, () -> location.getBlock().setType(material, false));
     }
 }

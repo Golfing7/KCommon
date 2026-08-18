@@ -8,8 +8,8 @@ import com.golfing8.kcommon.menu.MenuShapeType;
 import com.golfing8.kcommon.menu.PlayerMenuContainer;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
 import com.golfing8.kcommon.struct.item.ItemStackBuilder;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.CompletableFuture;
@@ -62,18 +62,18 @@ public class ConfirmMenu extends PlayerMenuContainer {
         builder.setAt(0, new ItemStackBuilder().material(XMaterial.GREEN_STAINED_GLASS_PANE).name("&a✔").buildFromTemplate());
         builder.addAction(0, event -> {
             answering = true;
-            Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
+            FoliaSchedulers.of(KCommon.getInstance()).runAtEntityLater(getPlayer(), () -> {
                 getPlayer().closeInventory();
                 resultPromise.supply(ConfirmationType.YES);
-            });
+            }, 1L);
         });
         builder.setAt(4, new ItemStackBuilder().material(XMaterial.RED_STAINED_GLASS_PANE).name("&c❌").buildFromTemplate());
         builder.addAction(4, event -> {
             answering = true;
-            Bukkit.getScheduler().runTask(KCommon.getInstance(), () -> {
+            FoliaSchedulers.of(KCommon.getInstance()).runAtEntityLater(getPlayer(), () -> {
                 getPlayer().closeInventory();
                 resultPromise.supply(ConfirmationType.NO);
-            });
+            }, 1L);
         });
         return builder.buildSimple();
     }

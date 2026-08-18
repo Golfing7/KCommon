@@ -3,6 +3,7 @@ main: com.golfing8.kcommon.KCommon
 version: "{{ version_kcommon }}"
 name: KCommon
 api-version: 1.13
+folia-supported: true
 depend:
   - PlaceholderAPI
   - Vault

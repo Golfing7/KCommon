@@ -3,6 +3,7 @@ package com.golfing8.kcommon.command;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -34,7 +35,7 @@ public final class CommandManager {
     private boolean needsSync;
 
     private CommandManager() {
-        Bukkit.getScheduler().runTaskTimer(KCommon.getInstance(), () -> {
+        FoliaSchedulers.of(KCommon.getInstance()).runTimer(() -> {
             if (needsSync) {
                 needsSync = false;
                 syncCommandsIfPossible();

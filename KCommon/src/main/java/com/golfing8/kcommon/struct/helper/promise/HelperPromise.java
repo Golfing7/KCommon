@@ -30,11 +30,10 @@ import com.golfing8.kcommon.struct.helper.exception.HelperExceptions;
 import com.golfing8.kcommon.struct.helper.interfaces.Delegate;
 import com.golfing8.kcommon.struct.helper.scheduler.HelperExecutors;
 import com.golfing8.kcommon.struct.time.TimeLength;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.bukkit.Bukkit;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -163,7 +162,7 @@ final class HelperPromise<V> implements Promise<V> {
         if (delayTicks <= 0) {
             executeSync(runnable);
         } else {
-            Bukkit.getScheduler().runTaskLater(KCommon.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), delayTicks);
+            FoliaSchedulers.of(KCommon.getInstance()).runLater(HelperExceptions.wrapSchedulerTask(runnable), delayTicks);
         }
     }
 
@@ -171,7 +170,7 @@ final class HelperPromise<V> implements Promise<V> {
         if (delayTicks <= 0) {
             executeAsync(runnable);
         } else {
-            Bukkit.getScheduler().runTaskLaterAsynchronously(KCommon.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), delayTicks);
+            FoliaSchedulers.of(KCommon.getInstance()).runLaterAsync(HelperExceptions.wrapSchedulerTask(runnable), delayTicks);
         }
     }
 
@@ -179,7 +178,7 @@ final class HelperPromise<V> implements Promise<V> {
         if (delay <= 0) {
             executeSync(runnable);
         } else {
-            Bukkit.getScheduler().runTaskLater(KCommon.getInstance(), HelperExceptions.wrapSchedulerTask(runnable), TimeLength.from(delay, unit).getDurationTicks());
+            FoliaSchedulers.of(KCommon.getInstance()).runLater(HelperExceptions.wrapSchedulerTask(runnable), TimeLength.from(delay, unit).getDurationTicks());
         }
     }
 

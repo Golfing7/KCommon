@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.nms.unknown;
 
 import com.golfing8.kcommon.ComponentUtils;
+import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.nms.ItemCapturePlayer;
 import com.golfing8.kcommon.nms.access.*;
 import com.golfing8.kcommon.nms.block.NMSBlock;
@@ -19,6 +20,7 @@ import com.golfing8.kcommon.nms.unknown.worldguard.Worldguard;
 import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.nms.worldedit.WorldEditHook;
 import com.golfing8.kcommon.nms.worldguard.WorldguardHook;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.mojang.authlib.GameProfile;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.CommandSourceStack;
@@ -63,6 +65,7 @@ public class NMS implements NMSAccess {
     private final MagicNumbers magicNumbers;
     private final MagicEvents magicEvents;
     private final MagicInventories magicInventories;
+    private final long loadTime = System.currentTimeMillis();
 
     private FieldHandle<Map<UUID, ServerPlayer>> byUUIDHandle;
     private FieldHandle<Map<String, ServerPlayer>> byNameHandle;
@@ -248,6 +251,12 @@ public class NMS implements NMSAccess {
 
     @Override
     public long getCurrentTick() {
-        return Bukkit.getServer().getCurrentTick();
+        if (!FoliaSchedulers.of(KCommon.getInstance()).getFoliaLib().isFolia()) {
+            return Bukkit.getCurrentTick();
+        }
+
+        long now = System.currentTimeMillis();
+        long delta = now - loadTime;
+        return delta / 50; // 50ms per tick
     }
 }

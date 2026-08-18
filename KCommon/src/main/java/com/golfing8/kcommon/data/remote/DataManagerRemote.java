@@ -7,6 +7,7 @@ import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.key.FieldIndexer;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
+import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -40,7 +41,7 @@ public class DataManagerRemote<T extends DataSerializable> extends DataManagerAb
         super(key, plugin, typeClass);
         this.objectCache = new ConcurrentHashMap<>();
 
-        plugin.getServer().getScheduler().runTaskTimer(plugin, this::saveAllChanged, 0, 600L);
+        FoliaSchedulers.of(plugin).runTimer(this::saveAllChanged, 0, 600L);
         if (KCommon.getInstance().getConnector() == null)
             throw new IllegalStateException("Cannot connect to MongoDatabase");
 
@@ -60,7 +61,7 @@ public class DataManagerRemote<T extends DataSerializable> extends DataManagerAb
             }
         }
 
-        getPlugin().getServer().getScheduler().runTaskAsynchronously(getPlugin(), () -> {
+        FoliaSchedulers.of(getPlugin()).runAsync(() -> {
             for (val entry : objectMap.entrySet()) {
                 try {
                     saveObject(entry.getKey(), entry.getValue());

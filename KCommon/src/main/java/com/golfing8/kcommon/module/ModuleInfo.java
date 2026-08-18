@@ -67,6 +67,13 @@ public @interface ModuleInfo {
     int maximumMinorVersion() default -1;
 
     /**
+     * Whether this module supports Folia. If false, the module will not be loaded on Folia.
+     *
+     * @return true if the module supports Folia, false otherwise.
+     */
+    boolean foliaSupported() default true;
+
+    /**
      * Config sources to load
      *
      * @return the config sources

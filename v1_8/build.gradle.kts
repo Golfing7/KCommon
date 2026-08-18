@@ -10,7 +10,9 @@ repositories {
 }
 
 dependencies {
+    compileOnly(project(":KCommon"))
     compileOnly(project(":NMS"))
+    compileOnly("com.tcoded:FoliaLib:0.5.2")
     compileOnly("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard:6.x")
     compileOnly("com.sk89q.worldedit:FAWE:19.11")
