@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  * A task that should be run based upon a given {@link Schedule}
  */
 @Getter
-public class ScheduleTask {
+public class ScheduleTask implements Runnable {
     private static final TimeLength MAX_ANTICIPATE_LENGTH = new TimeLength(100); // 5 seconds
 
     /**
@@ -89,7 +89,7 @@ public class ScheduleTask {
             return;
 
         started = true;
-        wrappedTask = FoliaSchedulers.of(KCommon.getInstance()).runTimer(this::run, 0, this.tickRate);
+        wrappedTask = FoliaSchedulers.of(KCommon.getInstance()).runTimer(this, 0, this.tickRate);
     }
 
     /**
@@ -155,6 +155,7 @@ public class ScheduleTask {
     /**
      * Performs one schedule evaluation tick.
      */
+    @Override
     public void run() {
         started = true;
         if (pauseCondition.get())
