@@ -15,13 +15,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -782,6 +783,137 @@ public final class FoliaSchedulers {
             }
         });
         return future.join();
+    }
+
+    /**
+     * Runs a supplier immediately if already region-owned; otherwise dispatches to the location scheduler and blocks for the result.
+     *
+     * @param location the location owner
+     * @param supplier supplier to execute
+     * @param <T>      supplied result type
+     * @return supplied value
+     */
+    public <T> @NotNull CompletableFuture<@NotNull T> callAtLocationAsync(@NotNull Location location, @NotNull Supplier<T> supplier) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        if (foliaLib.getScheduler().isOwnedByCurrentRegion(location)) {
+            future.complete(supplier.get());
+            return future;
+        }
+
+        foliaLib.getScheduler().runAtLocation(location, task -> {
+            try {
+                future.complete(supplier.get());
+            } catch (Throwable throwable) {
+                future.completeExceptionally(throwable);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Loops through a list of locations, running a task at each location and counting the number of successful results.
+     *
+     * @param locations the locations
+     * @param taskSupplier the task supplier
+     * @return the number of successful results
+     */
+    public @NotNull CompletableFuture<Integer> forEachCountingResult(@NotNull Collection<Location> locations, @NotNull Function<Location, CompletableFuture<Boolean>> taskSupplier) {
+        return forEachCountingResult(locations, Function.identity(), taskSupplier);
+    }
+
+    /**
+     * Loops through a list of subjects, running a task at each location and counting the number of successful results.
+     *
+     * @param subjects the subjects
+     * @param locationFunction function to get the location from a subject
+     * @param taskSupplier the task supplier
+     * @return the number of successful results
+     */
+    public <T> @NotNull CompletableFuture<Integer> forEachCountingResult(@NotNull Collection<T> subjects, @NotNull Function<T, Location> locationFunction, @NotNull Function<T, CompletableFuture<Boolean>> taskSupplier) {
+        CompletableFuture<Integer> resultFuture = new CompletableFuture<>();
+        AtomicInteger count = new AtomicInteger(0);
+        AtomicInteger completedCount = new AtomicInteger(0);
+
+        for (T subject : subjects) {
+            Location location = locationFunction.apply(subject);
+            callAtLocationAsync(location, () -> {
+                taskSupplier.apply(subject).thenAccept(success -> {
+                    if (success) {
+                        count.incrementAndGet();
+                    }
+                    if (completedCount.incrementAndGet() == subjects.size()) {
+                        resultFuture.complete(count.get());
+                    }
+                }).exceptionally(ex -> {
+                    if (completedCount.incrementAndGet() == subjects.size()) {
+                        resultFuture.complete(count.get());
+                    }
+                    return null;
+                });
+                return null;
+            });
+        }
+
+        return resultFuture;
+    }
+
+    /**
+     * Loops through a list of locations, running a task at each location and returning the result of the first successful task.
+     *
+     * @param locations the locations
+     * @param taskSupplier the task supplier
+     * @param <T> the type of the result
+     * @return a future that completes with the result of the first successful task, or completes exceptionally if all tasks fail
+     */
+    public <T> @NotNull CompletableFuture<T> mapFirstLocationTo(@NotNull Collection<Location> locations, @NotNull Function<Location, CompletableFuture<T>> taskSupplier) {
+        return mapFirstLocationTo(locations, Function.identity(), taskSupplier);
+    }
+
+    /**
+     * Loops through a list of subjects, running a task at each location and returning the result of the first successful task.
+     * A task may return null to indicate failure, in which case the next task will be attempted. If all tasks fail, the returned future will complete with null.
+     *
+     * @param subjects the subjects
+     * @param locationFunction function to get the location from a subject
+     * @param taskSupplier the task supplier
+     * @param <T> the type of the result
+     * @param <S> the type of the subject
+     * @return a future that completes with the result of the first successful task, or completes exceptionally if all tasks fail
+     */
+    public <T, S> @NotNull CompletableFuture<@Nullable T> mapFirstLocationTo(@NotNull Collection<S> subjects, @NotNull Function<S, Location> locationFunction, @NotNull Function<S, CompletableFuture<@Nullable T>> taskSupplier) {
+        CompletableFuture<T> resultFuture = new CompletableFuture<>();
+        AtomicBoolean found = new AtomicBoolean(false);
+
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+        for (S subject : subjects) {
+            if (found.get()) {
+                break;
+            }
+            Location location = locationFunction.apply(subject);
+            futures.add(callAtLocationAsync(location, () -> {
+                taskSupplier.apply(subject).thenAccept(result -> {
+                    if (result == null)
+                        return;
+
+                    if (!found.getAndSet(true)) {
+                        resultFuture.complete(result);
+                    }
+                }).exceptionally(ex -> {
+                    if (!found.getAndSet(true)) {
+                        resultFuture.completeExceptionally(ex);
+                    }
+                    return null;
+                });
+                return null;
+            }));
+        }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
+            if (!found.get()) {
+                resultFuture.complete(null);
+            }
+        });
+
+        return resultFuture;
     }
 
     /**
