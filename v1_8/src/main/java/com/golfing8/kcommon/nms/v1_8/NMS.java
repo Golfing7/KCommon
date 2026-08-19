@@ -300,4 +300,9 @@ public class NMS implements NMSAccess {
     public long getCurrentTick() {
         return MinecraftServer.currentTick;
     }
+
+    @Override
+    public boolean isStarting() {
+        return getCurrentTick() == 0;
+    }
 }

@@ -86,9 +86,8 @@ public class DelayedTeleport implements Listener {
         if (successMessage != null)
             successMessage.send(player);
 
-        boolean teleport = FoliaSchedulers.of(plugin).teleportAsync(player, destination, PlayerTeleportEvent.TeleportCause.PLUGIN).join();
-        resultFuture.complete(teleport);
-        return teleport;
+        FoliaSchedulers.of(plugin).teleportAsync(player, destination, PlayerTeleportEvent.TeleportCause.PLUGIN).thenAccept(resultFuture::complete);
+        return true;
     }
 
     /**

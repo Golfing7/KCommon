@@ -46,6 +46,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
+import org.spigotmc.WatchdogThread;
 
 import java.util.Map;
 import java.util.UUID;
@@ -258,5 +259,10 @@ public class NMS implements NMSAccess {
         long now = System.currentTimeMillis();
         long delta = now - loadTime;
         return delta / 50; // 50ms per tick
+    }
+
+    @Override
+    public boolean isStarting() {
+        return !WatchdogThread.hasStarted;
     }
 }

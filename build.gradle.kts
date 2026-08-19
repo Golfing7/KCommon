@@ -6,7 +6,7 @@ plugins {
 }
 
 val libraryFolder = "locallibs"
-val commonsVersion = "1.2-SNAPSHOT"
+val commonsVersion = "1.3-SNAPSHOT"
 
 group = "com.golfing8"
 version = commonsVersion

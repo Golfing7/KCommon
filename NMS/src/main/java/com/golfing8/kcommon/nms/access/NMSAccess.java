@@ -228,4 +228,11 @@ public interface NMSAccess {
      * @return server tick
      */
     long getCurrentTick();
+
+    /**
+     * Checks if the server is still starting
+     *
+     * @return true if still starting, false if fully started
+     */
+    boolean isStarting();
 }
