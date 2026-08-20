@@ -2,6 +2,7 @@ plugins {
     id("java")
     id("com.gradleup.shadow") version ("9.3.0")
     id("maven-publish")
+    id ("java-library")
     checkstyle
 }
 
@@ -75,8 +76,9 @@ publishing {
 }
 
 subprojects {
-    apply(plugin = "java")
-    apply(plugin = "checkstyle")
+    pluginManager.apply("java")
+    pluginManager.apply("checkstyle")
+    pluginManager.apply("java-library")
 
     java {
         toolchain.languageVersion.set(JavaLanguageVersion.of(8))
@@ -131,7 +133,8 @@ dependencies {
     implementation(project(":KCommon"))
     implementation(project(":NMS"))
     implementation(project(":v1_8"))
-    implementation(project(":vUnknown"))
+    implementation(project(":v1_20"))
+    implementation(project(":v26_1"))
     implementation(project(":DialogMenus"))
 }
 

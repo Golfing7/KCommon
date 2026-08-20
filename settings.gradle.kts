@@ -1,6 +1,7 @@
 include("NMS")
 include("KCommon")
 include("v1_8")
-include("vUnknown")
+include("v1_20")
+include("v26_1")
 include("APIPackaging")
 include("DialogMenus")

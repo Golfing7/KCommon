@@ -58,7 +58,8 @@ dependencies {
     implementation(project(":KCommon"))
     implementation(project(":NMS"))
     implementation(project(":v1_8"))
-    implementation(project(":vUnknown"))
+    implementation(project(":v1_20"))
+    implementation(project(":v26_1"))
     implementation(project(":DialogMenus"))
 
     implementation(rootProject.libs.itemnbtapi)

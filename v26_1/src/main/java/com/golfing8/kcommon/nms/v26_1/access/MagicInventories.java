@@ -1,0 +1,20 @@
+package com.golfing8.kcommon.nms.v26_1.access;
+
+import com.destroystokyo.paper.event.inventory.PrepareResultEvent;
+import com.golfing8.kcommon.nms.access.NMSMagicInventories;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+
+/**
+ * API agnostic inventory access
+ */
+public class MagicInventories implements NMSMagicInventories, Listener {
+
+    @EventHandler
+    public void onPrepareResult(PrepareResultEvent event) {
+        com.golfing8.kcommon.nms.event.PrepareResultEvent kEvent = new com.golfing8.kcommon.nms.event.PrepareResultEvent(event.getView(), event.getResult());
+        kEvent.callEvent();
+
+        event.setResult(kEvent.getResult());
+    }
+}

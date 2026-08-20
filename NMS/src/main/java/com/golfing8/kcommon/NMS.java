@@ -22,25 +22,8 @@ public final class NMS {
         {
             put(new NMSVersion(8, 0), "v1_8");
 
-            put(new NMSVersion(12, 0), "v1_12");
-
-            put(new NMSVersion(16, 0), "v1_16");
-
-            put(new NMSVersion(17, 0), "v1_17");
-
-            put(new NMSVersion(18, 0), "v1_18");
-
-            put(new NMSVersion(19, 0), "v1_19");
-            put(new NMSVersion(19, 2), "v1_19_R2");
-            put(new NMSVersion(19, 4), "v1_19_R3");
-
             put(new NMSVersion(20, 0), "v1_20");
-            put(new NMSVersion(20, 1), "v1_20_R2");
-            put(new NMSVersion(20, 3), "v1_20_R3");
-            put(new NMSVersion(20, 5), "v1_20_R4");
-
-            put(new NMSVersion(21, 0), "v1_21");
-            put(new NMSVersion(21, 5), "v1_21_R4");
+            put(new NMSVersion(26, 1), "v26_1");
         }
     };
     @Getter

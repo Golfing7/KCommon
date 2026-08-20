@@ -1,9 +1,11 @@
 package com.golfing8.kcommon.util;
 
+import com.golfing8.kcommon.struct.helper.exception.HelperExceptions;
 import com.tcoded.folialib.FoliaLib;
 import com.tcoded.folialib.enums.EntityTaskResult;
 import com.tcoded.folialib.wrapper.task.WrappedTask;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -24,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * FoliaLib-backed scheduler bridge bound to a single {@link Plugin} instance.
@@ -104,7 +107,7 @@ public final class FoliaSchedulers {
     /**
      * Checks whether the current thread owns the regions within the location's radius.
      *
-     * @param location    the center location to check
+     * @param location     the center location to check
      * @param squareRadius the radius in chunks
      * @return whether the current thread owns the regions
      */
@@ -573,9 +576,9 @@ public final class FoliaSchedulers {
      * Runs a delayed entity task with a fallback if the entity retires.
      *
      * @param entity          entity owner
-     * @param task             task callback
-     * @param retiredFallback  fallback task
-     * @param delayTicks       delay in ticks
+     * @param task            task callback
+     * @param retiredFallback fallback task
+     * @param delayTicks      delay in ticks
      * @return completion future
      */
     public @NotNull CompletableFuture<Void> runAtEntityLater(@NotNull Entity entity, @NotNull Consumer<WrappedTask> task, @NotNull Runnable retiredFallback, long delayTicks) {
@@ -585,10 +588,10 @@ public final class FoliaSchedulers {
     /**
      * Runs a delayed entity task using the supplied time unit.
      *
-     * @param entity entity owner
+     * @param entity   entity owner
      * @param runnable task
-     * @param delay delay in the supplied unit
-     * @param unit delay unit
+     * @param delay    delay in the supplied unit
+     * @param unit     delay unit
      * @return wrapped scheduled task
      */
     public @NotNull WrappedTask runAtEntityLater(@NotNull Entity entity, @NotNull Runnable runnable, long delay, @NotNull TimeUnit unit) {
@@ -599,9 +602,9 @@ public final class FoliaSchedulers {
      * Runs a delayed entity task with access to its wrapped task using the supplied time unit.
      *
      * @param entity entity owner
-     * @param task task callback
-     * @param delay delay in the supplied unit
-     * @param unit delay unit
+     * @param task   task callback
+     * @param delay  delay in the supplied unit
+     * @param unit   delay unit
      * @return completion future
      */
     public @NotNull CompletableFuture<Void> runAtEntityLater(@NotNull Entity entity, @NotNull Consumer<WrappedTask> task, long delay, @NotNull TimeUnit unit) {
@@ -611,9 +614,9 @@ public final class FoliaSchedulers {
     /**
      * Runs a repeating task on the scheduler owning an entity.
      *
-     * @param entity entity owner
-     * @param runnable task
-     * @param delayTicks initial delay in ticks
+     * @param entity      entity owner
+     * @param runnable    task
+     * @param delayTicks  initial delay in ticks
      * @param periodTicks repeat period in ticks
      * @return wrapped scheduled task
      */
@@ -638,9 +641,9 @@ public final class FoliaSchedulers {
     /**
      * Runs a repeating entity task with access to its wrapped task.
      *
-     * @param entity entity owner
-     * @param task task callback
-     * @param delayTicks initial delay in ticks
+     * @param entity      entity owner
+     * @param task        task callback
+     * @param delayTicks  initial delay in ticks
      * @param periodTicks repeat period in ticks
      */
     public void runAtEntityTimer(@NotNull Entity entity, @NotNull Consumer<WrappedTask> task, long delayTicks, long periodTicks) {
@@ -650,11 +653,11 @@ public final class FoliaSchedulers {
     /**
      * Runs a repeating entity task with a fallback if the entity retires.
      *
-     * @param entity entity owner
-     * @param task task callback
+     * @param entity          entity owner
+     * @param task            task callback
      * @param retiredFallback fallback task
-     * @param delayTicks initial delay in ticks
-     * @param periodTicks repeat period in ticks
+     * @param delayTicks      initial delay in ticks
+     * @param periodTicks     repeat period in ticks
      */
     public void runAtEntityTimer(@NotNull Entity entity, @NotNull Consumer<WrappedTask> task, @NotNull Runnable retiredFallback, long delayTicks, long periodTicks) {
         foliaLib.getScheduler().runAtEntityTimer(entity, task, retiredFallback, Math.max(1L, delayTicks), Math.max(1L, periodTicks));
@@ -663,11 +666,11 @@ public final class FoliaSchedulers {
     /**
      * Runs a repeating entity task using the supplied time unit.
      *
-     * @param entity entity owner
+     * @param entity   entity owner
      * @param runnable task
-     * @param delay initial delay in the supplied unit
-     * @param period repeat period in the supplied unit
-     * @param unit delay and period unit
+     * @param delay    initial delay in the supplied unit
+     * @param period   repeat period in the supplied unit
+     * @param unit     delay and period unit
      * @return wrapped scheduled task
      */
     public @NotNull WrappedTask runAtEntityTimer(@NotNull Entity entity, @NotNull Runnable runnable, long delay, long period, @NotNull TimeUnit unit) {
@@ -678,10 +681,10 @@ public final class FoliaSchedulers {
      * Runs a repeating entity task with access to its wrapped task using the supplied time unit.
      *
      * @param entity entity owner
-     * @param task task callback
-     * @param delay initial delay in the supplied unit
+     * @param task   task callback
+     * @param delay  initial delay in the supplied unit
      * @param period repeat period in the supplied unit
-     * @param unit delay and period unit
+     * @param unit   delay and period unit
      */
     public void runAtEntityTimer(@NotNull Entity entity, @NotNull Consumer<WrappedTask> task, long delay, long period, @NotNull TimeUnit unit) {
         foliaLib.getScheduler().runAtEntityTimer(entity, task, delay, period, unit);
@@ -807,40 +810,52 @@ public final class FoliaSchedulers {
                 future.completeExceptionally(throwable);
             }
         });
-        return future;
+        return future.whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                // Log the exception if needed
+                HelperExceptions.reportScheduler(throwable);
+            }
+        });
     }
 
     /**
      * Loops through a list of locations, running a task at each location and counting the number of successful results.
      *
-     * @param locations the locations
+     * @param locations    the locations
      * @param taskSupplier the task supplier
      * @return the number of successful results
      */
-    public @NotNull CompletableFuture<Integer> forEachCountingResult(@NotNull Collection<Location> locations, @NotNull Function<Location, CompletableFuture<Boolean>> taskSupplier) {
+    public @NotNull CompletableFuture<Integer> forEachCountingResult(@NotNull Collection<Location> locations, @NotNull Function<Location, CompletableFuture<Integer>> taskSupplier) {
         return forEachCountingResult(locations, Function.identity(), taskSupplier);
     }
 
     /**
      * Loops through a list of subjects, running a task at each location and counting the number of successful results.
      *
-     * @param subjects the subjects
+     * @param subjects         the subjects
      * @param locationFunction function to get the location from a subject
-     * @param taskSupplier the task supplier
+     * @param taskSupplier     the task supplier
      * @return the number of successful results
      */
-    public <T> @NotNull CompletableFuture<Integer> forEachCountingResult(@NotNull Collection<T> subjects, @NotNull Function<T, Location> locationFunction, @NotNull Function<T, CompletableFuture<Boolean>> taskSupplier) {
+    public <T> @NotNull CompletableFuture<Integer> forEachCountingResult(@NotNull Collection<T> subjects, @NotNull Function<T, Location> locationFunction, @NotNull Function<T, CompletableFuture<Integer>> taskSupplier) {
         CompletableFuture<Integer> resultFuture = new CompletableFuture<>();
         AtomicInteger count = new AtomicInteger(0);
         AtomicInteger completedCount = new AtomicInteger(0);
 
         for (T subject : subjects) {
-            Location location = locationFunction.apply(subject);
+            Location location;
+            try {
+                location = locationFunction.apply(subject);
+            } catch (Throwable throwable) {
+                HelperExceptions.reportScheduler(throwable);
+                if (completedCount.incrementAndGet() == subjects.size()) {
+                    resultFuture.complete(count.get());
+                }
+                continue;
+            }
             callAtLocationAsync(location, () -> {
                 taskSupplier.apply(subject).thenAccept(success -> {
-                    if (success) {
-                        count.incrementAndGet();
-                    }
+                    count.addAndGet(success);
                     if (completedCount.incrementAndGet() == subjects.size()) {
                         resultFuture.complete(count.get());
                     }
@@ -854,15 +869,20 @@ public final class FoliaSchedulers {
             });
         }
 
-        return resultFuture;
+        return resultFuture.whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                // Log the exception if needed
+                HelperExceptions.reportScheduler(throwable);
+            }
+        });
     }
 
     /**
      * Loops through a list of locations, running a task at each location and returning the result of the first successful task.
      *
-     * @param locations the locations
+     * @param locations    the locations
      * @param taskSupplier the task supplier
-     * @param <T> the type of the result
+     * @param <T>          the type of the result
      * @return a future that completes with the result of the first successful task, or completes exceptionally if all tasks fail
      */
     public <T> @NotNull CompletableFuture<T> mapFirstLocationTo(@NotNull Collection<Location> locations, @NotNull Function<Location, CompletableFuture<T>> taskSupplier) {
@@ -873,11 +893,11 @@ public final class FoliaSchedulers {
      * Loops through a list of subjects, running a task at each location and returning the result of the first successful task.
      * A task may return null to indicate failure, in which case the next task will be attempted. If all tasks fail, the returned future will complete with null.
      *
-     * @param subjects the subjects
+     * @param subjects         the subjects
      * @param locationFunction function to get the location from a subject
-     * @param taskSupplier the task supplier
-     * @param <T> the type of the result
-     * @param <S> the type of the subject
+     * @param taskSupplier     the task supplier
+     * @param <T>              the type of the result
+     * @param <S>              the type of the subject
      * @return a future that completes with the result of the first successful task, or completes exceptionally if all tasks fail
      */
     public <T, S> @NotNull CompletableFuture<@Nullable T> mapFirstLocationTo(@NotNull Collection<S> subjects, @NotNull Function<S, Location> locationFunction, @NotNull Function<S, CompletableFuture<@Nullable T>> taskSupplier) {
@@ -889,9 +909,23 @@ public final class FoliaSchedulers {
             if (found.get()) {
                 break;
             }
-            Location location = locationFunction.apply(subject);
+            Location location;
+            try {
+                location = locationFunction.apply(subject);
+            } catch (Throwable throwable) {
+                if (found.compareAndSet(false, true)) {
+                    resultFuture.completeExceptionally(throwable);
+                }
+                continue;
+            }
             futures.add(callAtLocationAsync(location, () -> {
-                taskSupplier.apply(subject).thenAccept(result -> {
+                CompletableFuture<@Nullable T> apply = taskSupplier.apply(subject);
+                if (apply == null) {
+                    resultFuture.completeExceptionally(new NullPointerException("taskSupplier returned null"));
+                    return null;
+                }
+
+                apply.thenAccept(result -> {
                     if (result == null)
                         return;
 
@@ -913,7 +947,133 @@ public final class FoliaSchedulers {
             }
         });
 
-        return resultFuture;
+        return resultFuture.whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                // Log the exception if needed
+                HelperExceptions.reportScheduler(throwable);
+            }
+        });
+    }
+
+    /**
+     * Maps all of the given subjects to a list of something else
+     *
+     * @param subjects the subjects
+     * @param locationFunction function to get the location from a subject
+     * @param taskSupplier the task supplier
+     * @return a future that completes with a list of the results
+     * @param <T> the type of the result
+     * @param <S> the type of the subject
+     */
+    public <T, S> @NotNull CompletableFuture<List<T>> mapSubjectsTo(@Nullable Collection<S> subjects, @NotNull Function<S, Location> locationFunction, @NotNull Function<S, CompletableFuture<@Nullable T>> taskSupplier) {
+        if (subjects == null || subjects.isEmpty()) {
+            return CompletableFuture.completedFuture(new ArrayList<>());
+        }
+
+        List<T> results = new ArrayList<>(Collections.nCopies(subjects.size(), null));
+        CompletableFuture<List<T>> resultFuture = new CompletableFuture<>();
+        AtomicInteger remaining = new AtomicInteger(subjects.size());
+        AtomicBoolean completed = new AtomicBoolean(false);
+
+        int index = 0;
+        for (S subject : subjects) {
+            final int currentIndex = index++;
+
+            Location location;
+            try {
+                location = locationFunction.apply(subject);
+            } catch (Throwable throwable) {
+                if (completed.compareAndSet(false, true)) {
+                    resultFuture.completeExceptionally(throwable);
+                }
+                continue;
+            }
+
+            try {
+                callAtLocationAsync(location, () -> {
+                    if (completed.get()) {
+                        return null;
+                    }
+
+                    CompletableFuture<@Nullable T> taskFuture;
+                    try {
+                        taskFuture = taskSupplier.apply(subject);
+                    } catch (Throwable throwable) {
+                        if (completed.compareAndSet(false, true)) {
+                            resultFuture.completeExceptionally(throwable);
+                        }
+                        return null;
+                    }
+
+                    if (taskFuture == null) {
+                        if (completed.compareAndSet(false, true)) {
+                            resultFuture.completeExceptionally(new NullPointerException("taskSupplier returned null"));
+                        }
+                        return null;
+                    }
+
+                    taskFuture.whenComplete((result, throwable) -> {
+                        if (completed.get()) {
+                            return;
+                        }
+
+                        if (throwable != null) {
+                            if (completed.compareAndSet(false, true)) {
+                                resultFuture.completeExceptionally(throwable);
+                            }
+                            return;
+                        }
+
+                        results.set(currentIndex, result);
+                        if (remaining.decrementAndGet() == 0 && completed.compareAndSet(false, true)) {
+                            resultFuture.complete(results);
+                        }
+                    });
+
+                    return null;
+                }).exceptionally(throwable -> {
+                    if (completed.compareAndSet(false, true)) {
+                        resultFuture.completeExceptionally(throwable);
+                    }
+                    return null;
+                });
+            } catch (Throwable throwable) {
+                if (completed.compareAndSet(false, true)) {
+                    resultFuture.completeExceptionally(throwable);
+                }
+            }
+        }
+
+        return resultFuture.whenComplete((result, throwable) -> {
+            if (throwable != null) {
+                // Log the exception if needed
+                HelperExceptions.reportScheduler(throwable);
+            }
+        });
+    }
+
+    /**
+     * Loops over each world and maps all subjects to a list of something else, returning a combined list of all results.
+     *
+     * @param worldToSubjectFunction the world to subject function
+     * @param locationFunction the location function for each subject
+     * @param taskSupplier the task supplier
+     * @return the future of lists
+     * @param <T> the type of the result
+     * @param <S> the type of the subject
+     */
+    public <T, S> CompletableFuture<List<T>> forEachWorldMapSubjectsTo(Function<World, Collection<S>> worldToSubjectFunction, Function<S, Location> locationFunction, Function<S, CompletableFuture<@Nullable T>> taskSupplier) {
+        List<CompletableFuture<List<T>>> futures = new ArrayList<>();
+        for (World world : Bukkit.getWorlds()) {
+            Collection<S> subjects = worldToSubjectFunction.apply(world);
+            if (subjects != null && !subjects.isEmpty()) {
+                futures.add(mapSubjectsTo(subjects, locationFunction, taskSupplier));
+            }
+        }
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream()
+                        .flatMap(future -> future.join().stream())
+                        .collect(Collectors.toList()));
     }
 
     /**
