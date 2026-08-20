@@ -53,15 +53,18 @@ public final class MenuBuilder {
     /**
      * The bottom click action, run when any slot in the bottom inventory is clicked.
      */
+    @Getter
     private ClickAction bottomClickEvent = null;
     /**
      * The top click event is called when a player clicks the top menu. Regardless if there is a click action on the slot clicked
      */
+    @Getter
     private ClickAction topClickEvent = null;
     /**
      * Slots in the menu that are locked from interaction.
      * Items cannot be placed in them and items cannot be taken from them.
      */
+    @Getter
     private Set<Integer> lockedSlots = new HashSet<>();
     /**
      * A map containing all special GUI items, mapped from their keys.
@@ -72,18 +75,22 @@ public final class MenuBuilder {
      * A map containing string key bindings to specific items in this GUI.
      * Will be applied to the same slot defined for the 'special gui items' or left out if they are not present.
      */
+    @Getter
     private Map<String, ClickAction> specialBindings = new LinkedHashMap<>();
     /**
      * A map containing special materials for each special item.
      */
+    @Getter
     private Map<String, Supplier<XMaterial>> specialMaterials = new LinkedHashMap<>();
     /**
      * A map containing placeholders for each special item.
      */
+    @Getter
     private Map<String, Supplier<Collection<Placeholder>>> specialPlaceholders = new LinkedHashMap<>();
     /**
      * A map containing multiline placeholders for each special item.
      */
+    @Getter
     private Map<String, Supplier<Collection<MultiLinePlaceholder>>> specialMPlaceholders = new LinkedHashMap<>();
     /**
      * The global placeholders to apply to EVERY string in this menu.
@@ -358,6 +365,43 @@ public final class MenuBuilder {
      */
     public MenuBuilder addLockedSlots(Collection<Integer> slots) {
         this.lockedSlots.addAll(slots);
+        return this;
+    }
+
+    /**
+     * Locks any nonempty slots in the menu
+     *
+     * @param lock true to lock, false to unlock
+     * @return this
+     */
+    public MenuBuilder lockNonEmptySlots(boolean lock) {
+        if (lock) {
+            for (int i = 0; i < size; i++) {
+                MenuCoordinate coordinate = new MenuCoordinate(i);
+                if (specialGUIItems.values().stream().anyMatch(guiItem -> guiItem.getSlots().contains(coordinate))) {
+                    lockedSlots.add(i);
+                } else if (specificItems.containsKey(i)) {
+                    lockedSlots.add(i);
+                } else if (otherGUIItems.values().stream().anyMatch(guiItem -> guiItem.getSlots().contains(coordinate))) {
+                    lockedSlots.add(i);
+                } else if (shapeCreation.stream().anyMatch(pair -> pair.getA().getInRange().contains(coordinate))) {
+                    lockedSlots.add(i);
+                }
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                MenuCoordinate coordinate = new MenuCoordinate(i);
+                if (specialGUIItems.values().stream().anyMatch(guiItem -> guiItem.getSlots().contains(coordinate))) {
+                    lockedSlots.remove(i);
+                } else if (specificItems.containsKey(i)) {
+                    lockedSlots.remove(i);
+                } else if (otherGUIItems.values().stream().anyMatch(guiItem -> guiItem.getSlots().contains(coordinate))) {
+                    lockedSlots.remove(i);
+                } else if (shapeCreation.stream().anyMatch(pair -> pair.getA().getInRange().contains(coordinate))) {
+                    lockedSlots.remove(i);
+                }
+            }
+        }
         return this;
     }
 
@@ -786,6 +830,8 @@ public final class MenuBuilder {
                 if (slot < 0)
                     return;
 
+                // Lock the slot of the special item and add the click action to it.
+                this.addLockedSlots(slot);
                 this.addAction(slot, specialBinding.getValue());
                 this.setAt(slot,
                         guiItem.buildFromTemplate(placeholderTarget));
