@@ -105,6 +105,7 @@ public final class MenuBuilder {
     /**
      * The other GUI items to apply in this menu.
      */
+    @Getter
     private Map<String, SimpleGUIItem> otherGUIItems = new LinkedHashMap<>();
     /**
      * The type of menu being built
