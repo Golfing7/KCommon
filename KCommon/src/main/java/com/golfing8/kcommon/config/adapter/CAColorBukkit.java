@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.Color;
@@ -55,8 +54,9 @@ public class CAColorBukkit implements ConfigAdapter<Color> {
         if (colorCache.containsKey(name))
             return colorCache.get(name);
 
-        FieldHandle<Color> fieldHandle = FieldHandles.getHandle(name, Color.class);
-        Color color = fieldHandle.get(null);
+        Color color = FieldHandles.<Color>getHandleOpt(name, Color.class)
+                .map(handle -> handle.get(null))
+                .orElse(null);
         if (color != null)
             colorCache.put(name, color);
         return color;

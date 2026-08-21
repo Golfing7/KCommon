@@ -121,7 +121,7 @@ public class Interval implements Iterable<Double> {
             }
 
             //Check if we'll be done next iteration.
-            if (positive ? (current == x2) : (current == x1)) {
+            if (current == x2) {
                 //NaN marks our "end".
                 //If we're on CAP mode, the function simply "caps" at the end of its interval.
                 if (overflowBehavior != CAP)

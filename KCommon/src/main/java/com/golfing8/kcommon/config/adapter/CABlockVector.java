@@ -23,9 +23,9 @@ public class CABlockVector implements ConfigAdapter<BlockVector> {
             return null;
 
         Map<String, Object> map = (Map<String, Object>) entry.getPrimitive();
-        return new BlockVector((int) map.getOrDefault("x", 0),
-                (int) map.getOrDefault("y", 0),
-                (int) map.getOrDefault("z", 0));
+        return new BlockVector(((Number) map.getOrDefault("x", 0)).intValue(),
+                ((Number) map.getOrDefault("y", 0)).intValue(),
+                ((Number) map.getOrDefault("z", 0)).intValue());
     }
 
     @Override

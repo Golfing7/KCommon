@@ -4,11 +4,18 @@ import com.golfing8.kcommon.struct.Range;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Adapts instances of {@link Range}
  */
 public class CARange implements ConfigAdapter<Range> {
     private static final double EPSILON = 1e-7;
+    // Matches two (possibly negative) numbers, optionally separated by one of |;:- . The leading
+    // '-' of a number is consumed by the number group itself rather than treated as a separator,
+    // so negative bounds (e.g. "-5-10") parse correctly instead of colliding with the separator.
+    private static final Pattern RANGE_PATTERN = Pattern.compile("^(-?\\d+(?:\\.\\d+)?)(?:[|;:-](-?\\d+(?:\\.\\d+)?))?$");
 
     @Override
     public Class<Range> getAdaptType() {
@@ -20,13 +27,18 @@ public class CARange implements ConfigAdapter<Range> {
         if (entry.getPrimitive() == null)
             return null;
 
-        String[] splitValue = ConfigPrimitive.coerceBoxedToString(entry.unwrap()).split("[|;:-]", 2);
-        double minimum = Double.parseDouble(splitValue[0]);
+        String value = ConfigPrimitive.coerceBoxedToString(entry.unwrap());
+        Matcher matcher = RANGE_PATTERN.matcher(value);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid range value: " + value);
+        }
+
+        double minimum = Double.parseDouble(matcher.group(1));
         // If there's only one number, just interpret it as a single point.
-        if (splitValue.length == 1) {
+        if (matcher.group(2) == null) {
             return new Range(minimum, minimum);
         }
-        double maximum = Double.parseDouble(splitValue[1]);
+        double maximum = Double.parseDouble(matcher.group(2));
         return new Range(minimum, maximum);
     }
 

@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.config.adapter;
 
-import com.golfing8.kcommon.nms.reflection.FieldHandle;
 import com.golfing8.kcommon.nms.reflection.FieldHandles;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +44,8 @@ public class CAColorAWT implements ConfigAdapter<Color> {
     }
 
     private static Color getColorByName(String name) {
-        FieldHandle<Color> fieldHandle = FieldHandles.getHandle(name, Color.class);
-        return fieldHandle.get(null);
+        return FieldHandles.<Color>getHandleOpt(name, Color.class)
+                .map(handle -> handle.get(null))
+                .orElse(null);
     }
 }

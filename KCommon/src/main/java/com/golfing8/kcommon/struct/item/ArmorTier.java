@@ -32,6 +32,10 @@ public enum ArmorTier {
             return null;
 
         String[] split = matName.split("_");
+        // XMaterial names golden armor as GOLDEN_*, but the enum constant is GOLD.
+        if (split[0].equals("GOLDEN"))
+            return GOLD;
+
         return ArmorTier.valueOf(split[0]);
     }
 }

@@ -116,7 +116,11 @@ public class WrappedConfigurationSection implements KConfigurationSection {
 
     @Override
     public WrappedConfigurationSection getConfigurationSection(String path) {
-        return new WrappedConfigurationSection(wrapped.getConfigurationSection(path), originalConfig);
+        ConfigurationSection section = wrapped.getConfigurationSection(path);
+        if (section == null)
+            return null;
+
+        return new WrappedConfigurationSection(section, originalConfig);
     }
 
     @Override

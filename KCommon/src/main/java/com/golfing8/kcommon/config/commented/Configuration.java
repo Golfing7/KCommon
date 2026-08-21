@@ -263,7 +263,11 @@ public class Configuration extends YamlConfiguration implements KConfig {
 
     @Override
     public WrappedConfigurationSection getConfigurationSection(String path) {
-        return new WrappedConfigurationSection(wrapped.getConfigurationSection(path), this);
+        ConfigurationSection section = wrapped.getConfigurationSection(path);
+        if (section == null)
+            return null;
+
+        return new WrappedConfigurationSection(section, this);
     }
 
     @Override

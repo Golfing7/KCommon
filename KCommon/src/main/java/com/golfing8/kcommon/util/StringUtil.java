@@ -511,9 +511,7 @@ public class StringUtil {
 
         if (secondAppend.length() < 2) secondAppend = "0" + secondAppend;
 
-        String minuteAppend = minutes != 0 ? minutes + ":" : "";
-
-        if (minuteAppend.length() < 2) minuteAppend = "0" + minuteAppend;
+        String minuteAppend = minutes + ":";
 
         return (minuteAppend + secondAppend).trim();
     }
@@ -610,7 +608,7 @@ public class StringUtil {
 
         int l = ROMAN_NUMERALS.floorKey(number);
         if (number == l) {
-            return ROMAN_NUMERALS.get(number);
+            return (negative ? "-" : "") + ROMAN_NUMERALS.get(number);
         }
         return (negative ? "-" : "") + ROMAN_NUMERALS.get(l) + toRoman(number - l);
     }

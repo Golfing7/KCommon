@@ -26,7 +26,7 @@ public class CAPotionData implements ConfigAdapter<PotionData> {
         PotionType potionType = PotionType.valueOf(values.get("potion-type").toString().toUpperCase());
         boolean amplified = (boolean) values.getOrDefault("amplified", false);
         boolean extended = (boolean) values.getOrDefault("extended", false);
-        return new PotionData(potionType, extended, amplified);
+        return new PotionData(potionType, amplified, extended);
     }
 
     @Override

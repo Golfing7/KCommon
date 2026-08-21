@@ -53,8 +53,8 @@ public class RGBUtils {
         Matcher m = fix2.matcher(text);
         while (m.find()) {
             String hexcode = m.group();
-            String fixed = hexcode.substring(2, 8);
-            text = text.replace(hexcode, "#" + fixed);
+            String fixed = hexcode.substring(3, 9);
+            text = text.replace(hexcode, "&#" + fixed);
         }
         return text;
     }
@@ -72,7 +72,7 @@ public class RGBUtils {
                     hexcode.charAt(11),
                     hexcode.charAt(13)
             });
-            text = text.replace(hexcode, "#" + fixed);
+            text = text.replace(hexcode, "&#" + fixed);
         }
         return text;
     }

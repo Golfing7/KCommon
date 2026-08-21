@@ -33,6 +33,6 @@ public class CAMenuCoordinate implements ConfigAdapter<MenuCoordinate> {
 
     @Override
     public ConfigPrimitive toPrimitive(@NotNull MenuCoordinate object) {
-        return ConfigPrimitive.ofInt((object.getY() - 1) * 9 + object.getX());
+        return ConfigPrimitive.ofInt((object.getY() - 1) * 9 + (object.getX() - 1));
     }
 }

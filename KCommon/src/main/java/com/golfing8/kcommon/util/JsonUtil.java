@@ -32,6 +32,7 @@ public class JsonUtil {
             int ind = 0;
             for (JsonElement jElement : element.getAsJsonArray()) {
                 arr[ind] = readByType(jElement, componentType);
+                ind++;
             }
             return (T) arr;
         }

@@ -57,7 +57,9 @@ public class CAReflective implements ConfigAdapter<CASerializable> {
             return ConfigTypeRegistry.getFromType(new ConfigEntry(root, delegatePath), type);
         }
 
-        Map<String, Object> primitives = entry.unwrap();
+        // A flattened, single-field serializable stores its raw (non-map) value directly, so only
+        // unwrap as a map when the underlying primitive actually is one.
+        Map<String, Object> primitives = entry.getPrimitive() instanceof Map ? entry.unwrap() : Collections.emptyMap();
 
         // This handles polymorphism.
         Class<? extends CASerializable.TypeResolver> typeResolverClass = options != null && options.typeResolverEnum() != CASerializable.TypeResolver.class ?

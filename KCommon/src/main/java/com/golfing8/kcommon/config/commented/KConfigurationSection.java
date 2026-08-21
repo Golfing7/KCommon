@@ -91,7 +91,7 @@ public interface KConfigurationSection extends ConfigurationSection {
         if (section == null)
             return;
 
-        for (String key : this.getKeys(false)) {
+        for (String key : section.getKeys(false)) {
             if (!section.isConfigurationSection(key))
                 continue;
 
@@ -121,7 +121,7 @@ public interface KConfigurationSection extends ConfigurationSection {
             return;
 
         for (String key : section.getKeys(false)) {
-            action.accept(!path.isEmpty() ? path + "." + key : path);
+            action.accept(!path.isEmpty() ? path + "." + key : key);
         }
     }
 

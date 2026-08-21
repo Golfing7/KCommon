@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @UtilityClass
 public final class MathExpressions {
-    private static final Function RAND_0 = new Function("rand0") {
+    private static final Function RAND_0 = new Function("rand0", 0) {
         @Override
         public double apply(double... doubles) {
             return Math.random();
@@ -25,7 +25,7 @@ public final class MathExpressions {
             return ThreadLocalRandom.current().nextDouble(doubles[0]);
         }
     };
-    private static final Function RAND_2 = new Function("rand2") {
+    private static final Function RAND_2 = new Function("rand2", 2) {
         @Override
         public double apply(double... doubles) {
             return ThreadLocalRandom.current().nextDouble(doubles[0], doubles[1]);
