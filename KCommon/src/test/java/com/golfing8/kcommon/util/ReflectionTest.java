@@ -32,10 +32,10 @@ class ReflectionTest {
         private String markedField = "marked";
         private int unmarkedField = 42;
 
-        public Sample() {
+        Sample() {
         }
 
-        public Sample(int value) {
+        Sample(int value) {
             this.unmarkedField = value;
         }
 

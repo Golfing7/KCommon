@@ -15,7 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CASetTest {
 
-    enum Suit { HEARTS, SPADES, CLUBS, DIAMONDS }
+    enum Suit {
+        HEARTS, SPADES, CLUBS, DIAMONDS
+    }
 
     private static class Holder {
         Set<String> strings;

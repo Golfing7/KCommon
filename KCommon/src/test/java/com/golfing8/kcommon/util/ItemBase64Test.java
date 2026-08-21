@@ -42,9 +42,9 @@ class ItemBase64Test {
         @DisplayName("Encoding and then decoding an array preserves every item, including nulls")
         void testRoundTrip() throws Exception {
             ItemStack[] original = new ItemStack[]{
-                    new ItemStack(Material.DIAMOND, 5),
-                    null,
-                    new ItemStack(Material.STONE, 64)
+                new ItemStack(Material.DIAMOND, 5),
+                null,
+                new ItemStack(Material.STONE, 64)
             };
             String encoded = ItemBase64.itemStackArrayToBase64(original);
             ItemStack[] decoded = ItemBase64.itemStackArrayFromBase64(encoded);

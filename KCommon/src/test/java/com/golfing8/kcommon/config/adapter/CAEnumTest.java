@@ -9,7 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CAEnumTest {
 
-    enum Suit { HEARTS, SPADES, CLUBS, DIAMONDS }
+    enum Suit {
+        HEARTS, SPADES, CLUBS, DIAMONDS
+    }
 
     @Test
     @DisplayName("Round trips an enum constant by name")

@@ -19,7 +19,7 @@ class ConfigClassTest {
         public int number = 5;
         public String unannotatedButStillLoaded = "default";
 
-        public SimpleConfig() {
+        SimpleConfig() {
             super();
         }
     }
@@ -121,7 +121,7 @@ class ConfigClassTest {
     }
 
     static class SourcedConfig extends ConfigClass {
-        public SourcedConfig() {
+        SourcedConfig() {
             super();
         }
     }

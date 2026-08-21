@@ -12,14 +12,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class ConfigTypeRegistryTest {
+final class ConfigTypeRegistryTest {
+    private ConfigTypeRegistryTest() {
+
+    }
 
     @BeforeAll
     static void bootstrap() {
