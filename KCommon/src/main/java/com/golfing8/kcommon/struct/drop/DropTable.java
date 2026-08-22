@@ -63,6 +63,8 @@ public class DropTable implements CASerializable {
      */
     private Map<String, Drop<?>> table;
     private Map<String, DropGroup> groupings;
+    private @Nullable Range dropTargetRange = null;
+    private int maxTries = 0;
 
     public DropTable(Map<String, Drop<?>> drops) {
         table = new HashMap<>(drops);
@@ -91,15 +93,6 @@ public class DropTable implements CASerializable {
             groupings = new HashMap<>();
 
         if (!groupings.containsKey(DEFAULT_GROUP)) {
-            Map<String, Object> unwrapped = primitive.unwrap();
-            Range dropTargetRange = null;
-            if (unwrapped.containsKey("drop-target-range")) {
-                dropTargetRange = ConfigTypeRegistry.getFromType(primitive.getSubValue("drop-target-range"), Range.class);
-            }
-            int maxTries = 0;
-            if (unwrapped.containsKey("max-tries")) {
-                maxTries = Integer.parseInt(unwrapped.get("max-tries").toString());
-            }
             initDefaultGroup(dropTargetRange, maxTries);
         }
 
