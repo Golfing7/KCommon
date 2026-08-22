@@ -36,12 +36,27 @@ object ConfigPsiUtil {
         }
     }
 
+    /** Mirrors FieldHandle#shouldSerialize: only non-static/non-transient fields (and never the reserved _key field) are serialized. */
+    private fun shouldSerialize(field: PsiField): Boolean {
+        if (field.name == KCConstants.KEY_FIELD_NAME) return false
+        val modifiers = field.modifierList ?: return true
+        return !modifiers.hasModifierProperty(PsiModifier.STATIC) && !modifiers.hasModifierProperty(PsiModifier.TRANSIENT)
+    }
+
+    /** ConfigClassSource fields are serialized only if they're static and annotated with @Conf. */
+    private fun shouldSerializeModuleField(field: PsiField): Boolean {
+        val modifiers = field.modifierList ?: return false
+        if (!modifiers.hasModifierProperty(PsiModifier.STATIC)) return false
+        return field.getAnnotation(KCConstants.CONF) != null
+    }
+
     /** Fields of a module-level ConfigClassSource that belong to the given config file bucket (e.g. "config", "limits"). */
     fun collectModuleFields(psiClass: PsiClass, bucket: String, project: Project): Map<String, ConfigFieldType> {
         val result = LinkedHashMap<String, ConfigFieldType>()
         for (field in psiClass.fields) {
-            val conf = field.getAnnotation(KCConstants.CONF) ?: continue
-            val configAttr = stringLiteralValue(conf.findAttributeValue("config"))
+            if (!shouldSerializeModuleField(field)) continue
+            val conf = field.getAnnotation(KCConstants.CONF)
+            val configAttr = stringLiteralValue(conf?.findAttributeValue("config"))
             val fieldBucket = if (configAttr.isNullOrBlank() || configAttr == KCConstants.DEFAULT_CONFIG_BUCKET) KCConstants.MAIN_CONFIG_BUCKET else configAttr
             if (!fieldBucket.equals(bucket, ignoreCase = true)) continue
 
@@ -56,7 +71,8 @@ object ConfigPsiUtil {
             val project = psiClass.project
             val result = LinkedHashMap<String, ConfigFieldType>()
             for (field in psiClass.fields) {
-                val conf = field.getAnnotation(KCConstants.CONF) ?: continue
+                if (!shouldSerialize(field)) continue
+                val conf = field.getAnnotation(KCConstants.CONF)
                 result[yamlKeyFor(field, conf)] = classifyType(field.type, project)
             }
             CachedValueProvider.Result.create(
@@ -66,8 +82,8 @@ object ConfigPsiUtil {
         }
     }
 
-    private fun yamlKeyFor(field: PsiField, conf: PsiAnnotation): String {
-        val label = stringLiteralValue(conf.findAttributeValue("label"))
+    private fun yamlKeyFor(field: PsiField, conf: PsiAnnotation?): String {
+        val label = stringLiteralValue(conf?.findAttributeValue("label"))
         return if (!label.isNullOrBlank()) label else camelToKebab(field.name)
     }
 
@@ -116,9 +132,11 @@ object ConfigPsiUtil {
             }
 
             if (qualifiedName == "java.util.Map" || InheritanceUtil.isInheritor(psiClass, "java.util.Map")) {
+                val keyParam = type.parameters.getOrNull(0)
                 val valueParam = type.parameters.getOrNull(1)
+                val keyType = keyParam?.let { classifyType(it, project) } ?: ConfigFieldType.Unknown
                 val inner = valueParam?.let { classifyType(it, project) } ?: ConfigFieldType.Unknown
-                return ConfigFieldType.MapOf(inner)
+                return ConfigFieldType.MapOf(inner, keyType)
             }
 
             if (isCollectionType(qualifiedName, psiClass)) {

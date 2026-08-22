@@ -233,7 +233,7 @@ object BuiltInAdapters {
             "skull-texture" to Unknown,
             "variable-amount" to Unknown,
             "item-id" to Unknown,
-            "enchantments" to MapOf(Unknown),
+            "enchantments" to MapOf(Unknown, EnumLike(EnumSource.StaticFieldsOfOwnType("com.golfing8.shade.com.cryptomorin.xseries.XEnchantment"))),
             "flags" to ListOf(EnumLike(EnumSource.JavaEnum("org.bukkit.inventory.ItemFlag"))),
             "attribute-modifiers" to MapOf(ListOf(entityAttributeModifierType())),
             "unstackable" to Unknown,

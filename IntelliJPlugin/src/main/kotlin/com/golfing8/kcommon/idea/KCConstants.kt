@@ -21,4 +21,7 @@ object KCConstants {
     /** Bucket name used for the module's main config.yml (i.e. @Conf.config() left unset). */
     const val MAIN_CONFIG_BUCKET = "config"
     const val DEFAULT_CONFIG_BUCKET = "@default"
+
+    /** Mirrors CAReflective.KEY_FIELD_NAME - the reserved field excluded from serialization. */
+    const val KEY_FIELD_NAME = "_key"
 }

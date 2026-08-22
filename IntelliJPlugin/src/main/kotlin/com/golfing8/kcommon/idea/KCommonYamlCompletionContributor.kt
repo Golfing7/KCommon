@@ -67,6 +67,13 @@ class KCommonYamlCompletionContributor : CompletionContributor() {
                             suggestFields(enclosingType.typeName, enclosingType.fields, existingKeys, result)
                             return
                         }
+                        if (enclosingType is ConfigFieldType.MapOf) {
+                            val keyType = enclosingType.keyType as? ConfigFieldType.EnumLike
+                            if (keyType != null) {
+                                suggestEnumKeys(keyType, originalFile.project, result)
+                                return
+                            }
+                        }
 
                         // Not object-shaped per our schema - only treat this as value-editing if
                         // the caret is actually inside a non-mapping value of this key.
@@ -78,7 +85,7 @@ class KCommonYamlCompletionContributor : CompletionContributor() {
                     }
 
                     val mapping = PsiTreeUtil.getParentOfType(position, YAMLMapping::class.java) ?: return
-                    suggestKeysForMapping(mapping, schema, result)
+                    suggestKeysForMapping(mapping, schema, originalFile.project, result)
                 }
             }
         )
@@ -92,18 +99,36 @@ class KCommonYamlCompletionContributor : CompletionContributor() {
     ) {
         val path = ConfigSchemaResolver.buildKeyPath(keyValue) ?: return
         val resolution = schema.resolve(path)
-        val type = (resolution as? SchemaResolution.Resolved)?.type as? ConfigFieldType.EnumLike ?: return
+        var resolvedType = (resolution as? SchemaResolution.Resolved)?.type
+        // A sequence item's own value is still resolved against the key's own type (e.g. list<enum>) -
+        // unwrap to the element type so completions fire for `- <cursor>` entries too.
+        while (resolvedType is ConfigFieldType.ListOf) {
+            resolvedType = resolvedType.inner
+        }
+        val type = resolvedType as? ConfigFieldType.EnumLike ?: return
 
         for (name in EnumSource.resolve(type.source, project)) {
             result.addElement(LookupElementBuilder.create(name))
         }
     }
 
-    private fun suggestKeysForMapping(mapping: YAMLMapping, schema: ConfigSchema, result: CompletionResultSet) {
+    private fun suggestKeysForMapping(mapping: YAMLMapping, schema: ConfigSchema, project: Project, result: CompletionResultSet) {
         val containerPath = ConfigSchemaResolver.buildContainerPath(mapping) ?: return
-        val container = schema.fieldsAt(containerPath) ?: return
-        val existingKeys = mapping.keyValues.map { it.keyText.lowercase() }.toSet()
-        suggestFields(container.typeName, container.fields, existingKeys, result)
+        val container = schema.fieldsAt(containerPath)
+        if (container != null) {
+            val existingKeys = mapping.keyValues.map { it.keyText.lowercase() }.toSet()
+            suggestFields(container.typeName, container.fields, existingKeys, result)
+            return
+        }
+
+        val keyType = schema.mapKeyTypeAt(containerPath) ?: return
+        suggestEnumKeys(keyType, project, result)
+    }
+
+    private fun suggestEnumKeys(keyType: ConfigFieldType.EnumLike, project: Project, result: CompletionResultSet) {
+        for (name in EnumSource.resolve(keyType.source, project)) {
+            result.addElement(LookupElementBuilder.create(name))
+        }
     }
 
     private fun suggestFields(

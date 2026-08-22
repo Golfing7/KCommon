@@ -16,8 +16,8 @@ sealed class ConfigFieldType {
     /** List/Set/Collection<T>: a YAML sequence whose items should each match `inner`. */
     data class ListOf(val inner: ConfigFieldType) : ConfigFieldType()
 
-    /** Map<String, T>: a YAML mapping with free-form keys and values matching `inner`. */
-    data class MapOf(val inner: ConfigFieldType) : ConfigFieldType()
+    /** Map<K, T>: a YAML mapping with values matching `inner`. Keys match `keyType` (usually Unknown/free-form, but EnumLike for e.g. Map<XEnchantment, Integer>). */
+    data class MapOf(val inner: ConfigFieldType, val keyType: ConfigFieldType = Unknown) : ConfigFieldType()
 
     /** Anything we don't have a specific model for (String, primitives, TimeLength, etc.) - never validated. */
     object Unknown : ConfigFieldType()
@@ -59,6 +59,18 @@ class ConfigSchema(val moduleId: String, rootFieldsProvider: () -> Map<String, C
         val resolution = resolve(containerPath)
         val nested = (resolution as? SchemaResolution.Resolved)?.type as? ConfigFieldType.Nested ?: return null
         return FieldContainer(nested.typeName, nested.fields)
+    }
+
+    /**
+     * The key type of the MapOf at [containerPath] (empty means "not inside a container we can
+     * say anything about"), for suggesting enum-like map keys. Null when the container isn't a
+     * MapOf with a known key type.
+     */
+    fun mapKeyTypeAt(containerPath: List<String>): ConfigFieldType.EnumLike? {
+        if (containerPath.isEmpty()) return null
+        val resolution = resolve(containerPath)
+        val mapOf = (resolution as? SchemaResolution.Resolved)?.type as? ConfigFieldType.MapOf ?: return null
+        return mapOf.keyType as? ConfigFieldType.EnumLike
     }
 
     fun resolve(path: List<String>): SchemaResolution {
