@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * Only meaningful when placed on a class implementing {@link ConfigAdapter}.
  * </p>
  */
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface ConfigAdapterInfo {
     /**

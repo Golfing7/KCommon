@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  * Only meaningful when placed on a class extending {@link MenuContainer}.
  * </p>
  */
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface MenuContainerInfo {
     /**

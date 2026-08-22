@@ -45,6 +45,9 @@ class KCommonYamlAnnotator : Annotator {
         val scalar = element.value as? YAMLScalar ?: return
         val text = scalar.textValue
         if (text.isBlank()) return
+        // Command items (ItemStackBuilder#type values like "/give ...") aren't real material
+        // names, so there's nothing to validate against - just leave them unflagged.
+        if (text.startsWith("/")) return
 
         val validNames = EnumSource.resolve(enumType.source, element.project)
         if (validNames.isEmpty()) return
