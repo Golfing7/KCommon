@@ -1,0 +1,30 @@
+<idea-plugin>
+    <id>com.golfing8.kcommon.idea.yaml</id>
+    <name>KCommon Config YAML Support</name>
+    <vendor>Golfing8</vendor>
+    <description>
+        Understands the KCommon module/config system: locates the module that a
+        &lt;module-id&gt;/config.yml belongs to, resolves the Java field each YAML key maps
+        to, and uses that to flag unrecognized keys and suggest valid values for
+        enum-like fields (e.g. XMaterial, XSound, or any plain enum). Resolution is
+        best-effort and silent whenever a module or field type can't be determined.
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <annotator language="yaml" implementationClass="com.golfing8.kcommon.idea.KCommonYamlAnnotator"/>
+        <completion.contributor language="yaml" implementationClass="com.golfing8.kcommon.idea.KCommonYamlCompletionContributor"/>
+        <codeInsight.declarativeInlayProvider
+            language="yaml"
+            implementationClass="com.golfing8.kcommon.idea.KCommonTypeHintsProvider"
+            isEnabledByDefault="true"
+            group="OTHER_GROUP"
+            providerId="kcommon.config.type.hints"
+            bundle="messages.KCommonHintsBundle"
+            nameKey="hints.kcommon.type.name"
+            descriptionKey="hints.kcommon.type.description"/>
+    </extensions>
+</idea-plugin>

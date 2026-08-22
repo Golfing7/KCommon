@@ -5,6 +5,7 @@ buildm
 BuildTools
 */build/*
 */logs
+*/.intellijPlatform
 
 # Ignore Gradle GUI config
 gradle-app.setting
