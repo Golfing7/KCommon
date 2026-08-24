@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    kotlin("jvm") version "1.9.25"
+    kotlin("jvm") version "2.1.20"
     id("org.jetbrains.intellij.platform") version "2.18.1"
 }
 
@@ -20,6 +20,9 @@ dependencies {
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.plugins.yaml")
     }
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {
@@ -28,6 +31,10 @@ kotlin {
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 intellijPlatform {

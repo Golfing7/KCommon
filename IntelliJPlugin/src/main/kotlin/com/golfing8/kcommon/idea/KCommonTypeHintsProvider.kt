@@ -24,9 +24,7 @@ class KCommonTypeHintsProvider : InlayHintsProvider {
         override fun collectFromElement(element: PsiElement, sink: InlayTreeSink) {
             if (element !is YAMLKeyValue) return
 
-            val schema = ConfigSchemaResolver.resolveForFile(element.containingFile) ?: return
-            val path = ConfigSchemaResolver.buildKeyPath(element) ?: return
-            val resolution = schema.resolve(path)
+            val resolution = ConfigSchemaResolver.resolveKey(element).resolution
             val type = (resolution as? SchemaResolution.Resolved)?.type ?: return
             val label = describeType(type) ?: return
 

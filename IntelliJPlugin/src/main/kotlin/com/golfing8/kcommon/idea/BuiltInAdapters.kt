@@ -27,6 +27,20 @@ object BuiltInAdapters {
 
     fun forType(qualifiedName: String): ConfigFieldType? = table[qualifiedName]?.invoke()
 
+    /** Looked up by [ConfigFieldType.Nested.typeName] rather than FQN - for `#$Type` tag resolution, where a user writes the type's simple display name, not its Java FQN. */
+    fun byTypeName(name: String): ConfigFieldType? = byName[name]
+
+    fun allTypeNames(): List<String> = byName.keys.toList()
+
+    private val byName: Map<String, ConfigFieldType> by lazy {
+        val map = LinkedHashMap<String, ConfigFieldType>()
+        for (factory in table.values) {
+            val type = factory()
+            if (type is Nested) map.putIfAbsent(type.typeName, type)
+        }
+        map
+    }
+
     private val table: Map<String, () -> ConfigFieldType> = mapOf(
         "com.golfing8.kcommon.struct.region.Region" to { regionType() },
         "com.golfing8.kcommon.struct.item.ItemStackBuilder" to { itemStackBuilderType() },

@@ -1,9 +1,12 @@
 package com.golfing8.kcommon.idea
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
+import com.intellij.psi.search.searches.ClassInheritorsSearch
+import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.InheritanceUtil
@@ -13,19 +16,82 @@ import com.intellij.psi.util.PsiTypesUtil
 /** Reflection-mirroring PSI helpers: reads @ModuleInfo / @Conf / CASerializable the same way KCommon's runtime does. */
 object ConfigPsiUtil {
 
-    fun findModuleClassByName(project: Project, moduleId: String): PsiClass? {
-        val annotationClass = JavaPsiFacade.getInstance(project)
-            .findClass(KCConstants.MODULE_INFO, GlobalSearchScope.allScope(project)) ?: return null
+    private val MODULES_BY_NAME_KEY: Key<CachedValue<Map<String, PsiClass>>> = Key.create("kcommon.modulesByName")
+    private val CA_SERIALIZABLE_CLASSES_KEY: Key<CachedValue<Map<String, PsiClass>>> = Key.create("kcommon.caSerializableClasses")
 
-        val scope = GlobalSearchScope.allScope(project)
-        for (candidate in AnnotatedElementsSearch.searchPsiClasses(annotationClass, scope)) {
-            val annotation = candidate.getAnnotation(KCConstants.MODULE_INFO) ?: continue
-            val nameValue = annotation.findAttributeValue("name") ?: continue
-            val constant = JavaPsiFacade.getInstance(project).constantEvaluationHelper
-                .computeConstantExpression(nameValue) as? String ?: continue
-            if (constant.equals(moduleId, ignoreCase = true)) return candidate
+    fun findModuleClassByName(project: Project, moduleId: String): PsiClass? =
+        allModulesByName(project).entries.firstOrNull { it.key.equals(moduleId, ignoreCase = true) }?.value
+
+    /** Every @ModuleInfo-annotated class in the project, keyed by its declared (original-case) module id - e.g. for [SchemaExportAction] to enumerate every module, or for tag completion to suggest module ids. */
+    fun allModulesByName(project: Project): Map<String, PsiClass> {
+        return CachedValuesManager.getManager(project).getCachedValue(project, MODULES_BY_NAME_KEY, {
+            val annotationClass = JavaPsiFacade.getInstance(project)
+                .findClass(KCConstants.MODULE_INFO, GlobalSearchScope.allScope(project))
+
+            val result: Map<String, PsiClass> = if (annotationClass == null) {
+                emptyMap()
+            } else {
+                val scope = GlobalSearchScope.allScope(project)
+                val map = LinkedHashMap<String, PsiClass>()
+                for (candidate in AnnotatedElementsSearch.searchPsiClasses(annotationClass, scope)) {
+                    val annotation = candidate.getAnnotation(KCConstants.MODULE_INFO) ?: continue
+                    val nameValue = annotation.findAttributeValue("name") ?: continue
+                    val constant = JavaPsiFacade.getInstance(project).constantEvaluationHelper
+                        .computeConstantExpression(nameValue) as? String ?: continue
+                    map[constant] = candidate
+                }
+                map
+            }
+
+            CachedValueProvider.Result.create(result, PsiModificationTracker.MODIFICATION_COUNT)
+        }, false)
+    }
+
+    /** Every config bucket name referenced by [configSources]' @Conf-annotated static fields, always including the default "config" bucket - for [SchemaExportAction] to know which buckets to export per module. */
+    fun collectBuckets(configSources: List<PsiClass>): Set<String> {
+        val buckets = linkedSetOf(KCConstants.MAIN_CONFIG_BUCKET)
+        for (source in configSources) {
+            for (field in source.fields) {
+                if (!shouldSerializeModuleField(field)) continue
+                val conf = field.getAnnotation(KCConstants.CONF) ?: continue
+                val configAttr = stringLiteralValue(conf.findAttributeValue("config"))
+                buckets += if (configAttr.isNullOrBlank() || configAttr == KCConstants.DEFAULT_CONFIG_BUCKET) {
+                    KCConstants.MAIN_CONFIG_BUCKET
+                } else {
+                    configAttr
+                }
+            }
         }
-        return null
+        return buckets
+    }
+
+    /** A CASerializable class anywhere on the project's classpath, found by its simple name - for `#$Type` tag resolution (see [NamedTypeRegistry]). Null for a flattened type (see [isFlattened]), since those have no fixed key set to offer. */
+    fun findNamedCASerializable(project: Project, name: String): ConfigFieldType.Nested? {
+        val match = allCASerializableClasses(project)[name] ?: return null
+        if (isFlattened(match)) return null
+        return ConfigFieldType.Nested(match.name ?: name, collectConfFields(match))
+    }
+
+    fun allCASerializableTypeNames(project: Project): List<String> = allCASerializableClasses(project).keys.toList()
+
+    private fun allCASerializableClasses(project: Project): Map<String, PsiClass> {
+        return CachedValuesManager.getManager(project).getCachedValue(project, CA_SERIALIZABLE_CLASSES_KEY, {
+            val caClass = JavaPsiFacade.getInstance(project)
+                .findClass(KCConstants.CA_SERIALIZABLE, GlobalSearchScope.allScope(project))
+
+            val result: Map<String, PsiClass> = if (caClass == null) {
+                emptyMap()
+            } else {
+                val map = LinkedHashMap<String, PsiClass>()
+                for (candidate in ClassInheritorsSearch.search(caClass, GlobalSearchScope.allScope(project), true)) {
+                    val name = candidate.name ?: continue
+                    map.putIfAbsent(name, candidate)
+                }
+                map
+            }
+
+            CachedValueProvider.Result.create(result, PsiModificationTracker.MODIFICATION_COUNT)
+        }, false)
     }
 
     fun extractConfigSources(annotation: PsiAnnotation): List<PsiClass> {
@@ -65,20 +131,38 @@ object ConfigPsiUtil {
         return result
     }
 
-    /** Fields of a nested CASerializable type - no bucket filtering, that only applies at the module's top level. */
+    /** The CASerializable classes currently being expanded on this thread, to break cycles in [collectConfFields] - see its doc. */
+    private val expansionStack = ThreadLocal.withInitial { mutableSetOf<PsiClass>() }
+
+    /**
+     * Fields of a nested CASerializable type - no bucket filtering, that only applies at the module's top level.
+     *
+     * A CASerializable type can reference itself, directly or through a cycle of other CASerializable
+     * types (e.g. a "condition" type with a `sub-conditions: List<Condition>` field) - naively
+     * recursing through [classifyType] for such a field would call back into this same function for
+     * the same [psiClass] before its first call ever returns, overflowing the stack. [expansionStack]
+     * detects that reentrancy and, per this plugin's usual leniency, just leaves the field that closes
+     * the loop as an empty object (unvalidated) instead of expanding it forever.
+     */
     fun collectConfFields(psiClass: PsiClass): Map<String, ConfigFieldType> {
-        return CachedValuesManager.getCachedValue(psiClass) {
-            val project = psiClass.project
-            val result = LinkedHashMap<String, ConfigFieldType>()
-            for (field in psiClass.fields) {
-                if (!shouldSerialize(field)) continue
-                val conf = field.getAnnotation(KCConstants.CONF)
-                result[yamlKeyFor(field, conf)] = classifyType(field.type, project)
+        val stack = expansionStack.get()
+        if (!stack.add(psiClass)) return emptyMap()
+        try {
+            return CachedValuesManager.getCachedValue(psiClass) {
+                val project = psiClass.project
+                val result = LinkedHashMap<String, ConfigFieldType>()
+                for (field in psiClass.fields) {
+                    if (!shouldSerialize(field)) continue
+                    val conf = field.getAnnotation(KCConstants.CONF)
+                    result[yamlKeyFor(field, conf)] = classifyType(field.type, project)
+                }
+                CachedValueProvider.Result.create(
+                    result as Map<String, ConfigFieldType>,
+                    PsiModificationTracker.MODIFICATION_COUNT
+                )
             }
-            CachedValueProvider.Result.create(
-                result as Map<String, ConfigFieldType>,
-                PsiModificationTracker.MODIFICATION_COUNT
-            )
+        } finally {
+            stack.remove(psiClass)
         }
     }
 

@@ -28,27 +28,36 @@ object UserAdapterRegistry {
     private const val CONFIG_ADAPTER_INFO = "com.golfing8.kcommon.config.adapter.ConfigAdapterInfo"
     private const val CONFIG_ADAPTER = "com.golfing8.kcommon.config.adapter.ConfigAdapter"
 
-    fun forType(project: Project, qualifiedName: String): ConfigFieldType? = scan(project)[qualifiedName]
+    fun forType(project: Project, qualifiedName: String): ConfigFieldType? = scan(project).byQualifiedName[qualifiedName]
 
-    private fun scan(project: Project): Map<String, ConfigFieldType> {
+    /** Looked up by the adapted type's simple name - for `#$Type` tag resolution, where a user writes a display name, not a Java FQN. */
+    fun byTypeName(project: Project, name: String): ConfigFieldType? = scan(project).byTypeName[name]
+
+    fun allTypeNames(project: Project): List<String> = scan(project).byTypeName.keys.toList()
+
+    private data class ScanResult(val byQualifiedName: Map<String, ConfigFieldType>, val byTypeName: Map<String, ConfigFieldType>)
+
+    private fun scan(project: Project): ScanResult {
         return CachedValuesManager.getManager(project).getCachedValue(project) {
             val infoAnnotationClass = JavaPsiFacade.getInstance(project)
                 .findClass(CONFIG_ADAPTER_INFO, GlobalSearchScope.allScope(project))
 
             val result = if (infoAnnotationClass == null) {
-                emptyMap()
+                ScanResult(emptyMap(), emptyMap())
             } else {
                 val scope = GlobalSearchScope.allScope(project)
-                val entries = LinkedHashMap<String, ConfigFieldType>()
+                val byQualifiedName = LinkedHashMap<String, ConfigFieldType>()
+                val byTypeName = LinkedHashMap<String, ConfigFieldType>()
                 for (candidate in AnnotatedElementsSearch.searchPsiClasses(infoAnnotationClass, scope)) {
                     if (!InheritanceUtil.isInheritor(candidate, CONFIG_ADAPTER)) continue
 
                     val annotation = candidate.getAnnotation(CONFIG_ADAPTER_INFO) ?: continue
                     val adaptedType = extractAdaptedType(annotation) ?: continue
                     val type = buildFieldType(annotation, adaptedType) ?: continue
-                    entries[adaptedType.qualifiedName ?: continue] = type
+                    adaptedType.qualifiedName?.let { byQualifiedName[it] = type }
+                    adaptedType.name?.let { byTypeName[it] = type }
                 }
-                entries
+                ScanResult(byQualifiedName, byTypeName)
             }
 
             CachedValueProvider.Result.create(result, PsiModificationTracker.MODIFICATION_COUNT)

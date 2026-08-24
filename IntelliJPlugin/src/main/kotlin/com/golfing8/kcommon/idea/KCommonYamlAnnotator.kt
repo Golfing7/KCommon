@@ -17,17 +17,15 @@ class KCommonYamlAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         if (element !is YAMLKeyValue) return
 
-        val file = element.containingFile ?: return
-        val schema = ConfigSchemaResolver.resolveForFile(file) ?: return
-        val path = ConfigSchemaResolver.buildKeyPath(element) ?: return
+        val (moduleId, resolution) = ConfigSchemaResolver.resolveKey(element)
 
-        when (val resolution = schema.resolve(path)) {
+        when (resolution) {
             is SchemaResolution.UnknownKey -> {
-                if (resolution.parentConfident) {
+                if (resolution.parentConfident && moduleId != null) {
                     val anchor = element.key?.textRange ?: element.textRange
                     holder.newAnnotation(
                         HighlightSeverity.WEAK_WARNING,
-                        "Unknown config key '${element.keyText}' for module '${schema.moduleId}'"
+                        "Unknown config key '${element.keyText}' for module '$moduleId'"
                     ).range(anchor).create()
                 }
             }
