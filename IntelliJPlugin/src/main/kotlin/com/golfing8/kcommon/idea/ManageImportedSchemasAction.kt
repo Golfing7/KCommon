@@ -10,7 +10,7 @@ import com.intellij.ui.components.JBList
 import javax.swing.DefaultListModel
 import javax.swing.JComponent
 
-/** Lists the KCommon config schema files currently imported into this project (via [SchemaImportAction]), letting the user remove ones no longer needed. */
+/** Lists the KCommon config schema files currently imported IDE-wide (via [SchemaImportAction] - see [ExternalSchemaRegistry] for why it isn't per-project), letting the user remove ones no longer needed. */
 class ManageImportedSchemasAction : AnAction() {
 
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
@@ -34,7 +34,7 @@ private class ManageImportedSchemasDialog(private val project: Project) : Dialog
     private val list = JBList(listModel)
 
     init {
-        title = "Imported KCommon Config Schemas"
+        title = "Imported KCommon Config Schemas (IDE-wide)"
         init()
     }
 

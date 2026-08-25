@@ -12,11 +12,14 @@ object KCConstants {
     const val CONFIG_CLASS_SOURCE = "com.golfing8.kcommon.config.generator.ConfigClassSource"
     const val CA_SERIALIZABLE = "com.golfing8.kcommon.config.adapter.CASerializable"
     const val CA_SERIALIZABLE_OPTIONS = "com.golfing8.kcommon.config.adapter.CASerializable.Options"
+    /** The abstract engine class `Module`/`SubModule` extend - see [ConfigPsiUtil.collectConfigClassFields]'s doc for how its field/nested-children resolution differs from a plain [CONFIG_CLASS_SOURCE]. */
+    const val CONFIG_CLASS = "com.golfing8.kcommon.config.generator.ConfigClass"
     const val DYNAMIC_ENUM = "com.golfing8.kcommon.struct.DynamicEnum"
     const val RANGE_MAP = "com.golfing8.kcommon.struct.map.RangeMap"
     const val OPTIONAL = "java.util.Optional"
     const val MENU_CONTAINER = "com.golfing8.kcommon.menu.MenuContainer"
     const val MENU_CONTAINER_INFO = "com.golfing8.kcommon.menu.MenuContainerInfo"
+    const val STRING_MACROS = "com.golfing8.kcommon.util.string.StringMacros"
 
     /** Bucket name used for the module's main config.yml (i.e. @Conf.config() left unset). */
     const val MAIN_CONFIG_BUCKET = "config"

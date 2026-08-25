@@ -13,11 +13,12 @@ import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTypesUtil
 
-/** Reflection-mirroring PSI helpers: reads @ModuleInfo / @Conf / CASerializable the same way KCommon's runtime does. */
+/** Reflection-mirroring PSI helpers: reads @ModuleInfo / @Conf / CASerializable / ConfigClass the same way KCommon's runtime does. */
 object ConfigPsiUtil {
 
     private val MODULES_BY_NAME_KEY: Key<CachedValue<Map<String, PsiClass>>> = Key.create("kcommon.modulesByName")
     private val CA_SERIALIZABLE_CLASSES_KEY: Key<CachedValue<Map<String, PsiClass>>> = Key.create("kcommon.caSerializableClasses")
+    private val CONFIG_CLASS_TYPES_KEY: Key<CachedValue<Map<String, PsiClass>>> = Key.create("kcommon.configClassTypes")
 
     fun findModuleClassByName(project: Project, moduleId: String): PsiClass? =
         allModulesByName(project).entries.firstOrNull { it.key.equals(moduleId, ignoreCase = true) }?.value
@@ -47,22 +48,34 @@ object ConfigPsiUtil {
         }, false)
     }
 
-    /** Every config bucket name referenced by [configSources]' @Conf-annotated static fields, always including the default "config" bucket - for [SchemaExportAction] to know which buckets to export per module. */
-    fun collectBuckets(configSources: List<PsiClass>): Set<String> {
+    /**
+     * Every config bucket name referenced anywhere in [moduleClass]'s own @Conf fields/nested
+     * ConfigClass children, or any of [configSources]' @Conf fields - always including the default
+     * "config" bucket. For [SchemaExportAction] to know which buckets to export per module.
+     */
+    fun collectBuckets(moduleClass: PsiClass, configSources: List<PsiClass>): Set<String> {
         val buckets = linkedSetOf(KCConstants.MAIN_CONFIG_BUCKET)
+        collectBucketNames(moduleClass, includeChildren = true, buckets)
         for (source in configSources) {
-            for (field in source.fields) {
-                if (!shouldSerializeModuleField(field)) continue
-                val conf = field.getAnnotation(KCConstants.CONF) ?: continue
-                val configAttr = stringLiteralValue(conf.findAttributeValue("config"))
-                buckets += if (configAttr.isNullOrBlank() || configAttr == KCConstants.DEFAULT_CONFIG_BUCKET) {
-                    KCConstants.MAIN_CONFIG_BUCKET
-                } else {
-                    configAttr
-                }
-            }
+            collectBucketNames(source, includeChildren = false, buckets)
         }
         return buckets
+    }
+
+    private fun collectBucketNames(psiClass: PsiClass, includeChildren: Boolean, into: MutableSet<String>) {
+        var current: PsiClass? = psiClass
+        while (current != null) {
+            for (field in current.fields) {
+                if (!isConfEligible(field)) continue
+                into += confBucket(field.getAnnotation(KCConstants.CONF))
+            }
+            current = nextConfigClassSuperclass(current)
+        }
+        if (includeChildren) {
+            for (inner in configClassChildrenOf(psiClass)) {
+                collectBucketNames(inner, includeChildren = true, into)
+            }
+        }
     }
 
     /** A CASerializable class anywhere on the project's classpath, found by its simple name - for `#$Type` tag resolution (see [NamedTypeRegistry]). Null for a flattened type (see [isFlattened]), since those have no fixed key set to offer. */
@@ -94,6 +107,41 @@ object ConfigPsiUtil {
         }, false)
     }
 
+    /**
+     * A class extending `com.golfing8.kcommon.config.generator.ConfigClass` directly - KCommon's
+     * original config engine, which `Module`/`SubModule` are themselves built on (see
+     * [collectConfigClassFields]'s doc) - found anywhere on the project's classpath by its simple
+     * name, for `#$Type` tag resolution (see [NamedTypeRegistry]). Unlike a module/configSources
+     * lookup, this isn't scoped to any one config bucket - a standalone type reference wants the
+     * whole shape, not just whichever fields happen to target a particular file.
+     */
+    fun findNamedConfigClass(project: Project, name: String): ConfigFieldType.Nested? {
+        val match = allConfigClassTypes(project)[name] ?: return null
+        return ConfigFieldType.Nested(match.name ?: name, collectConfigClassFields(match, bucket = null, project, includeChildren = true))
+    }
+
+    fun allConfigClassTypeNames(project: Project): List<String> = allConfigClassTypes(project).keys.toList()
+
+    private fun allConfigClassTypes(project: Project): Map<String, PsiClass> {
+        return CachedValuesManager.getManager(project).getCachedValue(project, CONFIG_CLASS_TYPES_KEY, {
+            val configClass = JavaPsiFacade.getInstance(project)
+                .findClass(KCConstants.CONFIG_CLASS, GlobalSearchScope.allScope(project))
+
+            val result: Map<String, PsiClass> = if (configClass == null) {
+                emptyMap()
+            } else {
+                val map = LinkedHashMap<String, PsiClass>()
+                for (candidate in ClassInheritorsSearch.search(configClass, GlobalSearchScope.allScope(project), true)) {
+                    val name = candidate.name ?: continue
+                    map.putIfAbsent(name, candidate)
+                }
+                map
+            }
+
+            CachedValueProvider.Result.create(result, PsiModificationTracker.MODIFICATION_COUNT)
+        }, false)
+    }
+
     fun extractConfigSources(annotation: PsiAnnotation): List<PsiClass> {
         val value = annotation.findAttributeValue("configSources") ?: return emptyList()
         val values = if (value is PsiArrayInitializerMemberValue) value.initializers.toList() else listOf(value)
@@ -109,26 +157,78 @@ object ConfigPsiUtil {
         return !modifiers.hasModifierProperty(PsiModifier.STATIC) && !modifiers.hasModifierProperty(PsiModifier.TRANSIENT)
     }
 
-    /** ConfigClassSource fields are serialized only if they're static and annotated with @Conf. */
-    private fun shouldSerializeModuleField(field: PsiField): Boolean {
+    /** Mirrors `ConfigClass#resolveFields` with `requireAnnotation = true` (always the case for a Module/SubModule/ConfigClass-driven field): eligible regardless of static-ness, as long as it isn't transient/final and carries `@Conf`. */
+    private fun isConfEligible(field: PsiField): Boolean {
         val modifiers = field.modifierList ?: return false
-        if (!modifiers.hasModifierProperty(PsiModifier.STATIC)) return false
+        if (modifiers.hasModifierProperty(PsiModifier.TRANSIENT) || modifiers.hasModifierProperty(PsiModifier.FINAL)) return false
         return field.getAnnotation(KCConstants.CONF) != null
     }
 
-    /** Fields of a module-level ConfigClassSource that belong to the given config file bucket (e.g. "config", "limits"). */
-    fun collectModuleFields(psiClass: PsiClass, bucket: String, project: Project): Map<String, ConfigFieldType> {
-        val result = LinkedHashMap<String, ConfigFieldType>()
-        for (field in psiClass.fields) {
-            if (!shouldSerializeModuleField(field)) continue
-            val conf = field.getAnnotation(KCConstants.CONF)
-            val configAttr = stringLiteralValue(conf?.findAttributeValue("config"))
-            val fieldBucket = if (configAttr.isNullOrBlank() || configAttr == KCConstants.DEFAULT_CONFIG_BUCKET) KCConstants.MAIN_CONFIG_BUCKET else configAttr
-            if (!fieldBucket.equals(bucket, ignoreCase = true)) continue
+    private fun confBucket(conf: PsiAnnotation?): String {
+        val configAttr = stringLiteralValue(conf?.findAttributeValue("config"))
+        return if (configAttr.isNullOrBlank() || configAttr == KCConstants.DEFAULT_CONFIG_BUCKET) KCConstants.MAIN_CONFIG_BUCKET else configAttr
+    }
 
-            result[yamlKeyFor(field, conf)] = classifyType(field.type, project)
+    /**
+     * The fields of [psiClass] belonging to [bucket] (e.g. "config", "limits") - or, if [bucket] is
+     * null, every `@Conf` field regardless of which bucket it targets (for a standalone `#$Type`
+     * reference, where "the whole shape" is wanted, not just one file's slice of it).
+     *
+     * Mirrors `ConfigClass#resolveFields`/`#initConfig`/`#resolveChildren` (KCommon's original config
+     * engine, which `Module`/`SubModule` are themselves thin wrappers around - see
+     * `ConfigClassWrapper`): a field is walked up through intermediate `ConfigClass`-extending
+     * superclasses (stopping at `ConfigClass` itself), and - only when [includeChildren] is true, i.e.
+     * only for whatever plays the role of a `ConfigClass`'s own `self` (a module class, or a
+     * standalone type referenced by `#$Type`; real `ConfigClassSource` entries never get this, since
+     * KCommon's own `ConfigClass#addSource` never calls `resolveChildren` on them either) - every
+     * `static` nested class assignable to `ConfigClass` is recursively resolved into a `Nested` entry,
+     * keyed by its own `@Conf.label()` if set, otherwise its raw (not kebab-cased) simple name -
+     * exactly matching `ConfigClass#buildPath`'s literal fallback.
+     */
+    fun collectConfigClassFields(psiClass: PsiClass, bucket: String?, project: Project, includeChildren: Boolean): Map<String, ConfigFieldType> {
+        val fields = LinkedHashMap<String, ConfigFieldType>()
+
+        var current: PsiClass? = psiClass
+        while (current != null) {
+            for (field in current.fields) {
+                if (!isConfEligible(field)) continue
+                val conf = field.getAnnotation(KCConstants.CONF)
+                if (bucket != null && !confBucket(conf).equals(bucket, ignoreCase = true)) continue
+                fields.putIfAbsent(yamlKeyFor(field, conf), classifyType(field.type, project))
+            }
+            current = nextConfigClassSuperclass(current)
         }
-        return result
+
+        if (includeChildren) {
+            for (inner in configClassChildrenOf(psiClass)) {
+                val childFields = collectConfigClassFields(inner, bucket, project, includeChildren = true)
+                // Bucket-filtering can leave a child with nothing for THIS bucket - only prune it
+                // then; an unfiltered (bucket == null) lookup always includes every child's full shape.
+                if (bucket != null && childFields.isEmpty()) continue
+                fields[configClassChildKey(inner)] = ConfigFieldType.Nested(inner.name ?: "object", childFields)
+            }
+        }
+
+        return fields
+    }
+
+    /** The intermediate superclass to keep walking for more `@Conf` fields, per `ConfigClass#resolveFields`'s own recursion condition - null once we'd hit `ConfigClass` itself (the abstract base has nothing to reflect over) or leave `ConfigClass`'s hierarchy entirely. */
+    private fun nextConfigClassSuperclass(clazz: PsiClass): PsiClass? {
+        val superClass = clazz.superClass ?: return null
+        return if (superClass.qualifiedName != KCConstants.CONFIG_CLASS && InheritanceUtil.isInheritor(superClass, KCConstants.CONFIG_CLASS)) {
+            superClass
+        } else {
+            null
+        }
+    }
+
+    /** Declared nested classes eligible to be resolved as `ConfigClass` children - `static` only: a non-static inner class has no no-arg constructor for `ConfigClass#resolveChildren`'s reflective instantiation to find, so it would fail at runtime rather than actually working this way. */
+    private fun configClassChildrenOf(psiClass: PsiClass): List<PsiClass> =
+        psiClass.innerClasses.filter { it.hasModifierProperty(PsiModifier.STATIC) && InheritanceUtil.isInheritor(it, KCConstants.CONFIG_CLASS) }
+
+    private fun configClassChildKey(childClass: PsiClass): String {
+        val label = stringLiteralValue(childClass.getAnnotation(KCConstants.CONF)?.findAttributeValue("label"))
+        return if (!label.isNullOrBlank()) label else (childClass.name ?: "object")
     }
 
     /** The CASerializable classes currently being expanded on this thread, to break cycles in [collectConfFields] - see its doc. */

@@ -17,13 +17,20 @@ import java.io.File
  * classpath - e.g. a lone YAML file opened for remote editing (an SFTP/FileZilla-style workflow)
  * outside the project it actually belongs to.
  *
- * Only the imported files' paths are persisted (as project state); their contents are re-read and
- * re-parsed from disk on [reload] - at project open, and right after an import/removal - so
- * re-exporting over an already-imported path is picked up on the next reload without re-importing.
+ * Deliberately an **application**-level service, not project-level: the whole point is supporting a
+ * file that isn't sitting in a stable, dedicated project at all (a remote-edit tool typically hands
+ * IntelliJ a fresh temp path per download, and IntelliJ's own no-project LightEdit mode has no
+ * `.idea` folder to persist project state into in the first place). Importing once therefore applies
+ * IDE-wide, to every window/project on this machine, rather than needing to be redone per project -
+ * the tradeoff is that unrelated projects opened in the same IDE share the same imported set.
+ *
+ * Only the imported files' paths are persisted; their contents are re-read and re-parsed from disk
+ * on [reload] - at IDE startup, and right after an import/removal - so re-exporting over an
+ * already-imported path is picked up on the next reload without re-importing.
  * When two imported files both define the same (module, bucket) or type name, the file imported
  * later wins - see [addFiles].
  */
-@Service(Service.Level.PROJECT)
+@Service(Service.Level.APP)
 @State(name = "KCommonExternalSchemas", storages = [Storage("kcommon-external-schemas.xml")])
 class ExternalSchemaRegistry : PersistentStateComponent<ExternalSchemaRegistry.State> {
 
@@ -111,6 +118,11 @@ class ExternalSchemaRegistry : PersistentStateComponent<ExternalSchemaRegistry.S
     fun allTypeNames(): List<String> = parsed.values.flatMap { it.types.keys }.distinct().sorted()
 
     companion object {
-        fun getInstance(project: Project): ExternalSchemaRegistry = project.service()
+        /**
+         * [project] is accepted (and ignored) purely so every existing call site - which naturally
+         * has a `Project` on hand from the PSI/action context it's already working with - doesn't
+         * need to change now that this is an application-level service; see the class doc for why.
+         */
+        fun getInstance(@Suppress("UNUSED_PARAMETER") project: Project): ExternalSchemaRegistry = service()
     }
 }

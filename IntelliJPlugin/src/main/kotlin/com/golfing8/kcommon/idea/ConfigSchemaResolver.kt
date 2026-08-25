@@ -173,7 +173,7 @@ object ConfigSchemaResolver {
             val moduleInfo = moduleClass.getAnnotation(KCConstants.MODULE_INFO)
             if (moduleInfo != null) {
                 val configSources = ConfigPsiUtil.extractConfigSources(moduleInfo)
-                return ConfigSchema(moduleId) { buildFieldsFromPsi(project, configSources, bucket) }
+                return ConfigSchema(moduleId) { buildFieldsFromPsi(project, moduleClass, configSources, bucket) }
             }
         }
 
@@ -181,11 +181,25 @@ object ConfigSchemaResolver {
         return ConfigSchema(moduleId) { externalFields }
     }
 
-    /** The module's fields for [bucket], from its Java config sources plus any @MenuContainerInfo entries targeting the same bucket - shared by [buildSchema] and [SchemaExportAction]. */
-    internal fun buildFieldsFromPsi(project: Project, configSources: List<PsiClass>, bucket: String): Map<String, ConfigFieldType> {
+    /**
+     * The module's fields for [bucket] - from [moduleClass]'s own `@Conf` fields and nested
+     * ConfigClass children (KCommon's `Module.loadConfigs()` always wraps the module class itself as
+     * the config engine's root - see [ConfigPsiUtil.collectConfigClassFields]'s doc), its explicit
+     * `configSources()` entries (flat fields only, no nested children - matches `ConfigClass#addSource`
+     * never calling `resolveChildren` on them), and any @MenuContainerInfo entries targeting the same
+     * bucket - shared by [buildSchema] and [SchemaExportAction]. On a key collision, [moduleClass]'s
+     * own field wins, then earlier `configSources()` entries over later ones - mirroring the order
+     * `ConfigClass#initConfig` itself resolves fields in.
+     */
+    internal fun buildFieldsFromPsi(project: Project, moduleClass: PsiClass, configSources: List<PsiClass>, bucket: String): Map<String, ConfigFieldType> {
         val fields = LinkedHashMap<String, ConfigFieldType>()
+        for ((key, type) in ConfigPsiUtil.collectConfigClassFields(moduleClass, bucket, project, includeChildren = true)) {
+            fields.putIfAbsent(key, type)
+        }
         for (sourceClass in configSources) {
-            fields.putAll(ConfigPsiUtil.collectModuleFields(sourceClass, bucket, project))
+            for ((key, type) in ConfigPsiUtil.collectConfigClassFields(sourceClass, bucket, project, includeChildren = false)) {
+                fields.putIfAbsent(key, type)
+            }
         }
         // @MenuContainerInfo entries aren't tied to a specific module (see MenuContainerRegistry's
         // doc comment) - merge them in for any module whose config bucket they target.

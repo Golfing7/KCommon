@@ -79,7 +79,7 @@ class KCommonTagCompletionContributor : CompletionContributor() {
             val configSources = moduleClass.getAnnotation(KCConstants.MODULE_INFO)
                 ?.let { ConfigPsiUtil.extractConfigSources(it) }
                 .orEmpty()
-            buckets += ConfigPsiUtil.collectBuckets(configSources)
+            buckets += ConfigPsiUtil.collectBuckets(moduleClass, configSources)
         }
         buckets += ExternalSchemaRegistry.getInstance(project).allBuckets(moduleId)
         if (buckets.isEmpty()) buckets += KCConstants.MAIN_CONFIG_BUCKET

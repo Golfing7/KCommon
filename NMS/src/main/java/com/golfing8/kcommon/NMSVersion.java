@@ -138,7 +138,13 @@ public class NMSVersion implements Comparable<NMSVersion> {
      */
     public static NMSVersion loadVersion() {
         String bukkitVersion = Bukkit.getBukkitVersion();
-        String version = bukkitVersion.substring(0, bukkitVersion.indexOf("-"));
+        int dashIndex = bukkitVersion.indexOf("-");
+        String version;
+        if (dashIndex > 0) {
+            version = bukkitVersion.substring(0, dashIndex);
+        } else {
+            version = bukkitVersion;
+        }
         String[] split = version.split("\\.");
         int major, minor;
         if (split[0].equals("1")) {

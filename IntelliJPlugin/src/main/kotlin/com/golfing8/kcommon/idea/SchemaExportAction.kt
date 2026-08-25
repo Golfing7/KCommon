@@ -30,8 +30,8 @@ class SchemaExportAction : AnAction() {
             val moduleInfo = moduleClass.getAnnotation(KCConstants.MODULE_INFO)
             val configSources = moduleInfo?.let { ConfigPsiUtil.extractConfigSources(it) }.orEmpty()
             val buckets = LinkedHashMap<String, Map<String, ConfigFieldType>>()
-            for (bucket in ConfigPsiUtil.collectBuckets(configSources)) {
-                buckets[bucket] = ConfigSchemaResolver.buildFieldsFromPsi(project, configSources, bucket)
+            for (bucket in ConfigPsiUtil.collectBuckets(moduleClass, configSources)) {
+                buckets[bucket] = ConfigSchemaResolver.buildFieldsFromPsi(project, moduleClass, configSources, bucket)
             }
             SchemaExport.Module(moduleId, buckets)
         }
@@ -48,6 +48,9 @@ class SchemaExportAction : AnAction() {
         val namedTypes = LinkedHashMap<String, ConfigFieldType>()
         for (name in ConfigPsiUtil.allCASerializableTypeNames(project)) {
             ConfigPsiUtil.findNamedCASerializable(project, name)?.let { namedTypes[name] = it }
+        }
+        for (name in ConfigPsiUtil.allConfigClassTypeNames(project)) {
+            ConfigPsiUtil.findNamedConfigClass(project, name)?.let { namedTypes.putIfAbsent(name, it) }
         }
 
         val json = SchemaExport.write(modules, namedTypes, project)

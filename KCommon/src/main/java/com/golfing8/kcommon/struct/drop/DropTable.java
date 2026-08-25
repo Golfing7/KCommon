@@ -1,7 +1,6 @@
 package com.golfing8.kcommon.struct.drop;
 
 import com.golfing8.kcommon.KCommon;
-import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.CASerializable;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.config.lang.Message;
