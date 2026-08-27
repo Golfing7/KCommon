@@ -41,8 +41,8 @@ public enum LocationAdapterFactory implements TypeAdapterFactory {
             jsonWriter.name("x").value(location.getX());
             jsonWriter.name("y").value(location.getY());
             jsonWriter.name("z").value(location.getZ());
-            jsonWriter.name("yaw").value(location.getYaw());
-            jsonWriter.name("pitch").value(location.getPitch());
+            jsonWriter.name("yaw").value((double) location.getYaw());
+            jsonWriter.name("pitch").value((double) location.getPitch());
             jsonWriter.name("world").value(location.getWorld().getName());
             jsonWriter.endObject();
         }
