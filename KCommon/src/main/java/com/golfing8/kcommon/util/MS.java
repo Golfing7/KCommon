@@ -38,9 +38,11 @@ public final class MS {
         TRANSFORMERS.add(str -> ChatColor.translateAlternateColorCodes('&', str));
 
         //Try hex coloring, if we're on a version which supports it.
+        //Legacy '&' codes were already translated by the transformer above, so we can skip
+        //RGBUtils re-running that same full-string translation pass a second time.
         TRANSFORMERS.add(string -> {
             if (KCommon.getInstance() == null || KCommon.getInstance().getServerVersion().isAtOrAfter(NMSVersion.v1_16))
-                return RGBUtils.INSTANCE.hexColor(string);
+                return RGBUtils.INSTANCE.hexColorLegacyAlreadyTranslated(string);
             return string;
         });
 

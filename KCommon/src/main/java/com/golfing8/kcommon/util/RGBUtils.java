@@ -39,29 +39,47 @@ public class RGBUtils {
      * @return the formatted text
      */
     public String hexColor(String in) {
-        String text = applyFormats(in);
+        return ChatColor.translateAlternateColorCodes('&', convertHexCodes(in));
+    }
+
+    /**
+     * Same as {@link #hexColor(String)}, but skips the trailing legacy '&amp;' color code translation
+     * pass. Intended for callers (such as {@code MS#applyTransformers}) that have already translated
+     * legacy '&amp;' codes to '§' upstream, where re-running the translation here would just be a
+     * full-string no-op scan.
+     *
+     * @param in the text, with legacy '&amp;' codes already translated
+     * @return the formatted text
+     */
+    public String hexColorLegacyAlreadyTranslated(String in) {
+        return convertHexCodes(in);
+    }
+
+    private String convertHexCodes(String textInput) {
+        String text = applyFormats(textInput);
         Matcher m = hex.matcher(text);
+        StringBuffer sb = new StringBuffer();
         while (m.find()) {
-            String hexCode = m.group();
-            text = text.replace(hexCode, toChatColor(hexCode));
+            m.appendReplacement(sb, Matcher.quoteReplacement(toChatColor(m.group())));
         }
-        return ChatColor.translateAlternateColorCodes('&', text);
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     private String fixFormat2(String input) {
-        String text = input;
-        Matcher m = fix2.matcher(text);
+        Matcher m = fix2.matcher(input);
+        StringBuffer sb = new StringBuffer();
         while (m.find()) {
-            String hexcode = m.group();
-            String fixed = hexcode.substring(3, 9);
-            text = text.replace(hexcode, "&#" + fixed);
+            String fixed = m.group().substring(3, 9);
+            m.appendReplacement(sb, Matcher.quoteReplacement("&#" + fixed));
         }
-        return text;
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     private String fixFormat3(String input) {
-        String text = input;
-        Matcher m = fix3.matcher(text);
+        Matcher m = fix3.matcher(input);
+        StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String hexcode = m.group();
             String fixed = new String(new char[] {
@@ -72,8 +90,9 @@ public class RGBUtils {
                     hexcode.charAt(11),
                     hexcode.charAt(13)
             });
-            text = text.replace(hexcode, "&#" + fixed);
+            m.appendReplacement(sb, Matcher.quoteReplacement("&#" + fixed));
         }
-        return text;
+        m.appendTail(sb);
+        return sb.toString();
     }
 }

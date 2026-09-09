@@ -51,4 +51,24 @@ class RGBUtilsTest {
     void testNoColorCodes() {
         assertEquals("Plain text", RGBUtils.INSTANCE.hexColor("Plain text"));
     }
+
+    @Test
+    @DisplayName("Multiple distinct hex codes in the same string are all converted")
+    void testMultipleDistinctHexCodes() {
+        StringBuilder red = new StringBuilder().append(ChatColor.COLOR_CHAR).append('x');
+        for (char c : "FF0000".toCharArray()) red.append(ChatColor.COLOR_CHAR).append(c);
+        StringBuilder green = new StringBuilder().append(ChatColor.COLOR_CHAR).append('x');
+        for (char c : "00FF00".toCharArray()) green.append(ChatColor.COLOR_CHAR).append(c);
+
+        assertEquals(red + "A" + green + "B", RGBUtils.INSTANCE.hexColor("&#FF0000A&#00FF00B"));
+    }
+
+    @Test
+    @DisplayName("The same hex code repeated in the same string is converted at every occurrence")
+    void testRepeatedIdenticalHexCode() {
+        StringBuilder red = new StringBuilder().append(ChatColor.COLOR_CHAR).append('x');
+        for (char c : "FF0000".toCharArray()) red.append(ChatColor.COLOR_CHAR).append(c);
+
+        assertEquals(red + "A" + red + "B", RGBUtils.INSTANCE.hexColor("&#FF0000A&#FF0000B"));
+    }
 }

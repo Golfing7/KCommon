@@ -23,40 +23,57 @@ import java.util.regex.Pattern;
 public class ComponentUtils {
 
     private static final MiniMessage miniMessage;
-    private static final Pattern AMPERSAND_RGB_3 = Pattern.compile("&#([\\da-fA-F]{3})");
-    private static final Pattern AMPERSAND_RGB_6 = Pattern.compile("&#([\\da-fA-F]{6})");
-    private static final Pattern AMPERSAND_RGB_SPIGOT = Pattern.compile("&x(&[\\da-fA-F]){6}");
-    private static final Pattern SECTION_RGB_3 = Pattern.compile("§#([\\da-fA-F]{3})");
-    private static final Pattern SECTION_RGB_6 = Pattern.compile("§#([\\da-fA-F]{6})");
-    private static final Pattern SECTION_RGB_SPIGOT = Pattern.compile("§x(§[\\da-fA-F]){6}");
-    private static final Map<String, String> legacyColorMap = new HashMap<>();
+    // Backreferenced so a single pass matches either the '&' or '§' variant while still requiring
+    // a consistent color character across the whole match (e.g. &x&F&F... or §x§F§F..., never mixed).
+    private static final Pattern RGB_3 = Pattern.compile("([&§])#([\\da-fA-F]{3})");
+    private static final Pattern RGB_6 = Pattern.compile("([&§])#([\\da-fA-F]{6})");
+    private static final Pattern RGB_SPIGOT = Pattern.compile("([&§])x(?:\\1[\\da-fA-F]){6}");
+    private static final Map<Character, String> legacyColorMap = new HashMap<>();
     private static final int CENTER_PX = 154;
+    /**
+     * Bounds memory usage of {@link #COMPONENT_CACHE}. Components are immutable, so caching them by
+     * their fully-transformed source string is always safe - this just bounds how many distinct
+     * strings we remember at once (oldest/least-recently-used evicted first).
+     */
+    private static final int COMPONENT_CACHE_MAX_SIZE = 2048;
+    /**
+     * Caches the result of {@link #toComponent(String)} keyed by its fully-transformed input string.
+     * Parsing the same message repeatedly (e.g. a static broadcast, or a repeating scoreboard/action
+     * bar line whose placeholder values haven't changed) is otherwise pure repeated work: the
+     * resulting {@link Component} is immutable, so sharing one cached instance across callers is safe.
+     */
+    private static final Map<String, Component> COMPONENT_CACHE = new LinkedHashMap<String, Component>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Component> eldest) {
+            return size() > COMPONENT_CACHE_MAX_SIZE;
+        }
+    };
     public static final BukkitAudiences bukkitAudiences = BukkitAudiences.create(Bukkit.getPluginManager().getPlugin("KCommon"));
 
     static {
         String resetFormat = "<!bold><!italic><!underlined><!strikethrough><!obfuscated>";
-        legacyColorMap.put("0", resetFormat + "<black>");
-        legacyColorMap.put("1", resetFormat + "<dark_blue>");
-        legacyColorMap.put("2", resetFormat + "<dark_green>");
-        legacyColorMap.put("3", resetFormat + "<dark_aqua>");
-        legacyColorMap.put("4", resetFormat + "<dark_red>");
-        legacyColorMap.put("5", resetFormat + "<dark_purple>");
-        legacyColorMap.put("6", resetFormat + "<gold>");
-        legacyColorMap.put("7", resetFormat + "<gray>");
-        legacyColorMap.put("8", resetFormat + "<dark_gray>");
-        legacyColorMap.put("9", resetFormat + "<blue>");
-        legacyColorMap.put("a", resetFormat + "<green>");
-        legacyColorMap.put("b", resetFormat + "<aqua>");
-        legacyColorMap.put("c", resetFormat + "<red>");
-        legacyColorMap.put("d", resetFormat + "<light_purple>");
-        legacyColorMap.put("e", resetFormat + "<yellow>");
-        legacyColorMap.put("f", resetFormat + "<white>");
-        legacyColorMap.put("n", "<underlined>");
-        legacyColorMap.put("m", "<strikethrough>");
-        legacyColorMap.put("k", "<obfuscated>");
-        legacyColorMap.put("o", "<italic>");
-        legacyColorMap.put("l", "<bold>");
-        legacyColorMap.put("r", "<reset>");
+        legacyColorMap.put('0', resetFormat + "<black>");
+        legacyColorMap.put('1', resetFormat + "<dark_blue>");
+        legacyColorMap.put('2', resetFormat + "<dark_green>");
+        legacyColorMap.put('3', resetFormat + "<dark_aqua>");
+        legacyColorMap.put('4', resetFormat + "<dark_red>");
+        legacyColorMap.put('5', resetFormat + "<dark_purple>");
+        legacyColorMap.put('6', resetFormat + "<gold>");
+        legacyColorMap.put('7', resetFormat + "<gray>");
+        legacyColorMap.put('8', resetFormat + "<dark_gray>");
+        legacyColorMap.put('9', resetFormat + "<blue>");
+        legacyColorMap.put('a', resetFormat + "<green>");
+        legacyColorMap.put('b', resetFormat + "<aqua>");
+        legacyColorMap.put('c', resetFormat + "<red>");
+        legacyColorMap.put('d', resetFormat + "<light_purple>");
+        legacyColorMap.put('e', resetFormat + "<yellow>");
+        legacyColorMap.put('f', resetFormat + "<white>");
+        legacyColorMap.put('n', "<underlined>");
+        legacyColorMap.put('m', "<strikethrough>");
+        legacyColorMap.put('k', "<obfuscated>");
+        legacyColorMap.put('o', "<italic>");
+        legacyColorMap.put('l', "<bold>");
+        legacyColorMap.put('r', "<reset>");
 
         miniMessage = MiniMessage.miniMessage();
     }
@@ -71,9 +88,19 @@ public class ComponentUtils {
         if (message == null)
             return null;
 
+        synchronized (COMPONENT_CACHE) {
+            Component cached = COMPONENT_CACHE.get(message);
+            if (cached != null)
+                return cached;
+        }
+
         Component deserialize = miniMessage.deserialize(processLine(message));
         if (!deserialize.hasDecoration(TextDecoration.ITALIC)) {
-            return deserialize.decoration(TextDecoration.ITALIC, false);
+            deserialize = deserialize.decoration(TextDecoration.ITALIC, false);
+        }
+
+        synchronized (COMPONENT_CACHE) {
+            COMPONENT_CACHE.put(message, deserialize);
         }
         return deserialize;
     }
@@ -85,10 +112,8 @@ public class ComponentUtils {
      * @return the processed string
      */
     public static String processLine(String str) {
-        str = replaceLegacyColors(str, '&');
-        str = replaceLegacyColors(str, '§');
-        str = replaceColors(str, '&');
-        str = replaceColors(str, '§');
+        str = replaceLegacyColors(str);
+        str = replaceColors(str);
         str = StringEscapeUtils.unescapeJava(str);
         str = maybeCenter(str);
         return str;
@@ -169,57 +194,70 @@ public class ComponentUtils {
     }
 
     /**
-     * Replaces the certain things from the message (&0 or §c) depending on what
-     * character you provide.
+     * Replaces legacy formatting codes (e.g. &amp;a or §a) with their {@link MiniMessage} tag
+     * equivalents, in a single left-to-right pass recognizing both '&amp;' and '§' as the color
+     * character.
      *
-     * @param message   the message you want to replace the colors from
-     * @param character the character you want to replace (most likely only § and &)
+     * @param message the message you want to replace the colors from
      * @return the string with the replaced colors
      */
-    private static String replaceColors(String message, char character) {
-        for (Map.Entry<String, String> entry : legacyColorMap.entrySet()) {
-            message = message.replace(character + entry.getKey(), entry.getValue());
+    private static String replaceColors(String message) {
+        int length = message.length();
+        StringBuilder result = new StringBuilder(length);
+        int i = 0;
+        while (i < length) {
+            char c = message.charAt(i);
+            if ((c == '&' || c == '§') && i + 1 < length) {
+                String tag = legacyColorMap.get(message.charAt(i + 1));
+                if (tag != null) {
+                    result.append(tag);
+                    i += 2;
+                    continue;
+                }
+            }
+            result.append(c);
+            i++;
         }
-
-        return message;
+        return result.toString();
     }
 
     /**
      * Replaces all legacy hex / color codes with the ones we need to support in {@link MiniMessage}.
+     * Recognizes both '&amp;' and '§' as the color character in a single pass per hex format
+     * (rather than running the whole pipeline once per character).
      *
-     * @param message   the message to replace the hex codes / colors in
-     * @param colorChar the color character to use
+     * @param message the message to replace the hex codes / colors in
      * @return the string with the replaced colors
      */
-    private static String replaceLegacyColors(String message, char colorChar) {
-        Pattern sixCharHex = colorChar == '&' ? AMPERSAND_RGB_6 : SECTION_RGB_6;
-        Matcher matcher = sixCharHex.matcher(message);
+    private static String replaceLegacyColors(String message) {
+        Matcher matcher = RGB_6.matcher(message);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
+            char colorChar = matcher.group(1).charAt(0);
             StringBuilder replacement = (new StringBuilder(14)).append("<reset>").append(colorChar).append("x");
-            for (char character : matcher.group(1).toCharArray())
+            for (char character : matcher.group(2).toCharArray())
                 replacement.append(colorChar).append(character);
             matcher.appendReplacement(sb, replacement.toString());
         }
         matcher.appendTail(sb);
         message = sb.toString();
 
-        Pattern threeCharHex = colorChar == '&' ? AMPERSAND_RGB_3 : SECTION_RGB_3;
-        matcher = threeCharHex.matcher(message);
+        matcher = RGB_3.matcher(message);
         sb = new StringBuffer();
         while (matcher.find()) {
+            char colorChar = matcher.group(1).charAt(0);
             StringBuilder replacement = (new StringBuilder(14)).append("<reset>").append(colorChar).append("x");
-            for (char character : matcher.group(1).toCharArray())
+            for (char character : matcher.group(2).toCharArray())
                 replacement.append(colorChar).append(character).append(colorChar).append(character);
             matcher.appendReplacement(sb, replacement.toString());
         }
         matcher.appendTail(sb);
 
         message = sb.toString();
-        Pattern spigotHexPattern = colorChar == '&' ? AMPERSAND_RGB_SPIGOT : SECTION_RGB_SPIGOT;
-        matcher = spigotHexPattern.matcher(message);
+        matcher = RGB_SPIGOT.matcher(message);
         sb = new StringBuffer();
         while (matcher.find()) {
+            char colorChar = matcher.group(1).charAt(0);
             StringBuilder replacement = (new StringBuilder(9)).append("<reset>").append("<#");
             for (char character : matcher.group().toCharArray()) {
                 if (character != colorChar && character != 'x') replacement.append(character);

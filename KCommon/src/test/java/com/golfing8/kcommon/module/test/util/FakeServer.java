@@ -1,14 +1,17 @@
 package com.golfing8.kcommon.module.test.util;
 
+import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.ServerConfig;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
 import org.bukkit.Warning.WarningState;
 import org.bukkit.World.Environment;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemFactory;
@@ -36,6 +39,7 @@ import org.bukkit.util.CachedServerIcon;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -47,6 +51,14 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings({"NullableProblems"})
 public final class FakeServer implements Server {
+    /**
+     * A minimal plugin returned by {@link FakePluginManager#getPlugin(String)}. Needed so that
+     * classes like {@code ComponentUtils} (which eagerly builds a {@code BukkitAudiences} from
+     * {@code Bukkit.getPluginManager().getPlugin("KCommon")} in a static initializer) can be
+     * loaded in tests without throwing.
+     */
+    static final Plugin FAKE_PLUGIN = new FakePlugin();
+
     private final List<World> worlds = new ArrayList<>();
     private final PluginManager pluginManager = new FakePluginManager();
     private final List<Player> players = new ArrayList<>();
@@ -1065,7 +1077,7 @@ public final class FakeServer implements Server {
 
         @Override
         public Plugin getPlugin(final String name) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            return FAKE_PLUGIN;
         }
 
         @Override
@@ -1120,7 +1132,8 @@ public final class FakeServer implements Server {
 
         @Override
         public void registerEvent(final Class<? extends Event> event, final Listener listener, final EventPriority priority, final EventExecutor executor, final Plugin plugin, final boolean ignoreCancelled) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            // No-op: nothing dispatches events through this fake plugin manager, but callers
+            // (e.g. BukkitAudiencesImpl's constructor) expect registration to not throw.
         }
 
         @Override
@@ -1206,6 +1219,120 @@ public final class FakeServer implements Server {
         @Override
         public void registerPacketListener(BukkitPacketListener bukkitPacketListener, Plugin plugin) {
 
+        }
+    }
+
+    /**
+     * A minimal {@link Plugin} implementation, only fleshed out enough to satisfy
+     * {@code BukkitAudiences.create(Plugin)} (name, server, description, logger).
+     */
+    static final class FakePlugin implements Plugin {
+        private final PluginDescriptionFile description = new PluginDescriptionFile("KCommon", "1.0", "com.golfing8.kcommon.KCommon");
+
+        @Override
+        public File getDataFolder() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public PluginDescriptionFile getDescription() {
+            return description;
+        }
+
+        @Override
+        public FileConfiguration getConfig() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public InputStream getResource(String filename) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void saveConfig() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void saveDefaultConfig() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void saveResource(String resourcePath, boolean replace) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void reloadConfig() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public PluginLoader getPluginLoader() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Server getServer() {
+            return FakeServer.getServer();
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+
+        @Override
+        public void onDisable() {
+        }
+
+        @Override
+        public void onLoad() {
+        }
+
+        @Override
+        public void onEnable() {
+        }
+
+        @Override
+        public boolean isNaggable() {
+            return false;
+        }
+
+        @Override
+        public void setNaggable(boolean canNag) {
+        }
+
+        @Override
+        public EbeanServer getDatabase() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Logger getLogger() {
+            return Logger.getLogger("KCommon");
+        }
+
+        @Override
+        public String getName() {
+            return "KCommon";
+        }
+
+        @Override
+        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+            throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 }
