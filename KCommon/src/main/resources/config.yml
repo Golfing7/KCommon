@@ -7,3 +7,15 @@ mongo:
   port: 27017
   database: 'kcommon'
   connection-string: ''
+
+# Lets data managers tell other servers sharing this database about the objects they change.
+# Only turn this on when more than one server uses the same mongo database.
+redis:
+  enabled: false
+  address: '127.0.0.1'
+  port: 6379
+  username: ''
+  password: ''
+  database: 0
+  max-connections: 16
+  timeout: 2000

@@ -101,7 +101,7 @@ public abstract class PagedMenuContainer extends PlayerMenuContainer {
      * @return the max elements per page.
      */
     public int getMaxPage(int elements) {
-        return (int) Math.ceil(elements / ((float) elementsPerPage) - 1);
+        return (int) Math.max(0, Math.ceil(elements / ((float) elementsPerPage) - 1));
     }
 
     /**

@@ -12,4 +12,8 @@ final class BuildParameters {
     public static final String VERSION_EXP4J = "{{ version_exp4j }}";
     public static final String VERSION_MONGO = "{{ version_mongo }}";
     public static final String VERSION_XSERIES = "{{ version_xseries }}";
+    public static final String VERSION_JEDIS = "{{ version_jedis }}";
+    public static final String VERSION_COMMONS_POOL = "{{ version_commonspool }}";
+    public static final String VERSION_SLF4J = "{{ version_slf4j }}";
+    public static final String VERSION_JSON = "{{ version_jsonlib }}";
 }
