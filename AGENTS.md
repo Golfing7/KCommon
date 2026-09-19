@@ -385,6 +385,19 @@ Use these for singleton runtime data, block data, location data, or anything not
 ### SenderSerializable
 Used for profile data for a player. If data can be tied to a player, use a SenderSerializable instance instead of an AbstractSerializable instance.
 
+### Remote data and redis
+Passing `true` as the third argument to `addDataManager` stores the objects in MongoDB instead of on disk.
+Those managers cache per JVM, so several servers sharing one database will each hand out their own copy of an object.
+
+Enabling `redis` in KCommon's `config.yml` makes every remote manager announce the objects it writes on
+`kcommon:data:<plugin>_<manager>`, and other servers drop their cached copy when they hear about it.
+Jedis is only downloaded when redis is enabled, and everything falls back to a no-op adapter when it isn't,
+so single server installs behave exactly as they always did.
+
+Announcing a change is not enough for an object two servers can change at the same moment.
+Use `DataManagerRemote#withLock`, and read the object again with `loadFresh` once the lock is held.
+`KCommon#getRedisAdapter` exposes the same channels and locks for anything that isn't a data manager.
+
 ## Agent Guidance
 When editing this project:
 * Prefer existing module, menu, command, config, and persistence patterns over introducing new abstractions

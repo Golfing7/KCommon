@@ -52,6 +52,7 @@ dependencies {
     compileOnly(rootProject.libs.exp4j)
     compileOnly(rootProject.libs.xseries)
     compileOnly(rootProject.libs.mongo.sync)
+    compileOnly(rootProject.libs.jedis)
     implementation(rootProject.libs.itemnbtapi)
     implementation("com.tcoded:FoliaLib:0.5.2")
     implementation("me.lucko:jar-relocator:1.7")
@@ -72,6 +73,10 @@ sourceSets {
                 setOf(
                     rootProject.libs.versions.xseries.get() to "xseries",
                     rootProject.libs.versions.mongo.get() to "mongo",
+                    rootProject.libs.versions.jedis.get() to "jedis",
+                    rootProject.libs.versions.commonspool.get() to "commonspool",
+                    rootProject.libs.versions.slf4j.get() to "slf4j",
+                    rootProject.libs.versions.jsonlib.get() to "jsonlib",
                     rootProject.libs.versions.exp4j.get() to "exp4j",
                     rootProject.libs.versions.expiringmap.get() to "expiringmap",
                     rootProject.libs.versions.adventure.platform.get() to "adventureplatform",
