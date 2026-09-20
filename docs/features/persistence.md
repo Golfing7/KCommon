@@ -69,6 +69,72 @@ addDataManager("player-profiles", PlayerProfile.class, true);
 Only use the remote manager when MongoDB is configured and available in the
 runtime environment.
 
+## Sharing data between servers
+
+A data manager caches what it loads, and that cache only covers its own JVM.
+When several servers share one Mongo database they each hand out their own copy
+of an object, so a change made on one server is invisible to the others until
+they restart.
+
+Turning redis on in KCommon's `config.yml` fixes that:
+
+```yaml
+redis:
+  enabled: true
+  address: '127.0.0.1'
+  port: 6379
+  username: ''
+  password: ''
+  database: 0
+  max-connections: 16
+  timeout: 2000
+```
+
+Jedis is downloaded on startup only when this is enabled, so installs that
+don't use it are unaffected. Every remote data manager then announces the
+objects it writes or deletes on `kcommon:data:<plugin>_<manager>`, and the other
+servers drop their cached copy when they hear about it. The next read comes
+from Mongo.
+
+An object that is changed locally but not yet saved is left alone, and a warning
+is logged instead, because dropping it would throw those changes away.
+
+### Locking
+
+Announcing a change is enough for data that one server owns at a time. Data that
+several servers can change at the same moment needs a lock, so nobody reads an
+object, decides something, and writes it back on top of a decision another
+server already made:
+
+```java
+DataManagerRemote<Auction> auctions = (DataManagerRemote<Auction>)
+        addDataManager("auctions", Auction.class, true);
+
+auctions.withLock(auctionId, () -> {
+    Auction auction = auctions.loadFresh(auctionId);
+    if (auction == null || auction.isSold())
+        return;
+
+    auction.markSold(buyer);
+    auctions.store(auction);
+});
+```
+
+`loadFresh` inside the lock is the important part. The cached copy is what the
+lock is protecting against, so read the object again once the lock is held.
+
+Locks live in redis with a five second expiry, which is what releases them when
+a server crashes while holding one. `withLock` throws an `IllegalStateException`
+when another server holds the lock for longer than a second. Without redis
+there is nobody to lock against and the body simply runs.
+
+`getOrCreate` takes the lock on its own, so two servers asking for the same
+missing object at the same time end up with one object instead of two.
+
+The adapter itself is available as `KCommon.getInstance().getRedisAdapter()` for
+anything that needs a channel or a lock of its own. It is never null; without
+redis it is a no-op adapter that grants every lock and publishes nothing.
+
 ## Data operations
 
 `DataManagerContainer` provides type-safe helpers:

@@ -10,6 +10,10 @@ junit-jupiter = "5.9.0"
 junit-platform = "1.14.4"
 xseries = "13.7.1"
 mongo = "5.0.1"
+jedis = "5.0.0"
+commonspool = "2.11.1"
+slf4j = "1.7.36"
+jsonlib = "20230227"
 triehard = "1.0"
 
 [libraries]
@@ -22,6 +26,7 @@ exp4j = { module = "net.objecthunter:exp4j", version.ref = "exp4j" }
 annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
 xseries = { module = "com.github.cryptomorin:XSeries", version.ref = "xseries" }
 mongo-sync = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongo" }
+jedis = { module = "redis.clients:jedis", version.ref = "jedis" }
 triehard = { module = "org.magnos.trie:TrieHard", version.ref = "triehard" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }

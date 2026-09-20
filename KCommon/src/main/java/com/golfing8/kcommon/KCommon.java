@@ -2,6 +2,8 @@ package com.golfing8.kcommon;
 
 import com.golfing8.kcommon.command.impl.*;
 import com.golfing8.kcommon.db.MongoConnector;
+import com.golfing8.kcommon.db.redis.JedisRedisAdapter;
+import com.golfing8.kcommon.db.redis.RedisAdapter;
 import com.golfing8.kcommon.library.LibraryDefinition;
 import com.golfing8.kcommon.listener.LinkedEntityListener;
 import com.golfing8.kcommon.listener.PlayerDataListener;
@@ -19,6 +21,7 @@ import java.lang.invoke.MethodHandle;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * A plugin implementation of {@link KPlugin} so this commons library can be loaded as a standalone.
@@ -51,6 +54,14 @@ public class KCommon extends KPlugin {
     @Getter
     private @Nullable MongoConnector connector;
     /**
+     * The adapter used to signal other server instances about shared data.
+     * <br>
+     * This is never null. Without redis it is a no-op adapter, which is what every install that doesn't share a
+     * database with another server wants.
+     */
+    @Getter
+    private RedisAdapter redisAdapter = RedisAdapter.noop();
+    /**
      * The main thread of Bukkit
      */
     @Getter
@@ -72,6 +83,14 @@ public class KCommon extends KPlugin {
                 new LibraryDefinition("org,mongodb", "mongodb-driver-sync", BuildParameters.VERSION_MONGO),
                 new LibraryDefinition("org,mongodb", "bson", BuildParameters.VERSION_MONGO)
         );
+
+        // Only downloaded when redis is turned on, so nothing changes for installs that don't use it.
+        if (getConfig().getBoolean("redis.enabled", false)) {
+            libraries.add(new LibraryDefinition("redis,clients", "jedis", BuildParameters.VERSION_JEDIS));
+            libraries.add(new LibraryDefinition("org,apache,commons", "commons-pool2", BuildParameters.VERSION_COMMONS_POOL));
+            libraries.add(new LibraryDefinition("org,slf4j", "slf4j-api", BuildParameters.VERSION_SLF4J));
+            libraries.add(new LibraryDefinition("org,json", "json", BuildParameters.VERSION_JSON));
+        }
 
         libraries.add(new LibraryDefinition("net,kyori", "option", "1.1.0"));
         libraries.add(new LibraryDefinition("net,kyori", "examination-string", "1.3.0"));
@@ -115,6 +134,10 @@ public class KCommon extends KPlugin {
             getLogger().info("Connected to MongoDB");
         }
 
+        if (trySetupRedis()) {
+            getLogger().info("Connected to redis");
+        }
+
         try {
             this.timeZone = ZoneId.of(getConfig().getString("time-zone", "America/New_York"));
         } catch (DateTimeException exc) {
@@ -149,6 +172,47 @@ public class KCommon extends KPlugin {
         if (this.metrics != null) {
             this.metrics.shutdown();
         }
+
+        this.redisAdapter.close();
+        this.redisAdapter = RedisAdapter.noop();
+    }
+
+    /**
+     * Connects the redis adapter if redis is enabled and jedis made it onto the classpath.
+     * <br>
+     * A failure here is never fatal. The adapter is left as a no-op, which only means that data managers can't
+     * tell other instances about their changes.
+     *
+     * @return true if a connection was made
+     */
+    private boolean trySetupRedis() {
+        if (!getConfig().getBoolean("redis.enabled", false))
+            return false;
+
+        if (!Reflection.forNameOptional("redis.clients.jedis.JedisPool").isPresent()) {
+            getLogger().warning("Redis is enabled but jedis isn't on the classpath. Cross instance signalling is off.");
+            return false;
+        }
+
+        JedisRedisAdapter adapter = new JedisRedisAdapter(
+                getLogger(),
+                getConfig().getString("redis.address", "127.0.0.1"),
+                getConfig().getInt("redis.port", 6379),
+                getConfig().getString("redis.username", ""),
+                getConfig().getString("redis.password", ""),
+                getConfig().getInt("redis.database", 0),
+                getConfig().getInt("redis.max-connections", 16),
+                getConfig().getInt("redis.timeout", 2000));
+        try {
+            adapter.connect();
+        } catch (Exception exc) {
+            getLogger().log(Level.WARNING, "Failed to connect to redis. Cross instance signalling is off.", exc);
+            adapter.close();
+            return false;
+        }
+
+        this.redisAdapter = adapter;
+        return true;
     }
 
     private boolean trySetupMongo() {

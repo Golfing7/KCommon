@@ -20,6 +20,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.server.v1_8_R3.AttributeModifier;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_8_R3.CraftOfflinePlayer;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -248,7 +250,19 @@ public class MagicItemsV1_8 implements NMSMagicItems {
     public void setSkullOwningPlayer(SkullMeta meta, OfflinePlayer offlinePlayer) {
         setupMetaSkullAccess();
 
-        gameProfileFieldHandle.set(meta, new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName()));
+        GameProfile gameProfile = null;
+        if (offlinePlayer instanceof CraftPlayer) {
+            CraftPlayer craftPlayer = (CraftPlayer) offlinePlayer;
+            gameProfile = craftPlayer.getProfile();
+        } else if (offlinePlayer instanceof CraftOfflinePlayer) {
+            CraftOfflinePlayer craftOfflinePlayer = (CraftOfflinePlayer) offlinePlayer;
+            gameProfile = craftOfflinePlayer.getProfile();
+        }
+
+        if (gameProfile == null)
+            return;
+
+        gameProfileFieldHandle.set(meta, gameProfile);
     }
 
     @Override
