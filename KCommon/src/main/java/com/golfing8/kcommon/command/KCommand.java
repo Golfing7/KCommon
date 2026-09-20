@@ -133,7 +133,7 @@ public abstract class KCommand implements TabExecutor, PermissionContext {
      * The requirements for executing this command.
      */
     @Getter
-    private final Set<Requirement> commandRequirements = new HashSet<>();
+    private final Set<Requirement> commandRequirements = new LinkedHashSet<>();
     /**
      * The source that this command uses for its lang
      */

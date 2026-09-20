@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.struct.filter;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.golfing8.kcommon.NMS;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,7 +61,8 @@ public class ItemFilter implements Filter<ItemStack> {
 
         ItemMeta meta = itemStack.getItemMeta();
         if (itemNameFilters != null && !itemNameFilters.isEmpty() && meta.hasDisplayName()) {
-            String displayName = stripColors ? ChatColor.stripColor(meta.getDisplayName()) : meta.getDisplayName();
+            String rawDisplayName = NMS.getTheNMS().getMagicItems().getDisplayName(itemStack);
+            String displayName = stripColors ? ChatColor.stripColor(rawDisplayName) : rawDisplayName;
             for (StringFilter filter : itemNameFilters) {
                 if (filter.filter(displayName) != 0) {
                     maxFilter = 2;
