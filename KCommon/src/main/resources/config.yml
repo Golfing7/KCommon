@@ -6,6 +6,7 @@ mongo:
   address: '127.0.0.1'
   port: 27017
   database: 'kcommon'
+  auth-database: 'admin'
   connection-string: ''
 
 # Lets data managers tell other servers sharing this database about the objects they change.

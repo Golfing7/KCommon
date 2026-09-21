@@ -226,7 +226,8 @@ public class KCommon extends KPlugin {
             String address = getConfig().getString("mongo.address");
             int port = getConfig().getInt("mongo.port");
             String database = getConfig().getString("mongo.database");
-            this.connector = new MongoConnector(username, password, address, port, database);
+            String authDb = getConfig().getString("mongo.auth-database", database);
+            this.connector = new MongoConnector(username, password, address, port, database, authDb);
         } else {
             String database = getConfig().getString("mongo.database");
             this.connector = new MongoConnector(connectionString, database);

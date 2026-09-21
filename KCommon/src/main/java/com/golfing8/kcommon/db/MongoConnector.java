@@ -22,6 +22,7 @@ public class MongoConnector implements Closeable {
     private String serverAddress;
     private int port;
     private final String databaseName;
+    private String authDb;
     private String connectionString;
 
     @Getter
@@ -34,12 +35,13 @@ public class MongoConnector implements Closeable {
         this.connectionString = connectionString;
     }
 
-    public MongoConnector(String username, String password, String serverAddress, int port, String database) {
+    public MongoConnector(String username, String password, String serverAddress, int port, String database, String authDb) {
         this.username = username;
         this.password = password;
         this.serverAddress = serverAddress;
         this.port = port;
         this.databaseName = database;
+        this.authDb = authDb;
     }
 
     /**
@@ -52,7 +54,7 @@ public class MongoConnector implements Closeable {
         MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder();
         if (this.connectionString == null) {
             if (!username.isEmpty() && !password.isEmpty()) {
-                MongoCredential credential = MongoCredential.createCredential(this.username, DATABASE_NAME, password.toCharArray());
+                MongoCredential credential = MongoCredential.createCredential(this.username, authDb, password.toCharArray());
                 settingsBuilder.credential(credential);
             }
 
