@@ -1,0 +1,924 @@
+{
+  "kcommonSchemaVersion": "2",
+  "enums": {
+    "e0": [],
+    "e1": [
+      "WATER",
+      "REGEN",
+      "SPEED",
+      "FIRE_RESISTANCE",
+      "POISON",
+      "INSTANT_HEAL",
+      "NIGHT_VISION",
+      "WEAKNESS",
+      "STRENGTH",
+      "SLOWNESS",
+      "JUMP",
+      "INSTANT_DAMAGE",
+      "WATER_BREATHING",
+      "INVISIBILITY"
+    ],
+    "e2": [
+      "HIDE_ENCHANTS",
+      "HIDE_ATTRIBUTES",
+      "HIDE_UNBREAKABLE",
+      "HIDE_DESTROYS",
+      "HIDE_PLACED_ON",
+      "HIDE_POTION_EFFECTS"
+    ],
+    "e3": [
+      "ADD_NUMBER",
+      "ADD_SCALAR",
+      "MULTIPLY_SCALAR_1"
+    ],
+    "e4": [
+      "HAND",
+      "FEET",
+      "LEGS",
+      "CHEST",
+      "HEAD"
+    ],
+    "e5": [
+      "DROPPED_ITEM",
+      "EXPERIENCE_ORB",
+      "LEASH_HITCH",
+      "PAINTING",
+      "ARROW",
+      "SNOWBALL",
+      "FIREBALL",
+      "SMALL_FIREBALL",
+      "ENDER_PEARL",
+      "ENDER_SIGNAL",
+      "THROWN_EXP_BOTTLE",
+      "ITEM_FRAME",
+      "WITHER_SKULL",
+      "PRIMED_TNT",
+      "FALLING_BLOCK",
+      "FIREWORK",
+      "ARMOR_STAND",
+      "MINECART_COMMAND",
+      "BOAT",
+      "MINECART",
+      "MINECART_CHEST",
+      "MINECART_FURNACE",
+      "MINECART_TNT",
+      "MINECART_HOPPER",
+      "MINECART_MOB_SPAWNER",
+      "CREEPER",
+      "SKELETON",
+      "SPIDER",
+      "GIANT",
+      "ZOMBIE",
+      "SLIME",
+      "GHAST",
+      "PIG_ZOMBIE",
+      "ENDERMAN",
+      "CAVE_SPIDER",
+      "SILVERFISH",
+      "BLAZE",
+      "MAGMA_CUBE",
+      "ENDER_DRAGON",
+      "WITHER",
+      "BAT",
+      "WITCH",
+      "ENDERMITE",
+      "GUARDIAN",
+      "PIG",
+      "SHEEP",
+      "COW",
+      "CHICKEN",
+      "SQUID",
+      "WOLF",
+      "MUSHROOM_COW",
+      "SNOWMAN",
+      "OCELOT",
+      "IRON_GOLEM",
+      "HORSE",
+      "RABBIT",
+      "VILLAGER",
+      "ENDER_CRYSTAL",
+      "SPLASH_POTION",
+      "EGG",
+      "FISHING_HOOK",
+      "LIGHTNING",
+      "WEATHER",
+      "PLAYER",
+      "COMPLEX_PART",
+      "UNKNOWN",
+      "CHARGED_CREEPER",
+      "WITHER_SKELETON",
+      "UNDEAD_HORSE",
+      "SKELETON_HORSE"
+    ],
+    "e6": [
+      "GENERIC_MAX_HEALTH",
+      "GENERIC_FOLLOW_RANGE",
+      "GENERIC_KNOCKBACK_RESISTANCE",
+      "GENERIC_MOVEMENT_SPEED",
+      "GENERIC_FLYING_SPEED",
+      "GENERIC_ATTACK_DAMAGE",
+      "GENERIC_ATTACK_KNOCKBACK",
+      "GENERIC_ATTACK_SPEED",
+      "GENERIC_ARMOR",
+      "GENERIC_ARMOR_TOUGHNESS",
+      "GENERIC_FALL_DAMAGE_MULTIPLIER",
+      "GENERIC_LUCK",
+      "GENERIC_MAX_ABSORPTION",
+      "GENERIC_SAFE_FALL_DISTANCE",
+      "GENERIC_SCALE",
+      "GENERIC_STEP_HEIGHT",
+      "GENERIC_GRAVITY",
+      "GENERIC_JUMP_STRENGTH",
+      "GENERIC_BURNING_TIME",
+      "GENERIC_EXPLOSION_KNOCKBACK_RESISTANCE",
+      "GENERIC_MOVEMENT_EFFICIENCY",
+      "GENERIC_OXYGEN_BONUS",
+      "GENERIC_WATER_MOVEMENT_EFFICIENCY",
+      "PLAYER_BLOCK_INTERACTION_RANGE",
+      "PLAYER_ENTITY_INTERACTION_RANGE",
+      "PLAYER_BLOCK_BREAK_SPEED",
+      "PLAYER_MINING_EFFICIENCY",
+      "PLAYER_SNEAKING_SPEED",
+      "PLAYER_SUBMERGED_MINING_SPEED",
+      "PLAYER_SWEEPING_DAMAGE_RATIO",
+      "HORSE_JUMP_STRENGTH",
+      "ZOMBIE_SPAWN_REINFORCEMENTS",
+      "GRAVITY"
+    ],
+    "e7": [
+      "SPEED",
+      "SLOW",
+      "FAST_DIGGING",
+      "SLOW_DIGGING",
+      "INCREASE_DAMAGE",
+      "HEAL",
+      "HARM",
+      "JUMP",
+      "CONFUSION",
+      "REGENERATION",
+      "DAMAGE_RESISTANCE",
+      "FIRE_RESISTANCE",
+      "WATER_BREATHING",
+      "INVISIBILITY",
+      "BLINDNESS",
+      "NIGHT_VISION",
+      "HUNGER",
+      "WEAKNESS",
+      "POISON",
+      "WITHER",
+      "HEALTH_BOOST",
+      "ABSORPTION",
+      "SATURATION"
+    ]
+  },
+  "types": {
+    "PotionData": {
+      "typeName": "PotionData",
+      "fields": {
+        "potion-type": {
+          "kind": "enumRef",
+          "ref": "e1"
+        },
+        "amplified": {
+          "kind": "unknown"
+        },
+        "extended": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "BookData": {
+      "typeName": "BookData",
+      "fields": {
+        "author": {
+          "kind": "unknown"
+        },
+        "title": {
+          "kind": "unknown"
+        },
+        "pages": {
+          "kind": "list",
+          "inner": {
+            "kind": "unknown"
+          }
+        }
+      }
+    },
+    "EntityAttributeModifier": {
+      "typeName": "EntityAttributeModifier",
+      "fields": {
+        "operation": {
+          "kind": "enumRef",
+          "ref": "e3"
+        },
+        "amount": {
+          "kind": "unknown"
+        },
+        "name": {
+          "kind": "unknown"
+        },
+        "slot": {
+          "kind": "enumRef",
+          "ref": "e4"
+        }
+      }
+    },
+    "ItemStackBuilder": {
+      "typeName": "ItemStackBuilder",
+      "fields": {
+        "type": {
+          "kind": "enumRef",
+          "ref": "e0"
+        },
+        "amount": {
+          "kind": "unknown"
+        },
+        "durability": {
+          "kind": "unknown"
+        },
+        "unbreakable": {
+          "kind": "unknown"
+        },
+        "custom-model-data": {
+          "kind": "unknown"
+        },
+        "item-model": {
+          "kind": "unknown"
+        },
+        "name": {
+          "kind": "unknown"
+        },
+        "lore": {
+          "kind": "list",
+          "inner": {
+            "kind": "unknown"
+          }
+        },
+        "nbt-data": {
+          "kind": "map",
+          "inner": {
+            "kind": "unknown"
+          },
+          "keyType": {
+            "kind": "unknown"
+          }
+        },
+        "components": {
+          "kind": "map",
+          "inner": {
+            "kind": "unknown"
+          },
+          "keyType": {
+            "kind": "unknown"
+          }
+        },
+        "potion-data": {
+          "kind": "nestedRef",
+          "ref": "PotionData"
+        },
+        "book-data": {
+          "kind": "nestedRef",
+          "ref": "BookData"
+        },
+        "glowing": {
+          "kind": "unknown"
+        },
+        "skull-texture": {
+          "kind": "unknown"
+        },
+        "variable-amount": {
+          "kind": "unknown"
+        },
+        "item-id": {
+          "kind": "unknown"
+        },
+        "enchantments": {
+          "kind": "map",
+          "inner": {
+            "kind": "unknown"
+          },
+          "keyType": {
+            "kind": "enumRef",
+            "ref": "e0"
+          }
+        },
+        "flags": {
+          "kind": "list",
+          "inner": {
+            "kind": "enumRef",
+            "ref": "e2"
+          }
+        },
+        "attribute-modifiers": {
+          "kind": "map",
+          "inner": {
+            "kind": "list",
+            "inner": {
+              "kind": "nestedRef",
+              "ref": "EntityAttributeModifier"
+            }
+          },
+          "keyType": {
+            "kind": "unknown"
+          }
+        },
+        "unstackable": {
+          "kind": "unknown"
+        },
+        "color": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "KDialogBody": {
+      "typeName": "KDialogBody",
+      "fields": {
+        "item": {
+          "kind": "nestedRef",
+          "ref": "ItemStackBuilder"
+        },
+        "message": {
+          "kind": "unknown"
+        },
+        "message-width": {
+          "kind": "unknown"
+        },
+        "decorations": {
+          "kind": "unknown"
+        },
+        "tooltip": {
+          "kind": "unknown"
+        },
+        "width": {
+          "kind": "unknown"
+        },
+        "height": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "KDialogBase": {
+      "typeName": "KDialogBase",
+      "fields": {
+        "title": {
+          "kind": "unknown"
+        },
+        "external-title": {
+          "kind": "unknown"
+        },
+        "can-close-with-escape": {
+          "kind": "unknown"
+        },
+        "dialog-body": {
+          "kind": "list",
+          "inner": {
+            "kind": "nestedRef",
+            "ref": "KDialogBody"
+          }
+        }
+      }
+    },
+    "KClickEvent": {
+      "typeName": "KClickEvent",
+      "fields": {
+        "url": {
+          "kind": "unknown"
+        },
+        "file": {
+          "kind": "unknown"
+        },
+        "clipboard": {
+          "kind": "unknown"
+        },
+        "run-command": {
+          "kind": "unknown"
+        },
+        "suggest-command": {
+          "kind": "unknown"
+        },
+        "page": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "KDialogAction": {
+      "typeName": "KDialogAction",
+      "fields": {
+        "command-template": {
+          "kind": "unknown"
+        },
+        "click-event": {
+          "kind": "nestedRef",
+          "ref": "KClickEvent"
+        }
+      }
+    },
+    "KActionButton": {
+      "typeName": "KActionButton",
+      "fields": {
+        "label": {
+          "kind": "unknown"
+        },
+        "tooltip": {
+          "kind": "unknown"
+        },
+        "width": {
+          "kind": "unknown"
+        },
+        "dialog-action": {
+          "kind": "nestedRef",
+          "ref": "KDialogAction"
+        }
+      }
+    },
+    "KDialog": {
+      "typeName": "KDialog",
+      "fields": {}
+    },
+    "DialogList": {
+      "typeName": "DialogList",
+      "fields": {
+        "dialogs": {
+          "kind": "list",
+          "inner": {
+            "kind": "nestedRef",
+            "ref": "KDialog"
+          }
+        },
+        "exit-button": {
+          "kind": "nestedRef",
+          "ref": "KActionButton"
+        },
+        "columns": {
+          "kind": "unknown"
+        },
+        "button-width": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "MultiAction": {
+      "typeName": "MultiAction",
+      "fields": {
+        "actions": {
+          "kind": "list",
+          "inner": {
+            "kind": "nestedRef",
+            "ref": "KActionButton"
+          }
+        },
+        "exit-button": {
+          "kind": "nestedRef",
+          "ref": "KActionButton"
+        },
+        "columns": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "Confirmation": {
+      "typeName": "Confirmation",
+      "fields": {
+        "yes": {
+          "kind": "nestedRef",
+          "ref": "KActionButton"
+        },
+        "no": {
+          "kind": "nestedRef",
+          "ref": "KActionButton"
+        }
+      }
+    },
+    "KDialog#2": {
+      "typeName": "KDialog",
+      "fields": {
+        "base": {
+          "kind": "nestedRef",
+          "ref": "KDialogBase"
+        },
+        "notice": {
+          "kind": "nestedRef",
+          "ref": "KActionButton"
+        },
+        "dialog-list": {
+          "kind": "nestedRef",
+          "ref": "DialogList"
+        },
+        "multi-action": {
+          "kind": "nestedRef",
+          "ref": "MultiAction"
+        },
+        "confirmation": {
+          "kind": "nestedRef",
+          "ref": "Confirmation"
+        }
+      }
+    },
+    "PolymorphicSerializable": {
+      "typeName": "PolymorphicSerializable",
+      "fields": {}
+    },
+    "EntityEquipmentPiece": {
+      "typeName": "EntityEquipmentPiece",
+      "fields": {
+        "piece": {
+          "kind": "nestedRef",
+          "ref": "ItemStackBuilder"
+        },
+        "chance-to-equip": {
+          "kind": "unknown"
+        },
+        "chance-to-drop": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "Patch": {
+      "typeName": "Patch",
+      "fields": {
+        "pattern": {
+          "kind": "unknown"
+        },
+        "replacement": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "PotionEffect": {
+      "typeName": "PotionEffect",
+      "fields": {
+        "effect-type": {
+          "kind": "enumRef",
+          "ref": "e7"
+        },
+        "duration": {
+          "kind": "unknown"
+        },
+        "amplifier": {
+          "kind": "unknown"
+        },
+        "ambient": {
+          "kind": "unknown"
+        },
+        "particles": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "EntityEquipment": {
+      "typeName": "EntityEquipment",
+      "fields": {
+        "helmet": {
+          "kind": "nestedRef",
+          "ref": "EntityEquipmentPiece"
+        },
+        "chestplate": {
+          "kind": "nestedRef",
+          "ref": "EntityEquipmentPiece"
+        },
+        "leggings": {
+          "kind": "nestedRef",
+          "ref": "EntityEquipmentPiece"
+        },
+        "boots": {
+          "kind": "nestedRef",
+          "ref": "EntityEquipmentPiece"
+        },
+        "hand": {
+          "kind": "nestedRef",
+          "ref": "EntityEquipmentPiece"
+        },
+        "off-hand": {
+          "kind": "nestedRef",
+          "ref": "EntityEquipmentPiece"
+        }
+      }
+    },
+    "EntityDefinition": {
+      "typeName": "EntityDefinition",
+      "fields": {}
+    },
+    "Drop": {
+      "typeName": "Drop",
+      "fields": {
+        "chance": {
+          "kind": "unknown"
+        },
+        "display-name": {
+          "kind": "unknown"
+        },
+        "max-boost": {
+          "kind": "unknown"
+        },
+        "item": {
+          "kind": "nestedRef",
+          "ref": "ItemStackBuilder"
+        },
+        "items": {
+          "kind": "map",
+          "inner": {
+            "kind": "nestedRef",
+            "ref": "ItemStackBuilder"
+          },
+          "keyType": {
+            "kind": "unknown"
+          }
+        },
+        "give-directly": {
+          "kind": "unknown"
+        },
+        "fancy": {
+          "kind": "unknown"
+        },
+        "player-locked": {
+          "kind": "unknown"
+        },
+        "boost-quantity": {
+          "kind": "unknown"
+        },
+        "looting-enabled": {
+          "kind": "unknown"
+        },
+        "fortune-enabled": {
+          "kind": "unknown"
+        },
+        "looting-formula": {
+          "kind": "unknown"
+        },
+        "commands": {
+          "kind": "list",
+          "inner": {
+            "kind": "unknown"
+          }
+        },
+        "xp": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "DropGroup": {
+      "typeName": "DropGroup",
+      "fields": {
+        "drops": {
+          "kind": "list",
+          "inner": {
+            "kind": "unknown"
+          }
+        },
+        "drop-target-range": {
+          "kind": "unknown"
+        },
+        "max-tries": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "DropTable": {
+      "typeName": "DropTable",
+      "fields": {
+        "table": {
+          "kind": "map",
+          "inner": {
+            "kind": "nestedRef",
+            "ref": "Drop"
+          },
+          "keyType": {
+            "kind": "unknown"
+          }
+        },
+        "groupings": {
+          "kind": "map",
+          "inner": {
+            "kind": "nestedRef",
+            "ref": "DropGroup"
+          },
+          "keyType": {
+            "kind": "unknown"
+          }
+        },
+        "drop-target-range": {
+          "kind": "unknown"
+        },
+        "max-tries": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "EntityDefinition#2": {
+      "typeName": "EntityDefinition",
+      "fields": {
+        "entity-type": {
+          "kind": "enumRef",
+          "ref": "e5"
+        },
+        "name": {
+          "kind": "unknown"
+        },
+        "attributes": {
+          "kind": "map",
+          "inner": {
+            "kind": "unknown"
+          },
+          "keyType": {
+            "kind": "enumRef",
+            "ref": "e6"
+          }
+        },
+        "potion-effects": {
+          "kind": "list",
+          "inner": {
+            "kind": "nestedRef",
+            "ref": "PotionEffect"
+          }
+        },
+        "max-health": {
+          "kind": "unknown"
+        },
+        "spawn-health": {
+          "kind": "unknown"
+        },
+        "equipment": {
+          "kind": "nestedRef",
+          "ref": "EntityEquipment"
+        },
+        "vehicle": {
+          "kind": "nestedRef",
+          "ref": "EntityDefinition"
+        },
+        "passenger": {
+          "kind": "nestedRef",
+          "ref": "EntityDefinition"
+        },
+        "adult": {
+          "kind": "unknown"
+        },
+        "randomize-data": {
+          "kind": "unknown"
+        },
+        "linked": {
+          "kind": "unknown"
+        },
+        "drop-table": {
+          "kind": "nestedRef",
+          "ref": "DropTable"
+        }
+      }
+    },
+    "SimpleSerializableConf": {
+      "typeName": "SimpleSerializableConf",
+      "fields": {
+        "thing1": {
+          "kind": "unknown"
+        },
+        "thing2": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "ItemPatch": {
+      "typeName": "ItemPatch",
+      "fields": {
+        "material-patch": {
+          "kind": "nestedRef",
+          "ref": "Patch"
+        },
+        "name-patch": {
+          "kind": "nestedRef",
+          "ref": "Patch"
+        },
+        "lore-patch": {
+          "kind": "nestedRef",
+          "ref": "Patch"
+        }
+      }
+    },
+    "SoundWrapper": {
+      "typeName": "SoundWrapper",
+      "fields": {
+        "sound": {
+          "kind": "enumRef",
+          "ref": "e0"
+        },
+        "pitch": {
+          "kind": "unknown"
+        },
+        "volume": {
+          "kind": "unknown"
+        },
+        "delay": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "Title": {
+      "typeName": "Title",
+      "fields": {
+        "title": {
+          "kind": "unknown"
+        },
+        "subtitle": {
+          "kind": "unknown"
+        },
+        "in": {
+          "kind": "unknown"
+        },
+        "stay": {
+          "kind": "unknown"
+        },
+        "out": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "Message": {
+      "typeName": "Message",
+      "fields": {
+        "paged": {
+          "kind": "unknown"
+        },
+        "page-header": {
+          "kind": "unknown"
+        },
+        "page-footer": {
+          "kind": "unknown"
+        },
+        "page-height": {
+          "kind": "unknown"
+        },
+        "message": {
+          "kind": "list",
+          "inner": {
+            "kind": "unknown"
+          }
+        },
+        "sounds": {
+          "kind": "map",
+          "inner": {
+            "kind": "nestedRef",
+            "ref": "SoundWrapper"
+          },
+          "keyType": {
+            "kind": "unknown"
+          }
+        },
+        "actionbar": {
+          "kind": "unknown"
+        },
+        "title": {
+          "kind": "nestedRef",
+          "ref": "Title"
+        }
+      }
+    },
+    "ScheduledMessage": {
+      "typeName": "ScheduledMessage",
+      "fields": {
+        "delay": {
+          "kind": "unknown"
+        },
+        "period": {
+          "kind": "unknown"
+        },
+        "message": {
+          "kind": "nestedRef",
+          "ref": "Message"
+        }
+      }
+    },
+    "KeyedObject": {
+      "typeName": "KeyedObject",
+      "fields": {
+        "value": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "Type1Serializable": {
+      "typeName": "Type1Serializable",
+      "fields": {
+        "data1": {
+          "kind": "unknown"
+        },
+        "data2": {
+          "kind": "unknown"
+        }
+      }
+    },
+    "Type2Serializable": {
+      "typeName": "Type2Serializable",
+      "fields": {
+        "string1": {
+          "kind": "unknown"
+        },
+        "string2": {
+          "kind": "unknown"
+        }
+      }
+    }
+  },
+  "modules": {
+    "test": {
+      "config": {}
+    }
+  }
+}

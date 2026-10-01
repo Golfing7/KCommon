@@ -148,7 +148,7 @@ public final class MS {
      * @param placeholders the placeholders.
      */
     public static void sendTitle(Player player, Title title, Object... placeholders) {
-        Audience audience = ComponentUtils.bukkitAudiences.player(player);
+        Audience audience = packetAudience(player);
         audience.sendTitlePart(TitlePart.TITLE, toComponent(title.getTitle(), placeholders));
         audience.sendTitlePart(TitlePart.SUBTITLE, toComponent(title.getSubtitle(), placeholders));
         audience.sendTitlePart(TitlePart.TIMES, net.kyori.adventure.title.Title.Times.times(
@@ -166,8 +166,20 @@ public final class MS {
      * @param placeholders the placeholders.
      */
     public static void sendActionBar(Player player, String actionBar, Object... placeholders) {
-        Audience audience = ComponentUtils.bukkitAudiences.player(player);
+        Audience audience = packetAudience(player);
         audience.sendActionBar(toComponent(actionBar, placeholders));
+    }
+
+    /**
+     * Gets the audience titles and action bars go through. Paper's players already are adventure audiences, so the
+     * server builds those packets itself. adventure-platform builds them by reflection, which lags behind new versions:
+     * on 26.2 it sent action bars with a null component, which the server then failed to encode.
+     *
+     * @param player the player.
+     * @return the audience.
+     */
+    private static Audience packetAudience(Player player) {
+        return player instanceof Audience ? (Audience) player : ComponentUtils.bukkitAudiences.player(player);
     }
 
     /**
