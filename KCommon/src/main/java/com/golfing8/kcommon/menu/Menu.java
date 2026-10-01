@@ -93,13 +93,6 @@ public interface Menu extends Listener {
     void setLockedSlots(Set<Integer> lockedSlots);
 
     /**
-     * Gets the tick this menu was created.
-     *
-     * @return the tick
-     */
-    long getCreatedTick();
-
-    /**
      * Gets all placeholders registered to this menu
      *
      * @return the placeholders

@@ -69,9 +69,6 @@ public final class MenuManager {
 
         while (menuIterator.hasNext()) {
             Menu menu = menuIterator.next().getValue();
-            // If the menu was just created, let it go for a bit.
-            if (menu.getCreatedTick() + 20 > NMS.getTheNMS().getCurrentTick())
-                continue;
 
             // If the menu was manually shutdown, just remove it
             if (!menu.isValid()) {

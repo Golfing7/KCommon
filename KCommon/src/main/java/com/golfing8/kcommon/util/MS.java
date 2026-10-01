@@ -148,7 +148,7 @@ public final class MS {
      * @param placeholders the placeholders.
      */
     public static void sendTitle(Player player, Title title, Object... placeholders) {
-        Audience audience = packetAudience(player);
+        Audience audience = audience(player);
         audience.sendTitlePart(TitlePart.TITLE, toComponent(title.getTitle(), placeholders));
         audience.sendTitlePart(TitlePart.SUBTITLE, toComponent(title.getSubtitle(), placeholders));
         audience.sendTitlePart(TitlePart.TIMES, net.kyori.adventure.title.Title.Times.times(
@@ -166,7 +166,7 @@ public final class MS {
      * @param placeholders the placeholders.
      */
     public static void sendActionBar(Player player, String actionBar, Object... placeholders) {
-        Audience audience = packetAudience(player);
+        Audience audience = audience(player);
         audience.sendActionBar(toComponent(actionBar, placeholders));
     }
 
@@ -175,11 +175,11 @@ public final class MS {
      * server builds those packets itself. adventure-platform builds them by reflection, which lags behind new versions:
      * on 26.2 it sent action bars with a null component, which the server then failed to encode.
      *
-     * @param player the player.
+     * @param sender the command sender.
      * @return the audience.
      */
-    private static Audience packetAudience(Player player) {
-        return player instanceof Audience ? (Audience) player : ComponentUtils.bukkitAudiences.player(player);
+    public static Audience audience(CommandSender sender) {
+        return sender instanceof Audience ? (Audience) sender : ComponentUtils.bukkitAudiences.sender(sender);
     }
 
     /**
@@ -194,7 +194,7 @@ public final class MS {
         if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
             return;
 
-        ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
+        audience(sender).sendMessage(toComponent(message, placeholders));
     }
 
     /**
@@ -211,7 +211,7 @@ public final class MS {
             if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
                 return;
 
-            ComponentUtils.bukkitAudiences.sender(sender).sendMessage(component);
+            audience(sender).sendMessage(component);
         }
     }
 
@@ -227,7 +227,7 @@ public final class MS {
         if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
             return;
 
-        ComponentUtils.bukkitAudiences.sender(sender).sendMessage(toComponent(message, placeholders));
+        audience(sender).sendMessage(toComponent(message, placeholders));
     }
 
     /**
@@ -244,7 +244,7 @@ public final class MS {
             if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
                 return;
 
-            ComponentUtils.bukkitAudiences.sender(sender).sendMessage(component);
+            audience(sender).sendMessage(component);
         }
     }
 }

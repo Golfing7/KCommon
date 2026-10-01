@@ -24,7 +24,6 @@ public abstract class MenuContainer {
         if (this.menu == null)
             this.menu = loadMenu();
 
-        this.menu.register();
         return menu;
     }
 

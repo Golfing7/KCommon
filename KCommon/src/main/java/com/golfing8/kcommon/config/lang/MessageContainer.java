@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.config.lang;
 
-import com.golfing8.kcommon.ComponentUtils;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.struct.title.Title;
@@ -209,7 +208,10 @@ public interface MessageContainer {
                 }
             } else {
                 Component component = MS.toComponent(getMessage().getMessages(), container);
-                ComponentUtils.bukkitAudiences.all().sendMessage(component);
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    MS.audience(player).sendMessage(component);
+                }
+                MS.audience(Bukkit.getConsoleSender()).sendMessage(component);
             }
         }
 

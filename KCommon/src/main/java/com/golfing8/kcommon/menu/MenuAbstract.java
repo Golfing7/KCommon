@@ -52,8 +52,6 @@ public abstract class MenuAbstract implements Menu {
     @Getter
     private final UUID menuID = UUID.randomUUID();
 
-    @Getter
-    private final long createdTick;
     private Inventory backingInventory;
     private String title;
     private boolean canExpire;
@@ -90,10 +88,8 @@ public abstract class MenuAbstract implements Menu {
         this.clickable = clickable;
         this.placeholders = placeholders;
         this.multiLinePlaceholders = multiLinePlaceholders;
-        this.createdTick = NMS.getTheNMS().getCurrentTick();
 
         this.actionMap = actionMap;
-        register();
     }
 
     @Override
@@ -163,11 +159,8 @@ public abstract class MenuAbstract implements Menu {
 
     @Override
     public void open(Player player) {
-        if (!this.valid) {
-            this.register();
-        }
-
         player.openInventory(this.backingInventory);
+        this.register();
     }
 
     @Override
