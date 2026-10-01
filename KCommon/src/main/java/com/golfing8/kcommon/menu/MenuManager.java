@@ -1,6 +1,5 @@
 package com.golfing8.kcommon.menu;
 
-import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.tcoded.folialib.wrapper.task.WrappedTask;
 import org.bukkit.entity.Player;
