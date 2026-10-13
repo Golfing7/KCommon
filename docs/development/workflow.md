@@ -39,6 +39,26 @@ Module reloads are intended to replace a plugin reload during development.
 Avoid keeping module-owned listeners, scheduled tasks, commands, or cached
 objects in static fields.
 
+## Check KCommon's status
+
+`/kstatus` (alias `/ks`) prints an overview of KCommon: versions, uptime and
+memory, the Mongo and redis connections, and how many plugins, modules,
+commands, data managers, placeholders, and open menus are registered. The
+details are split into sub commands:
+
+```text
+/kstatus plugins                    # Each KCommon plugin and what it registered
+/kstatus modules [plugin] [-v]      # Module states, flags modules that failed to enable
+/kstatus commands [plugin] [-v]     # Registered commands, their aliases and sub commands
+/kstatus data [plugin] [-s] [-v]    # Data managers and their cache sizes
+/kstatus connections [-v]           # Mongo and redis connection details (alias: db)
+```
+
+`-v` adds detail such as dependencies, permissions, and storage locations.
+`/kstatus data -s` also counts what each manager has in storage, which reads the
+disk or database off of the server thread. `/kstatus connections` pings Mongo
+and redis to confirm they answer.
+
 ## GitHub Pages documentation
 
 The repository's `mkdocs.yml` defines the documentation site. Preview it

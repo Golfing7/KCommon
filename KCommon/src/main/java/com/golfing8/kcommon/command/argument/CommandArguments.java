@@ -266,7 +266,7 @@ public final class CommandArguments {
     public static final CommandArgument<KPlugin> KPLUGIN = new CommandArgument<>("kcommon plugin", context -> {
         return Arrays.stream(Bukkit.getServer().getPluginManager().getPlugins()).filter(pl -> pl instanceof KPlugin).map(Plugin::getName).collect(Collectors.toList());
     }, context -> {
-        return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) != null;
+        return Bukkit.getServer().getPluginManager().getPlugin(context.getArgument()) instanceof KPlugin;
     }, ctx -> (KPlugin) Bukkit.getServer().getPluginManager().getPlugin(ctx.getArgument()));
 
     /**

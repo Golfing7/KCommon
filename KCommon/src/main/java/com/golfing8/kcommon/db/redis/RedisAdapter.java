@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -52,6 +54,55 @@ public interface RedisAdapter extends Closeable {
      * @return true if connected, false if this adapter does nothing
      */
     boolean isConnected();
+
+    /**
+     * Gets the address of the redis server this adapter talks to, for display only.
+     *
+     * @return the address as {@code host:port/database}, or null if this adapter isn't backed by a server
+     */
+    @Nullable
+    default String getAddress() {
+        return null;
+    }
+
+    /**
+     * Gets the channels that have a listener registered on this instance.
+     *
+     * @return a copy of the channels
+     */
+    @NotNull
+    default Set<String> getChannels() {
+        return Collections.emptySet();
+    }
+
+    /**
+     * Gets the number of pooled connections that are currently borrowed.
+     *
+     * @return the active connections
+     */
+    default int getActiveConnections() {
+        return 0;
+    }
+
+    /**
+     * Gets the number of pooled connections that are open but not borrowed.
+     *
+     * @return the idle connections
+     */
+    default int getIdleConnections() {
+        return 0;
+    }
+
+    /**
+     * Pings the redis server, blocking until it answers.
+     * <br>
+     * Never call this from the server thread.
+     *
+     * @return the round trip time in milliseconds, or -1 if the server couldn't be reached
+     */
+    default long ping() {
+        return -1L;
+    }
 
     /**
      * Publishes a message on the given channel, blocking until redis accepts it.

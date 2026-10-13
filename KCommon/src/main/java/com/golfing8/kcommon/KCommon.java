@@ -150,6 +150,7 @@ public class KCommon extends KPlugin {
         new KMenuCommand().register();
         new KItemCommand().register();
         new KTimingsCommand().register();
+        new KStatusCommand().register();
         if (NMS.getTheNMS().supportsPersistentDataContainers())
             getServer().getPluginManager().registerEvents(new LinkedEntityListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDataListener(), this);

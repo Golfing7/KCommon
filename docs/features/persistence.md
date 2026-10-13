@@ -99,6 +99,9 @@ from Mongo.
 An object that is changed locally but not yet saved is left alone, and a warning
 is logged instead, because dropping it would throw those changes away.
 
+Run `/kstatus connections` to confirm that redis is connected and to see the
+channels this server listens on (add `-v` to list them).
+
 ### Locking
 
 Announcing a change is enough for data that one server owns at a time. Data that

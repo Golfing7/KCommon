@@ -13,6 +13,7 @@ import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.params.SetParams;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,6 +134,42 @@ public class JedisRedisAdapter implements RedisAdapter {
     @Override
     public boolean isConnected() {
         return this.running && this.pool != null && !this.pool.isClosed();
+    }
+
+    @Override
+    public @NotNull String getAddress() {
+        return this.address + ":" + this.port + "/" + this.database;
+    }
+
+    @Override
+    public @NotNull Set<String> getChannels() {
+        return new HashSet<>(this.listeners.keySet());
+    }
+
+    @Override
+    public int getActiveConnections() {
+        JedisPool active = this.pool;
+        return active == null ? 0 : active.getNumActive();
+    }
+
+    @Override
+    public int getIdleConnections() {
+        JedisPool active = this.pool;
+        return active == null ? 0 : active.getNumIdle();
+    }
+
+    @Override
+    public long ping() {
+        if (!isConnected())
+            return -1L;
+
+        long start = System.nanoTime();
+        try (Jedis jedis = this.pool.getResource()) {
+            jedis.ping();
+            return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+        } catch (Exception exc) {
+            return -1L;
+        }
     }
 
     @Override

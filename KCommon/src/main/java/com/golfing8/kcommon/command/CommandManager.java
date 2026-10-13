@@ -16,8 +16,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -28,6 +27,12 @@ public final class CommandManager {
     private static final CommandManager INSTANCE = new CommandManager();
     private final FieldHandle<CommandMap> commandMapHandle;
     private final FieldHandle<Map<String, Command>> knownCommandsHandle;
+    /**
+     * Every top level command currently registered through this manager.
+     * <br>
+     * Weakly held so a plugin that goes away without unregistering its commands doesn't stay loaded because of it.
+     */
+    private final Set<KCommand> registeredCommands = Collections.newSetFromMap(new WeakHashMap<>());
 
     /**
      * The plugin this command manager uses.
@@ -61,6 +66,7 @@ public final class CommandManager {
         //Add the executor and completer.
         pluginCommand.setExecutor(command);
         pluginCommand.setTabCompleter(command);
+        registeredCommands.add(command);
 
         if (sync) {
             needsSync = true;
@@ -75,7 +81,19 @@ public final class CommandManager {
      */
     public void unregisterCommand(KCommand command) {
         deregisterCommand(command.getCommandName(), command.getCommandAliases());
+        registeredCommands.remove(command);
         needsSync = true;
+    }
+
+    /**
+     * Gets every top level command currently registered through this manager.
+     * <br>
+     * Sub commands aren't included, they can be reached through {@link KCommand#getSubcommands()}.
+     *
+     * @return a copy of the registered commands
+     */
+    public List<KCommand> getRegisteredCommands() {
+        return new ArrayList<>(registeredCommands);
     }
 
     /**
