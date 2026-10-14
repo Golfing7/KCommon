@@ -88,7 +88,7 @@ public final class CommandManager {
     /**
      * Gets every top level command currently registered through this manager.
      * <br>
-     * Sub commands aren't included, they can be reached through {@link KCommand#getSubcommands()}.
+     * Sub commands aren't included, they can be reached through the sub commands.
      *
      * @return a copy of the registered commands
      */
