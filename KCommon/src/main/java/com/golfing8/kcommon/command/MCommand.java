@@ -58,7 +58,7 @@ public abstract class MCommand<T extends Module> extends KCommand implements Lan
 
     @Override
     public String getPrefix() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder("command.");
 
         //Generate the command prefix.
         KCommand parent = getParent();
@@ -67,7 +67,6 @@ public abstract class MCommand<T extends Module> extends KCommand implements Lan
             parent = parent.getParent();
         }
         builder.append(this.getCommandName());
-        builder.insert(0, "command.");
 
         return builder.toString();
     }
