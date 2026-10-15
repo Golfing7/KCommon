@@ -1,8 +1,13 @@
 package com.golfing8.kcommon.config.commented;
 
 import com.golfing8.kcommon.KCommon;
+import com.golfing8.kcommon.util.StringUtil;
+import it.unimi.dsi.fastutil.chars.CharSet;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -11,6 +16,9 @@ import java.util.*;
  * A utility class for recognizing config keys and allowing iteration over them.
  */
 public class ConfigTransformer implements Iterator<String>, Iterable<String> {
+    private static final CharSet INVALID_KEY_STARTS = CharSet.of(
+            '#', '-', ':', '?', '|', '>', '&', '*', '!', '%', '[', ']', '{', '}', ',', '`'
+    );
     /**
      * The index of the last key in the transformed lines list.
      */
@@ -38,6 +46,10 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
      */
     private int indent = -1, lastIndent = -1;
     /**
+     * A stack of key indentations
+     */
+    private Stack<LineInfo> keyIndentations = new Stack<>();
+    /**
      * The lines of the config
      */
     private final String[] lines;
@@ -61,7 +73,7 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
      * @param insertion the lines to insert.
      */
     public void insertLinesOnCurrentKey(String... insertion) {
-        String indent = StringUtils.repeat(" ", this.lastIndent * 2);
+        String indent = StringUtils.repeat(" ", lastIndent);
         insertion = Arrays.stream(insertion).map(str -> indent + str).toArray(String[]::new);
         this.transformedLines.addAll(linesInserted + this.lastKeyIndex - 1, Arrays.asList(insertion));
         linesInserted += insertion.length;
@@ -96,8 +108,12 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
             junk = junk2;
             junk2 = temp;
 
+            LineInfo startInfo = this.keyIndentations.isEmpty() ? null : this.keyIndentations.peek();
             while (index < lines.length && !isKeyLine(line = lines[index++])) {
-                junk2.add(line);
+                // Scalar block content is not considered junk.
+                if (startInfo == null || !startInfo.isBlockScalarStart() || getIndent(line) <= startInfo.getIndent()) {
+                    junk2.add(line);
+                }
                 this.transformedLines.add(line);
             }
 
@@ -116,43 +132,89 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
             }
 
             // Update indent and key path
-            int nextIndent = getIndent(line);
-            keys = keys.subList(0, Math.min(nextIndent, keys.size()));
-            String strippedLine = StringUtils.strip(line);
-            if (strippedLine.charAt(0) == '\'')
-                strippedLine = strippedLine.replace("'", "");
-            keys.add(strippedLine.substring(0, strippedLine.indexOf(":")));
+            LineInfo lineInfo = getLineInfo(line);
+            // Clear out old indentations
+            while (!this.keyIndentations.isEmpty() && this.keyIndentations.peek().getIndent() >= lineInfo.getIndent()) {
+                this.keyIndentations.pop();
+            }
+            // Add our new indentations
+            this.keyIndentations.push(lineInfo);
+
+            int keyDepth = this.keyIndentations.size() - 1;
+            keys = new ArrayList<>(keys.subList(0, Math.min(keyDepth, keys.size())));
+            keys.add(lineInfo.getKeyLabel());
 
             // Build key, update next
             transformedLines.add(line);
             String previous = nextKey;
             String fullKey = String.join(".", keys);
             lastIndent = indent;
-            indent = nextIndent;
+            indent = lineInfo.getIndent();
             nextKey = fullKey;
             return previous;
+        } catch (NoSuchElementException exc) {
+            throw exc;
         } catch (Exception exc) {
-            KCommon.getInstance().getLogger().severe("Failed to read config! Current Line: " + line + " " + this);
+            if (KCommon.getInstance() != null) {
+                KCommon.getInstance().getLogger().severe("Failed to read config! Current Line: " + line + " " + this);
+            }
             throw exc;
         }
 
     }
 
-    /**
-     * Gets the indentation of the given line.
-     *
-     * @param line the line.
-     * @return the line indent.
-     */
     private static int getIndent(String line) {
         int indent = 0;
         for (int i = 0; i < line.length(); i++) {
             if (!Character.isWhitespace(line.charAt(i))) {
-                indent = i / 2;
+                indent = i;
                 break;
             }
         }
         return indent;
+    }
+
+    /**
+     * Gets the key from the line, given that it is a key line.
+     *
+     * @param line the full line
+     * @return the parsed key, removing any quotes.
+     */
+    private static LineInfo getLineInfo(String line) {
+        String stripLine = StringUtils.strip(line);
+        char first = stripLine.charAt(0);
+        int valueStartIndex;
+        String returnedKey;
+        if (first == '\'' || first == '"') {
+            // Find the first occurrence of quote:
+            // BUG (quoted key end): [^q] can't match when the key ends in an escape, so `'it''': 1` and `"a\"": 1`
+            // find nothing and silently become "" (-1 + 2 = 1). `"x\": y": 1` stops at the escaped quote and gives `x\`.
+            // The +2 also only works because indexOfByRegex returns an index relative to fromIndex (see StringUtil).
+            // Tests: parsesSingleQuotedKeyEndingInEscapedQuote, parsesDoubleQuotedKeysWithEscapedQuotes
+            int finalIndex = StringUtil.indexOfByRegex("[^" + first + "]" + first + "\\s*:", stripLine, 1) + 2;
+            // Unquote the key.
+            returnedKey = stripLine.substring(1, finalIndex);
+            // BUG (value start): finalIndex is the closing quote, so +2 assumes the ':' comes right after it.
+            // For `'key' : |-` the value part becomes ": |-" and the block is missed.
+            // Test: recognizesBlockScalarAfterQuotedKeyWithSpaceBeforeColon
+            valueStartIndex = finalIndex + 2;
+        } else {
+            // Without quotes, the first `:` indicates the end of the key.
+            int endIndex = StringUtil.indexOfByRegex(":(\\s+|$)", stripLine);
+            returnedKey = stripLine.substring(0, endIndex);
+            valueStartIndex = endIndex + 1;
+        }
+
+        // Replace the `''` and `""` escape sequences.
+        // BUG (unescape): still applies both rules to every key, and to plain keys too. `"it''s"` becomes it's and
+        // `'a\"b'` becomes a"b; both are literal in those quote styles. Test: unescapesOnlyTheMatchingQuoteStyle
+        String keyLabel = returnedKey.replace("''", "'").replace("\\\"", "\"");
+        boolean blockScalarStart = false;
+        if (stripLine.length() > valueStartIndex) {
+            String valuePart = StringUtils.strip(stripLine.substring(valueStartIndex));
+            blockScalarStart = valuePart.startsWith("|") || valuePart.startsWith(">");
+        }
+        return new LineInfo(blockScalarStart, keyLabel, getIndent(line));
     }
 
     /**
@@ -161,12 +223,33 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
      * @param line the line.
      * @return the key line.
      */
-    private static boolean isKeyLine(String line) {
+    @Contract("null -> false")
+    private boolean isKeyLine(String line) {
         if (StringUtils.isBlank(line))
             return false;
 
+        boolean scalarBlock = !keyIndentations.isEmpty() && keyIndentations.peek().isBlockScalarStart();
+        if (scalarBlock) {
+            int indent = getIndent(line);
+            // if the indent is greater than the scalar block start, then it hasn't ended yet and this isn't a key line.
+            if (indent > keyIndentations.peek().getIndent()) {
+                return false;
+            }
+        }
+
         String strippedLine = StringUtils.strip(line);
-        return strippedLine.contains(":") && (Character.isLetterOrDigit(strippedLine.charAt(0)) || strippedLine.charAt(0) == '\'');
+        // BUG (folded quoted values): SnakeYAML 1.x (Bukkit 1.8) wraps long quoted values at 80 columns. A continuation
+        // line containing ": " is accepted as a key, e.g. `  this server today. Note: be nice'`.
+        // Test: ignoresColonsInWrappedQuotedValues
+        return (strippedLine.contains(": ") || strippedLine.endsWith(":")) && !INVALID_KEY_STARTS.contains(strippedLine.charAt(0));
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static final class LineInfo {
+        private boolean blockScalarStart;
+        private String keyLabel;
+        private int indent;
     }
 
     @NotNull

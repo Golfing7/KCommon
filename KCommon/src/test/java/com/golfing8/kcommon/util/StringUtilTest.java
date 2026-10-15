@@ -177,6 +177,22 @@ class StringUtilTest {
     }
 
     @Nested
+    @DisplayName("indexOfByRegex")
+    class IndexOfByRegex {
+        @Test
+        @DisplayName("Returns an index into the whole string when searching from an offset")
+        void returnsIndexIntoWholeString() {
+            assertEquals("abcb".indexOf("b", 2), StringUtil.indexOfByRegex("b", "abcb", 2));
+        }
+
+        @Test
+        @DisplayName("Returns -1 when the pattern is not found after the offset")
+        void returnsMinusOneWhenNotFound() {
+            assertEquals(-1, StringUtil.indexOfByRegex("a", "abc", 1));
+        }
+    }
+
+    @Nested
     @DisplayName("Levenshtein distance")
     class Levenshtein {
         @Test

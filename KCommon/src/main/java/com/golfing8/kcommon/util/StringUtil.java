@@ -5,11 +5,14 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.intellij.lang.annotations.Language;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Contains utility methods for Strings
@@ -538,6 +541,33 @@ public class StringUtil {
         }
 
         return toReturn.toString().trim();
+    }
+
+    /**
+     * Finds the first occurrence of the given regex pattern in the text
+     *
+     * @param regex the regex
+     * @param text the text
+     * @return the index, or -1 if not found
+     */
+    public static int indexOfByRegex(@Language("RegExp") String regex, String text) {
+        return indexOfByRegex(regex, text, 0);
+    }
+
+    /**
+     * Finds the first occurrence of the given regex pattern in the text
+     *
+     * @param regex the regex
+     * @param text the text
+     * @param fromIndex the index to search from
+     * @return the index, or -1 if not found
+     */
+    public static int indexOfByRegex(@Language("RegExp") String regex, String text, int fromIndex) {
+        // BUG (relative index): m.start() is relative to the substring, so the result is off by fromIndex.
+        // String.indexOf(str, fromIndex) returns an index into the whole string.
+        // Test: StringUtilTest.IndexOfByRegex.returnsIndexIntoWholeString
+        Matcher m = Pattern.compile(regex).matcher(text.substring(fromIndex));
+        return m.find() ? m.start() : -1;
     }
 
     /**
