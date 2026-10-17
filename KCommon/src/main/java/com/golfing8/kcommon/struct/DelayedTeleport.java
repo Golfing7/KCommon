@@ -3,6 +3,7 @@ package com.golfing8.kcommon.struct;
 import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
 import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.golfing8.kcommon.util.StringUtil;
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,6 +22,7 @@ import com.tcoded.folialib.wrapper.task.WrappedTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.IntConsumer;
 
 /**
  * A class for performing a delayed teleport.
@@ -52,14 +54,38 @@ public class DelayedTeleport implements Listener {
     private final @Nullable Runnable onSuccess;
     /** Called when this teleport fails */
     private final @Nullable Runnable onFailure;
+    /** The countdown task */
+    private final @Nullable IntConsumer onCountdown;
     /** The message to send the player on success */
     private final @Nullable Message successMessage;
     /** The message to send the player on failure */
     private final @Nullable Message failureMessage;
+    /** The message to send when counting down */
+    private final @Nullable Message countdownMessage;
     /** The task responsible for teleporting the player */
     private WrappedTask teleportTask;
+    /** The countdown task */
+    private WrappedTask countdownTask;
+    /** The total amount of ticks that have elapsed for the entity */
+    private int ticks;
     private boolean done;
     private final CompletableFuture<Boolean> resultFuture = new CompletableFuture<>();
+
+    private void onCountdownTask() {
+        int tickDelta = delayTicks - ticks++;
+        if (tickDelta < 0) {
+            countdownTask.cancel();
+            return;
+        }
+
+        if (onCountdown != null) {
+            onCountdown.accept(tickDelta);
+        }
+
+        if (countdownMessage != null && tickDelta > 0 && tickDelta % 20 == 0) {
+            countdownMessage.send(player, "SECONDS", tickDelta / 20, "TIME", StringUtil.timeFormatted(tickDelta / 20, true));
+        }
+    }
 
     /**
      * Gets a promise of the result
@@ -99,6 +125,7 @@ public class DelayedTeleport implements Listener {
 
         done = true;
         HandlerList.unregisterAll(this);
+        countdownTask.cancel();
         teleportTask.cancel();
         if (onFailure != null)
             onFailure.run();
@@ -141,8 +168,10 @@ public class DelayedTeleport implements Listener {
         private Location destination;
         private Runnable onSuccess;
         private Runnable onFailure;
+        private IntConsumer onCountdown;
         private Message successMessage;
         private Message failureMessage;
+        private Message countdownMessage;
 
         /**
          * Create a builder with the given arguments
@@ -188,6 +217,18 @@ public class DelayedTeleport implements Listener {
         }
 
         /**
+         * Sets the countdown task.
+         * The countdown task runs once per tick until the teleport is done, providing the time remaining.
+         *
+         * @param onCountdown the task to run for countdown
+         * @return this
+         */
+        public Builder onCountdown(IntConsumer onCountdown) {
+            this.onCountdown = onCountdown;
+            return this;
+        }
+
+        /**
          * Set the success message
          *
          * @param successMessage the message
@@ -210,6 +251,18 @@ public class DelayedTeleport implements Listener {
         }
 
         /**
+         * Sets the countdown message. Sent once every second with a SECONDS
+         * placeholder for time
+         *
+         * @param countdownMessage the countdown message
+         * @return this
+         */
+        public Builder countdownMessage(Message countdownMessage) {
+            this.countdownMessage = countdownMessage;
+            return this;
+        }
+
+        /**
          * Builds the instance with the given plugin as the backer
          *
          * @param plugin the plugin
@@ -218,9 +271,11 @@ public class DelayedTeleport implements Listener {
         public DelayedTeleport build(Plugin plugin) {
             Preconditions.checkNotNull(plugin, "Plugin is null");
 
-            DelayedTeleport delayedTeleport = new DelayedTeleport(player, delayTicks, destination, plugin, onSuccess, onFailure, successMessage, failureMessage);
+            DelayedTeleport delayedTeleport = new DelayedTeleport(player, delayTicks, destination, plugin, onSuccess, onFailure, onCountdown, successMessage, failureMessage, countdownMessage);
             plugin.getServer().getPluginManager().registerEvents(delayedTeleport, plugin);
             delayedTeleport.teleportTask = FoliaSchedulers.of(plugin).runAtEntityLater(player, delayedTeleport::teleport, delayTicks);
+            delayedTeleport.countdownTask = FoliaSchedulers.of(plugin).runAtEntityTimer(player, delayedTeleport::onCountdownTask, 0, 1);
+
             return delayedTeleport;
         }
     }
