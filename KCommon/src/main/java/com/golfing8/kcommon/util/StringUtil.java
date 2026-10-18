@@ -567,7 +567,7 @@ public class StringUtil {
         // String.indexOf(str, fromIndex) returns an index into the whole string.
         // Test: StringUtilTest.IndexOfByRegex.returnsIndexIntoWholeString
         Matcher m = Pattern.compile(regex).matcher(text.substring(fromIndex));
-        return m.find() ? m.start() : -1;
+        return m.find() ? m.start() + fromIndex : -1;
     }
 
     /**

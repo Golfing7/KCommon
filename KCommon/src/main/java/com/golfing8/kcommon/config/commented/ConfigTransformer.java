@@ -191,7 +191,7 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
             // find nothing and silently become "" (-1 + 2 = 1). `"x\": y": 1` stops at the escaped quote and gives `x\`.
             // The +2 also only works because indexOfByRegex returns an index relative to fromIndex (see StringUtil).
             // Tests: parsesSingleQuotedKeyEndingInEscapedQuote, parsesDoubleQuotedKeysWithEscapedQuotes
-            int finalIndex = StringUtil.indexOfByRegex("[^" + first + "]" + first + "\\s*:", stripLine, 1) + 2;
+            int finalIndex = StringUtil.indexOfByRegex("[^" + first + "]" + first + "\\s*:", stripLine, 1) + 1;
             // Unquote the key.
             returnedKey = stripLine.substring(1, finalIndex);
             // BUG (value start): finalIndex is the closing quote, so +2 assumes the ':' comes right after it.
