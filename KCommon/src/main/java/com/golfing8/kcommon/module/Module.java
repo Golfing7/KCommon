@@ -21,6 +21,7 @@ import com.golfing8.kcommon.struct.profiler.HighLowAverageProfiler;
 import com.golfing8.kcommon.struct.profiler.IMethodProfiler;
 import com.golfing8.kcommon.util.FileUtil;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -121,7 +122,11 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
      * Used to indicate that the {@link #disable()} method was called during the execution of {@link #onEnable()}
      */
     private transient boolean prematureDisable;
-
+    /**
+     * If this module is in debug mode.
+     */
+    @Getter @Setter
+    private boolean moduleDebug;
     /**
      * The list of tasks this module is currently running.
      */
@@ -554,6 +559,9 @@ public abstract class Module implements Listener, LangConfigContainer, Placehold
         }
 
         this.loadLangConstants(this.langConfig);
+
+        // Finally, load the debug flag
+        this.moduleDebug = getMainConfig().getBoolean("module-debug", false);
     }
 
     /**
