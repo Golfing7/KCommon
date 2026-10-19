@@ -66,9 +66,9 @@ public class MagicItems implements NMSMagicItems {
             return null;
 
         Component display = itemStack.displayName();
-        if (display instanceof TranslatableComponent && ((TranslatableComponent) display).args().size() == 1) {
+        if (display instanceof TranslatableComponent && ((TranslatableComponent) display).arguments().size() == 1) {
             TranslatableComponent translatable = (TranslatableComponent) display;
-            return LegacyComponentSerializer.legacyAmpersand().serialize(translatable.args().get(0));
+            return LegacyComponentSerializer.legacyAmpersand().serialize(translatable.arguments().get(0).asComponent());
         } else {
             return LegacyComponentSerializer.legacyAmpersand().serialize(display);
         }
