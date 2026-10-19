@@ -18,7 +18,7 @@ public class ModuleLogger extends Logger {
 
     @Override
     public boolean isLoggable(Level level) {
-        if (module.isModuleDebug() && level == Level.FINEST) {
+        if (module.isModuleDebug() && level.intValue() < Level.INFO.intValue()) {
             return true;
         }
         return super.isLoggable(level);
