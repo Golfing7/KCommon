@@ -61,6 +61,15 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
      * The key to return on the next {@link #next()} call.
      */
     private String nextKey;
+    /**
+     * The inline comment trailing the value of the current key, or null if it has none.
+     */
+    @Getter
+    private String inlineComment;
+    /**
+     * The index of the last line holding the value of the current key.
+     */
+    private int valueEndIndex = -1;
 
     public ConfigTransformer(String configString) {
         this.lines = configString.split("\n");
@@ -92,6 +101,19 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
         insertLinesOnCurrentKey(insertion);
     }
 
+    /**
+     * Appends the inline comment to the value of the current key, unless it already has one.
+     *
+     * @param comment the comment, starting with '#'
+     */
+    public void insertInlineComment(String comment) {
+        if (inlineComment != null || valueEndIndex < 0)
+            return;
+        int lineIndex = linesInserted + valueEndIndex;
+        transformedLines.set(lineIndex, transformedLines.get(lineIndex) + " " + comment);
+        inlineComment = comment;
+    }
+
     @Override
     public boolean hasNext() {
         return nextKey != null;
@@ -109,16 +131,38 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
             junk2 = temp;
 
             LineInfo startInfo = this.keyIndentations.isEmpty() ? null : this.keyIndentations.peek();
-            while (index < lines.length && !isKeyLine(line = lines[index++])) {
-                // Scalar block content is not considered junk.
-                if (startInfo == null || !startInfo.isBlockScalarStart() || getIndent(line) <= startInfo.getIndent()) {
+            valueEndIndex = index - 1;
+            inlineComment = startInfo == null ? null : startInfo.getInlineComment();
+            char openQuote = startInfo == null ? 0 : startInfo.getOpenQuote();
+            boolean foundKey = false;
+            while (index < lines.length) {
+                line = lines[index++];
+                if (openQuote != 0) {
+                    // Lines of a quoted value spanning multiple lines are neither keys nor junk.
+                    int close = findClosingQuote(line, 0, openQuote);
+                    if (close >= 0) {
+                        openQuote = 0;
+                        inlineComment = getComment(line, close + 1);
+                    }
+                    valueEndIndex = index - 1;
+                } else if (isKeyLine(line)) {
+                    foundKey = true;
+                    break;
+                } else if (startInfo == null || !startInfo.isBlockScalarStart() || getIndent(line) <= startInfo.getIndent()) {
+                    // Scalar block content is not considered junk.
                     junk2.add(line);
+                    // Plain values may continue on more indented lines.
+                    if (startInfo != null && startInfo.isPlainValue() && getIndent(line) > startInfo.getIndent()
+                            && !StringUtils.isBlank(line) && !StringUtils.strip(line).startsWith("#")) {
+                        inlineComment = getComment(line, 0);
+                        valueEndIndex = index - 1;
+                    }
                 }
                 this.transformedLines.add(line);
             }
 
             // Failed to find anything, return null
-            if (!isKeyLine(line) && index == lines.length) {
+            if (!foundKey) {
                 if (nextKey != null) {
                     String toReturn = nextKey;
                     nextKey = null;
@@ -182,39 +226,106 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
      */
     private static LineInfo getLineInfo(String line) {
         String stripLine = StringUtils.strip(line);
-        char first = stripLine.charAt(0);
-        int valueStartIndex;
-        String returnedKey;
-        if (first == '\'' || first == '"') {
-            // Find the first occurrence of quote:
-            // BUG (quoted key end): [^q] can't match when the key ends in an escape, so `'it''': 1` and `"a\"": 1`
-            // find nothing and silently become "" (-1 + 2 = 1). `"x\": y": 1` stops at the escaped quote and gives `x\`.
-            // The +2 also only works because indexOfByRegex returns an index relative to fromIndex (see StringUtil).
-            // Tests: parsesSingleQuotedKeyEndingInEscapedQuote, parsesDoubleQuotedKeysWithEscapedQuotes
-            int finalIndex = StringUtil.indexOfByRegex("[^" + first + "]" + first + "\\s*:", stripLine, 1) + 1;
-            // Unquote the key.
-            returnedKey = stripLine.substring(1, finalIndex);
-            // BUG (value start): finalIndex is the closing quote, so +2 assumes the ':' comes right after it.
-            // For `'key' : |-` the value part becomes ": |-" and the block is missed.
-            // Test: recognizesBlockScalarAfterQuotedKeyWithSpaceBeforeColon
-            valueStartIndex = finalIndex + 2;
+        int colon = findKeyColon(stripLine);
+        // Unquote the key, replacing only the escapes of its quote style.
+        String keyLabel;
+        if (stripLine.charAt(0) == '\'') {
+            keyLabel = stripLine.substring(1, stripLine.lastIndexOf('\'', colon)).replace("''", "'");
+        } else if (stripLine.charAt(0) == '"') {
+            // drops the backslash of every escape, so `\n` becomes `n`. Fine for `\"` and `\\` in keys.
+            keyLabel = stripLine.substring(1, stripLine.lastIndexOf('"', colon)).replaceAll("\\\\(.)", "$1");
         } else {
-            // Without quotes, the first `:` indicates the end of the key.
-            int endIndex = StringUtil.indexOfByRegex(":(\\s+|$)", stripLine);
-            returnedKey = stripLine.substring(0, endIndex);
-            valueStartIndex = endIndex + 1;
+            keyLabel = stripLine.substring(0, colon);
         }
 
-        // Replace the `''` and `""` escape sequences.
-        // BUG (unescape): still applies both rules to every key, and to plain keys too. `"it''s"` becomes it's and
-        // `'a\"b'` becomes a"b; both are literal in those quote styles. Test: unescapesOnlyTheMatchingQuoteStyle
-        String keyLabel = returnedKey.replace("''", "'").replace("\\\"", "\"");
-        boolean blockScalarStart = false;
-        if (stripLine.length() > valueStartIndex) {
-            String valuePart = StringUtils.strip(stripLine.substring(valueStartIndex));
-            blockScalarStart = valuePart.startsWith("|") || valuePart.startsWith(">");
+        String valuePart = StringUtils.strip(stripLine.substring(colon + 1));
+        char valueStart = valuePart.isEmpty() ? 0 : valuePart.charAt(0);
+        boolean quoted = valueStart == '\'' || valueStart == '"';
+        boolean blockScalarStart = valueStart == '|' || valueStart == '>';
+        char openQuote = 0;
+        String inlineComment;
+        if (quoted) {
+            int close = findClosingQuote(valuePart, 1, valueStart);
+            openQuote = close < 0 ? valueStart : 0;
+            inlineComment = close < 0 ? null : getComment(valuePart, close + 1);
+        } else {
+            inlineComment = getComment(valuePart, 0);
         }
-        return new LineInfo(blockScalarStart, keyLabel, getIndent(line));
+        // A plain value continues on the following lines until a comment ends it.
+        boolean plainValue = valueStart != 0 && !quoted && !blockScalarStart && inlineComment == null;
+        return new LineInfo(blockScalarStart, keyLabel, getIndent(line), openQuote, plainValue, inlineComment);
+    }
+
+    /**
+     * Finds the ':' that ends the key of a stripped line.
+     *
+     * @param stripLine the stripped line
+     * @return the index of the ':', or -1 if the line has no key
+     */
+    private static int findKeyColon(String stripLine) {
+        char first = stripLine.charAt(0);
+        if (first == '\'' || first == '"') {
+            int close = findClosingQuote(stripLine, 1, first);
+            if (close < 0 || StringUtil.indexOfByRegex("^\\s*:(\\s|$)", stripLine, close + 1) < 0)
+                return -1;
+            return stripLine.indexOf(':', close + 1);
+        }
+        // Without quotes, the first `:` indicates the end of the key, unless a comment starts before it.
+        int colon = StringUtil.indexOfByRegex(":(\\s|$)", stripLine);
+        int comment = findComment(stripLine, 0);
+        return comment >= 0 && comment < colon ? -1 : colon;
+    }
+
+    /**
+     * Finds the quote closing a quoted scalar.
+     *
+     * @param line  the line
+     * @param from  the index to search from, after the opening quote
+     * @param quote the quote character
+     * @return the index of the closing quote, or -1 if it isn't on this line
+     */
+    private static int findClosingQuote(String line, int from, char quote) {
+        for (int i = from; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (quote == '"' && c == '\\') {
+                i++;
+            } else if (c == quote) {
+                // `''` is an escaped quote in single quoted scalars.
+                if (quote == '\'' && i + 1 < line.length() && line.charAt(i + 1) == '\'') {
+                    i++;
+                } else {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Finds an inline comment, a '#' at the start of the line or after whitespace.
+     *
+     * @param line the line, which must not be inside a quoted scalar from {@code from} onward
+     * @param from the index to search from
+     * @return the index of the '#', or -1 if there is no comment
+     */
+    private static int findComment(String line, int from) {
+        for (int i = from; i < line.length(); i++) {
+            if (line.charAt(i) == '#' && (i == 0 || Character.isWhitespace(line.charAt(i - 1))))
+                return i;
+        }
+        return -1;
+    }
+
+    /**
+     * Gets the inline comment of the line.
+     *
+     * @param line the line
+     * @param from the index to search from
+     * @return the comment, or null if there is none
+     */
+    private static String getComment(String line, int from) {
+        int start = findComment(line, from);
+        return start < 0 ? null : StringUtils.stripEnd(line.substring(start), null);
     }
 
     /**
@@ -238,10 +349,7 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
         }
 
         String strippedLine = StringUtils.strip(line);
-        // BUG (folded quoted values): SnakeYAML 1.x (Bukkit 1.8) wraps long quoted values at 80 columns. A continuation
-        // line containing ": " is accepted as a key, e.g. `  this server today. Note: be nice'`.
-        // Test: ignoresColonsInWrappedQuotedValues
-        return (strippedLine.contains(": ") || strippedLine.endsWith(":")) && !INVALID_KEY_STARTS.contains(strippedLine.charAt(0));
+        return !INVALID_KEY_STARTS.contains(strippedLine.charAt(0)) && findKeyColon(strippedLine) >= 0;
     }
 
     @Data
@@ -250,6 +358,15 @@ public class ConfigTransformer implements Iterator<String>, Iterable<String> {
         private boolean blockScalarStart;
         private String keyLabel;
         private int indent;
+        /**
+         * The quote of a quoted value left open at the end of the line, or 0.
+         */
+        private char openQuote;
+        /**
+         * If the value is a plain scalar that may continue on the following lines.
+         */
+        private boolean plainValue;
+        private String inlineComment;
     }
 
     @NotNull

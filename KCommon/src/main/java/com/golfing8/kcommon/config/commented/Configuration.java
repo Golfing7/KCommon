@@ -44,6 +44,11 @@ public class Configuration extends YamlConfiguration implements KConfig {
      */
     @Getter
     private final Map<String, String[]> comments;
+    /**
+     * The inline comments trailing each mapped value
+     */
+    @Getter
+    private final Map<String, String> inlineComments;
 
     /**
      * The source configuration that this configuration should mirror
@@ -61,6 +66,7 @@ public class Configuration extends YamlConfiguration implements KConfig {
     public Configuration(Path configPath) {
         this.configPath = configPath;
         this.comments = new HashMap<>();
+        this.inlineComments = new HashMap<>();
         this.wrapped = new YamlConfiguration();
     }
 
@@ -73,6 +79,7 @@ public class Configuration extends YamlConfiguration implements KConfig {
     public void loadFromString(String data) {
         try {
             this.comments.clear();
+            this.inlineComments.clear();
             this.wrapped.loadFromString(data);
             loadComments(data);
         } catch (InvalidConfigurationException exc) {
@@ -111,6 +118,7 @@ public class Configuration extends YamlConfiguration implements KConfig {
     public void load() {
         try {
             this.comments.clear();
+            this.inlineComments.clear();
             String fileString = String.join("\n", Files.readAllLines(this.configPath));
             this.wrapped.loadFromString(fileString);
             loadComments(fileString);
@@ -127,6 +135,8 @@ public class Configuration extends YamlConfiguration implements KConfig {
         for (String key : transformer) {
             if (comments.containsKey(key))
                 transformer.insertComment(comments.get(key));
+            if (inlineComments.containsKey(key))
+                transformer.insertInlineComment(inlineComments.get(key));
         }
 
         return String.join("\n", transformer.getTransformedLines());
@@ -154,6 +164,8 @@ public class Configuration extends YamlConfiguration implements KConfig {
         ConfigTransformer transformer = new ConfigTransformer(configString);
         for (String key : transformer) {
             comments.put(key, transformer.getJunk().stream().map(StringUtils::strip).filter(str -> str.startsWith("#")).toArray(String[]::new));
+            if (transformer.getInlineComment() != null)
+                inlineComments.put(key, transformer.getInlineComment());
         }
     }
 

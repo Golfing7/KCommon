@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.config.commented;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -342,74 +345,199 @@ class ConfigTransformerTest {
         );
     }
 
-    // TODO Fix later
-    //    @Test
-    //    @DisplayName("Parses single-quoted keys that end in an escaped quote")
-    //    void parsesSingleQuotedKeyEndingInEscapedQuote() {
-    //        String yaml =
-    //                "'it''': 1\n" +
-    //                        "next: 2";
-    //
-    //        assertIterableEquals(
-    //                Arrays.asList("it'", "next"),
-    //                collectKeys(new ConfigTransformer(yaml))
-    //        );
-    //    }
-    //
-    //    @Test
-    //    @DisplayName("Parses double-quoted keys containing escaped quotes")
-    //    void parsesDoubleQuotedKeysWithEscapedQuotes() {
-    //        String yaml =
-    //                "\"a\\\"\": 1\n" +
-    //                        "\"x\\\": y\": 2";
-    //
-    //        assertIterableEquals(
-    //                Arrays.asList("a\"", "x\": y"),
-    //                collectKeys(new ConfigTransformer(yaml))
-    //        );
-    //    }
-    //
-    //    @Test
-    //    @DisplayName("Detects block scalars after a quoted key with whitespace before the colon")
-    //    void recognizesBlockScalarAfterQuotedKeyWithSpaceBeforeColon() {
-    //        String yaml =
-    //                "'description' : |-\n" +
-    //                        "  Some text: with a colon\n" +
-    //                        "next: 1";
-    //
-    //        assertIterableEquals(
-    //                Arrays.asList("description", "next"),
-    //                collectKeys(new ConfigTransformer(yaml))
-    //        );
-    //    }
-    //
-    //    @Test
-    //    @DisplayName("Only unescapes the sequences belonging to the key's quote style")
-    //    void unescapesOnlyTheMatchingQuoteStyle() {
-    //        String yaml =
-    //                "\"it''s\": 1\n" +
-    //                        "'a\\\"b': 2";
-    //
-    //        assertIterableEquals(
-    //                Arrays.asList("it''s", "a\\\"b"),
-    //                collectKeys(new ConfigTransformer(yaml))
-    //        );
-    //    }
-    //
-    //    @Test
-    //    @DisplayName("Ignores colons in continuation lines of wrapped quoted values")
-    //    void ignoresColonsInWrappedQuotedValues() {
-    //        // Matches what SnakeYAML 1.x writes for a long quoted value at its default 80 column width.
-    //        String yaml =
-    //                "message: 'Welcome to the server, please read the rules carefully before playing on\n" +
-    //                        "  this server today and every other day too. Note: be nice'\n" +
-    //                        "next: 1";
-    //
-    //        assertIterableEquals(
-    //                Arrays.asList("message", "next"),
-    //                collectKeys(new ConfigTransformer(yaml))
-    //        );
-    //    }
+    @Test
+    @DisplayName("Parses single-quoted keys that end in an escaped quote")
+    void parsesSingleQuotedKeyEndingInEscapedQuote() {
+        String yaml =
+                "'it''': 1\n" +
+                        "next: 2";
+
+        assertIterableEquals(
+                Arrays.asList("it'", "next"),
+                collectKeys(new ConfigTransformer(yaml))
+        );
+    }
+
+    @Test
+    @DisplayName("Parses double-quoted keys containing escaped quotes")
+    void parsesDoubleQuotedKeysWithEscapedQuotes() {
+        String yaml =
+                "\"a\\\"\": 1\n" +
+                        "\"x\\\": y\": 2";
+
+        assertIterableEquals(
+                Arrays.asList("a\"", "x\": y"),
+                collectKeys(new ConfigTransformer(yaml))
+        );
+    }
+
+    @Test
+    @DisplayName("Detects block scalars after a quoted key with whitespace before the colon")
+    void recognizesBlockScalarAfterQuotedKeyWithSpaceBeforeColon() {
+        String yaml =
+                "'description' : |-\n" +
+                        "  Some text: with a colon\n" +
+                        "next: 1";
+
+        assertIterableEquals(
+                Arrays.asList("description", "next"),
+                collectKeys(new ConfigTransformer(yaml))
+        );
+    }
+
+    @Test
+    @DisplayName("Only unescapes the sequences belonging to the key's quote style")
+    void unescapesOnlyTheMatchingQuoteStyle() {
+        String yaml =
+                "\"it''s\": 1\n" +
+                        "'a\\\"b': 2";
+
+        assertIterableEquals(
+                Arrays.asList("it''s", "a\\\"b"),
+                collectKeys(new ConfigTransformer(yaml))
+        );
+    }
+
+    @Test
+    @DisplayName("Ignores colons in continuation lines of wrapped quoted values")
+    void ignoresColonsInWrappedQuotedValues() {
+        // Matches what SnakeYAML 1.x writes for a long quoted value at its default 80 column width.
+        String yaml =
+                "message: 'Welcome to the server, please read the rules carefully before playing on\n" +
+                        "  this server today and every other day too. Note: be nice'\n" +
+                        "next: 1";
+
+        assertIterableEquals(
+                Arrays.asList("message", "next"),
+                collectKeys(new ConfigTransformer(yaml))
+        );
+    }
+
+    @Test
+    @DisplayName("Exposes the inline comment of each parsed key")
+    void exposesInlineCommentsForEachParsedKey() {
+        String yaml =
+                "root: # Root note\n" +
+                        "  child: 1 # Child note\n" +
+                        "  quoted: 'a # not a comment' # Quoted note\n" +
+                        "  hash: a#b\n" +
+                        "sibling: 2";
+
+        ConfigTransformer transformer = new ConfigTransformer(yaml);
+
+        assertEquals("root", transformer.next());
+        assertEquals("# Root note", transformer.getInlineComment());
+        assertEquals("root.child", transformer.next());
+        assertEquals("# Child note", transformer.getInlineComment());
+        assertEquals("root.quoted", transformer.next());
+        assertEquals("# Quoted note", transformer.getInlineComment());
+        assertEquals("root.hash", transformer.next());
+        assertNull(transformer.getInlineComment());
+        assertEquals("sibling", transformer.next());
+        assertNull(transformer.getInlineComment());
+    }
+
+    @Test
+    @DisplayName("Ignores colons inside inline comments")
+    void ignoresColonsInInlineComments() {
+        String yaml =
+                "key: value # note: here\n" +
+                        "'a # b': 1\n" +
+                        "plain: some long text\n" +
+                        "  continued # note: here\n" +
+                        "next: 1";
+
+        assertIterableEquals(
+                Arrays.asList("key", "a # b", "plain", "next"),
+                collectKeys(new ConfigTransformer(yaml))
+        );
+    }
+
+    @Test
+    @DisplayName("Reads inline comments that follow values spanning several lines")
+    void readsInlineCommentsAfterMultilineValues() {
+        String yaml =
+                "quoted: 'first line\n" +
+                        "  second line' # Quoted note\n" +
+                        "plain: first line\n" +
+                        "  second line # Plain note\n" +
+                        "block: | # Block note\n" +
+                        "  text # not a comment\n" +
+                        "next: 1";
+
+        ConfigTransformer transformer = new ConfigTransformer(yaml);
+
+        assertEquals("quoted", transformer.next());
+        assertEquals("# Quoted note", transformer.getInlineComment());
+        assertEquals("plain", transformer.next());
+        assertEquals("# Plain note", transformer.getInlineComment());
+        assertEquals("block", transformer.next());
+        assertEquals("# Block note", transformer.getInlineComment());
+        assertEquals("next", transformer.next());
+        assertNull(transformer.getInlineComment());
+    }
+
+    @Test
+    @DisplayName("Inserts inline comments after the last line of each value")
+    void insertsInlineCommentsAfterTheValue() {
+        String yaml =
+                "root:\n" +
+                        "  child: 1\n" +
+                        "plain: first line\n" +
+                        "  second line\n" +
+                        "quoted: 'first line\n" +
+                        "  second line'\n" +
+                        "existing: 2 # Existing note";
+
+        ConfigTransformer transformer = new ConfigTransformer(yaml);
+        for (String key : transformer) {
+            if ("root.child".equals(key)) {
+                transformer.insertComment("# Child comment");
+            }
+            transformer.insertInlineComment("# Note");
+        }
+
+        assertEquals(
+                Arrays.asList(
+                        "root: # Note",
+                        "  # Child comment",
+                        "  child: 1 # Note",
+                        "plain: first line",
+                        "  second line # Note",
+                        "quoted: 'first line",
+                        "  second line' # Note",
+                        "existing: 2 # Existing note"
+                ),
+                transformer.getTransformedLines()
+        );
+    }
+
+    @Test
+    @DisplayName("Round-trips inline comments through configuration saves")
+    void roundTripsInlineCommentsThroughConfigurationSaves() throws InvalidConfigurationException {
+        String message = "Welcome to the server, please read the rules carefully before playing on this server today";
+        String yaml =
+                "# Root comment\n" +
+                        "root: # Root note\n" +
+                        "  child: 1 # Child note\n" +
+                        "message: " + message + " # Message note";
+
+        Configuration configuration = new Configuration(Paths.get("config-transformer-test.yml"));
+        configuration.loadFromString(yaml);
+        String saved = configuration.saveToString();
+
+        assertTrue(saved.contains("# Root comment\nroot: # Root note"));
+        assertTrue(saved.contains("  child: 1 # Child note"));
+
+        YamlConfiguration reloaded = new YamlConfiguration();
+        reloaded.loadFromString(saved);
+        assertEquals(message, reloaded.getString("message"));
+
+        Configuration reloadedConfiguration = new Configuration(Paths.get("config-transformer-test.yml"));
+        reloadedConfiguration.loadFromString(saved);
+        assertEquals(configuration.getInlineComments(), reloadedConfiguration.getInlineComments());
+        assertEquals("# Message note", reloadedConfiguration.getInlineComments().get("message"));
+    }
 
     private static List<String> collectKeys(ConfigTransformer transformer) {
         List<String> keys = new ArrayList<>();
