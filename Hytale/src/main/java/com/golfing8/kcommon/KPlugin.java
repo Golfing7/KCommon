@@ -84,6 +84,12 @@ public abstract class KPlugin extends JavaPlugin implements KPluginContext, Lang
     protected final void start() {
         this.langConfig = new LangConfig(getDataDirectory().resolve("kore-lang.yml"));
         this.langConfig.load();
+        this.langConfig.addLanguageConstant("invalid-argument", "&cArgument '{ARGUMENT}' at position {POSITION} is invalid! Was expecting a '{TYPE}', you entered {ACTUAL}!");
+        this.langConfig.addLanguageConstant("missing-argument", "&cArgument '{ARGUMENT}' at position {POSITION} was missing! Was expecting a '{TYPE}'!");
+        this.langConfig.addLanguageConstant("no-permission", "&cYou don't have permission to use this command!");
+        this.langConfig.addLanguageConstant("command-help", "&6&m-----&r &6Help for command: /{COMMAND} &6&m-----", "%COMMAND_HELP%");
+        this.langConfig.addLanguageConstant("command-help-none-found", "&cNo command matches found :(");
+        this.langConfig.addLanguageConstant("command-help-format", "&e/{COMMAND}&6{ARGUMENTS} &a{DESCRIPTION}");
         this.moduleManifest = ModuleManifest.load(getDataDirectory().resolve("module-manifest.json"), logger);
 
         if (isPluginEnabled("PlaceholderAPI")) {

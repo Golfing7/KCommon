@@ -283,6 +283,25 @@ public abstract class AbstractModule<C extends KFileConfig> implements Terminabl
     }
 
     /**
+     * Turns this module on or off and remembers the choice in its plugin's module manifest.
+     *
+     * @param active true to enable the module, false to disable it.
+     * @return false if the module was already in that state.
+     */
+    public final boolean setActive(boolean active) {
+        if (getModuleManifest().isActive(this) == active && this.enabled == active)
+            return false;
+
+        getModuleManifest().setActive(this, active);
+        if (active) {
+            this.enable();
+        } else {
+            this.disable();
+        }
+        return true;
+    }
+
+    /**
      * Disables this module and removes it from the registry.
      */
     public final void shutdown() {

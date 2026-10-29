@@ -26,14 +26,11 @@ public class KModuleEnableCommand extends KCommand {
     @Override
     protected void execute(@NotNull CommandContext context) {
         Module module = context.next();
-        if (module.getPlugin().getManifest().isActive(module) && module.isEnabled()) {
+        long tNow = System.currentTimeMillis();
+        if (!module.setActive(true)) {
             KCommon.getInstance().sendConfigMessage(context.getSender(), "enable-command-already");
             return;
         }
-
-        long tNow = System.currentTimeMillis();
-        module.getPlugin().getManifest().setActive(module, true);
-        module.enable();
         long tEnd = System.currentTimeMillis();
         KCommon.getInstance().sendConfigMessage(context.getSender(), "enable-command-message",
                 "MODULE", module.getModuleName(),

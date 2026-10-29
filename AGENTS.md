@@ -407,8 +407,8 @@ Use `DataManagerRemote#withLock`, and read the object again with `loadFresh` onc
 `KCommon#getRedisAdapter` exposes the same channels and locks for anything that isn't a data manager.
 
 ## Hytale
-The Hytale build keeps modules, YAML configs (with comments), lang files, persistence, placeholders (through the Hytale build of PlaceholderAPI) and regions (with OrbisGuard as the protection hook).
-It has no commands or menus; use Hytale's own command and UI systems.
+The Hytale build keeps modules, YAML configs (with comments), lang files, persistence, placeholders (through the Hytale build of PlaceholderAPI), commands and regions (with OrbisGuard as the protection hook).
+It has no menus; use Hytale's own UI system.
 ```java
 public class SomePlugin extends KPlugin {
     public SomePlugin(JavaPluginInit init) {
@@ -436,6 +436,10 @@ public class SomeModule extends Module {
 * Delays and periods are still in Minecraft ticks (50 ms), so configs mean the same on both platforms.
 * Messages use the same `&` codes, hex colors and MiniMessage tags as Bukkit; `HytaleMessages` turns them into Hytale `Message`s.
 * `KCommon.getInstance().getProtectionHook()` answers build, PvP and region questions through OrbisGuard when it is installed.
+* Commands are written exactly as in [Commands](#commands) (`@Cmd`, `MCommand<SomeModule>`, `CommandArguments`, flags, requirements) and registered with `addCommand(new SomeModuleCMD())` in `onEnable`.
+  Senders are Hytale `CommandSender`s and players are `PlayerRef`s. Commands run on the sender's world thread (the default world for the console) unless `async = true`.
+  Hytale's command tree only knows the names, sub commands and `--flags`, so the client can't suggest values for positional arguments. Help isn't paged.
+* `/km` (`reload`, `enable`, `disable`, `list`, `placeholders`, `commands`) works the same as on Bukkit.
 
 ## Agent Guidance
 When editing this project:

@@ -1,0 +1,1186 @@
+package com.golfing8.kcommon.command;
+
+import com.golfing8.kcommon.KPlugin;
+import com.golfing8.kcommon.command.argument.ArgumentContext;
+import com.golfing8.kcommon.command.argument.CommandArgument;
+import com.golfing8.kcommon.command.exc.CommandInstantiationException;
+import com.golfing8.kcommon.command.flag.CommandFlag;
+import com.golfing8.kcommon.command.requirement.Requirement;
+import com.golfing8.kcommon.command.requirement.RequirementPlayer;
+import com.golfing8.kcommon.config.lang.LangConfig;
+import com.golfing8.kcommon.config.lang.Message;
+import com.golfing8.kcommon.platform.Platform;
+import com.golfing8.kcommon.struct.Pair;
+import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
+import com.golfing8.kcommon.struct.placeholder.Placeholder;
+import com.golfing8.kcommon.struct.profiler.HighLowAverageProfiler;
+import com.golfing8.kcommon.struct.profiler.IMethodProfiler;
+import com.golfing8.kcommon.util.MSCore;
+import com.golfing8.kcommon.util.MapUtil;
+import com.golfing8.kcommon.util.StringUtilCore;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.hypixel.hytale.server.core.command.system.AbstractCommand;
+import com.hypixel.hytale.server.core.command.system.CommandRegistration;
+import com.hypixel.hytale.server.core.command.system.CommandSender;
+import com.hypixel.hytale.server.core.command.system.ParseResult;
+import com.hypixel.hytale.server.core.command.system.ParserContext;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.universe.world.World;
+import lombok.*;
+import net.kyori.adventure.util.TriState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+/**
+ * An abstract KCommon command. Can be registered without a module and should be used for plugin-wide commands.
+ * <p>
+ * Hytale is told about the command's name, aliases, permission, flags and sub commands so its command tree,
+ * permissions and completion know them. Parsing and running the command is left to KCommon, so arguments,
+ * flags, requirements and help messages behave as they do on Bukkit.
+ * </p>
+ */
+public abstract class KCommand {
+    private static final Pattern HELP_PATTERN = Pattern.compile(
+            "(help|\\?)",
+            Pattern.CASE_INSENSITIVE
+    );
+
+    /**
+     * Represents a fully constructed argument for an instance of {@link KCommand}
+     * <p>
+     * These instances are tied to a specific command and are intended to allow
+     * for specific commands to modify behavior such as autocompletion
+     * </p>
+     */
+    @Data
+    @AllArgsConstructor
+    @RequiredArgsConstructor
+    public static final class BuiltCommandArgument {
+        /**
+         * The name of the argument.
+         */
+        private final String name;
+        /**
+         * The command argument backing this built command argument.
+         */
+        private final CommandArgument<?> argument;
+        /**
+         * The auto-complete function. Can be null.
+         */
+        private @Nullable Function<CommandSender, @Nullable Object> autoComplete = null;
+        /**
+         * If players do not have this required permission extension, they will not be able
+         * to override the auto complete function.
+         * <p>
+         * Note that in a chain of arguments, if a player doesn't have permission for one argument,
+         * the remaining arguments will also be autofilled.
+         * </p>
+         */
+        private @Nullable String requiredPermissionExtension;
+        /**
+         * true = Only players are allowed to use the autofill for this argument.
+         * false = Only console is allowed to autofill this argument.
+         * null = Anyone can autofill this argument.
+         */
+        private @Nullable Boolean autoFillPlayersOnly;
+
+        public BuiltCommandArgument(String name, CommandArgument<?> argument, @Nullable Function<CommandSender, @Nullable Object> autoComplete) {
+            this.name = name;
+            this.argument = argument;
+            this.autoComplete = autoComplete;
+        }
+    }
+
+    /**
+     * The name of this command.
+     */
+    @Getter
+    private final String commandName;
+    /**
+     * This command's aliases.
+     */
+    @Getter
+    private final List<String> commandAliases;
+    /**
+     * The arguments for this command, kept with a nullable autofill function.
+     */
+    @Getter
+    private final List<BuiltCommandArgument> commandArguments = new ArrayList<>();
+    /**
+     * Contains the long name mapped command flags.
+     */
+    private final Map<String, CommandFlag> longNameMappedCommandFlags = new HashMap<>();
+    /**
+     * Contains the short name mapped command flags.
+     */
+    private final Map<Character, CommandFlag> shortNameMappedCommandFlags = new HashMap<>();
+    /**
+     * The sub commands of this command.
+     */
+    @Getter
+    private final List<KCommand> subcommands = new ArrayList<>();
+    /**
+     * The plugin that registered this command.
+     */
+    @Getter
+    private final KPlugin plugin;
+    /**
+     * The requirements for executing this command.
+     */
+    @Getter
+    private final Set<Requirement> commandRequirements = new LinkedHashSet<>();
+    /**
+     * The source that this command uses for its lang
+     */
+    @Getter
+    private final LangConfig langSource;
+    /**
+     * The annotation defining the structure of this command.
+     */
+    @Getter
+    private Cmd annotation;
+    /**
+     * The visibility of the command
+     */
+    @Getter
+    private CommandVisibility visibility = CommandVisibility.PUBLIC;
+    /**
+     * The permission required to execute this command.
+     * <p>
+     * This is set after {@link #onRegister()} is called as it can be dynamically built.
+     * </p>
+     */
+    @Getter
+    @Setter
+    private String commandPermission = "";
+    /**
+     * A description of this command
+     */
+    @Getter
+    @Setter
+    private String description;
+    /**
+     * The parent of this command, can be null.
+     */
+    @Getter
+    @Nullable
+    private KCommand parent;
+
+    /**
+     * If this command should be run async
+     */
+    @Getter
+    @Setter
+    private boolean async;
+
+    /**
+     * The last time this command was executed.
+     */
+    @Getter
+    private long lastExecutionTime;
+
+    /**
+     * If this command should accept extra arguments not defined specifically
+     */
+    @Getter
+    @Setter
+    private boolean acceptExtraArguments = false;
+
+    /**
+     * A cached version of {@link #isExecutionImplemented()}
+     */
+    private Boolean executionImplemented;
+    /**
+     * The profiler of the command
+     */
+    @Getter
+    private IMethodProfiler profiler;
+    /**
+     * The registration of this command with Hytale, null while it isn't registered.
+     */
+    private @Nullable CommandRegistration registration;
+
+    /**
+     * A constructor to initialize all fields with the {}
+     */
+    public KCommand() {
+        Cmd cmd = getClass().getAnnotation(Cmd.class);
+        if (cmd == null)
+            throw new CommandInstantiationException(String.format("Cannot instantiate command '%s' with default constructor without Cmd annotation!", this.getClass().getName()));
+
+        this.annotation = cmd;
+        this.plugin = (KPlugin) Platform.get().getProvidingPlugin(this.getClass());
+        this.commandPermission = cmd.permission();
+        this.commandName = cmd.name();
+        this.commandAliases = Arrays.asList(cmd.aliases());
+        this.description = cmd.description();
+        this.visibility = cmd.visibility();
+        this.async = cmd.async();
+        if (cmd.forPlayers()) {
+            this.commandRequirements.add(RequirementPlayer.getInstance());
+        }
+        this.langSource = plugin.getLangConfig();
+    }
+
+    public KCommand(String commandName, List<String> commandAliases, boolean forPlayers) {
+        this.commandName = commandName;
+        this.commandAliases = commandAliases;
+        this.plugin = (KPlugin) Platform.get().getProvidingPlugin(this.getClass());
+        if (forPlayers) {
+            this.commandRequirements.add(RequirementPlayer.getInstance());
+        }
+        this.langSource = plugin.getLangConfig();
+    }
+
+    /**
+     * Checks if this command can only be executed by players.
+     *
+     * @return true if only players can execute this command.
+     */
+    public boolean isOnlyForPlayers() {
+        return this.commandRequirements.contains(RequirementPlayer.getInstance());
+    }
+
+    /**
+     * If execution has been implemented on this command.
+     *
+     * @return the command.
+     */
+    public boolean isExecutionImplemented() {
+        if (executionImplemented != null)
+            return executionImplemented;
+
+        try {
+            this.getClass().getDeclaredMethod("execute", CommandContext.class);
+            return executionImplemented = true;
+        } catch (NoSuchMethodException exc) {
+            return executionImplemented = false;
+        }
+    }
+
+    /**
+     * Sets the parent of this command, can be null.
+     *
+     * @param parent the parent.
+     */
+    protected void setParent(@Nullable KCommand parent) {
+        this.parent = parent;
+    }
+
+    /**
+     * Builds the suffix of the command permission.
+     * The suffix is the part that comes after the <code>{PLUGIN_NAME}.command</code> prefix.
+     */
+    protected String buildCommandPermissionSuffix() {
+        List<String> parentNames = Lists.newArrayList(this.commandName);
+        KCommand parent = this.parent;
+        while (parent != null) {
+            parentNames.add(parent.commandName);
+            parent = parent.getParent();
+        }
+        Collections.reverse(parentNames);
+
+        return String.join(".", parentNames);
+    }
+
+    /**
+     * Gets the prefix to this command's permission.
+     * <p>
+     * This is the part of the permission that's inserted BEFORE 'command'.
+     * If null/empty, nothing is inserted.
+     * </p>
+     * <p>
+     * e.g. If this method returns {@code "lifesteal"}, then the permission's prefix transforms from
+     * <br>
+     * {@code PLUGIN.command.COMMAND_NAME}
+     * <br>
+     * to
+     * <br>
+     * {@code PLUGIN.lifesteal.command.COMMAND_NAME}
+     * </p>
+     *
+     * @return the prefix.
+     */
+    protected String getCommandPermissionPrefix() {
+        return null;
+    }
+
+    protected String getGeneratedCommandPermission() {
+        String prefixInsertion = getCommandPermissionPrefix();
+        String builtPrefix;
+        if (StringUtilCore.isNotEmpty(prefixInsertion)) {
+            builtPrefix = plugin.getPluginName().toLowerCase() + "." + prefixInsertion + ".command.";
+        } else {
+            builtPrefix = plugin.getPluginName().toLowerCase() + ".command.";
+        }
+        return builtPrefix + buildCommandPermissionSuffix();
+    }
+
+    /**
+     * Sets up the permission for using this command.
+     */
+    private void setupPermission() {
+        // If the annotation is null, we have no business in setting this back up.
+        if (this.annotation == null)
+            return;
+
+        // Is it not dynamic? Then there's no reason to change it.
+        if (!this.annotation.permission().equals(Cmd.GENERATE_PERMISSION))
+            return;
+
+        this.commandPermission = getGeneratedCommandPermission();
+    }
+
+    /**
+     * Gets the prefix of all permission checks done through {@link #hasPermission(CommandSender, String)}.
+     *
+     * @return the permission prefix
+     */
+    public @Nullable String getPermissionPrefix() {
+        return this.commandPermission;
+    }
+
+    /**
+     * Checks if the sender has the permission under this command's permission.
+     *
+     * @param sender     the sender
+     * @param permission the permission extension, or empty for the command's permission itself
+     * @return true if they have the permission
+     */
+    public boolean hasPermission(CommandSender sender, String permission) {
+        String prefix = getPermissionPrefix();
+        if (StringUtilCore.isEmpty(prefix))
+            return sender.hasPermission(permission);
+
+        if (StringUtilCore.isEmpty(permission)) {
+            return sender.hasPermission(prefix);
+        }
+        return sender.hasPermission(prefix + "." + permission);
+    }
+
+    /**
+     * Recursive method for calling sub commands' onRegister methods.
+     */
+    protected final void subRegister() {
+        for (KCommand sub : this.subcommands) {
+            try {
+                sub.onRegister();
+                sub.subRegister();
+            } catch (Exception exc) {
+                throw new RuntimeException("Failed to initialize subcommand " + sub.getCommandName() + "!", exc);
+            }
+        }
+
+        this.profiler = new HighLowAverageProfiler("/" + getFullCommandChain());
+        this.setupPermission();
+        this.internalOnRegister();
+    }
+
+    /**
+     * Recursive method for calling sub commands' onUnregister methods.
+     */
+    protected final void subUnregister() {
+        for (KCommand sub : this.subcommands) {
+            sub.onUnregister();
+            sub.subUnregister();
+        }
+    }
+
+    /**
+     * Registers this command with Hytale.
+     */
+    public final void register() {
+        this.onRegister();
+        this.subRegister();
+        // Hytale freezes a command once it is registered, so it's built after the whole tree is set up.
+        this.registration = plugin.getCommandRegistry().registerCommand(new HytaleCommand(this));
+    }
+
+    /**
+     * Unregisters this command from Hytale.
+     */
+    public final void unregister() {
+        if (this.registration != null && this.registration.isRegistered())
+            this.registration.unregister();
+        this.registration = null;
+        this.onUnregister();
+        this.subUnregister();
+    }
+
+    /**
+     * Adds a subcommand to the list of subcommands this command manages.
+     *
+     * @param command the subcommand.
+     */
+    protected final void addSubCommand(KCommand command) {
+        if (command == this)
+            throw new CommandInstantiationException("Cannot add self as sub command!");
+
+        if (this.subcommands.contains(command))
+            throw new CommandInstantiationException("That subcommand is already registered!");
+
+        this.subcommands.add(command);
+        command.setParent(this);
+        this.subcommands.sort(Comparator.comparing(KCommand::getCommandName));
+    }
+
+    /**
+     * Adds an argument to this command.
+     *
+     * @param name     the name of the argument.
+     * @param argument the argument to add.
+     */
+    protected final BuiltCommandArgument addArgument(String name, CommandArgument<?> argument) {
+        BuiltCommandArgument arg = new BuiltCommandArgument(name, argument);
+        this.commandArguments.add(arg);
+        return arg;
+    }
+
+    /**
+     * Adds the argument and its autofill function to the argument list.
+     *
+     * @param name     the name of the argument.
+     * @param argument the argument to add.
+     * @param autofill the autofill function.
+     */
+    protected final BuiltCommandArgument addArgument(String name, CommandArgument<?> argument, @Nullable Function<CommandSender, @Nullable Object> autofill) {
+        BuiltCommandArgument arg = new BuiltCommandArgument(name, argument, autofill);
+        this.commandArguments.add(arg);
+        return arg;
+    }
+
+    /**
+     * Adds a command flag
+     *
+     * @param flag the command flag
+     */
+    protected final void addFlag(@NotNull CommandFlag flag) {
+        if (flag.getShortName() != null)
+            shortNameMappedCommandFlags.put(flag.getShortName(), flag);
+        longNameMappedCommandFlags.put(flag.getFullName(), flag);
+    }
+
+    /**
+     * Adds the given command requirement to this command.
+     *
+     * @param requirement the requirement.
+     */
+    protected final void addRequirement(Requirement requirement) {
+        this.commandRequirements.add(requirement);
+    }
+
+    /**
+     * Builds the command context from the given sender, label, and arguments.
+     * If the arguments are not valid, null is returned.
+     *
+     * @param sender  the sender of the command.
+     * @param label   the label of the command used.
+     * @param args    the arguments used in the command.
+     * @param verbose if something goes wrong, should we send a message?
+     * @return the command context or null.
+     */
+    @Nullable
+    private CommandContext buildContext(CommandSender sender, String label, String[] args, boolean verbose) {
+        if (args.length > 0 && HELP_PATTERN.matcher(args[0]).matches()) {
+            handleHelpMessage(sender, null);
+            return null;
+        }
+
+        profiler.start("buildArguments");
+        var builtArgumentsPair = buildArguments(sender, label, args, true, verbose);
+        profiler.stop("buildArguments");
+        if (builtArgumentsPair == null)
+            return null;
+        var builtArguments = builtArgumentsPair.getA();
+        // If we didn't fill all arguments, stop.
+        if (builtArguments.size() < commandArguments.size())
+            return null;
+
+        profiler.start("buildFlagStates");
+        Map<CommandFlag, TriState> flagStates = args.length > builtArgumentsPair.getB() ? buildFlagStates(Arrays.copyOfRange(args, builtArgumentsPair.getB(), args.length), false) : Collections.emptyMap();
+        profiler.stop("buildFlagStates");
+        if (flagStates == null)
+            return null;
+
+        return new CommandContext(sender, label, builtArguments, this, flagStates);
+    }
+
+    /**
+     * Builds the flag states with the given arguments.
+     *
+     * @return the arguments.
+     */
+    private @Nullable Map<CommandFlag, TriState> buildFlagStates(String[] potentialFlagArguments, boolean tolerant) {
+        if (this.longNameMappedCommandFlags.isEmpty())
+            return Collections.emptyMap();
+
+        Map<CommandFlag, TriState> flagStates = Maps.newHashMap();
+        for (String arg : potentialFlagArguments) {
+            var argumentFlags = matchArgumentForFlags(arg, tolerant);
+            if (argumentFlags == null) {
+                if (tolerant)
+                    continue;
+                return null;
+            }
+            flagStates.putAll(argumentFlags);
+        }
+        return flagStates;
+    }
+
+    /**
+     * Matches a single argument against command flags.
+     * If the argument doesn't match one of the arguments, null is returned to signify failure.
+     *
+     * @param argument the argument
+     * @return the arguments
+     */
+    private @Nullable Map<CommandFlag, TriState> matchArgumentForFlags(String argument, boolean tolerant) {
+        // Match against long flag first.
+        if (argument.startsWith(CommandFlag.LONG_FLAG_PREFIX)) {
+            String longFlag = argument.substring(CommandFlag.LONG_FLAG_PREFIX.length());
+            CommandFlag found = this.longNameMappedCommandFlags.get(longFlag);
+            if (found == null)
+                return tolerant ? Collections.emptyMap() : null;
+
+            return MapUtil.of(found, TriState.TRUE);
+        } else if (argument.startsWith(CommandFlag.SHORT_FLAG_PREFIX)) {
+            String shortFlags = argument.substring(CommandFlag.SHORT_FLAG_PREFIX.length());
+            Map<CommandFlag, TriState> flagStates = new HashMap<>();
+            for (char c : shortFlags.toCharArray()) {
+                CommandFlag found = this.shortNameMappedCommandFlags.get(c);
+                if (found == null) {
+                    if (tolerant)
+                        continue;
+                    return null;
+                }
+
+                flagStates.put(found, TriState.TRUE);
+            }
+            return flagStates;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Builds the arguments for this command, up to the end of the argument array provided.
+     *
+     * @param sender  the sender.
+     * @param label   the label.
+     * @param args    the args.
+     * @param verbose verbose mode
+     * @return the built arguments paired with the number of arguments that were not autofilled
+     */
+    private Pair<List<String>, Integer> buildArguments(CommandSender sender, String label, String[] args, boolean autoFill, boolean verbose) {
+        List<String> builtArguments = new ArrayList<>();
+        List<String> allArguments = new ArrayList<>(Arrays.asList(args));
+        for (int i = 0; i < args.length; i++) {
+            String stringArgument = args[i];
+
+            //Check if we should just immediately add the argument.
+            if (this.commandArguments.size() <= i) {
+                // Try matching it against a flag.
+                var flagStates = matchArgumentForFlags(stringArgument, false);
+                if (flagStates != null)
+                    continue;
+
+                if (!acceptExtraArguments) {
+                    if (verbose)
+                        handleHelpMessage(sender, stringArgument);
+                    return null;
+                }
+                builtArguments.add(stringArgument);
+                continue;
+            }
+
+            BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
+            if (!canSeeArgument(sender, builtCommandArgument)) {
+                if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
+                    boolean player = sender instanceof PlayerRef;
+                    if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
+                        if (verbose)
+                            handleMissingArgument(sender, builtCommandArgument);
+                        continue;
+                    }
+                }
+
+                if (builtCommandArgument.autoComplete != null) {
+                    builtArguments.add(Objects.toString(builtCommandArgument.autoComplete.apply(sender), null));
+                }
+                // If we fail the 'can see' check once, make sure all remaining arguments are auto completed.
+                break;
+            }
+            CommandArgument<?> commandArgument = builtCommandArgument.getArgument();
+
+            //Create the argument context and test it.
+            ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(allArguments), i);
+            if (!commandArgument.getPredicate().test(context)) {
+                // Last ditch attempt try to match the argument as a flag.
+                if (builtCommandArgument.autoComplete != null) {
+                    var flagStates = matchArgumentForFlags(stringArgument, false);
+                    if (flagStates != null)
+                        continue;
+                }
+
+                // Handle the argument as invalid.
+                if (verbose) {
+                    handleInvalidArgument(sender, builtCommandArgument, stringArgument);
+                }
+                return null;
+            }
+            builtArguments.add(stringArgument);
+            allArguments.set(i, stringArgument);
+        }
+
+        //Try to fill in the 'autofill' arguments.
+        if (!autoFill)
+            return new Pair<>(builtArguments, builtArguments.size());
+
+        int nonAutoFilled = builtArguments.size();
+        for (int i = builtArguments.size(); i < this.commandArguments.size(); i++) {
+            BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
+            Function<CommandSender, Object> autofill = builtCommandArgument.getAutoComplete();
+            if (autofill == null) {
+                // Handle the argument as missing.
+                if (verbose) {
+                    handleMissingArgument(sender, builtCommandArgument);
+
+                    // Check if the help command should be sent.
+                    handleHelpMessage(sender, null);
+                }
+                return null;
+            }
+
+            if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
+                boolean player = sender instanceof PlayerRef;
+                if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
+                    if (verbose)
+                        handleMissingArgument(sender, builtCommandArgument);
+                    continue;
+                }
+            }
+
+            //Create the argument context and test it.
+            builtArguments.add(Objects.toString(autofill.apply(sender), null));
+        }
+        return new Pair<>(builtArguments, nonAutoFilled);
+    }
+
+    /**
+     * Checks for sub commands and runs them if found.
+     *
+     * @param sender the command sender.
+     * @param args   the arguments of the command.
+     * @return true if a sub command was found and run, false if not.
+     */
+    private boolean checkSubcommands(CommandSender sender, String[] args) {
+        if (this.subcommands.isEmpty() || args.length == 0)
+            return false;
+
+        //Build the new parts of the command.
+        String[] newArgs = new String[args.length - 1];
+        System.arraycopy(args, 1, newArgs, 0, args.length - 1);
+        String newLabel = args[0];
+
+        //Check all subcommands.
+        for (KCommand subcommand : this.subcommands) {
+            if (subcommand.labelMatches(newLabel)) {
+                if (subcommand.async) {
+                    Platform.get().runAsync(() -> subcommand.pass(sender, newLabel, newArgs));
+                } else {
+                    subcommand.pass(sender, newLabel, newArgs);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks that the context meets all requirements.
+     *
+     * @param context the context.
+     * @return if they meet the requirements.
+     */
+    private boolean checkRequirements(CommandContext context) {
+        for (Requirement requirement : this.commandRequirements) {
+            if (!requirement.meetsRequirement(context)) {
+                requirement.getErrorMessage(context).send(context.getSender());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the sender has permission to execute this command.
+     *
+     * @param sender the sender.
+     * @return if they have permission.
+     */
+    public boolean checkPermission(CommandSender sender) {
+        return StringUtilCore.isEmpty(this.commandPermission) || sender.hasPermission(this.commandPermission);
+    }
+
+    /**
+     * Checks if the player can see the given command argument.
+     * <p>
+     * In particular, this checks if the player has the {@link BuiltCommandArgument#requiredPermissionExtension} permission
+     * and that the command argument is an autocomplete argument.
+     * </p>
+     *
+     * @param sender   the command sender.
+     * @param argument the argument.
+     * @return true if they can see the argument.
+     */
+    public boolean canSeeArgument(CommandSender sender, BuiltCommandArgument argument) {
+        if (argument.autoComplete == null)
+            return true;
+
+        if (argument.requiredPermissionExtension == null)
+            return true;
+
+        return hasPermission(sender, argument.requiredPermissionExtension);
+    }
+
+    /**
+     * Checks if the user can see this command.
+     *
+     * @param sender the sender.
+     * @return if they can see this command.
+     */
+    private boolean canSee(CommandSender sender) {
+        if (visibility == CommandVisibility.PRIVATE)
+            return false;
+
+        return visibility == CommandVisibility.PUBLIC || this.checkPermission(sender) && visibility == CommandVisibility.PROTECTED;
+    }
+
+    /**
+     * Gets this command as a full chain.
+     *
+     * @return the full command chain.
+     */
+    public String getFullCommandChain() {
+        StringBuilder commandChain = new StringBuilder();
+        KCommand current = this;
+        while (current != null) {
+            commandChain.insert(0, " ").insert(0, current.commandName);
+            current = current.getParent();
+        }
+        return commandChain.toString().trim();
+    }
+
+    /**
+     * Gets a descriptive message for this command.
+     *
+     * @return the descriptive message.
+     */
+    private String getDescriptiveCommandHelp(CommandSender sender) {
+        if (!isExecutionImplemented())
+            return null;
+
+        boolean consoleSender = !(sender instanceof PlayerRef);
+        StringBuilder argumentChain = new StringBuilder();
+        for (BuiltCommandArgument argument : this.commandArguments) {
+            // As soon as a player cannot see a command argument, prevent adding the rest.
+            if (!canSeeArgument(sender, argument))
+                break;
+
+            // Required or not?
+            if (argument.getAutoComplete() == null) {
+                argumentChain.append("(").append(argument.getName()).append(") ");
+            } else {
+                if (this.isOnlyForPlayers() && consoleSender) {
+                    argumentChain.append("[").append(argument.getName()).append("] ");
+                } else {
+                    argumentChain.append("[").append(argument.getName()).append("=").append(argument.getAutoComplete().apply(sender)).append("] ");
+                }
+            }
+        }
+
+        String builtArguments = this.commandArguments.isEmpty() ? "" : " " + argumentChain.toString().trim();
+        String message = langSource.getMessage("command-help-format").getMessages().get(0);
+        return MSCore.parseSingle(message,
+                "COMMAND", getFullCommandChain(),
+                "ARGUMENTS", builtArguments,
+                "DESCRIPTION", getDescription() == null ? "No description" : getDescription());
+    }
+
+    /**
+     * Handles a user that is requesting a help message for this command.
+     *
+     * @param sender       the sender.
+     * @param lastArgument the last argument provided in the command.
+     */
+    public void handleHelpMessage(CommandSender sender, String lastArgument) {
+        if (!canSee(sender)) {
+            return;
+        }
+
+        List<String> commandHelp = new ArrayList<>();
+        String help = getDescriptiveCommandHelp(sender);
+        if (help != null)
+            commandHelp.add(help);
+        commandHelp.addAll(getHelpMessages0(sender, lastArgument != null ? lastArgument.toLowerCase() : null));
+        if (commandHelp.isEmpty()) {
+            commandHelp.add(langSource.getMessage("command-help-none-found").getMessages().get(0));
+        }
+        langSource.getMessage("command-help").send(
+                sender,
+                Placeholder.curlyTrusted("COMMAND", this.getFullCommandChain()),
+                MultiLinePlaceholder.percentTrusted("COMMAND_HELP", commandHelp)
+        );
+    }
+
+    /**
+     * Sends sub command help.
+     *
+     * @param sender the sender.
+     */
+    private List<String> getHelpMessages0(CommandSender sender, @Nullable String lastArgument) {
+        List<String> allMessages = new ArrayList<>();
+        for (KCommand sub : this.subcommands) {
+            if (!matchesForHelpMessage(lastArgument, sub.getCommandName()))
+                continue;
+
+            if (!sub.canSee(sender))
+                continue;
+
+            String result = sub.getDescriptiveCommandHelp(sender);
+            if (result != null)
+                allMessages.add(result);
+            allMessages.addAll(sub.getHelpMessages0(sender, lastArgument));
+        }
+        return allMessages;
+    }
+
+    /**
+     * Checks if the argument matches the command name close enough for it to be displayed in the help message.
+     *
+     * @param argument    the argument.
+     * @param commandName the command name.
+     * @return true if the command matches.
+     */
+    private static boolean matchesForHelpMessage(@Nullable String argument, String commandName) {
+        if (argument == null)
+            return true;
+
+        return commandName.startsWith(argument) ||
+                // Levenshtein is calculated with a greater cost for replace/swap as we *really* only want to match prefixes/suffixes.
+                StringUtilCore.levenshteinDistance(argument, commandName, 1, 1, 2, 2) < commandName.length() * 1.5;
+    }
+
+    /**
+     * Handles a user that has entered an invalid argument.
+     *
+     * @param sender   the sender.
+     * @param argument the argument.
+     * @param actual   the actual argument.
+     */
+    private void handleInvalidArgument(CommandSender sender, BuiltCommandArgument argument, String actual) {
+        if (!canSee(sender)) {
+            return;
+        }
+
+        langSource.getMessage("invalid-argument").send(sender, "POSITION", this.commandArguments.indexOf(argument), "ARGUMENT", argument.getName(), "TYPE", argument.getArgument().getDescription(), "ACTUAL", actual);
+    }
+
+    /**
+     * Handles a user that has entered a missing argument.
+     *
+     * @param sender   the sender.
+     * @param argument the argument.
+     */
+    private void handleMissingArgument(CommandSender sender, BuiltCommandArgument argument) {
+        if (!canSee(sender)) {
+            return;
+        }
+
+        langSource.getMessage("missing-argument").send(sender, "POSITION", this.commandArguments.indexOf(argument), "ARGUMENT", argument.getName(), "TYPE", argument.getArgument().getDescription());
+    }
+
+    /**
+     * Handles a user that is trying to execute this command but doesn't have permission.
+     *
+     * @param sender the sender.
+     */
+    private void handleNoPerms(CommandSender sender) {
+        if (this.visibility == CommandVisibility.PRIVATE || this.visibility == CommandVisibility.PROTECTED) {
+            sender.sendMessage(com.hypixel.hytale.server.core.Message.translation("server.modules.command.notFound").param("cmd", getFullCommandChain()));
+        } else {
+            langSource.getMessage("no-permission").send(sender);
+        }
+    }
+
+    /**
+     * A method to take the raw data from a Hytale command and run it through this one.
+     *
+     * @param sender the sender of the command.
+     * @param label  the label of the command used.
+     * @param args   the arguments used in the command.
+     */
+    public final void pass(CommandSender sender, String label, String[] args) {
+        if (checkSubcommands(sender, args)) {
+            return;
+        }
+
+        if (!checkPermission(sender)) {
+            handleNoPerms(sender);
+            return;
+        }
+
+        //Check for the command context.
+        profiler.start("buildContext");
+        CommandContext builtContext = buildContext(sender, label, args, true);
+        profiler.stop("buildContext");
+        if (builtContext == null) {
+            return;
+        }
+
+        if (!this.checkRequirements(builtContext)) {
+            return;
+        }
+
+        this.lastExecutionTime = System.currentTimeMillis();
+
+        profiler.start("execute");
+        this.execute(builtContext);
+        profiler.stop("execute");
+    }
+
+    /**
+     * Runs the command for the sender. Hytale calls commands off the world threads, so unless this command is
+     * async it is moved onto the sender's world thread, or the default world's for the console.
+     *
+     * @param sender the sender of the command.
+     * @param label  the label of the command used.
+     * @param args   the arguments used in the command.
+     * @return a future completed once the command has run.
+     */
+    private CompletableFuture<Void> dispatch(CommandSender sender, String label, String[] args) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        Runnable task = () -> {
+            try {
+                this.pass(sender, label, args);
+                future.complete(null);
+            } catch (Throwable thr) {
+                future.completeExceptionally(thr);
+            }
+        };
+
+        if (async) {
+            task.run();
+            return future;
+        }
+
+        UUID worldId = sender instanceof PlayerRef ? ((PlayerRef) sender).getWorldUuid() : null;
+        World world = worldId == null ? null : Universe.get().getWorld(worldId);
+        if (world != null) {
+            world.execute(task);
+        } else {
+            Platform.get().runSync(task);
+        }
+        return future;
+    }
+
+    /**
+     * Checks if the given label is the command name or an alias of this command.
+     *
+     * @param label the label to check.
+     * @return true if the label matches.
+     */
+    public final boolean labelMatches(String label) {
+        if (label.equalsIgnoreCase(this.commandName))
+            return true;
+
+        for (String alias : this.commandAliases) {
+            if (label.equalsIgnoreCase(alias))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the label of this command starts with the given prefix.
+     *
+     * @param prefix the prefix of the command.
+     * @return true if it starts with the prefix.
+     */
+    public final boolean labelStartsWith(String prefix) {
+        String prefixToLower = prefix.toLowerCase();
+        //Check main label.
+        if (this.commandName.toLowerCase().startsWith(prefixToLower))
+            return true;
+
+        //Check all aliases.
+        for (String alias : this.commandAliases) {
+            if (alias.toLowerCase().startsWith(prefixToLower))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Gathers the tab completions for this command.
+     *
+     * @param sender the sender.
+     * @param label  the command's label used
+     * @param args   the arguments.
+     * @return the list of tab completions.
+     */
+    public final List<String> gatherTabCompletions(CommandSender sender, String label, String[] args) {
+        if (args.length == 0)
+            return Collections.emptyList();
+
+        //We need to check our subcommands.
+        for (KCommand command : this.getSubcommands()) {
+            if (!command.labelMatches(args[0]))
+                continue;
+
+            // Does the player have permission to see the command?
+            if (!command.canSee(sender))
+                continue;
+
+            String[] newArguments = new String[args.length - 1];
+            System.arraycopy(args, 1, newArguments, 0, newArguments.length);
+            return command.gatherTabCompletions(sender, args[0], newArguments);
+        }
+
+        //Loop over the arguments to match.
+        if (args.length > this.commandArguments.size() + this.subcommands.size() && this.longNameMappedCommandFlags.isEmpty())
+            return Collections.emptyList();
+
+        //Get the raw completions.
+        String[] previousArgs = Arrays.copyOf(args, args.length - 1);
+        var builtArgumentsPair = buildArguments(sender, label, previousArgs, false, false);
+        List<String> completions = new ArrayList<>();
+        String stringArgument = args[args.length - 1];
+        if (builtArgumentsPair != null) {
+            var builtArguments = builtArgumentsPair.getA();
+            if (this.commandArguments.size() > args.length - 1) {
+                CommandArgument<?> argument = this.commandArguments.get(args.length - 1).getArgument();
+                ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(builtArguments), args.length - 1);
+                completions.addAll(argument.getCompletions().apply(context));
+            }
+
+            if (builtArguments.size() >= this.commandArguments.size()) {
+                Map<CommandFlag, TriState> previousFlags = buildFlagStates(previousArgs, true);
+                // Show flags if the player has begun entering them.
+                if (stringArgument.startsWith(String.valueOf(CommandFlag.LONG_FLAG_PREFIX.charAt(0)))) {
+                    completions.addAll(longNameMappedCommandFlags.entrySet().stream()
+                            .filter(k -> previousFlags == null || !previousFlags.containsKey(k.getValue()))
+                            .map(k -> CommandFlag.LONG_FLAG_PREFIX + k.getKey()).collect(Collectors.toList()));
+                }
+
+                // If the argument is specifically the short flag prefix, populate with the flags.
+                if (stringArgument.equals(CommandFlag.SHORT_FLAG_PREFIX)) {
+                    completions.addAll(shortNameMappedCommandFlags.entrySet().stream()
+                            .filter(k -> previousFlags == null || !previousFlags.containsKey(k.getValue()))
+                            .map(k -> CommandFlag.SHORT_FLAG_PREFIX + k.getKey()).collect(Collectors.toList()));
+                }
+            }
+        }
+
+        // Then go through the subcommands and try to add those as well.
+        if (args.length == 1) {
+            String argToLower = stringArgument.toLowerCase();
+            for (KCommand command : this.getSubcommands()) {
+                if (!command.canSee(sender))
+                    continue;
+
+                //Add the main label.
+                if (command.getCommandName().toLowerCase().startsWith(argToLower))
+                    completions.add(command.getCommandName());
+
+                //Add all aliases.
+                for (String alias : command.getCommandAliases()) {
+                    if (alias.toLowerCase().startsWith(argToLower))
+                        completions.add(alias);
+                }
+            }
+        }
+
+        //Finally, filter out the rest of the completions.
+        return completions.stream().filter(string -> string.toLowerCase(Locale.ROOT).startsWith(stringArgument.toLowerCase())).collect(Collectors.toList());
+    }
+
+    /**
+     * Used to register internals for {@link MCommand}.
+     */
+    void internalOnRegister() {
+        /*Intentionally empty*/
+    }
+
+    /**
+     * Run when this command is registered. Should be used for bootstrapping things like command arguments.
+     */
+    protected void onRegister() {
+        /*Intentionally empty*/
+    }
+
+    /**
+     * Run when this command is unregistered. Can be overridden if necessary.
+     */
+    protected void onUnregister() {
+        /*Intentionally empty*/
+    }
+
+    /**
+     * Run when a player has executed this command and it needs to function.
+     */
+    protected void execute(@NotNull CommandContext context) {
+        // Send a help message.
+        this.handleHelpMessage(context.getSender(), context.getArguments().isEmpty() ? null : context.getArguments().get(0));
+    }
+
+    /**
+     * The command Hytale sees for a {@link KCommand}.
+     * <p>
+     * It carries the name, aliases, permission, flags and sub commands for Hytale's command tree and completion,
+     * and hands the raw input to KCommon before Hytale parses any arguments.
+     * </p>
+     */
+    private static final class HytaleCommand extends AbstractCommand {
+        private final KCommand command;
+
+        HytaleCommand(KCommand command) {
+            super(command.getCommandName(), command.getDescription());
+            this.command = command;
+            setAllowsExtraArguments(true);
+            if (!command.getCommandAliases().isEmpty())
+                addAliases(command.getCommandAliases().toArray(new String[0]));
+            if (StringUtilCore.isEmpty(command.getCommandPermission()))
+                requireNoPermission();
+            else
+                requirePermission(command.getCommandPermission());
+            for (CommandFlag flag : command.longNameMappedCommandFlags.values()) {
+                withFlagArg(flag.getFullName(), "");
+            }
+            for (KCommand sub : command.getSubcommands()) {
+                addSubCommand(new HytaleCommand(sub));
+            }
+        }
+
+        @Override
+        public CompletableFuture<Void> acceptCall(@NotNull CommandSender sender, @NotNull ParserContext parserContext, @NotNull ParseResult parseResult) {
+            // Split like Bukkit does, so arguments reach KCommon exactly as they were typed.
+            String[] input = parserContext.getRawInput().trim().split("\\s+");
+            return command.dispatch(sender, input[0], Arrays.copyOfRange(input, 1, input.length));
+        }
+
+        @Override
+        protected CompletableFuture<Void> execute(@NotNull com.hypixel.hytale.server.core.command.system.CommandContext context) {
+            // Unreachable, acceptCall never hands the input to Hytale's parser.
+            return null;
+        }
+    }
+}

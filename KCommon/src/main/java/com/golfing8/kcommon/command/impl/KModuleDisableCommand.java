@@ -26,14 +26,11 @@ public class KModuleDisableCommand extends KCommand {
     @Override
     protected void execute(@NotNull CommandContext context) {
         Module module = context.next();
-        if (!module.getPlugin().getManifest().isActive(module) && !module.isEnabled()) {
+        long tNow = System.currentTimeMillis();
+        if (!module.setActive(false)) {
             KCommon.getInstance().sendConfigMessage(context.getSender(), "disable-command-already");
             return;
         }
-
-        long tNow = System.currentTimeMillis();
-        module.getPlugin().getManifest().setActive(module, false);
-        module.disable();
         long tEnd = System.currentTimeMillis();
         KCommon.getInstance().sendConfigMessage(context.getSender(), "disable-command-message",
                 "MODULE", module.getModuleName(),

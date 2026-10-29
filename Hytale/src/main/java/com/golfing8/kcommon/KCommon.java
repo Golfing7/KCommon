@@ -1,5 +1,6 @@
 package com.golfing8.kcommon;
 
+import com.golfing8.kcommon.command.impl.KModuleCommand;
 import com.golfing8.kcommon.config.yaml.YamlConfig;
 import com.golfing8.kcommon.data.DataManager;
 import com.golfing8.kcommon.data.DataManagerContainer;
@@ -93,6 +94,8 @@ public class KCommon extends KPlugin {
         if (trySetupRedis()) {
             getPluginLogger().info("Connected to redis");
         }
+
+        new KModuleCommand().register();
 
         // Cache player data on join and save it on quit, like the Bukkit build does.
         getEventRegistry().registerAsync(PlayerConnectEvent.class, future -> future.thenApply(event -> {

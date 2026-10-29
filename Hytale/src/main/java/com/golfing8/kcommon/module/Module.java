@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.module;
 
 import com.golfing8.kcommon.KPlugin;
+import com.golfing8.kcommon.command.MCommand;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
 import com.golfing8.kcommon.config.lang.LangConfigEnum;
@@ -30,9 +31,9 @@ import java.util.function.Function;
 /**
  * A module on a Hytale server. All 'Features' should be implemented through an extension of this class.
  * <p>
- * Hytale has its own command and UI systems, so unlike the Bukkit module there is no command or menu support.
- * Register events with {@link #addListener} and ECS events with {@link #addEcsListener} so they are removed
- * when the module is disabled.
+ * Hytale has its own UI system, so unlike the Bukkit module there is no menu support.
+ * Register commands with {@link #addCommand}, events with {@link #addListener} and ECS events with
+ * {@link #addEcsListener} so they are removed when the module is disabled.
  * </p>
  */
 public abstract class Module extends AbstractModule<YamlConfig> implements LangConfigContainer, PlaceholderProvider {
@@ -49,6 +50,12 @@ public abstract class Module extends AbstractModule<YamlConfig> implements LangC
     }
 
     private final List<EventRegistration<?, ?>> eventRegistrations = new ArrayList<>();
+    /**
+     * The commands this module controls. They are unregistered when this module is disabled,
+     * so the module should register them again in {@link #onEnable()}.
+     */
+    @Getter
+    private final List<MCommand<?>> moduleCommands = new ArrayList<>();
     /**
      * The language config for this module.
      */
@@ -144,12 +151,25 @@ public abstract class Module extends AbstractModule<YamlConfig> implements LangC
         }
         eventRegistrations.clear();
 
+        this.moduleCommands.forEach(MCommand::unregister);
+        this.moduleCommands.clear();
+
         KPAPIHook hook = getPlugin().getPlaceholderAPIHook();
         if (hook != null)
             hook.unregisterProvider(this);
 
         this.relationalPlaceholders.clear();
         this.placeholders.clear();
+    }
+
+    /**
+     * Adds a command to this module. It is unregistered when this module is disabled.
+     *
+     * @param mCommand the command.
+     */
+    protected final void addCommand(MCommand<?> mCommand) {
+        this.moduleCommands.add(mCommand);
+        mCommand.register();
     }
 
     /**
