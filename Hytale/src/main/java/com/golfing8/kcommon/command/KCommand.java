@@ -3,6 +3,7 @@ package com.golfing8.kcommon.command;
 import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.command.argument.ArgumentContext;
 import com.golfing8.kcommon.command.argument.CommandArgument;
+import com.golfing8.kcommon.command.argument.CommandArguments;
 import com.golfing8.kcommon.command.exc.CommandInstantiationException;
 import com.golfing8.kcommon.command.flag.CommandFlag;
 import com.golfing8.kcommon.command.requirement.Requirement;
@@ -25,8 +26,7 @@ import com.hypixel.hytale.server.core.command.system.CommandRegistration;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.command.system.ParseResult;
 import com.hypixel.hytale.server.core.command.system.ParserContext;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.world.World;
 import lombok.*;
 import net.kyori.adventure.util.TriState;
@@ -458,6 +458,21 @@ public abstract class KCommand {
     }
 
     /**
+     * Adds an online player argument that defaults to the sending player. Naming another player needs this
+     * command's permission plus {@code .<permissionExtension>}, and the console always has to name one.
+     *
+     * @param name                the name of the argument.
+     * @param permissionExtension the permission extension needed to name another player.
+     * @return the argument.
+     */
+    protected final BuiltCommandArgument addPlayerOrSelfArgument(String name, String permissionExtension) {
+        BuiltCommandArgument arg = addArgument(name, CommandArguments.PLAYER, CommandArguments.SELF);
+        arg.setAutoFillPlayersOnly(true);
+        arg.setRequiredPermissionExtension(permissionExtension);
+        return arg;
+    }
+
+    /**
      * Adds a command flag
      *
      * @param flag the command flag
@@ -604,7 +619,7 @@ public abstract class KCommand {
             BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
             if (!canSeeArgument(sender, builtCommandArgument)) {
                 if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
-                    boolean player = sender instanceof PlayerRef;
+                    boolean player = sender instanceof Player;
                     if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
                         if (verbose)
                             handleMissingArgument(sender, builtCommandArgument);
@@ -660,7 +675,7 @@ public abstract class KCommand {
             }
 
             if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
-                boolean player = sender instanceof PlayerRef;
+                boolean player = sender instanceof Player;
                 if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
                     if (verbose)
                         handleMissingArgument(sender, builtCommandArgument);
@@ -788,7 +803,7 @@ public abstract class KCommand {
         if (!isExecutionImplemented())
             return null;
 
-        boolean consoleSender = !(sender instanceof PlayerRef);
+        boolean consoleSender = !(sender instanceof Player);
         StringBuilder argumentChain = new StringBuilder();
         for (BuiltCommandArgument argument : this.commandArguments) {
             // As soon as a player cannot see a command argument, prevent adding the rest.
@@ -982,8 +997,8 @@ public abstract class KCommand {
             return future;
         }
 
-        UUID worldId = sender instanceof PlayerRef ? ((PlayerRef) sender).getWorldUuid() : null;
-        World world = worldId == null ? null : Universe.get().getWorld(worldId);
+        // Players send commands as their Player component.
+        World world = sender instanceof Player ? ((Player) sender).getWorld() : null;
         if (world != null) {
             world.execute(task);
         } else {

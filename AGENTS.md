@@ -437,9 +437,12 @@ public class SomeModule extends Module {
 * Messages use the same `&` codes, hex colors and MiniMessage tags as Bukkit; `HytaleMessages` turns them into Hytale `Message`s.
 * `KCommon.getInstance().getProtectionHook()` answers build, PvP and region questions through OrbisGuard when it is installed.
 * Commands are written exactly as in [Commands](#commands) (`@Cmd`, `MCommand<SomeModule>`, `CommandArguments`, flags, requirements) and registered with `addCommand(new SomeModuleCMD())` in `onEnable`.
-  Senders are Hytale `CommandSender`s and players are `PlayerRef`s. Commands run on the sender's world thread (the default world for the console) unless `async = true`.
+  Senders are Hytale `CommandSender`s; a player sends as their `Player` component, so use `context.getPlayer()` for the `PlayerRef` and `getEntity()`, `getStore()`, `getWorld()` for their entity. Commands run on the sender's world thread (the default world for the console) unless `async = true`, so those are safe to use there.
+  Another player may be in another world: touch their components through `HytalePlayers.runOnWorld(target, ref -> ...)`. For a player argument that defaults to the sender use `addPlayerOrSelfArgument("player", "other")`; naming someone else needs the `.other` permission.
   Hytale's command tree only knows the names, sub commands and `--flags`, so the client can't suggest values for positional arguments. Help isn't paged.
 * `/km` (`reload`, `enable`, `disable`, `list`, `placeholders`, `commands`) works the same as on Bukkit.
+* Hytale types are stored with their own codecs, both in YAML configs and in data managers. `HytaleCodecs` knows items, locations, vectors, components, UUIDs and dates, and any class with a static `CODEC` field.
+  Register anything else with `HytaleCodecs.register(SomeType.class, codec)`. `AutoCodec.generateCodec(SomeClass.class, SomeClass::new)` builds a codec from a class' fields, for ECS components and UI event data.
 
 ## Agent Guidance
 When editing this project:

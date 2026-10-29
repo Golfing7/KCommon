@@ -23,3 +23,6 @@ gradle-app.setting
 CASerializableTest_testSerializableSimple.yml
 */CASerializableTest_testSerializableSimple.yml
 */drop-tables.yml
+
+# macOS folder metadata
+.DS_Store

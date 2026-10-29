@@ -59,7 +59,7 @@ public abstract class Platform {
     public abstract long getCurrentTick();
 
     /**
-     * Sends a message to the console. The message may contain '&' color codes.
+     * Sends a message to the console. The message may contain ampersand color codes.
      *
      * @param message the message.
      */

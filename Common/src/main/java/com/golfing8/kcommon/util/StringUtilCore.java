@@ -25,7 +25,7 @@ public class StringUtilCore {
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + COLOR_CHAR + "[0-9A-FK-ORX]");
 
     /**
-     * Replaces the alternate color character (usually '&') with {@link #COLOR_CHAR} wherever it starts a valid code.
+     * Replaces the alternate color character (usually ampersand) with {@link #COLOR_CHAR} wherever it starts a valid code.
      *
      * @param altColorChar the alternate color character.
      * @param text         the text to translate.

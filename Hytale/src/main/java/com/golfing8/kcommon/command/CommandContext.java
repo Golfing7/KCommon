@@ -5,11 +5,17 @@ import com.golfing8.kcommon.command.argument.CommandArgument;
 import com.golfing8.kcommon.command.flag.CommandFlag;
 import lombok.Getter;
 import net.kyori.adventure.util.TriState;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.NameMatching;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -116,19 +122,69 @@ public class CommandContext {
      * @return true if the sender is a player.
      */
     public boolean isSenderPlayer() {
-        return sender instanceof PlayerRef;
+        return sender instanceof Player;
     }
 
     /**
-     * Gets the sender as a player, or returns null if the sender is not a player.
+     * Gets the sender as a player.
      *
      * @return the sender as a player.
+     * @throws ClassCastException if the sender is not a player.
      */
+    @SuppressWarnings("removal") // Still Hytale's only way to read it off the world thread.
     public PlayerRef getPlayer() {
-        if (!(sender instanceof PlayerRef))
+        if (!(sender instanceof Player))
             throw new ClassCastException("Sender is not a player");
 
-        return (PlayerRef) sender;
+        return ((Player) sender).getPlayerRef();
+    }
+
+    /**
+     * Gets the sending player's entity. Only touch its components on the sender's world thread,
+     * which is where commands that aren't async run.
+     *
+     * @return the sender's entity.
+     * @throws ClassCastException if the sender is not a player.
+     */
+    public Ref<EntityStore> getEntity() {
+        if (!(sender instanceof Player))
+            throw new ClassCastException("Sender is not a player");
+
+        return ((Player) sender).getReference();
+    }
+
+    /**
+     * Gets the entity store of the sending player's world.
+     *
+     * @return the store.
+     * @throws ClassCastException if the sender is not a player.
+     */
+    public Store<EntityStore> getStore() {
+        return getEntity().getStore();
+    }
+
+    /**
+     * Gets the world the sending player is in.
+     *
+     * @return the world.
+     * @throws ClassCastException if the sender is not a player.
+     */
+    public World getWorld() {
+        if (!(sender instanceof Player))
+            throw new ClassCastException("Sender is not a player");
+
+        return ((Player) sender).getWorld();
+    }
+
+    /**
+     * Gets the sender as a player, if it is one. Players send commands as their {@link Player} component.
+     *
+     * @param sender the sender.
+     * @return the player, or null for the console.
+     */
+    @SuppressWarnings("removal") // Still Hytale's only way to read it off the world thread.
+    public static @Nullable PlayerRef asPlayer(CommandSender sender) {
+        return sender instanceof Player ? ((Player) sender).getPlayerRef() : null;
     }
 
     /**

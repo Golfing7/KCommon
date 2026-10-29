@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.command.argument;
 
 import com.golfing8.kcommon.KPlugin;
+import com.golfing8.kcommon.command.CommandContext;
 import com.golfing8.kcommon.command.argument.type.BooleanCommandArgument;
 import com.golfing8.kcommon.config.ConfigPath;
 import com.golfing8.kcommon.module.Module;
@@ -10,6 +11,7 @@ import com.golfing8.kcommon.struct.time.TimeLength;
 import com.golfing8.kcommon.util.MapUtil;
 import com.google.common.collect.Lists;
 import com.hypixel.hytale.server.core.NameMatching;
+import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.plugin.PluginBase;
 import com.hypixel.hytale.server.core.plugin.PluginManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -24,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -61,6 +64,15 @@ public final class CommandArguments {
     }, context -> {
         return Universe.get().getPlayerByUsername(context.getArgument(), NameMatching.EXACT_IGNORE_CASE) != null;
     }, ctx -> Universe.get().getPlayerByUsername(ctx.getArgument(), NameMatching.EXACT_IGNORE_CASE));
+
+    /**
+     * Autofills a {@link #PLAYER} argument with the sending player's name, for commands that default to the sender.
+     * Pair it with {@code setAutoFillPlayersOnly(true)} so the console has to name a player.
+     */
+    public static final Function<CommandSender, Object> SELF = sender -> {
+        PlayerRef player = CommandContext.asPlayer(sender);
+        return player == null ? null : player.getUsername();
+    };
 
     /**
      * A command argument for alphanumeric strings. (A-Za-z0-9_)

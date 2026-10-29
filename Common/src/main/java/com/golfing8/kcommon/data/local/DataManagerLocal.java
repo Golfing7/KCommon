@@ -6,6 +6,7 @@ import com.golfing8.kcommon.data.DataSerializable;
 import com.golfing8.kcommon.data.key.FieldIndexer;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
+import com.golfing8.kcommon.struct.helper.terminable.Terminable;
 import com.golfing8.kcommon.platform.Platform;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
@@ -18,9 +19,11 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -43,6 +46,10 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
      * The manager for alternative keys
      */
     private final FieldIndexerLocal<T> fieldIndexer;
+    /**
+     * The autosave task, cancelled when this manager shuts down.
+     */
+    private final Terminable autosaveTask;
 
     public DataManagerLocal(String key, KPluginContext plugin, Class<T> typeClass) {
         super(key, plugin, typeClass);
@@ -68,7 +75,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
         this.fieldIndexer = new FieldIndexerLocal<>(this);
 
-        Platform.get().runTimer(this::saveAllChanged, 0, 600L);
+        this.autosaveTask = Platform.get().runTimer(this::saveAllChanged, 0, 600L);
     }
 
     /**
@@ -159,6 +166,8 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
 
     @Override
     public synchronized void shutdown() {
+        // Otherwise every module reload leaves another timer saving this stale cache.
+        this.autosaveTask.closeSilently();
         this.objectCache.forEach((key, value) -> {
             if (isStrictSaving() && !value.hasChanged())
                 return;
@@ -183,7 +192,8 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
                 if (objectCache.containsKey(path.getFileName().toString().replace(".json", "")))
                     return;
 
-                if (Files.isDirectory(path))
+                // Skips folders, unfinished writes and unreadable objects that were set aside.
+                if (Files.isDirectory(path) || !path.getFileName().toString().endsWith(".json"))
                     return;
 
                 try {
@@ -273,22 +283,20 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
      * @throws IOException if there's a reading error
      */
     private T loadObject(Path objPath) throws IOException {
-        Reader reader = Files.newBufferedReader(objPath);
-
-        //Read the object in
-        JsonElement object = JsonParser.parseReader(reader);
-
         String key = objPath.getFileName().toString().replace(".json", "");
         //Create an empty instance
         T newObject;
-        try {
-            newObject = DataSerializer.getGSONBase().fromJson(object, getTypeClass());
+        try (Reader reader = Files.newBufferedReader(objPath)) {
+            newObject = DataSerializer.getGSONBase().fromJson(JsonParser.parseReader(reader), getTypeClass());
         } catch (JsonParseException exc) {
             getPlugin().getPluginLogger().log(Level.WARNING, String.format("Cache %s failed to load object %s!", getTypeClass().getName(), key), exc);
             newObject = null;
         }
         if (newObject == null) {
-            Files.delete(objPath);
+            // Keep the unreadable file for recovery instead of deleting it; the next save writes a fresh one.
+            Path corrupt = objPath.resolveSibling(objPath.getFileName() + ".corrupt-" + System.currentTimeMillis());
+            Files.move(objPath, corrupt);
+            getPlugin().getPluginLogger().severe(String.format("Moved unreadable object %s of cache %s to %s", key, getKey(), corrupt.getFileName()));
             return null;
         }
         newObject.setKey(key);
@@ -302,14 +310,7 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
      * @throws IOException if there's a writing error
      */
     private void writeObject(T obj) throws IOException {
-        Path objPath = directoryPrefix.resolve(String.format("%s.json", obj.getKey()));
-        if (Files.notExists(objPath))
-            Files.createFile(objPath);
-
-        try (Writer writer = Files.newBufferedWriter(objPath)) {
-            writer.write(DataSerializer.getGSONBase().toJson(obj));
-            writer.flush();
-        }
+        writeAtomically(directoryPrefix.resolve(String.format("%s.json", obj.getKey())), DataSerializer.getGSONBase().toJson(obj));
     }
 
     /**
@@ -323,13 +324,21 @@ public class DataManagerLocal<T extends DataSerializable> extends DataManagerAbs
         if (object == null)
             return;
 
-        Path objPath = directoryPrefix.resolve(String.format("%s.json", key));
-        if (Files.notExists(objPath))
-            Files.createFile(objPath);
+        writeAtomically(directoryPrefix.resolve(String.format("%s.json", key)), DataSerializer.getGSONBase().toJson(object));
+    }
 
-        try (Writer writer = Files.newBufferedWriter(objPath)) {
-            writer.write(DataSerializer.getGSONBase().toJson(object));
-            writer.flush();
+    /**
+     * Writes a temporary file and moves it over the target, so a crash mid-write never leaves a half written object.
+     */
+    private static void writeAtomically(Path target, String json) throws IOException {
+        Path temp = target.resolveSibling(target.getFileName() + ".tmp");
+        try (Writer writer = Files.newBufferedWriter(temp)) {
+            writer.write(json);
+        }
+        try {
+            Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException exc) {
+            Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }

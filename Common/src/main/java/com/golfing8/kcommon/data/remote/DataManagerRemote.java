@@ -7,6 +7,7 @@ import com.golfing8.kcommon.data.key.FieldIndexer;
 import com.golfing8.kcommon.db.redis.RedisAdapter;
 import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.golfing8.kcommon.struct.helper.promise.Promise;
+import com.golfing8.kcommon.struct.helper.terminable.Terminable;
 import com.golfing8.kcommon.platform.Platform;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -63,6 +64,10 @@ public class DataManagerRemote<T extends DataSerializable> extends DataManagerAb
      */
     private final Map<String, T> objectCache;
     /**
+     * The autosave task, cancelled when this manager shuts down.
+     */
+    private final Terminable autosaveTask;
+    /**
      * The backing mongo collection. Exposed for atomic operations this manager doesn't provide.
      */
     @Getter
@@ -95,7 +100,7 @@ public class DataManagerRemote<T extends DataSerializable> extends DataManagerAb
         super(key, plugin, typeClass);
         this.objectCache = new ConcurrentHashMap<>();
 
-        Platform.get().runTimer(this::saveAllChanged, 0, 600L);
+        this.autosaveTask = Platform.get().runTimer(this::saveAllChanged, 0, 600L);
         if (Platform.get().getMongoConnector() == null)
             throw new IllegalStateException("Cannot connect to MongoDatabase");
 
@@ -389,6 +394,7 @@ public class DataManagerRemote<T extends DataSerializable> extends DataManagerAb
 
     @Override
     public synchronized void shutdown() {
+        this.autosaveTask.closeSilently();
         this.redisAdapter.unsubscribe(this.channel, this.signalListener);
         this.objectCache.forEach((key, value) -> {
             if (isStrictSaving() && !value.hasChanged())

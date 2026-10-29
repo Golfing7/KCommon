@@ -14,7 +14,7 @@ dependencies {
 
     testImplementation("org.yaml:snakeyaml:2.2")
     testImplementation("com.google.guava:guava:17.0")
-    testImplementation("com.google.code.gson:gson:2.2.4")
+    testImplementation("com.google.code.gson:gson:2.10.1")
     testImplementation("it.unimi.dsi:fastutil:8.5.12")
     testImplementation(rootProject.libs.junit.jupiter.api)
     testRuntimeOnly(rootProject.libs.junit.jupiter.engine)

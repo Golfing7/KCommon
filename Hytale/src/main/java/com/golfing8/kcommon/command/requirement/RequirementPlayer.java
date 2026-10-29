@@ -5,7 +5,6 @@ import com.golfing8.kcommon.config.lang.Message;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
 
 /**
  * Represents a requirement that the command sender must be a player.
@@ -17,7 +16,7 @@ public class RequirementPlayer implements Requirement {
 
     @Override
     public boolean meetsRequirement(CommandContext context) {
-        return context.getSender() instanceof PlayerRef;
+        return context.isSenderPlayer();
     }
 
     @Override
