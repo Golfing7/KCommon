@@ -1,0 +1,51 @@
+package com.golfing8.kcommon.data;
+
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
+
+/**
+ * An abstract data serializable class that is backed by a player.
+ */
+public abstract class SenderSerializable extends AbstractSerializable {
+    /**
+     * The player's UUID.
+     */
+    private transient UUID playerUUID;
+
+    @Override
+    public String getKey() {
+        if (playerUUID == null)
+            playerUUID = UUID.fromString(super.getKey());
+        return playerUUID.toString();
+    }
+
+    @Override
+    public void setKey(String objectId) {
+        super.setKey(objectId);
+        playerUUID = UUID.fromString(objectId);
+    }
+
+    /**
+     * Gets the player UUID associated with the key
+     *
+     * @return the player UUID
+     */
+    public UUID getPlayerUUID() {
+        if (playerUUID == null)
+            playerUUID = UUID.fromString(super.getKey());
+        return playerUUID;
+    }
+
+    /**
+     * Gets an online version of this player, or null if they're not online.
+     *
+     * @return the player.
+     */
+    @Nullable
+    public PlayerRef getPlayer() {
+        return Universe.get().getPlayer(getPlayerUUID());
+    }
+}

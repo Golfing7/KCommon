@@ -2,9 +2,17 @@
 This file acts as a top level description of how KCommon works.
 
 ## Project Management
-KCommon strictly requires Java 21 and Java 8 to build.
+KCommon strictly requires Java 8, 21 and 25 to build (25 for `v26_1` and `Hytale`).
 * Building `./gradlew jar`
 * Testing `./gradlew test`
+* Release jars: `./gradlew :APIPackaging:shadowJar` (Minecraft) and `./gradlew :APIPackaging:hytaleShadowJar` (classifier `hytale`)
+
+### Subprojects
+* `Common` holds everything that works on any platform: `AbstractModule`, `ModuleRegistry`, `ModuleLoader`, config (`KSection`, `ConfigTypeRegistry`, the portable adapters, `YamlConfig`), data managers, Mongo/redis, text parsing (`MSCore`, `ComponentUtils`), structs and utils.
+  It compiles without Bukkit or Hytale on the classpath, so a platform import there fails the build.
+* `KCommon` is the Bukkit platform. `Hytale` is the Hytale platform. Each has its own `KPlugin`, `KCommon`, `Module`, `Modules`, lang package (`Message`, `LangConfig`, ...) and `PlaceholderProvider`, with the same class names, on top of `Common`.
+* Platform hooks that shared code needs (scheduling, ticks, logging, the providing plugin) live in `com.golfing8.kcommon.platform.Platform`. Platform config adapters and Gson types are found through `ServiceLoader` (`ConfigAdapterSource`, `DataSerializerExtension`).
+* Static utilities that are only partly portable are split: `StringUtilCore`, `ReflectionCore` and `MSCore` live in `Common`, and the Bukkit `StringUtil`, `Reflection` and `MS` extend them, so `StringUtil.parseCommas(...)` keeps working.
 
 ## Structure
 Each module acts as the center of some feature and should be implemented as follows.
@@ -398,6 +406,37 @@ Announcing a change is not enough for an object two servers can change at the sa
 Use `DataManagerRemote#withLock`, and read the object again with `loadFresh` once the lock is held.
 `KCommon#getRedisAdapter` exposes the same channels and locks for anything that isn't a data manager.
 
+## Hytale
+The Hytale build keeps modules, YAML configs (with comments), lang files, persistence, placeholders (through the Hytale build of PlaceholderAPI) and regions (with OrbisGuard as the protection hook).
+It has no commands or menus; use Hytale's own command and UI systems.
+```java
+public class SomePlugin extends KPlugin {
+    public SomePlugin(JavaPluginInit init) {
+        super(init);
+    }
+}
+
+@ModuleInfo(name = "somemodule", configSources = SomeModuleConf.class)
+public class SomeModule extends Module {
+    @Override
+    public void onEnable() {
+        // Unregistered automatically when the module is disabled.
+        addListener(PlayerDisconnectEvent.class, event -> getLogger().info(event.getPlayerRef().getUsername() + " left"));
+        addEcsListener(BreakBlockEvent.class, (entity, store, buffer, event) -> event.setCancelled(true));
+        addTimer(() -> getLogger().info("Every second"), 20, 20, false);
+    }
+
+    @Override
+    public void onDisable() {
+    }
+}
+```
+* The plugin's `manifest.json` must depend on `"Golfing8:KCommon": "*"`.
+* Hytale has no main thread. "Sync" tasks run on the default world's thread; anything touching another world must use `world.execute(...)`.
+* Delays and periods are still in Minecraft ticks (50 ms), so configs mean the same on both platforms.
+* Messages use the same `&` codes, hex colors and MiniMessage tags as Bukkit; `HytaleMessages` turns them into Hytale `Message`s.
+* `KCommon.getInstance().getProtectionHook()` answers build, PvP and region questions through OrbisGuard when it is installed.
+
 ## Agent Guidance
 When editing this project:
 * Prefer existing module, menu, command, config, and persistence patterns over introducing new abstractions
@@ -405,3 +444,4 @@ When editing this project:
 * Treat `SomeModule`, `SomeModuleConf`, and related types in this document as templates, not literal required names
 * When replacing examples, preserve the lifecycle and framework semantics shown here
 * Favor minimal, targeted changes that fit the surrounding KCommon-based architecture
+* Put new platform independent code in `Common`; only Bukkit or Hytale specific code goes in `KCommon` or `Hytale`

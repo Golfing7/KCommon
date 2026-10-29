@@ -419,7 +419,7 @@ public class Configuration extends YamlConfiguration implements KConfig {
 
     @Override
     public void set(String path, Object value) {
-        ConfigTypeRegistry.setInConfig(wrapped, path, value);
+        ConfigTypeRegistry.setInConfig(BukkitSection.of(wrapped), path, value);
         modified = true;
     }
 
@@ -479,7 +479,7 @@ public class Configuration extends YamlConfiguration implements KConfig {
     }
 
     @Override
-    public ConfigurationSection createSection(String path) {
+    public WrappedConfigurationSection createSection(String path) {
         return new WrappedConfigurationSection(wrapped.createSection(path), this);
     }
 

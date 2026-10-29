@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.entity;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.KCommon;
 import com.golfing8.kcommon.NMS;
 import com.golfing8.kcommon.config.ConfigEntry;
@@ -95,12 +96,12 @@ public class EntityEquipment implements CASerializable {
      * @return the equipment.
      */
     public static EntityEquipment fromSection(ConfigurationSection section) {
-        EntityEquipmentPiece helmet = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "helmet"), EntityEquipmentPiece.class);
-        EntityEquipmentPiece chestplate = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "chestplate"), EntityEquipmentPiece.class);
-        EntityEquipmentPiece leggings = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "leggings"), EntityEquipmentPiece.class);
-        EntityEquipmentPiece boots = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "boots"), EntityEquipmentPiece.class);
-        EntityEquipmentPiece hand = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "hand"), EntityEquipmentPiece.class);
-        EntityEquipmentPiece offHand = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "off-hand"), EntityEquipmentPiece.class);
+        EntityEquipmentPiece helmet = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "helmet"), EntityEquipmentPiece.class);
+        EntityEquipmentPiece chestplate = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "chestplate"), EntityEquipmentPiece.class);
+        EntityEquipmentPiece leggings = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "leggings"), EntityEquipmentPiece.class);
+        EntityEquipmentPiece boots = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "boots"), EntityEquipmentPiece.class);
+        EntityEquipmentPiece hand = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "hand"), EntityEquipmentPiece.class);
+        EntityEquipmentPiece offHand = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "off-hand"), EntityEquipmentPiece.class);
 
         return new EntityEquipment(helmet, chestplate, leggings, boots, hand, offHand);
     }

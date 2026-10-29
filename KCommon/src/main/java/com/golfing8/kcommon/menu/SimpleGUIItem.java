@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.menu;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
@@ -72,15 +73,15 @@ public class SimpleGUIItem {
 
     public SimpleGUIItem(ConfigurationSection section) {
         if (section.contains("item")) {
-            this.item = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "item"), ItemStackBuilder.class);
+            this.item = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "item"), ItemStackBuilder.class);
         } else {
             this.item = new ItemStackBuilder(section);
         }
         if (section.contains("slots")) {
-            this.slots = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slots"), FieldType.extractFrom(new TypeToken<Set<MenuCoordinate>>() {
+            this.slots = ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(BukkitSection.of(section)).getSubValue("slots"), FieldType.extractFrom(new TypeToken<Set<MenuCoordinate>>() {
             }));
         } else {
-            this.slots = Sets.newHashSet(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(section).getSubValue("slot"), MenuCoordinate.class));
+            this.slots = Sets.newHashSet(ConfigTypeRegistry.getFromType(ConfigPrimitive.ofSection(BukkitSection.of(section)).getSubValue("slot"), MenuCoordinate.class));
         }
         this.configSection = section;
     }

@@ -1,3 +1,5 @@
+include("Common")
+include("Hytale")
 include("NMS")
 include("KCommon")
 include("v1_8")

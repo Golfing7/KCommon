@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.particle;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.Pair;
@@ -58,9 +59,9 @@ public class ParticleCompound extends Particle {
 
         this.particleOffset = new ArrayList<>();
         for (String subKey : section.getConfigurationSection("particles").getKeys(false)) {
-            Particle loadedParticle = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "particles." + subKey), Particle.class);
+            Particle loadedParticle = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "particles." + subKey), Particle.class);
             Vector offset = section.contains("particles." + subKey + ".offset") ?
-                    ConfigTypeRegistry.getFromType(new ConfigEntry(section, "particles." + subKey + ".offset"), Vector.class) :
+                    ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "particles." + subKey + ".offset"), Vector.class) :
                     new Vector(0, 0, 0);
 
             addParticle(loadedParticle, offset);

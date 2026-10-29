@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.item;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.deanveloper.skullcreator.SkullCreator;
@@ -266,24 +267,24 @@ public final class ItemStackBuilder {
         this.amount = Math.max(section.getInt("amount", 1), 1);
         this.unstackable = section.getBoolean("unstackable", false);
         if (section.contains("book-data")) {
-            this.bookData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "book-data"), BookData.class);
+            this.bookData = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "book-data"), BookData.class);
         }
         if (section.contains("nbt-data")) {
-            this.extraData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "nbt-data"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {
+            this.extraData = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "nbt-data"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {
             }));
         }
         if (section.contains("components")) {
-            this.components = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "components"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {
+            this.components = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "components"), FieldType.extractFrom(new TypeToken<Map<String, Object>>() {
             }));
         }
         if (section.contains("variable-amount")) {
-            this.variableAmount = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "variable-amount"), Range.class);
+            this.variableAmount = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "variable-amount"), Range.class);
         }
         if (section.contains("potion-data")) {
-            this.potionData = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "potion-data"), PotionData.class);
+            this.potionData = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "potion-data"), PotionData.class);
         }
         if (section.contains("color")) {
-            this.color = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "color"), Color.class);
+            this.color = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "color"), Color.class);
         }
 
         //Load the enchantments.
@@ -293,7 +294,7 @@ public final class ItemStackBuilder {
                 //Check that the enchantment is actually defined.
                 Optional<XEnchantment> optionalEnchantment = XEnchantment.of(key);
                 if (!optionalEnchantment.isPresent()) {
-                    throw new ImproperlyConfiguredValueException(enchSection, key);
+                    throw new ImproperlyConfiguredValueException(BukkitSection.of(enchSection), key);
                 }
 
                 //Add the enchantment to the map.
@@ -309,7 +310,7 @@ public final class ItemStackBuilder {
                     ItemFlag itemFlag = ItemFlag.valueOf(flag);
                     this.itemFlags.add(itemFlag);
                 } catch (IllegalArgumentException exc) {
-                    throw new ImproperlyConfiguredValueException(section, "flags");
+                    throw new ImproperlyConfiguredValueException(BukkitSection.of(section), "flags");
                 }
             });
         }

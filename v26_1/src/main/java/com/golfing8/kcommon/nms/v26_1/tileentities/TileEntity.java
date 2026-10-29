@@ -2,6 +2,7 @@ package com.golfing8.kcommon.nms.v26_1.tileentities;
 
 import com.golfing8.kcommon.nms.block.NMSBlock;
 import com.golfing8.kcommon.nms.struct.Position;
+import com.golfing8.kcommon.util.LocationUtil;
 import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.v26_1.block.Block;
 import org.bukkit.block.TileState;
@@ -23,7 +24,7 @@ public class TileEntity implements NMSTileEntity {
 
     @Override
     public Position getPosition() {
-        return new Position(tileEntity.getBlock());
+        return LocationUtil.toPosition(tileEntity.getBlock());
     }
 
     @Override

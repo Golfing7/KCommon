@@ -34,6 +34,30 @@ repositories {
     mavenCentral()
 }
 
+// Everything the Hytale build needs at runtime: Common, the Hytale classes and the libraries Hytale lacks.
+val hytale by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    // Hytale's server jar already has Gson and BSON, and its class loader prefers them.
+    exclude(group = "com.google.code.gson")
+    exclude(group = "org.mongodb", module = "bson-record-codec")
+    attributes {
+        attribute(org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
+    }
+}
+
+val hytaleShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("hytaleShadowJar") {
+    group = "build"
+    description = "Assembles the KCommon jar for Hytale servers"
+    archiveFileName.set("${project.name}-${project.version}-hytale.jar")
+    archiveClassifier.set("hytale")
+    configurations = listOf(hytale)
+    mergeServiceFiles()
+    relocate("org.yaml.snakeyaml", "com.golfing8.shade.org.yaml.snakeyaml")
+    relocate("org.apache.commons.lang3", "com.golfing8.shade.org.apache.commons.lang3")
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "module-info.class", "META-INF/versions/*/module-info.class")
+}
+
 tasks {
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.jar")
@@ -47,6 +71,7 @@ tasks {
 
     build {
         dependsOn("shadowJar")
+        dependsOn(hytaleShadowJar)
     }
 }
 
@@ -73,6 +98,8 @@ dependencies {
     }
 
     implementation(rootProject.libs.mongo.sync)
+
+    hytale(project(":Hytale"))
 }
 
 // Javadoc module detection requires project evaluation (so api module is detected)
@@ -84,6 +111,7 @@ gradle.projectsEvaluated {
     //   The version specific implementation modules don't have public API or javadocs
     //   They are excluded to avoid Javadoc errors due to NMS references that javadoc can't handle
     val exportedProjects = listOf(
+        project(":Common"),
         project(":KCommon"),
         project(":NMS"),
     )
@@ -165,6 +193,9 @@ gradle.projectsEvaluated {
                 artifact(tasks.named("aggregateSourcesJar")) // Java source files
                 artifact(tasks.named("shadowJar")) {
                     classifier = null
+                }
+                artifact(hytaleShadowJar) {
+                    classifier = "hytale"
                 }
             }
         }

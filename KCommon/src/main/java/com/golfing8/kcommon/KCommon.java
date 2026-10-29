@@ -5,6 +5,8 @@ import com.golfing8.kcommon.db.MongoConnector;
 import com.golfing8.kcommon.db.redis.JedisRedisAdapter;
 import com.golfing8.kcommon.db.redis.RedisAdapter;
 import com.golfing8.kcommon.library.LibraryDefinition;
+import com.golfing8.kcommon.platform.BukkitPlatform;
+import com.golfing8.kcommon.platform.Platform;
 import com.golfing8.kcommon.listener.LinkedEntityListener;
 import com.golfing8.kcommon.listener.PlayerDataListener;
 import com.golfing8.kcommon.util.Reflection;
@@ -119,6 +121,7 @@ public class KCommon extends KPlugin {
         this.mainThread = Thread.currentThread();
 
         NMS.initialize(this);
+        Platform.set(new BukkitPlatform());
     }
 
     @Override

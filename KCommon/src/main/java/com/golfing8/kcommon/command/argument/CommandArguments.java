@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -232,7 +233,7 @@ public final class CommandArguments {
             String[] split = argument.split(":");
             Plugin plugin = Bukkit.getPluginManager().getPlugin(split[0]);
             if (plugin != null) {
-                return Modules.getModule(new KNamespacedKey(plugin, split[1])) != null;
+                return Modules.getModule(new KNamespacedKey(plugin.getName().toLowerCase(Locale.ROOT), split[1])) != null;
             } else {
                 return Modules.getModule(new KNamespacedKey(split[0], split[1])) != null;
             }
@@ -243,7 +244,7 @@ public final class CommandArguments {
             String[] split = ctx.getArgument().split(":");
             Plugin plugin = Bukkit.getPluginManager().getPlugin(split[0]);
             if (plugin != null) {
-                return Modules.getModule(new KNamespacedKey(plugin, split[1]));
+                return Modules.getModule(new KNamespacedKey(plugin.getName().toLowerCase(Locale.ROOT), split[1].toLowerCase(Locale.ROOT)));
             } else {
                 return Modules.getModule(new KNamespacedKey(split[0], split[1]));
             }

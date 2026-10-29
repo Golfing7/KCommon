@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.lang;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
@@ -78,7 +79,7 @@ public class Message implements MessageContainer {
         } else if (message instanceof ConfigurationSection) { //In this case the player might be defining a title too.
             ConfigurationSection section = (ConfigurationSection) message;
             //Check for the title
-            this.title = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "title"),
+            this.title = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "title"),
                     new FieldType(Title.class));
 
             if (section.contains("message")) {
@@ -101,7 +102,7 @@ public class Message implements MessageContainer {
             this.sounds = new ArrayList<>();
             if (section.contains("sounds")) {
                 for (String soundKey : section.getConfigurationSection("sounds").getKeys(false)) {
-                    SoundWrapper fromType = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "sounds." + soundKey),
+                    SoundWrapper fromType = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "sounds." + soundKey),
                             new FieldType(SoundWrapper.class));
                     this.sounds.add(fromType);
                 }

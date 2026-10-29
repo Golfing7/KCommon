@@ -37,6 +37,7 @@ tasks {
 }
 
 dependencies {
+    api(project(":Common"))
     testImplementation("net.techcable.tacospigot:WineSpigot:1.8.8-R0.2-SNAPSHOT")
     testImplementation("org.mockito:mockito-inline:4.11.0")
     testImplementation(rootProject.libs.junit.jupiter.api)

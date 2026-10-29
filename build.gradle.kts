@@ -88,8 +88,11 @@ subprojects {
 
     dependencies {
         annotationProcessor(rootProject.libs.lombok)
-        implementation(rootProject.libs.adventure.libraries)
-        implementation(rootProject.libs.adventure.platform)
+        // Common and Hytale must stay free of the Bukkit flavored adventure platform.
+        if (project.name != "Common" && project.name != "Hytale") {
+            implementation(rootProject.libs.adventure.libraries)
+            implementation(rootProject.libs.adventure.platform)
+        }
         compileOnly(rootProject.libs.expiringmap)
         compileOnly(rootProject.libs.lombok)
         compileOnly(rootProject.libs.itemnbtapi)

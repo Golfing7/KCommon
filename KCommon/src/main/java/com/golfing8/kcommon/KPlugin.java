@@ -3,7 +3,6 @@ package com.golfing8.kcommon;
 import com.golfing8.kcommon.config.lang.LangConfig;
 import com.golfing8.kcommon.config.lang.LangConfigContainer;
 import com.golfing8.kcommon.config.lang.Message;
-import com.golfing8.kcommon.data.serializer.DataSerializer;
 import com.golfing8.kcommon.hook.placeholderapi.KPAPIHook;
 import com.golfing8.kcommon.library.LibraryLoader;
 import com.golfing8.kcommon.menu.Menu;
@@ -14,24 +13,21 @@ import com.golfing8.kcommon.module.Modules;
 import com.golfing8.kcommon.util.FoliaSchedulers;
 import com.golfing8.kcommon.util.Reflection;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.PluginClassLoader;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An abstract plugin that uses this library.
  */
-public abstract class KPlugin extends JavaPlugin implements LangConfigContainer {
+public abstract class KPlugin extends JavaPlugin implements LangConfigContainer, KPluginContext {
     @Getter
     private MenuManager menuManager;
     @Getter
@@ -144,6 +140,26 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         return super.getFile();
     }
 
+    @Override
+    public String getPluginName() {
+        return getName();
+    }
+
+    @Override
+    public Logger getPluginLogger() {
+        return getLogger();
+    }
+
+    @Override
+    public Path getPluginDataFolder() {
+        return getDataFolder().toPath();
+    }
+
+    @Override
+    public Path getPluginJar() {
+        return getFile().toPath();
+    }
+
     /**
      * Loads language constants for the main language file.
      */
@@ -166,39 +182,14 @@ public abstract class KPlugin extends JavaPlugin implements LangConfigContainer 
         if (this.manifest == null)
             return;
 
-        try {
-            BufferedWriter writer = Files.newBufferedWriter(getDataFolder().toPath().resolve("module-manifest.json"));
-            DataSerializer.getGSONBase().toJson(this.manifest, writer);
-            writer.close();
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Failed to save module-manifest.json!", e);
-        }
+        this.manifest.save(getDataFolder().toPath().resolve("module-manifest.json"), getLogger());
     }
 
     /**
      * Tries to load the module manifest.
      */
     private void loadModuleManifest() {
-        Path path = getDataFolder().toPath().resolve("module-manifest.json");
-        if (Files.notExists(path)) {
-            // Load default manifest.
-            this.manifest = new ModuleManifest();
-            try {
-                Files.createFile(path);
-            } catch (IOException exc) {
-                getLogger().log(Level.SEVERE, "Failed to save default module-manifest.json!", exc);
-            }
-            return;
-        }
-
-        Gson gsonBase = DataSerializer.getGSONBase();
-        try {
-            ModuleManifest loadedManifest = gsonBase.fromJson(Files.newBufferedReader(path), ModuleManifest.class);
-            this.manifest = loadedManifest == null || loadedManifest.getModuleStates() == null ? new ModuleManifest() : loadedManifest;
-        } catch (IOException exc) {
-            getLogger().log(Level.SEVERE, "Failed to read module-manifest.json! Loading default manifest...", exc);
-            this.manifest = new ModuleManifest();
-        }
+        this.manifest = ModuleManifest.load(getDataFolder().toPath().resolve("module-manifest.json"), getLogger());
     }
 
     /**

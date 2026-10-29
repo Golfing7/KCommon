@@ -1,7 +1,7 @@
 package com.golfing8.kcommon.versioned;
 
 import com.golfing8.kcommon.NMSVersion;
-import com.golfing8.kcommon.util.Reflection;
+import com.golfing8.kcommon.util.ReflectionCore;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,8 +53,8 @@ class VersionedTest {
         @Test
         @DisplayName("Returns the first matching annotated implementation")
         void returnsMatchingImplementation() {
-            try (MockedStatic<Reflection> reflection = mockStatic(Reflection.class, CALLS_REAL_METHODS)) {
-                reflection.when(() -> Reflection.getAllImplementors(SampleVersioned.class))
+            try (MockedStatic<ReflectionCore> reflection = mockStatic(ReflectionCore.class, CALLS_REAL_METHODS)) {
+                reflection.when(() -> ReflectionCore.getAllImplementors(SampleVersioned.class))
                         .thenReturn(new HashSet<>(Arrays.asList(UnannotatedImplementation.class, Version8Implementation.class)));
 
                 Optional<SampleVersioned> result = Versioned.getImplementationFor(new NMSVersion(8, -1), SampleVersioned.class);
@@ -67,8 +67,8 @@ class VersionedTest {
         @Test
         @DisplayName("Supports minor version ranges")
         void supportsMinorVersionRange() {
-            try (MockedStatic<Reflection> reflection = mockStatic(Reflection.class, CALLS_REAL_METHODS)) {
-                reflection.when(() -> Reflection.getAllImplementors(SampleVersioned.class))
+            try (MockedStatic<ReflectionCore> reflection = mockStatic(ReflectionCore.class, CALLS_REAL_METHODS)) {
+                reflection.when(() -> ReflectionCore.getAllImplementors(SampleVersioned.class))
                         .thenReturn(Collections.singleton(Version8MinorRangeImplementation.class));
 
                 Optional<SampleVersioned> result = Versioned.getImplementationFor(new NMSVersion(8, 4), SampleVersioned.class);
@@ -81,8 +81,8 @@ class VersionedTest {
         @Test
         @DisplayName("Returns empty when no implementation matches")
         void returnsEmptyWhenNoMatch() {
-            try (MockedStatic<Reflection> reflection = mockStatic(Reflection.class, CALLS_REAL_METHODS)) {
-                reflection.when(() -> Reflection.getAllImplementors(SampleVersioned.class))
+            try (MockedStatic<ReflectionCore> reflection = mockStatic(ReflectionCore.class, CALLS_REAL_METHODS)) {
+                reflection.when(() -> ReflectionCore.getAllImplementors(SampleVersioned.class))
                         .thenReturn(new HashSet<>(Arrays.asList(UnannotatedImplementation.class, Version9Implementation.class)));
 
                 Optional<SampleVersioned> result = Versioned.getImplementationFor(new NMSVersion(8, -1), SampleVersioned.class);
@@ -94,8 +94,8 @@ class VersionedTest {
         @Test
         @DisplayName("Throws when a matching implementation has no no-args constructor")
         void throwsWhenNoNoArgsConstructorExists() {
-            try (MockedStatic<Reflection> reflection = mockStatic(Reflection.class, CALLS_REAL_METHODS)) {
-                reflection.when(() -> Reflection.getAllImplementors(SampleVersioned.class))
+            try (MockedStatic<ReflectionCore> reflection = mockStatic(ReflectionCore.class, CALLS_REAL_METHODS)) {
+                reflection.when(() -> ReflectionCore.getAllImplementors(SampleVersioned.class))
                         .thenReturn(Collections.singleton(NoNoArgsConstructorImplementation.class));
 
                 IllegalStateException exception = assertThrows(IllegalStateException.class,

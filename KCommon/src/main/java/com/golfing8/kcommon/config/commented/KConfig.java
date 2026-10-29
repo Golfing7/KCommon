@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.commented;
 
+import com.golfing8.kcommon.config.KFileConfig;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -11,7 +12,7 @@ import java.lang.reflect.Field;
  * Along with comments, other convenience methods have been added.
  * </p>
  */
-public interface KConfig extends org.bukkit.configuration.Configuration, KConfigurationSection {
+public interface KConfig extends org.bukkit.configuration.Configuration, KConfigurationSection, KFileConfig {
 
     /**
      * Gets the source config that this config should mirror.

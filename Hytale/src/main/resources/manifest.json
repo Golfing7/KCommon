@@ -1,0 +1,15 @@
+{
+  "Group": "Golfing8",
+  "Name": "KCommon",
+  "Version": "${version}",
+  "Description": "Shared module, config, language and data framework for Golfing8's plugins",
+  "Authors": [{"Name": "Golfing8"}],
+  "ServerVersion": "*",
+  "Dependencies": {},
+  "OptionalDependencies": {
+    "HelpChat:PlaceholderAPI": "*",
+    "OrbisGuard:OrbisGuard": "*"
+  },
+  "Main": "com.golfing8.kcommon.KCommon",
+  "IncludesAssetPack": false
+}

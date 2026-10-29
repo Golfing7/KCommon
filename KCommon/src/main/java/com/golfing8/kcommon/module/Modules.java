@@ -1,140 +1,90 @@
 package com.golfing8.kcommon.module;
 
-import com.golfing8.kcommon.KPlugin;
 import com.golfing8.kcommon.struct.KNamespacedKey;
-import com.google.common.base.Preconditions;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * A class to manage the instances of the {@link Module} class. This is used in place of the
- * main {@link KPlugin} class to ensure that other plugins can register modules.
+ * Typed access to the {@link ModuleRegistry} for Bukkit modules.
  */
 @UtilityClass
 public final class Modules {
     /**
-     * Maps modules from their name to their instance.
-     * <br>
-     * Note that module names are stored as lowercase strings to ensure that no two modules can share
-     * similar names.
-     */
-    private static final Map<KNamespacedKey, Module> MODULE_MAP = new HashMap<>();
-    /**
-     * A clone of the above map, but uses ONLY the name of the module. (Can cause problems if two plugins register the same module)
-     */
-    private static final Map<String, List<Module>> SMODULE_MAP = new HashMap<>();
-    /**
-     * Stores the module's class to its instance.
-     */
-    private static final Map<Class<? extends Module>, Module> CLASS_MODULE_MAP = new HashMap<>();
-
-    /**
-     * Gets all modules registered.
+     * Gets all modules currently registered.
      *
-     * @return the collection of all modules registered.
+     * @return all modules.
      */
     public static Collection<Module> getAll() {
-        return new ArrayList<>(MODULE_MAP.values());
+        List<Module> modules = new ArrayList<>();
+        for (AbstractModule<?> module : ModuleRegistry.getAll()) {
+            modules.add((Module) module);
+        }
+        return modules;
     }
 
     /**
-     * Checks if the given name of a module is registered.
+     * Checks if a module exists with the given name.
      *
-     * @param moduleName the name of the module
-     * @return true if the module exists
+     * @param moduleName the name of the module.
+     * @return true if the module exists.
      */
     public static boolean moduleExists(@Nonnull String moduleName) {
-        Preconditions.checkNotNull(moduleName);
-        return SMODULE_MAP.containsKey(moduleName.toLowerCase());
+        return ModuleRegistry.moduleExists(moduleName);
     }
 
     /**
-     * Checks if the module under the given key is registered
+     * Checks if a module exists with the given key.
      *
-     * @param namespacedKey the key
-     * @return true if the module exists
+     * @param namespacedKey the key of the module.
+     * @return true if the module exists.
      */
     public static boolean moduleExists(@Nonnull KNamespacedKey namespacedKey) {
-        Preconditions.checkNotNull(namespacedKey);
-        return MODULE_MAP.containsKey(namespacedKey);
+        return ModuleRegistry.moduleExists(namespacedKey);
     }
 
     /**
-     * Gets the module with the given name, or null if the module does not exist.
+     * Gets the module with the given name.
      *
-     * @param moduleName the module's name.
-     * @return the module, or null if no such module exists.
+     * @param moduleName the name of the module.
+     * @return the module, or null if none exists.
      */
     @Nullable
     public static Module getModule(@Nonnull String moduleName) {
-        Preconditions.checkNotNull(moduleName);
-        if (!SMODULE_MAP.containsKey(moduleName.toLowerCase()))
-            return null;
-        return SMODULE_MAP.get(moduleName.toLowerCase()).get(0);
+        return (Module) ModuleRegistry.getModule(moduleName);
     }
 
     /**
-     * Gets the module with the given namespaced key, or null if the module does not exist.
+     * Gets the module with the given key.
      *
-     * @param namespacedKey the module's name.
-     * @return the module, or null if no such module exists.
+     * @param namespacedKey the key of the module.
+     * @return the module, or null if none exists.
      */
     @Nullable
     public static Module getModule(@Nonnull KNamespacedKey namespacedKey) {
-        Preconditions.checkNotNull(namespacedKey);
-        return MODULE_MAP.get(namespacedKey);
+        return (Module) ModuleRegistry.getModule(namespacedKey);
     }
 
     /**
-     * Gets the given module with the class type.
+     * Gets the module instance of the given class.
      *
-     * @param moduleClass the class of the module to get
-     * @param <T>         the type of module
+     * @param moduleClass the class of the module.
+     * @param <T>         the type of the module.
+     * @return the module, or null if none exists.
      */
-    @SuppressWarnings("unchecked")
     public static <T extends Module> T getModule(@Nonnull Class<T> moduleClass) {
-        Preconditions.checkNotNull(moduleClass);
-        return (T) CLASS_MODULE_MAP.get(moduleClass);
+        return ModuleRegistry.getModule(moduleClass);
     }
 
-    /**
-     * A method for the {@link Module} class to call when it needs to register itself.
-     * This method should not be called by any other class.
-     *
-     * @param module the module to register.
-     * @return true if the module registered successfully, false if it already exists/was registered
-     */
     static boolean registerModule(@Nonnull Module module) {
-        Preconditions.checkNotNull(module);
-        KNamespacedKey namespacedKey = module.getNamespacedKey();
-        if (MODULE_MAP.containsKey(namespacedKey))
-            return false;
-
-        MODULE_MAP.put(namespacedKey, module);
-        SMODULE_MAP.computeIfAbsent(module.getModuleName(), k -> new ArrayList<>()).add(module);
-        CLASS_MODULE_MAP.put(module.getClass(), module);
-        return true;
+        return ModuleRegistry.registerModule(module);
     }
 
-    /**
-     * Unregisters the given module from the module map. Note that the module should still call its own
-     * shutdown logic as this method will not.
-     *
-     * @param module the module to unregister.
-     */
     static void unregisterModule(@Nonnull Module module) {
-        Preconditions.checkNotNull(module);
-        MODULE_MAP.remove(module.getNamespacedKey());
-        if (SMODULE_MAP.containsKey(module.getModuleName())) {
-            List<Module> modules = SMODULE_MAP.get(module.getModuleName());
-            modules.remove(module);
-            if (modules.isEmpty())
-                SMODULE_MAP.remove(module.getModuleName());
-        }
-        SMODULE_MAP.remove(module.getModuleName());
-        CLASS_MODULE_MAP.remove(module.getClass());
+        ModuleRegistry.unregisterModule(module);
     }
 }

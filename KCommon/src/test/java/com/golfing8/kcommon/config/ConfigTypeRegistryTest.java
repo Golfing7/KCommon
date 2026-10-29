@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.config.adapter.ConfigAdapter;
 import com.golfing8.kcommon.config.adapter.ConfigPrimitive;
 import com.golfing8.kcommon.config.commented.Configuration;
@@ -107,7 +108,7 @@ final class ConfigTypeRegistryTest {
         @DisplayName("Sets a plain value converted through toPrimitive")
         void testSetsPlainValue() {
             YamlConfiguration section = new YamlConfiguration();
-            ConfigTypeRegistry.setInConfig(section, "key", 5);
+            ConfigTypeRegistry.setInConfig(BukkitSection.of(section), "key", 5);
             assertEquals(5, section.getInt("key"));
         }
 
@@ -118,7 +119,7 @@ final class ConfigTypeRegistryTest {
             YamlConfiguration nested = new YamlConfiguration();
             nested.set("inner", 1);
 
-            ConfigTypeRegistry.setInConfig(section, "key", nested);
+            ConfigTypeRegistry.setInConfig(BukkitSection.of(section), "key", BukkitSection.of(nested));
             assertEquals(1, section.getConfigurationSection("key").getInt("inner"));
         }
     }

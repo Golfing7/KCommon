@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.util;
 
+import com.golfing8.kcommon.nms.struct.Position;
 import com.golfing8.kcommon.struct.region.CuboidRegion;
 import com.golfing8.kcommon.struct.region.Region;
 import com.google.common.base.Preconditions;
@@ -7,6 +8,8 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.util.BlockVector;
 
 import java.util.function.Consumer;
 
@@ -85,5 +88,46 @@ public class LocationUtil {
         int z = Integer.parseInt(split[2]);
         World world = Bukkit.getWorld(split[3]);
         return new Location(world, x, y, z);
+    }
+
+    /**
+     * Gets the block position of the given location.
+     *
+     * @param location the location.
+     * @return the position.
+     */
+    public Position toPosition(Location location) {
+        return new Position(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    /**
+     * Gets the position of the given block.
+     *
+     * @param block the block.
+     * @return the position.
+     */
+    public Position toPosition(Block block) {
+        return new Position(block.getX(), block.getY(), block.getZ());
+    }
+
+    /**
+     * Converts the position to a location in the given world.
+     *
+     * @param position the position.
+     * @param world    the world.
+     * @return the location.
+     */
+    public Location toLocation(Position position, World world) {
+        return new Location(world, position.getX(), position.getY(), position.getZ());
+    }
+
+    /**
+     * Converts the position to a block vector.
+     *
+     * @param position the position.
+     * @return the block vector.
+     */
+    public BlockVector toBlockVector(Position position) {
+        return new BlockVector(position.getX(), position.getY(), position.getZ());
     }
 }

@@ -6,6 +6,7 @@ import com.golfing8.kcommon.nms.tileentities.NMSTileEntity;
 import com.golfing8.kcommon.nms.v26_1.chunks.ChunkProvider;
 import com.golfing8.kcommon.nms.world.NMSWorld;
 import com.golfing8.kcommon.util.FoliaSchedulers;
+import com.golfing8.kcommon.util.LocationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -125,7 +126,7 @@ public class World implements NMSWorld {
 
     @Override
     public Position findTargetedBlock(Player player, double range) {
-        return new Position(player.getTargetBlock(null, (int) range));
+        return LocationUtil.toPosition(player.getTargetBlock(null, (int) range));
     }
 
     @Override

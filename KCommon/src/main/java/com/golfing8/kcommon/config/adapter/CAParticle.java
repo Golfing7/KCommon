@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.adapter;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.config.exc.InvalidConfigException;
 import com.golfing8.kcommon.struct.particle.Particle;
 import com.golfing8.kcommon.struct.particle.ParticleType;
@@ -28,7 +29,7 @@ public class CAParticle implements ConfigAdapter<Particle> {
             throw new InvalidConfigException("Type key missing for Particle adapter");
         }
         ParticleType particleType = ParticleType.valueOf(data.get("type").toString().toUpperCase());
-        return particleType.fromConfig(entry.getSource());
+        return particleType.fromConfig(BukkitSection.unwrap(entry.getSource()));
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.golfing8.kcommon.config.commented;
 
-import com.golfing8.kcommon.config.ConfigEntry;
-import com.golfing8.kcommon.config.ConfigTypeRegistry;
-import com.golfing8.kcommon.struct.reflection.FieldType;
-import com.google.gson.reflect.TypeToken;
+import com.golfing8.kcommon.config.KSection;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * Provides extra getters for KCommon structures.
  */
-public interface KConfigurationSection extends ConfigurationSection {
+public interface KConfigurationSection extends ConfigurationSection, KSection {
     /**
      * Sets the value at the given path with the given comments.
      *
@@ -61,6 +58,15 @@ public interface KConfigurationSection extends ConfigurationSection {
      */
     @Nullable
     KConfigurationSection getConfigurationSection(String path);
+
+    @Override
+    KConfigurationSection createSection(String path);
+
+    @Override
+    default KSection getRootSection() {
+        org.bukkit.configuration.Configuration root = getRoot();
+        return root instanceof KSection ? (KSection) root : BukkitSection.of(root);
+    }
 
     /**
      * An optional variant of {@link #getConfigurationSection(String)}
@@ -123,62 +129,5 @@ public interface KConfigurationSection extends ConfigurationSection {
         for (String key : section.getKeys(false)) {
             action.accept(!path.isEmpty() ? path + "." + key : key);
         }
-    }
-
-    /**
-     * Gets the value under the given path with the given type
-     *
-     * @param path the path
-     * @param type the type
-     * @return the value
-     */
-    default <T> Optional<T> get(String path, Class<T> type) {
-        if (!this.contains(path)) {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), type));
-    }
-
-    /**
-     * Gets or loads the value under the given path with the given type.
-     *
-     * @param path the path
-     * @param type the type
-     * @return the loaded value
-     */
-    default <T> Optional<T> getOrLoad(String path, Class<T> type) {
-        if (!this.tryLoadFromSource(path))
-            return Optional.empty();
-
-        return Optional.ofNullable(ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), type));
-    }
-
-    /**
-     * Gets or loads the value under the given path with the given type.
-     *
-     * @param path the path
-     * @param type the type
-     * @return the loaded value
-     */
-    default <T> Optional<T> getOrLoad(String path, TypeToken<T> type) {
-        if (!this.tryLoadFromSource(path))
-            return Optional.empty();
-
-        return Optional.ofNullable(ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), FieldType.extractFrom(type)));
-    }
-
-    /**
-     * Gets or loads the value under the given path with the given type.
-     *
-     * @param path the path
-     * @param type the type
-     * @return the loaded value
-     */
-    default <T> Optional<T> getOrLoad(String path, FieldType type) {
-        if (!this.tryLoadFromSource(path))
-            return Optional.empty();
-
-        return Optional.ofNullable(ConfigTypeRegistry.getFromType(new ConfigEntry(this, path), type));
     }
 }

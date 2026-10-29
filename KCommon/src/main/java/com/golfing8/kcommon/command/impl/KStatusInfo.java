@@ -142,7 +142,7 @@ public class KStatusInfo {
         for (Map.Entry<Class<? extends DataManagerContainer>, Map<String, DataManager<?>>> entry : DataManagerContainer.dataManagers.entrySet()) {
             for (DataManager<?> manager : entry.getValue().values()) {
                 Plugin owningPlugin = manager instanceof DataManagerAbstract ?
-                        ((DataManagerAbstract<?>) manager).getPlugin() : JavaPlugin.getProvidingPlugin(entry.getKey());
+                        Bukkit.getPluginManager().getPlugin(((DataManagerAbstract<?>) manager).getPlugin().getPluginName()) : JavaPlugin.getProvidingPlugin(entry.getKey());
                 if (plugin != null && owningPlugin != plugin)
                     continue;
 

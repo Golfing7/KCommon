@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.lang;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -127,7 +128,7 @@ public class LangConfig {
             throw new IllegalArgumentException(String.format("Key %s does not match expected 'key-string-format' format!", key));
 
         if (!this.configuration.contains(key)) {
-            ConfigTypeRegistry.setInConfig(this.configuration, key, value);
+            ConfigTypeRegistry.setInConfig(BukkitSection.of(this.configuration), key, value);
             this.loadedMessages.put(key, value);
             this.pendingSave = true;
             return true;

@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.menu;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.cryptomorin.xseries.XMaterial;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
@@ -187,7 +188,7 @@ public final class MenuBuilder {
                     new ItemStackBuilder(section.getConfigurationSection("filler-item")) :
                     DEFAULT_FILLER;
             if (section.contains("filler-shape")) {
-                MenuLayoutShape shape = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "filler-shape"), MenuLayoutShape.class);
+                MenuLayoutShape shape = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "filler-shape"), MenuLayoutShape.class);
                 this.drawShape(shape, fillerItem.buildFromTemplate());
             } else {
                 this.filler(fillerItem.buildFromTemplate());

@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.exc;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,7 @@ class OtherConfigExceptionsTest {
         root.createSection("nested");
         ConfigurationSection nested = root.getConfigurationSection("nested");
 
-        ImproperlyConfiguredValueException exc = new ImproperlyConfiguredValueException(nested, "my-option");
+        ImproperlyConfiguredValueException exc = new ImproperlyConfiguredValueException(BukkitSection.of(nested), "my-option");
         assertTrue(exc.getMessage().contains("my-option"));
         assertTrue(exc.getMessage().contains(nested.getCurrentPath()));
     }

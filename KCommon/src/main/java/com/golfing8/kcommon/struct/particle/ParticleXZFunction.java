@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.struct.particle;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.struct.Interval;
@@ -34,8 +35,8 @@ public class ParticleXZFunction extends ParticleFunction {
     protected ParticleXZFunction(ConfigurationSection section) {
         super(section);
 
-        this.intervalX = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "intervalX"), Interval.class);
-        this.intervalZ = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "intervalZ"), Interval.class);
+        this.intervalX = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "intervalX"), Interval.class);
+        this.intervalZ = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "intervalZ"), Interval.class);
         String biFunction = section.getString("function");
         this.function = (x, z) -> MathExpressions.evaluate(biFunction, "X", x, "Z", z);
     }

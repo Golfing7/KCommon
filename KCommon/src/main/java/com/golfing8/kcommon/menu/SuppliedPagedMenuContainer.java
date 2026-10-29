@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.menu;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.config.ConfigEntry;
 import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.menu.shape.LayoutShapeRectangle;
@@ -63,7 +64,7 @@ public abstract class SuppliedPagedMenuContainer<T> extends PagedMenuContainer {
     public void setParentSection(@NotNull ConfigurationSection section) {
         super.setParentSection(section);
 
-        MenuLayoutShape elementSection = ConfigTypeRegistry.getFromType(new ConfigEntry(section, "element-section-shape"), MenuLayoutShape.class);
+        MenuLayoutShape elementSection = ConfigTypeRegistry.getFromType(new ConfigEntry(BukkitSection.of(section), "element-section-shape"), MenuLayoutShape.class);
         if (elementSection != null) {
             this.elementSection = elementSection;
             setElementsPerPage(elementSection.getInRange().size());

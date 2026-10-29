@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.adapter;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.menu.MenuBuilder;
 import com.golfing8.kcommon.struct.reflection.FieldType;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +19,6 @@ public class CAMenuBuilder implements ReadOnlyConfigAdapter<MenuBuilder> {
         if (entry.getPrimitive() == null || entry.getSource() == null)
             return null;
 
-        return new MenuBuilder(entry.getSource());
+        return new MenuBuilder(BukkitSection.unwrap(entry.getSource()));
     }
 }

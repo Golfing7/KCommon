@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.exc;
 
+import com.golfing8.kcommon.config.commented.BukkitSection;
 import com.golfing8.kcommon.config.commented.Configuration;
 import com.golfing8.kcommon.config.commented.MConfiguration;
 import com.golfing8.kcommon.module.Module;
@@ -37,7 +38,7 @@ class ConfigExceptionTest {
             root.createSection("nested");
             ConfigurationSection nested = root.getConfigurationSection("nested");
 
-            ConfigException exc = new ConfigException(nested, "Something broke");
+            ConfigException exc = new ConfigException(BukkitSection.of(nested), "Something broke");
             assertEquals(nested.getCurrentPath() + "Something broke", exc.getMessage());
         }
 
