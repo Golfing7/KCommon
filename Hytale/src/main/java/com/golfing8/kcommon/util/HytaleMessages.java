@@ -77,7 +77,7 @@ public final class HytaleMessages {
 
         ClickEvent click = style.clickEvent();
         if (click != null && click.action() == ClickEvent.Action.OPEN_URL)
-            message = message.link(click.value());
+            message = message.link(((ClickEvent.Payload.Text) click.payload()).value());
         return message;
     }
 }
