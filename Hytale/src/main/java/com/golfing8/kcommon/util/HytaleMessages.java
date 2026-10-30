@@ -10,6 +10,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 
 /**
  * Turns KCommon's text (legacy '&' codes, hex colors and MiniMessage, parsed into Adventure components)
@@ -79,5 +81,16 @@ public final class HytaleMessages {
         if (click != null && click.action() == ClickEvent.Action.OPEN_URL)
             message = message.link(((ClickEvent.Payload.Text) click.payload()).value());
         return message;
+    }
+
+    /**
+     * Broadcasts the message to all players connected to the server
+     *
+     * @param message the message
+     */
+    public static void broadcast(Message message) {
+        for (PlayerRef ref : Universe.get().getPlayers()) {
+            ref.sendMessage(message);
+        }
     }
 }

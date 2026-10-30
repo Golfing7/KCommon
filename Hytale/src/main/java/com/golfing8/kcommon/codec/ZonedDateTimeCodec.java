@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+/**
+ * Stores a date and time as its zone and its year through second fields.
+ */
 public class ZonedDateTimeCodec implements Codec<ZonedDateTime> {
     @Override
     public @Nullable ZonedDateTime decode(BsonValue bsonValue, ExtraInfo extraInfo) {

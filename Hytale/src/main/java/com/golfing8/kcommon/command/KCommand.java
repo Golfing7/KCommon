@@ -9,7 +9,6 @@ import com.golfing8.kcommon.command.flag.CommandFlag;
 import com.golfing8.kcommon.command.requirement.Requirement;
 import com.golfing8.kcommon.command.requirement.RequirementPlayer;
 import com.golfing8.kcommon.config.lang.LangConfig;
-import com.golfing8.kcommon.config.lang.Message;
 import com.golfing8.kcommon.platform.Platform;
 import com.golfing8.kcommon.struct.Pair;
 import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;

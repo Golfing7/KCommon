@@ -20,7 +20,7 @@ public class StringUtilCore {
     /**
      * The section sign used by legacy color codes.
      */
-    public static final char COLOR_CHAR = '\u00A7';
+    public static final char COLOR_CHAR = 0xA7; // §
     private static final String LEGACY_CODES = "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx";
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + COLOR_CHAR + "[0-9A-FK-ORX]");
 

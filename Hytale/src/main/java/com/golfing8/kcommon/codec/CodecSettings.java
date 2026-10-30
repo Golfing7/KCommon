@@ -34,25 +34,53 @@ public final class CodecSettings<T> {
         return new Builder<>();
     }
 
+    /**
+     * Builds {@link CodecSettings}.
+     *
+     * @param <T> the type
+     */
     public static class Builder<T> {
         private BuilderCodec<? super T> parent;
         private BiConsumer<T, ExtraInfo> callback;
 
+        /**
+         * Sets the parent codec, whose fields are inherited.
+         *
+         * @param parent the parent codec
+         * @return this builder
+         */
         public Builder<T> parent(BuilderCodec<? super T> parent) {
             this.parent = parent;
             return this;
         }
 
+        /**
+         * Sets the callback run on each object after it is decoded.
+         *
+         * @param c the callback
+         * @return this builder
+         */
         public Builder<T> callback(Consumer<T> c) {
             this.callback = (obj, _) -> c.accept(obj);
             return this;
         }
 
+        /**
+         * Sets the callback run on each object after it is decoded.
+         *
+         * @param c the callback, also given the decoding info
+         * @return this builder
+         */
         public Builder<T> callback(BiConsumer<T, ExtraInfo> c) {
             this.callback = c;
             return this;
         }
 
+        /**
+         * Builds the settings.
+         *
+         * @return the settings
+         */
         public CodecSettings<T> build() {
             return new CodecSettings<>(parent, callback);
         }

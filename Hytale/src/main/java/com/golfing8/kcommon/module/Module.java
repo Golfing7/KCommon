@@ -13,10 +13,13 @@ import com.golfing8.kcommon.hook.placeholderapi.PlaceholderProvider;
 import com.golfing8.kcommon.platform.Platform;
 import com.golfing8.kcommon.struct.helper.terminable.Terminable;
 import com.hypixel.hytale.component.system.EcsEvent;
+import com.hypixel.hytale.component.system.ISystem;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.event.IAsyncEvent;
 import com.hypixel.hytale.event.IBaseEvent;
+import com.hypixel.hytale.registry.Registration;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +30,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
 
 /**
  * A module on a Hytale server. All 'Features' should be implemented through an extension of this class.
@@ -203,6 +207,40 @@ public abstract class Module extends AbstractModule<YamlConfig> implements LangC
      */
     protected final <E extends EcsEvent> void addEcsListener(Class<E> eventClass, EcsEvents.Handler<E> handler) {
         bind(EcsEvents.listen(eventClass, handler));
+    }
+
+    /**
+     * Unregisters the given registration, such as a global event listener, when this module is disabled.
+     *
+     * @param registration the registration.
+     */
+    public final void addRegistration(Registration registration) {
+        bind((AutoCloseable) () -> {
+            if (!registration.isRegistered())
+                return;
+
+            try {
+                registration.unregister();
+            } catch (IllegalArgumentException exc) {
+                // May occur if the registration thinks it is registered, but the registry doesn't find it.
+                getLogger().log(Level.WARNING, "Unexpected error when unregistering registration for " + getModuleName(), exc);
+            }
+        });
+    }
+
+    /**
+     * Registers an entity ECS system until this module is disabled.
+     *
+     * @param system the system.
+     */
+    @SuppressWarnings("unchecked")
+    public final void registerSystem(ISystem<EntityStore> system) {
+        getPlugin().getEntityStoreRegistry().registerSystem(system);
+        bind((AutoCloseable) () -> {
+            // The registry is already shut down when the server stops, and then removes the system itself.
+            if (!EntityStore.REGISTRY.isShutdown() && EntityStore.REGISTRY.hasSystemClass(system.getClass()))
+                EntityStore.REGISTRY.unregisterSystem((Class<? extends ISystem<EntityStore>>) system.getClass());
+        });
     }
 
     /**

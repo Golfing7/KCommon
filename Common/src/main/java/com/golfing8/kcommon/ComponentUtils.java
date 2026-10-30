@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringEscapeUtils;
 import com.golfing8.kcommon.util.StringUtilCore;
@@ -72,6 +73,25 @@ public class ComponentUtils {
         legacyColorMap.put('r', "<reset>");
 
         miniMessage = MiniMessage.miniMessage();
+    }
+
+    /**
+     * Converts a {@link String} into a {@link Component}, resolving the given MiniMessage tags.
+     * The result isn't cached, since the tags usually change per call.
+     *
+     * @param message      the string to convert
+     * @param tagResolvers the tag resolvers, such as unparsed player input
+     * @return the component
+     */
+    public static Component toComponent(String message, TagResolver... tagResolvers) {
+        if (message == null)
+            return null;
+
+        Component deserialize = miniMessage.deserialize(processLine(message), tagResolvers);
+        if (!deserialize.hasDecoration(TextDecoration.ITALIC)) {
+            deserialize = deserialize.decoration(TextDecoration.ITALIC, false);
+        }
+        return deserialize;
     }
 
     /**

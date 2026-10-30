@@ -13,6 +13,9 @@ import org.jspecify.annotations.Nullable;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * Stores a UUID as its string form.
+ */
 public class UUIDStringCodec implements Codec<UUID> {
     @Override
     public @Nullable UUID decode(BsonValue bsonValue, ExtraInfo extraInfo) {

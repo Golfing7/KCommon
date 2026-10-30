@@ -156,6 +156,16 @@ public class PlaceholderContainer {
     }
 
     /**
+     * Applies the trusted placeholders to the given message, with no other formatting.
+     *
+     * @param input the input.
+     * @return the message, with any multi-line placeholder joined by new lines.
+     */
+    public String applyTrusted(String input) {
+        return String.join("\n", apply(Collections.singletonList(input), true));
+    }
+
+    /**
      * Applies the untrusted placeholders to the given messages.
      *
      * @param input the input.

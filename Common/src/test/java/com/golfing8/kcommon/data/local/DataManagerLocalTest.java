@@ -53,22 +53,72 @@ class DataManagerLocalTest {
             }
         };
         Platform.set(new Platform() {
-            public long getCurrentTick() { return 0; }
-            public void sendConsoleMessage(String message) { }
-            public boolean supportsHexColors() { return true; }
-            public Logger getLogger() { return Logger.getAnonymousLogger(); }
-            public ZoneId getTimeZone() { return ZoneId.systemDefault(); }
-            public KPluginContext getKCommon() { return plugin; }
-            public KPluginContext getProvidingPlugin(Class<?> clazz) { return plugin; }
-            public MongoConnector getMongoConnector() { return null; }
-            public RedisAdapter getRedisAdapter() { return RedisAdapter.noop(); }
-            public boolean isMainThread(Thread thread) { return true; }
-            public void runSync(Runnable task) { task.run(); }
-            public void runAsync(Runnable task) { task.run(); }
-            public Terminable runLater(Runnable task, long delayTicks) { return () -> { }; }
-            public Terminable runLaterAsync(Runnable task, long delayTicks) { return () -> { }; }
-            public Terminable runTimer(Runnable task, long delayTicks, long periodTicks) { return () -> { }; }
-            public Terminable runTimerAsync(Runnable task, long delayTicks, long periodTicks) { return () -> { }; }
+            public long getCurrentTick() {
+                return 0;
+            }
+
+            public void sendConsoleMessage(String message) {
+            }
+
+            public boolean supportsHexColors() {
+                return true;
+            }
+
+            public Logger getLogger() {
+                return Logger.getAnonymousLogger();
+            }
+
+            public ZoneId getTimeZone() {
+                return ZoneId.systemDefault();
+            }
+
+            public KPluginContext getKCommon() {
+                return plugin;
+            }
+
+            public KPluginContext getProvidingPlugin(Class<?> clazz) {
+                return plugin;
+            }
+
+            public MongoConnector getMongoConnector() {
+                return null;
+            }
+
+            public RedisAdapter getRedisAdapter() {
+                return RedisAdapter.noop();
+            }
+
+            public boolean isMainThread(Thread thread) {
+                return true;
+            }
+
+            public void runSync(Runnable task) {
+                task.run();
+            }
+
+            public void runAsync(Runnable task) {
+                task.run();
+            }
+
+            public Terminable runLater(Runnable task, long delayTicks) {
+                return () -> {
+                };
+            }
+
+            public Terminable runLaterAsync(Runnable task, long delayTicks) {
+                return () -> {
+                };
+            }
+
+            public Terminable runTimer(Runnable task, long delayTicks, long periodTicks) {
+                return () -> {
+                };
+            }
+
+            public Terminable runTimerAsync(Runnable task, long delayTicks, long periodTicks) {
+                return () -> {
+                };
+            }
         });
     }
 

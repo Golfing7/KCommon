@@ -2,6 +2,7 @@ package com.golfing8.kcommon.util;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.OptionalInt;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -52,6 +53,20 @@ public final class MathUtil {
      */
     public static long clamp(long value, long min, long max) {
         return value < min ? min : value > max ? max : value;
+    }
+
+    /**
+     * Parses the given string as an integer.
+     *
+     * @param s the string.
+     * @return the integer, or empty if it is not one.
+     */
+    public static OptionalInt parseInteger(String s) {
+        try {
+            return OptionalInt.of(Integer.parseInt(s));
+        } catch (NumberFormatException e) {
+            return OptionalInt.empty();
+        }
     }
 
     /**

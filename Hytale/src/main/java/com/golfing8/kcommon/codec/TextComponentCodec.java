@@ -7,7 +7,6 @@ import com.hypixel.hytale.codec.schema.SchemaContext;
 import com.hypixel.hytale.codec.schema.config.Schema;
 import com.hypixel.hytale.codec.schema.config.StringSchema;
 import com.hypixel.hytale.codec.util.RawJsonReader;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bson.BsonValue;
@@ -16,6 +15,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 
+/**
+ * Stores a text component as a MiniMessage string.
+ */
 public class TextComponentCodec implements Codec<TextComponent> {
     @Override
     public BsonValue encode(TextComponent component, ExtraInfo extraInfo) {

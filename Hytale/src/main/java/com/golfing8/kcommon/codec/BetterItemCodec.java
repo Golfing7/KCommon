@@ -14,6 +14,9 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 
+/**
+ * Stores an item stack like {@link ItemStack#CODEC}, and also reads a plain item id string.
+ */
 public class BetterItemCodec implements Codec<ItemStack> {
     @Override
     public @Nullable ItemStack decode(BsonValue bsonValue, ExtraInfo extraInfo) {

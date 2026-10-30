@@ -443,6 +443,10 @@ public class SomeModule extends Module {
 * `/km` (`reload`, `enable`, `disable`, `list`, `placeholders`, `commands`) works the same as on Bukkit.
 * Hytale types are stored with their own codecs, both in YAML configs and in data managers. `HytaleCodecs` knows items, locations, vectors, components, UUIDs and dates, and any class with a static `CODEC` field.
   Register anything else with `HytaleCodecs.register(SomeType.class, codec)`. `AutoCodec.generateCodec(SomeClass.class, SomeClass::new)` builds a codec from a class' fields, for ECS components and UI event data.
+* Modules register ECS systems with `registerSystem(system)` and tie any other Hytale `Registration` (such as a `registerGlobal` listener) to their lifetime with `addRegistration(...)`; both are undone when the module disables.
+  `saveConfigValue("fieldName", value)` writes a changed `@Conf` field back to the module's `config.yml`.
+* Helpers: `HytalePlayers` (player lookup on the right thread, offline components, giving items with overflow dropped, the item in hand), `HytaleEntities` (healing, the attacker behind a damage source), `HytaleMessages.broadcast`, `CooldownMap`, `WorldBlockPosition`, `PrefabPasteUtil`, `VoidLogger`, and `StyledTextExtractor`/`StyledTextRenderer` for gradient text in UIs.
+* `struct.drop` holds config driven drop tables (`DropTable`, with `ItemDrop` and `CommandDrop` selected by `type:`); see its README.
 
 ## Agent Guidance
 When editing this project:

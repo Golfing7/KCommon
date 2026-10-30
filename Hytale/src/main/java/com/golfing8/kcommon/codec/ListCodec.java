@@ -31,6 +31,7 @@ public class ListCodec<V, S extends List<V>> implements Codec<List<V>>, WrappedC
         this.unmodifiable = unmodifiable;
     }
 
+    @Override
     public List<V> decode(@Nonnull BsonValue bsonValue, @Nonnull ExtraInfo extraInfo) {
         BsonArray list = bsonValue.asArray();
         if (list.isEmpty()) {
@@ -60,6 +61,7 @@ public class ListCodec<V, S extends List<V>> implements Codec<List<V>>, WrappedC
         }
     }
 
+    @Override
     public List<V> decodeJson(@Nonnull RawJsonReader reader, @Nonnull ExtraInfo extraInfo) throws IOException {
         reader.expect('[');
         reader.consumeWhiteSpace();
@@ -92,6 +94,7 @@ public class ListCodec<V, S extends List<V>> implements Codec<List<V>>, WrappedC
         }
     }
 
+    @Override
     @Nonnull
     public BsonValue encode(@Nonnull List<V> vs, @Nonnull ExtraInfo extraInfo) {
         BsonArray out = new BsonArray();
@@ -110,6 +113,7 @@ public class ListCodec<V, S extends List<V>> implements Codec<List<V>>, WrappedC
         return out;
     }
 
+    @Override
     @Nonnull
     public Schema toSchema(@Nonnull SchemaContext context) {
         ArraySchema schema = new ArraySchema();

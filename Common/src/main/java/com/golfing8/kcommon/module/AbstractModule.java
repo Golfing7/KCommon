@@ -1,5 +1,7 @@
 package com.golfing8.kcommon.module;
 
+import com.golfing8.kcommon.util.StringUtilCore;
+import com.golfing8.kcommon.config.ConfigTypeRegistry;
 import com.golfing8.kcommon.KPluginContext;
 import com.golfing8.kcommon.config.KFileConfig;
 import com.golfing8.kcommon.config.generator.ConfigClassSource;
@@ -178,6 +180,17 @@ public abstract class AbstractModule<C extends KFileConfig> implements Terminabl
 
     public @NotNull C getMainConfig() {
         return configs.get("config");
+    }
+
+    /**
+     * Writes a changed {@code @Conf} field back to this module's main config and saves it.
+     *
+     * @param fieldName the name of the static config field.
+     * @param value     its new value.
+     */
+    public final void saveConfigValue(String fieldName, Object value) {
+        ConfigTypeRegistry.setInConfig(getMainConfig(), StringUtilCore.camelToYaml(fieldName), value);
+        getMainConfig().save();
     }
 
     /**

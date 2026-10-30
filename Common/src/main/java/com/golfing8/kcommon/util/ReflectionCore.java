@@ -408,4 +408,25 @@ public class ReflectionCore {
     public static <T> T invokeQuietly(MethodHandle methodHandle, Object... arguments) {
         return (T) methodHandle.invokeWithArguments(arguments);
     }
+
+    /**
+     * Creates an instance through the class's no-args constructor, even if it is not public.
+     *
+     * @param clazz the class.
+     * @param <T>   the type.
+     * @return the instance, or null if the class has no accessible no-args constructor.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> @Nullable T newInstance(Class<T> clazz) {
+        try {
+            Constructor<T> constructor = clazz.getDeclaredConstructor();
+            constructor.setAccessible(true);
+
+            return (T) MethodHandles.lookup().unreflectConstructor(constructor).invokeWithArguments();
+        } catch (NoSuchMethodException | IllegalAccessException exc) {
+            return null;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
