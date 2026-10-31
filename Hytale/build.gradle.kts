@@ -9,7 +9,7 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
-val hytaleServerVersion = "0.7.4"
+val hytaleServerVersion = "0.7.5"
 
 dependencies {
     implementation(project(":Common"))

@@ -17,10 +17,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Context for a running command. Contains things like the sender, arguments, etc.
@@ -122,7 +119,7 @@ public class CommandContext {
      * @return true if the sender is a player.
      */
     public boolean isSenderPlayer() {
-        return sender instanceof Player;
+        return sender instanceof PlayerRef;
     }
 
     /**
@@ -131,12 +128,11 @@ public class CommandContext {
      * @return the sender as a player.
      * @throws ClassCastException if the sender is not a player.
      */
-    @SuppressWarnings("removal") // Still Hytale's only way to read it off the world thread.
     public PlayerRef getPlayer() {
-        if (!(sender instanceof Player))
+        if (!(sender instanceof PlayerRef pref))
             throw new ClassCastException("Sender is not a player");
 
-        return ((Player) sender).getPlayerRef();
+        return pref;
     }
 
     /**
@@ -147,10 +143,10 @@ public class CommandContext {
      * @throws ClassCastException if the sender is not a player.
      */
     public Ref<EntityStore> getEntity() {
-        if (!(sender instanceof Player))
+        if (!(sender instanceof PlayerRef pref))
             throw new ClassCastException("Sender is not a player");
 
-        return ((Player) sender).getReference();
+        return pref.getReference();
     }
 
     /**
@@ -169,11 +165,11 @@ public class CommandContext {
      * @return the world.
      * @throws ClassCastException if the sender is not a player.
      */
-    public World getWorld() {
-        if (!(sender instanceof Player))
+    public Optional<World> getWorld() {
+        if (!(sender instanceof PlayerRef pref))
             throw new ClassCastException("Sender is not a player");
 
-        return ((Player) sender).getWorld();
+        return pref.getWorldUuid() == null ? Optional.empty() : Optional.ofNullable(Universe.get().getWorld(pref.getWorldUuid()));
     }
 
     /**
@@ -182,9 +178,8 @@ public class CommandContext {
      * @param sender the sender.
      * @return the player, or null for the console.
      */
-    @SuppressWarnings("removal") // Still Hytale's only way to read it off the world thread.
     public static @Nullable PlayerRef asPlayer(CommandSender sender) {
-        return sender instanceof Player ? ((Player) sender).getPlayerRef() : null;
+        return sender instanceof PlayerRef pref ? pref : null;
     }
 
     /**

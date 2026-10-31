@@ -26,6 +26,8 @@ import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.command.system.ParseResult;
 import com.hypixel.hytale.server.core.command.system.ParserContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import lombok.*;
 import net.kyori.adventure.util.TriState;
@@ -618,7 +620,7 @@ public abstract class KCommand {
             BuiltCommandArgument builtCommandArgument = this.commandArguments.get(i);
             if (!canSeeArgument(sender, builtCommandArgument)) {
                 if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
-                    boolean player = sender instanceof Player;
+                    boolean player = sender instanceof PlayerRef;
                     if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
                         if (verbose)
                             handleMissingArgument(sender, builtCommandArgument);
@@ -674,7 +676,7 @@ public abstract class KCommand {
             }
 
             if (builtCommandArgument.getAutoFillPlayersOnly() != null) {
-                boolean player = sender instanceof Player;
+                boolean player = sender instanceof PlayerRef;
                 if (player != builtCommandArgument.getAutoFillPlayersOnly()) {
                     if (verbose)
                         handleMissingArgument(sender, builtCommandArgument);
@@ -802,7 +804,7 @@ public abstract class KCommand {
         if (!isExecutionImplemented())
             return null;
 
-        boolean consoleSender = !(sender instanceof Player);
+        boolean consoleSender = !(sender instanceof PlayerRef);
         StringBuilder argumentChain = new StringBuilder();
         for (BuiltCommandArgument argument : this.commandArguments) {
             // As soon as a player cannot see a command argument, prevent adding the rest.
@@ -997,8 +999,9 @@ public abstract class KCommand {
         }
 
         // Players send commands as their Player component.
-        World world = sender instanceof Player ? ((Player) sender).getWorld() : null;
-        if (world != null) {
+        UUID worldUuid = sender instanceof PlayerRef pref ? pref.getWorldUuid() : null;
+        World world;
+        if (worldUuid != null && (world = Universe.get().getWorld(worldUuid)) != null) {
             world.execute(task);
         } else {
             Platform.get().runSync(task);
