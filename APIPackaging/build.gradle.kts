@@ -49,7 +49,7 @@ val hytale by configurations.creating {
 val hytaleShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("hytaleShadowJar") {
     group = "build"
     description = "Assembles the KCommon jar for Hytale servers"
-    archiveFileName.set("${project.name}-${project.version}-hytale.jar")
+    archiveFileName.set("${rootProject.name}-${project.version}-hytale.jar")
     archiveClassifier.set("hytale")
     configurations = listOf(hytale)
     mergeServiceFiles()
@@ -60,7 +60,7 @@ val hytaleShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.
 
 tasks {
     shadowJar {
-        archiveFileName.set("${project.name}-${project.version}.jar")
+        archiveFileName.set("${rootProject.name}-${project.version}.jar")
         // Mongo's record codec is Java 17-only and cannot be used by Java 8 consumers.
         exclude("org/bson/codecs/record/**")
         relocate("de.tr7zw.changeme.nbtapi", "de.tr7zw.kcommon.nbtapi")

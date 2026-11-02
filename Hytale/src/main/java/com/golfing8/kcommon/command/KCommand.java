@@ -25,7 +25,6 @@ import com.hypixel.hytale.server.core.command.system.CommandRegistration;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.command.system.ParseResult;
 import com.hypixel.hytale.server.core.command.system.ParserContext;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
