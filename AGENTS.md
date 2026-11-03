@@ -437,9 +437,10 @@ public class SomeModule extends Module {
 * Messages use the same `&` codes, hex colors and MiniMessage tags as Bukkit; `HytaleMessages` turns them into Hytale `Message`s.
 * `KCommon.getInstance().getProtectionHook()` answers build, PvP and region questions through OrbisGuard when it is installed.
 * Commands are written exactly as in [Commands](#commands) (`@Cmd`, `MCommand<SomeModule>`, `CommandArguments`, flags, requirements) and registered with `addCommand(new SomeModuleCMD())` in `onEnable`.
-  Senders are Hytale `CommandSender`s; a player sends as their `Player` component, so use `context.getPlayer()` for the `PlayerRef` and `getEntity()`, `getStore()`, `getWorld()` for their entity. Commands run on the sender's world thread (the default world for the console) unless `async = true`, so those are safe to use there.
+  Senders are Hytale `CommandSender`s; a player sends as their `PlayerRef`, so use `context.getPlayer()` for the `PlayerRef` and `getEntity()`, `getStore()`, `getWorld()` for their entity. Commands run on the sender's world thread (the default world for the console) unless `async = true`, so those are safe to use there.
   Another player may be in another world: touch their components through `HytalePlayers.runOnWorld(target, ref -> ...)`. For a player argument that defaults to the sender use `addPlayerOrSelfArgument("player", "other")`; naming someone else needs the `.other` permission.
-  Hytale's command tree only knows the names, sub commands and `--flags`, so the client can't suggest values for positional arguments. Help isn't paged.
+  Positional arguments are completed in game and on the console from their `CommandArgument`'s completions, but Hytale only sends the text typed for that argument, so `ArgumentContext.getAllArguments()` is empty there.
+  Completions run on the network thread; for anything that reads world or entity data call `completeOnWorld(ctx -> ...)` (or `completeAsync` with your own future) on your own `CommandArgument`, not a shared `CommandArguments` constant, and the values are sent once read. Help isn't paged.
 * `/km` (`reload`, `enable`, `disable`, `list`, `placeholders`, `commands`) works the same as on Bukkit.
 * Hytale types are stored with their own codecs, both in YAML configs and in data managers. `HytaleCodecs` knows items, locations, vectors, components, UUIDs and dates, and any class with a static `CODEC` field.
   Register anything else with `HytaleCodecs.register(SomeType.class, codec)`. `AutoCodec.generateCodec(SomeClass.class, SomeClass::new)` builds a codec from a class' fields, for ECS components and UI event data.
@@ -456,3 +457,4 @@ When editing this project:
 * When replacing examples, preserve the lifecycle and framework semantics shown here
 * Favor minimal, targeted changes that fit the surrounding KCommon-based architecture
 * Put new platform independent code in `Common`; only Bukkit or Hytale specific code goes in `KCommon` or `Hytale`
+* When working with Hytale, search for hytale shared source on the host computer for use. Start with searching the project's parent directory. Usually this is stored under ~/IdeaProjects/hytale-shared-source/

@@ -1,6 +1,8 @@
 package com.golfing8.kcommon.util;
 
+import com.golfing8.kcommon.platform.Platform;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -32,6 +34,21 @@ import java.util.function.Supplier;
  */
 public final class HytalePlayers {
     private HytalePlayers() {
+    }
+
+    /**
+     * Queues the task on the sender's world thread, or the default world's for the console and other senders.
+     *
+     * @param sender the sender.
+     * @param task   the task.
+     */
+    public static void runOnSenderWorld(CommandSender sender, Runnable task) {
+        UUID worldId = sender instanceof PlayerRef player ? player.getWorldUuid() : null;
+        World world = worldId == null ? null : Universe.get().getWorld(worldId);
+        if (world != null)
+            world.execute(task);
+        else
+            Platform.get().runSync(task);
     }
 
     /**

@@ -1,9 +1,12 @@
 package com.golfing8.kcommon.command.argument;
 
+import com.golfing8.kcommon.util.HytalePlayers;
 import com.golfing8.kcommon.util.StringUtilCore;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -32,6 +35,59 @@ public class CommandArgument<A> {
      * A getter for the argument. Takes in the argument context and converts it to whatever type was requested.
      */
     private final Function<ArgumentContext, A> getter;
+    /**
+     * Completions that are read somewhere other than the thread asking for them, such as the sender's world thread.
+     * Used in place of {@link #completions} when set.
+     */
+    private @Nullable Function<ArgumentContext, CompletableFuture<? extends Collection<String>>> asyncCompletions;
+
+    /**
+     * Completes this argument through the given future instead of {@link #completions}.
+     *
+     * @param completer gives a future of the completions.
+     * @return this argument.
+     */
+    public CommandArgument<A> completeAsync(Function<ArgumentContext, CompletableFuture<? extends Collection<String>>> completer) {
+        this.asyncCompletions = completer;
+        return this;
+    }
+
+    /**
+     * Completes this argument on the sender's world thread, or the default world's for the console,
+     * so world and entity data can be read safely.
+     *
+     * @param completer gives the completions, called on the world thread.
+     * @return this argument.
+     */
+    public CommandArgument<A> completeOnWorld(Function<ArgumentContext, Collection<String>> completer) {
+        return completeAsync(context -> {
+            CompletableFuture<Collection<String>> future = new CompletableFuture<>();
+            HytalePlayers.runOnSenderWorld(context.getSender(), () -> {
+                try {
+                    future.complete(completer.apply(context));
+                } catch (Throwable thr) {
+                    future.completeExceptionally(thr);
+                }
+            });
+            return future;
+        });
+    }
+
+    /**
+     * Gets the completions for this argument, from {@link #asyncCompletions} if set.
+     *
+     * @param context the argument context.
+     * @return a future of the completions.
+     */
+    public CompletableFuture<Collection<String>> complete(ArgumentContext context) {
+        try {
+            return asyncCompletions != null
+                    ? asyncCompletions.apply(context).thenApply(values -> values)
+                    : CompletableFuture.completedFuture(completions.apply(context));
+        } catch (Throwable thr) {
+            return CompletableFuture.failedFuture(thr);
+        }
+    }
 
     /**
      * Creates a command argument with all valid types being from the given enum.

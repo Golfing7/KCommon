@@ -15,6 +15,7 @@ import com.golfing8.kcommon.struct.placeholder.MultiLinePlaceholder;
 import com.golfing8.kcommon.struct.placeholder.Placeholder;
 import com.golfing8.kcommon.struct.profiler.HighLowAverageProfiler;
 import com.golfing8.kcommon.struct.profiler.IMethodProfiler;
+import com.golfing8.kcommon.util.HytalePlayers;
 import com.golfing8.kcommon.util.MSCore;
 import com.golfing8.kcommon.util.MapUtil;
 import com.golfing8.kcommon.util.StringUtilCore;
@@ -26,8 +27,9 @@ import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.command.system.ParseResult;
 import com.hypixel.hytale.server.core.command.system.ParserContext;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
-import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.command.system.arguments.types.ArgumentType;
+import com.hypixel.hytale.server.core.command.system.suggestion.SuggestionResult;
+import com.hypixel.hytale.protocol.packets.interface_.ArgValuesResponse;
 import lombok.*;
 import net.kyori.adventure.util.TriState;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +37,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -997,14 +1003,7 @@ public abstract class KCommand {
             return future;
         }
 
-        // Players send commands as their Player component.
-        UUID worldUuid = sender instanceof PlayerRef pref ? pref.getWorldUuid() : null;
-        World world;
-        if (worldUuid != null && (world = Universe.get().getWorld(worldUuid)) != null) {
-            world.execute(task);
-        } else {
-            Platform.get().runSync(task);
-        }
+        HytalePlayers.runOnSenderWorld(sender, task);
         return future;
     }
 
@@ -1085,7 +1084,7 @@ public abstract class KCommand {
             if (this.commandArguments.size() > args.length - 1) {
                 CommandArgument<?> argument = this.commandArguments.get(args.length - 1).getArgument();
                 ArgumentContext context = new ArgumentContext(sender, this, label, stringArgument, Collections.unmodifiableList(builtArguments), args.length - 1);
-                completions.addAll(argument.getCompletions().apply(context));
+                completions.addAll(argument.complete(context).getNow(Collections.emptyList()));
             }
 
             if (builtArguments.size() >= this.commandArguments.size()) {
@@ -1161,7 +1160,7 @@ public abstract class KCommand {
     /**
      * The command Hytale sees for a {@link KCommand}.
      * <p>
-     * It carries the name, aliases, permission, flags and sub commands for Hytale's command tree and completion,
+     * It carries the name, aliases, permission, arguments, flags and sub commands for Hytale's command tree and completion,
      * and hands the raw input to KCommon before Hytale parses any arguments.
      * </p>
      */
@@ -1178,6 +1177,10 @@ public abstract class KCommand {
                 requireNoPermission();
             else
                 requirePermission(command.getCommandPermission());
+            for (int i = 0; i < command.commandArguments.size(); i++) {
+                BuiltCommandArgument argument = command.commandArguments.get(i);
+                withRequiredArg(argument.getName(), argument.getArgument().getDescription(), new KArgType(command, argument, i));
+            }
             for (CommandFlag flag : command.longNameMappedCommandFlags.values()) {
                 withFlagArg(flag.getFullName(), "");
             }
@@ -1197,6 +1200,87 @@ public abstract class KCommand {
         protected CompletableFuture<Void> execute(@NotNull com.hypixel.hytale.server.core.command.system.CommandContext context) {
             // Unreachable, acceptCall never hands the input to Hytale's parser.
             return null;
+        }
+    }
+
+    /**
+     * The Hytale argument type for one of a {@link KCommand}'s arguments, which completes it from its {@link CommandArgument}.
+     * <p>
+     * Each instance has its own suggestion type id, so a request maps back to exactly this command and argument.
+     * Hytale only sends the text typed for this argument, so {@link ArgumentContext#getAllArguments()} is empty here.
+     * Hytale never parses the value, since {@link HytaleCommand} hands the raw input to KCommon.
+     * </p>
+     */
+    private static final class KArgType extends ArgumentType<String> {
+        // Matches the cap GamePacketHandler puts on a suggestion packet.
+        private static final int MAX_WIRE_SUGGESTIONS = 150;
+        private static final long CONSOLE_TIMEOUT_MILLIS = 1000;
+
+        private final KCommand command;
+        private final BuiltCommandArgument argument;
+        private final int index;
+
+        KArgType(KCommand command, BuiltCommandArgument argument, int index) {
+            super(com.hypixel.hytale.server.core.Message.raw(argument.getName()),
+                    com.hypixel.hytale.server.core.Message.raw(argument.getArgument().getDescription()), 1);
+            this.command = command;
+            this.argument = argument;
+            this.index = index;
+        }
+
+        @Override
+        public String parse(@NotNull String[] input, @NotNull ParseResult parseResult) {
+            return input[0];
+        }
+
+        @Override
+        public void suggest(@NotNull CommandSender sender, @NotNull String textAlreadyEntered, int numParametersTyped, @NotNull SuggestionResult result) {
+            if (!command.canSee(sender) || !command.canSeeArgument(sender, argument))
+                return;
+
+            ArgumentContext context = new ArgumentContext(sender, command, command.getCommandName(), textAlreadyEntered, Collections.emptyList(), index);
+            CompletableFuture<Collection<String>> future = argument.getArgument().complete(context);
+            if (!(sender instanceof PlayerRef player) || future.isDone()) {
+                // The console completes on its own thread, so it can wait on a world thread.
+                try {
+                    addMatching(future.get(CONSOLE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS), textAlreadyEntered, result);
+                } catch (InterruptedException exc) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException | TimeoutException exc) {
+                    Platform.get().getLogger().log(Level.WARNING, "Failed to complete argument " + argument.getName() + " of " + command.getFullCommandChain(), exc);
+                }
+                return;
+            }
+
+            // Hytale replies as soon as this returns, so that reply is marked incomplete and the values follow once read.
+            // Both go out through the connection's event loop, which is running this request, so the follow-up lands second.
+            result.markTruncated();
+            future.whenComplete((values, thr) -> {
+                if (thr != null) {
+                    Platform.get().getLogger().log(Level.WARNING, "Failed to complete argument " + argument.getName() + " of " + command.getFullCommandChain(), thr);
+                    return;
+                }
+                if (!player.isValid())
+                    return;
+
+                SuggestionResult late = new SuggestionResult(MAX_WIRE_SUGGESTIONS);
+                addMatching(values, textAlreadyEntered, late);
+                ArgValuesResponse response = new ArgValuesResponse();
+                response.argTypeId = getSuggestionTypeId();
+                response.values = late.getSuggestions().toArray(new String[0]);
+                response.continuations = new boolean[response.values.length];
+                response.isComplete = !late.isTruncated();
+                player.getPacketHandler().write(response);
+            });
+        }
+
+        private static void addMatching(Collection<String> values, String typed, SuggestionResult result) {
+            // The client re-sorts typed input by length then name, but shows an empty input and fills the cap in our order.
+            String typedLower = typed.toLowerCase(Locale.ROOT);
+            values.stream()
+                    .filter(value -> value.toLowerCase(Locale.ROOT).startsWith(typedLower))
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                    .forEach(result::suggest);
         }
     }
 }
