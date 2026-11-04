@@ -47,7 +47,7 @@ public class StyledTextRenderer {
                 styleBuilder.append(", RenderBold: true");
             }
             if (isItalic) {
-                styleBuilder.append(", RenderItalic: true");
+                styleBuilder.append(", RenderItalics: true");
             }
 
             String labelMarkup = String.format(

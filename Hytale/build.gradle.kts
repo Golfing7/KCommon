@@ -30,6 +30,15 @@ dependencies {
         exclude(group = "org.mongodb", module = "bson")
     }
     implementation(rootProject.libs.jedis)
+
+    testImplementation("com.hypixel.hytale:Server:$hytaleServerVersion")
+    testImplementation(rootProject.libs.junit.jupiter.api)
+    testRuntimeOnly(rootProject.libs.junit.jupiter.engine)
+    testRuntimeOnly(rootProject.libs.junit.platform.launcher)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.processResources {

@@ -183,3 +183,102 @@ For data supplied by another service, snapshot the current collection with
 global placeholders and build each element. Before performing a click action,
 recheck that the element is still available; a menu can remain open while the
 underlying data changes.
+
+## Hytale
+
+The Hytale build has the same split. A menu section loads as a Hytale
+`MenuBuilder`, and `PlayerMenuContainer` or `PagedMenuContainer<T>` owns it
+for one player. The menu is sent to the client as one inline UI document, so
+plugins need no `.ui` asset files.
+
+Hytale menus are trees rather than slots. Put them in the module's
+`menus.yml` and load them with `module.getConfig("menus")`:
+
+```yaml
+greeting-menu:
+  title: "&aGreetings"
+  width: 500
+  height: 400
+  # Properties of the frame's content Group.
+  content:
+    layout-mode: Top
+    padding: {full: 16}
+  elements:
+    greetings:
+      layout-mode: TopScrolling
+      flex-weight: 1
+      scrollbar-style: '@DefaultScrollbarStyle'
+    close:
+      type: TextButton
+      special: true
+      style: '@CancelTextButtonStyle'
+      anchor: {height: 44}
+      text: Close
+  templates:
+    greeting:
+      layout-mode: Left
+      anchor: {height: 40}
+      children:
+        name:
+          type: Label
+          text: "&e{NAME}"
+          style: {font-size: 16, text-color: '#ffffff'}
+          flex-weight: 1
+        greet:
+          type: TextButton
+          style: '@DefaultTextButtonStyle'
+          text: Greet
+```
+
+```java
+public final class GreetingMenu extends PlayerMenuContainer {
+    private final GreetingsModule module = GreetingsModule.get();
+
+    public GreetingMenu(PlayerRef player) {
+        super(player);
+    }
+
+    @Override
+    protected Menu loadMenu() {
+        MenuBuilder builder = module.getConfig("menus")
+                .getOrLoad("greeting-menu", MenuBuilder.class)
+                .orElseThrow(() -> new IllegalStateException("greeting-menu is missing"));
+
+        for (Greeting greeting : module.getGreetings()) {
+            builder.addRow("greetings", "greeting")
+                    .placeholders("NAME", greeting.getName())
+                    .bindTo("greet", event -> {
+                        greeting.send(event.getPlayerRef());
+                        event.refresh();
+                    });
+        }
+        return builder.bindTo("close", MenuClickEvent::close).build();
+    }
+}
+```
+
+Open it with `new GreetingMenu(playerRef).open()`. Every container method may
+be called from any thread; the work runs on the player's world thread, and so
+do click actions.
+
+- Elements default to `Group`. Types and properties are Hytale's markup names
+  in kebab case: `Label`, `TextButton`, `Button`, `ItemIcon`, `ItemSlot`,
+  `AssetImage`, `ProgressBar`, `TextField`, plus `Title` (a label styled like
+  the game's titles) and `StyledText` (one label per character, for
+  gradients).
+- The Hytale client disconnects a player when a page holds markup it doesn't
+  know. KCommon checks element types, properties and values when the menu
+  loads, and placeholder values when it builds, and refuses to open a menu
+  that would break.
+- A value like `'@DefaultTextButtonStyle'` references `Common.ui`;
+  `'Pages/Foo.ui@Name'` references another document. Use
+  `{ref: '@SecondaryButtonStyle', sounds: '@ButtonSounds'}` to add sounds to a
+  referenced style.
+- `special` elements only appear once Java binds or `show`s them. Use
+  `set`, `visible`, `disabled` and `text` to change an element from Java.
+- Rows come from `templates`, added with `addRow(container, template)`. Each
+  row has its own placeholders and bindings; its placeholders win over the
+  menu's.
+- `PagedMenuContainer` reads `elements-per-page`, adds `{PAGE}` and
+  `{MAX_PAGE}`, and `bindPageButtons` wires previous and next buttons.
+

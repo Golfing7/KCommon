@@ -408,7 +408,7 @@ Use `DataManagerRemote#withLock`, and read the object again with `loadFresh` onc
 
 ## Hytale
 The Hytale build keeps modules, YAML configs (with comments), lang files, persistence, placeholders (through the Hytale build of PlaceholderAPI), commands and regions (with OrbisGuard as the protection hook).
-It has no menus; use Hytale's own UI system.
+Menus are YAML too (see [Hytale menus](#hytale-menus)); they are sent as inline UI markup, so plugins need no `.ui` files.
 ```java
 public class SomePlugin extends KPlugin {
     public SomePlugin(JavaPluginInit init) {
@@ -448,6 +448,40 @@ public class SomeModule extends Module {
   `saveConfigValue("fieldName", value)` writes a changed `@Conf` field back to the module's `config.yml`.
 * Helpers: `HytalePlayers` (player lookup on the right thread, offline components, giving items with overflow dropped, the item in hand), `HytaleEntities` (healing, the attacker behind a damage source), `HytaleMessages.broadcast`, `CooldownMap`, `WorldBlockPosition`, `PrefabPasteUtil`, `VoidLogger`, and `StyledTextExtractor`/`StyledTextRenderer` for gradient text in UIs.
 * `struct.drop` holds config driven drop tables (`DropTable`, with `ItemDrop` and `CommandDrop` selected by `type:`); see its README.
+
+### Hytale menus
+`com.golfing8.kcommon.menu` on Hytale mirrors the Bukkit menus: `MenuBuilder` (loaded with `getOrLoad`), `PlayerMenuContainer` and `PagedMenuContainer<T>`.
+Put menus in the module's `menus.yml` (`resources/<module>/menus.yml`, read with `getConfig("menus")`).
+```yaml
+shop-menu:
+  title: '&eShop'        # frame title; width, height, overlay, frame (decorated|none), lifetime, elements-per-page
+  content: {layout-mode: Top, padding: {full: 16}}
+  elements:              # ordered tree; elements default to Group
+    items: {layout-mode: TopScrolling, flex-weight: 1}
+    close: {type: TextButton, special: true, style: '@CancelTextButtonStyle', anchor: {height: 44}, text: Close}
+  templates:             # copied into a list once per row
+    item:
+      layout-mode: Left
+      children:
+        name: {type: Label, text: '{NAME}', style: {font-size: 16, text-color: '#ffffff'}}
+        buy: {type: TextButton, style: '@DefaultTextButtonStyle', text: Buy}
+```
+```java
+public class ShopMenu extends PlayerMenuContainer {
+    @Override
+    protected Menu loadMenu() {
+        MenuBuilder builder = module.getConfig("menus").getOrLoad("shop-menu", MenuBuilder.class).orElseThrow();
+        for (ShopItem item : items)
+            builder.addRow("items", "item").placeholders("NAME", item.getName())
+                    .disabled("buy", !item.canAfford(getPlayer())).bindTo("buy", event -> { item.buy(event.getPlayer()); event.refresh(); });
+        return builder.bindTo("close", MenuClickEvent::close).build();
+    }
+}
+```
+* Element types and properties are Hytale's markup names in kebab case. The client disconnects a player over markup it doesn't know, so `MenuSchema` whitelists them and the menu fails to load (or build) instead; add a property there only after checking the client accepts it.
+* `'@Name'` references a value of `Common.ui` (`'Pages/Foo.ui@Name'` another document) and is sent as a `Set` command; `{ref: '@SecondaryButtonStyle', sounds: '@ButtonSounds'}` adds the sounds. Inline documents can't import `.ui` files, so this is the only way to reuse their styles.
+* `special` elements appear only once bound or `show`n. `Title` is a label styled like the game's titles; `StyledText` renders one label per character for gradients.
+* Actions get a `MenuClickEvent` on the player's world thread. Never trust client data; bind the object you need in the closure instead of sending ids.
 
 ## Agent Guidance
 When editing this project:

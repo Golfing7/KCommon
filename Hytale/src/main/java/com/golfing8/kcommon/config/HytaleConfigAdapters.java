@@ -2,6 +2,7 @@ package com.golfing8.kcommon.config;
 
 import com.golfing8.kcommon.codec.HytaleCodecs;
 import com.golfing8.kcommon.config.adapter.CAHytaleCodec;
+import com.golfing8.kcommon.config.adapter.CAMenuBuilder;
 import com.golfing8.kcommon.config.adapter.CAMessage;
 import com.golfing8.kcommon.config.adapter.CARegion;
 import com.golfing8.kcommon.config.adapter.ConfigAdapter;
@@ -22,6 +23,7 @@ public class HytaleConfigAdapters implements ConfigAdapterSource {
         return Arrays.asList(
                 new CAMessage(),
                 new CARegion(),
+                new CAMenuBuilder(),
                 new CAHytaleCodec<>(ItemStack.class, HytaleCodecs.find(ItemStack.class)),
                 new CAHytaleCodec<>(Location.class, HytaleCodecs.LOCATION_CODEC),
                 new CAHytaleCodec<>(Box.class, Box.CODEC)
