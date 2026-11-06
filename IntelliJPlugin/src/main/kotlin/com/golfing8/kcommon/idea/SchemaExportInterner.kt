@@ -26,6 +26,11 @@ class SchemaExportInterner(private val project: Project) {
     /** typeName -> every (alias, canonical signature text) registered so far under that name, for collision detection. */
     private val aliasesByTypeName = LinkedHashMap<String, MutableList<Pair<String, String>>>()
 
+    /** Already-written JSON by type instance: a Hytale menu element repeats itself ten levels deep, and every container variant points at the next level, so walking it without this is exponential. */
+    private val written = java.util.IdentityHashMap<ConfigFieldType, JsonValue>()
+
+    fun memoize(type: ConfigFieldType, write: () -> JsonValue): JsonValue = written[type] ?: write().also { written[type] = it }
+
     fun resolveEnumValues(source: EnumSource): List<String> =
         enumResolutionCache.getOrPut(source) { EnumSource.resolve(source, project) }
 
@@ -39,14 +44,24 @@ class SchemaExportInterner(private val project: Project) {
      * synthetic "MenuBuilder" shape varies between a normal and a paged menu container), in which
      * case a disambiguating suffix is appended.
      */
-    fun internNested(typeName: String, fieldsJson: JsonValue.JsonObject): String {
-        val signature = fieldsJson.render()
+    fun internNested(
+        typeName: String,
+        fieldsJson: JsonValue.JsonObject,
+        discriminator: String? = null,
+        variantsJson: JsonValue.JsonObject? = null,
+    ): String {
+        val record = jsonObjectOf("typeName" to JsonValue.JsonString(typeName), "fields" to fieldsJson)
+        if (discriminator != null && variantsJson != null) {
+            record["discriminator"] = JsonValue.JsonString(discriminator)
+            record["variants"] = variantsJson
+        }
+        val signature = record.render()
         val existing = aliasesByTypeName.getOrPut(typeName) { mutableListOf() }
         existing.firstOrNull { it.second == signature }?.let { return it.first }
 
         val alias = if (existing.isEmpty()) typeName else "$typeName#${existing.size + 1}"
         existing.add(alias to signature)
-        nestedTypes[alias] = jsonObjectOf("typeName" to JsonValue.JsonString(typeName), "fields" to fieldsJson)
+        nestedTypes[alias] = record
         return alias
     }
 

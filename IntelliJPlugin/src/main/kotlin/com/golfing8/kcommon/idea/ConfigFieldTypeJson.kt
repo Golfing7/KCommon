@@ -15,9 +15,8 @@ object ConfigFieldTypeJson {
             val ref = interner.internEnum(interner.resolveEnumValues(type.source))
             jsonObjectOf("kind" to JsonValue.JsonString("enumRef"), "ref" to JsonValue.JsonString(ref))
         }
-        is ConfigFieldType.Nested -> {
-            val fieldsJson = fieldsToJson(type.fields, project, interner)
-            val ref = interner.internNested(type.typeName, fieldsJson)
+        is ConfigFieldType.Nested -> interner.memoize(type) {
+            val ref = internNested(type.typeName, type, project, interner)
             jsonObjectOf("kind" to JsonValue.JsonString("nestedRef"), "ref" to JsonValue.JsonString(ref))
         }
         is ConfigFieldType.ListOf -> jsonObjectOf(
@@ -30,6 +29,14 @@ object ConfigFieldTypeJson {
             "keyType" to toJson(type.keyType, project, interner)
         )
         ConfigFieldType.Unknown -> jsonObjectOf("kind" to JsonValue.JsonString("unknown"))
+    }
+
+    /** Interns [type]'s fields (and variants) under [alias], returning the alias to reference it by. */
+    fun internNested(alias: String, type: ConfigFieldType.Nested, project: Project, interner: SchemaExportInterner): String {
+        val variantsJson = if (type.variants.isEmpty()) null else JsonValue.JsonObject().also { obj ->
+            for ((variant, fields) in type.variants) obj[variant] = fieldsToJson(fields, project, interner)
+        }
+        return interner.internNested(alias, fieldsToJson(type.fields, project, interner), type.discriminator, variantsJson)
     }
 
     fun fieldsToJson(fields: Map<String, ConfigFieldType>, project: Project, interner: SchemaExportInterner): JsonValue.JsonObject {

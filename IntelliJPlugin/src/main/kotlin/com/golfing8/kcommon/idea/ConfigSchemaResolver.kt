@@ -11,6 +11,7 @@ import org.jetbrains.yaml.psi.YAMLDocument
 import org.jetbrains.yaml.psi.YAMLFile
 import org.jetbrains.yaml.psi.YAMLKeyValue
 import org.jetbrains.yaml.psi.YAMLMapping
+import org.jetbrains.yaml.psi.YAMLScalar
 import org.jetbrains.yaml.psi.YAMLSequence
 import org.jetbrains.yaml.psi.YAMLSequenceItem
 
@@ -38,7 +39,19 @@ object ConfigSchemaResolver {
     private const val MAX_RESOURCES_SEARCH_DEPTH = 6
 
     /** The schema governing some point in a file, plus the path *within that schema* left to resolve - not necessarily the file's own full key path, since a `#@Module`/`#@File` tag on an ancestor key re-roots it. */
-    data class SchemaContext(val schema: ConfigSchema, val relativePath: List<String>)
+    data class SchemaContext(val schema: ConfigSchema, val relativePath: KeyPath)
+
+    /**
+     * A dot-path of YAML keys plus, for each key, the mapping on the path below it (its value, or
+     * the list item the path goes through), so a [ConfigFieldType.Nested] variant can be picked
+     * from that mapping's own `type:` value.
+     */
+    class KeyPath(val keys: List<String>, private val mappings: List<YAMLMapping?>) : VariantLookup {
+        fun drop(n: Int) = KeyPath(keys.drop(n), mappings.drop(n))
+
+        override fun valueAt(index: Int, key: String): String? =
+            (mappings.getOrNull(index)?.getKeyValueByKey(key)?.value as? YAMLScalar)?.textValue
+    }
 
     /** The outcome of resolving one YAMLKeyValue: its type (if any), and the module id that governed the resolution (for diagnostic messages). */
     data class KeyResolution(val moduleId: String?, val resolution: SchemaResolution)
@@ -82,7 +95,7 @@ object ConfigSchemaResolver {
 
         val ctx = schemaContextFor(fallbackFile, keyValue, fullPath)
             ?: return KeyResolution(null, SchemaResolution.Indeterminate)
-        return KeyResolution(ctx.schema.moduleId, ctx.schema.resolve(ctx.relativePath))
+        return KeyResolution(ctx.schema.moduleId, ctx.schema.resolve(ctx.relativePath.keys, ctx.relativePath))
     }
 
     /** Resolves the fields/map-key-type available for suggestion inside [mapping] - honoring the same tag overrides as [resolveKey] (including the same [fallbackFile] caveat) when [mapping] is itself a `#$Type`-tagged key's value. */
@@ -91,7 +104,7 @@ object ConfigSchemaResolver {
         if (owner != null) {
             FileTagParser.typeTag(owner)?.let { typeName ->
                 return when (val type = NamedTypeRegistry.resolve(owner.project, typeName)) {
-                    is ConfigFieldType.Nested -> ContainerResolution(FieldContainer(type.typeName, type.fields), null)
+                    is ConfigFieldType.Nested -> ContainerResolution(FieldContainer(type.typeName, fieldsOf(type, mapping)), null)
                     is ConfigFieldType.MapOf -> ContainerResolution(null, type.keyType as? ConfigFieldType.EnumLike)
                     else -> ContainerResolution.EMPTY
                 }
@@ -100,10 +113,14 @@ object ConfigSchemaResolver {
 
         val fullPath = buildContainerPath(mapping) ?: return ContainerResolution.EMPTY
         val ctx = schemaContextFor(fallbackFile, mapping.parent, fullPath) ?: return ContainerResolution.EMPTY
-        val fields = ctx.schema.fieldsAt(ctx.relativePath)
+        val fields = ctx.schema.fieldsAt(ctx.relativePath.keys, ctx.relativePath)
         if (fields != null) return ContainerResolution(fields, null)
-        return ContainerResolution(null, ctx.schema.mapKeyTypeAt(ctx.relativePath))
+        return ContainerResolution(null, ctx.schema.mapKeyTypeAt(ctx.relativePath.keys, ctx.relativePath))
     }
+
+    /** The keys [type] allows in [mapping], picking its variant from the mapping's discriminator value. */
+    fun fieldsOf(type: ConfigFieldType.Nested, mapping: YAMLMapping?): Map<String, ConfigFieldType> =
+        type.fieldsFor(type.discriminator?.let { (mapping?.getKeyValueByKey(it)?.value as? YAMLScalar)?.textValue })
 
     /**
      * Walks outward from [start] (a YAMLKeyValue or null) through its YAMLKeyValue ancestors,
@@ -112,7 +129,7 @@ object ConfigSchemaResolver {
      * schema's root is the last `d` segments of [fullPath] - everything *inside* the tagged key.
      * Falls back to [resolveForFile] (file-tag-or-directory-convention) when no section tag is found.
      */
-    private fun schemaContextFor(file: PsiFile, start: PsiElement?, fullPath: List<String>): SchemaContext? {
+    private fun schemaContextFor(file: PsiFile, start: PsiElement?, fullPath: KeyPath): SchemaContext? {
         var node = start
         var idxFromEnd = 0
         while (node != null) {
@@ -120,7 +137,7 @@ object ConfigSchemaResolver {
                 val tag = FileTagParser.sectionTag(node)
                 if (tag != null) {
                     val schema = buildSchema(file.project, tag.moduleId, tag.bucket ?: KCConstants.MAIN_CONFIG_BUCKET) ?: return null
-                    val relative = fullPath.drop((fullPath.size - idxFromEnd).coerceAtLeast(0))
+                    val relative = fullPath.drop((fullPath.keys.size - idxFromEnd).coerceAtLeast(0))
                     return SchemaContext(schema, relative)
                 }
                 idxFromEnd++
@@ -224,16 +241,18 @@ object ConfigSchemaResolver {
     }
 
     /** Builds the dot-path of YAML keys from the document root down to [keyValue], ignoring sequence indices. */
-    fun buildKeyPath(keyValue: YAMLKeyValue): List<String>? = buildPathUpFrom(keyValue)
+    fun buildKeyPath(keyValue: YAMLKeyValue): KeyPath? = buildPathUpFrom(keyValue, null)
 
     /**
      * Builds the dot-path of YAML keys from the document root down to (but not including) the
      * given [mapping] itself - i.e. the path to the container whose missing keys we'd suggest.
      */
-    fun buildContainerPath(mapping: YAMLMapping): List<String>? = buildPathUpFrom(mapping.parent)
+    fun buildContainerPath(mapping: YAMLMapping): KeyPath? = buildPathUpFrom(mapping.parent, mapping)
 
-    private fun buildPathUpFrom(start: PsiElement?): List<String>? {
+    private fun buildPathUpFrom(start: PsiElement?, startMapping: YAMLMapping?): KeyPath? {
         val path = ArrayDeque<String>()
+        val mappings = ArrayDeque<YAMLMapping?>()
+        var below: YAMLMapping? = startMapping
         var current: PsiElement? = start
 
         while (current != null) {
@@ -242,15 +261,20 @@ object ConfigSchemaResolver {
                     val key = current.keyText
                     if (key.isBlank()) return null
                     path.addFirst(key)
+                    mappings.addFirst(below ?: current.value as? YAMLMapping)
+                    below = null
                     current = current.parent
                 }
-                is YAMLMapping -> current = current.parent
+                is YAMLMapping -> {
+                    below = current
+                    current = current.parent
+                }
                 is YAMLSequenceItem -> current = current.parent
                 is YAMLSequence -> current = current.parent
                 is YAMLDocument, is YAMLFile -> current = null
                 else -> current = current.parent
             }
         }
-        return path.toList()
+        return KeyPath(path.toList(), mappings.toList())
     }
 }

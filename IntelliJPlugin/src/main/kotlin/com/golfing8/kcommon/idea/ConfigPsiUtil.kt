@@ -82,7 +82,7 @@ object ConfigPsiUtil {
     fun findNamedCASerializable(project: Project, name: String): ConfigFieldType.Nested? {
         val match = allCASerializableClasses(project)[name] ?: return null
         if (isFlattened(match)) return null
-        return ConfigFieldType.Nested(match.name ?: name, collectConfFields(match))
+        return caSerializableType(match)
     }
 
     fun allCASerializableTypeNames(project: Project): List<String> = allCASerializableClasses(project).keys.toList()
@@ -305,7 +305,7 @@ object ConfigPsiUtil {
             // Known-by-FQN types take priority: KCommon's own baked-in adapters, then anything a
             // consuming project has declared via @ConfigAdapterInfo.
             if (qualifiedName != null) {
-                BuiltInAdapters.forType(qualifiedName)?.let { return it }
+                BuiltInAdapters.forType(project, qualifiedName)?.let { return it }
                 UserAdapterRegistry.forType(project, qualifiedName)?.let { return it }
             }
 
@@ -338,11 +338,73 @@ object ConfigPsiUtil {
             }
 
             if (InheritanceUtil.isInheritor(psiClass, KCConstants.CA_SERIALIZABLE) && !isFlattened(psiClass)) {
-                return ConfigFieldType.Nested(psiClass.name ?: "object", collectConfFields(psiClass))
+                return caSerializableType(psiClass)
+            }
+
+            if (PlatformDetector.isHytale(project)) {
+                codecType(psiClass)?.let { return it }
             }
         }
 
         return ConfigFieldType.Unknown
+    }
+
+    /**
+     * A CASerializable's shape. With `@CASerializable.Options(typeResolverEnum = X.class)`, mirrors
+     * CAReflective's polymorphism: the mapping's `type:` value names a constant of X (case-insensitive),
+     * and that constant's class supplies the rest of the keys.
+     */
+    private fun caSerializableType(psiClass: PsiClass): ConfigFieldType.Nested {
+        val name = psiClass.name ?: "object"
+        val base = collectConfFields(psiClass)
+        val subtypes = typeResolverSubtypes(psiClass) ?: return ConfigFieldType.Nested(name, base)
+
+        val typeField = ConfigFieldType.EnumLike(EnumSource.FixedValues(subtypes.keys.toList()))
+        val variants = subtypes.mapValues { (_, subtype) ->
+            LinkedHashMap(base).apply {
+                if (subtype != null && subtype != psiClass) putAll(collectConfFields(subtype))
+                put(TYPE_KEY, typeField)
+            }
+        }
+        return ConfigFieldType.Nested(name, base + (TYPE_KEY to typeField), TYPE_KEY, variants)
+    }
+
+    private const val TYPE_KEY = "type"
+
+    /** typeResolverEnum constant name -> the CASerializable it creates (null when it can't be found, e.g. a compiled enum whose constructor args PSI can't see). */
+    private fun typeResolverSubtypes(psiClass: PsiClass): Map<String, PsiClass?>? {
+        val options = psiClass.getAnnotation(KCConstants.CA_SERIALIZABLE_OPTIONS) ?: return null
+        val resolverValue = options.findAttributeValue("typeResolverEnum") as? PsiClassObjectAccessExpression ?: return null
+        val resolverEnum = PsiTypesUtil.getPsiClass(resolverValue.operand.type) ?: return null
+        if (!resolverEnum.isEnum) return null
+
+        val inheritors by lazy { ClassInheritorsSearch.search(psiClass, GlobalSearchScope.allScope(psiClass.project), true).findAll() }
+        val result = LinkedHashMap<String, PsiClass?>()
+        for (constant in resolverEnum.fields.filterIsInstance<PsiEnumConstant>()) {
+            val fromArgs = constant.argumentList?.expressions
+                ?.firstNotNullOfOrNull { (it as? PsiClassObjectAccessExpression)?.operand?.type?.let(PsiTypesUtil::getPsiClass) }
+            // Compiled enums keep no constructor args, so fall back to the subclass named like the constant (ITEMDROP -> ItemDrop).
+            result[constant.name] = fromArgs ?: inheritors.firstOrNull { it.name.equals(constant.name, ignoreCase = true) }
+        }
+        return result.ifEmpty { null }
+    }
+
+    /**
+     * A Hytale type stored through its static `CODEC` (HytaleCodecs#find): the keys of every
+     * `new KeyedCodec<>("Key", ...)` in the field's initializer. Only works for source classes,
+     * since compiled classes keep no initializer, and null when no key is found.
+     */
+    private fun codecType(psiClass: PsiClass): ConfigFieldType.Nested? {
+        val codec = psiClass.findFieldByName("CODEC", false) ?: return null
+        if (!codec.hasModifierProperty(PsiModifier.STATIC)) return null
+        val initializer = codec.initializer ?: return null
+        val keys = LinkedHashMap<String, ConfigFieldType>()
+        for (creation in com.intellij.psi.util.PsiTreeUtil.findChildrenOfType(initializer, PsiNewExpression::class.java)) {
+            if (creation.classReference?.referenceName != "KeyedCodec") continue
+            val key = (creation.argumentList?.expressions?.firstOrNull() as? PsiLiteralExpression)?.value as? String ?: continue
+            keys[key] = ConfigFieldType.Unknown
+        }
+        return if (keys.isEmpty()) null else ConfigFieldType.Nested(psiClass.name ?: "object", keys)
     }
 
     private fun isCollectionType(qualifiedName: String?, psiClass: PsiClass): Boolean {

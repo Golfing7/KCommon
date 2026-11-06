@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
  *   "kcommonSchemaVersion": "2",
  *   "enums": { "e0": ["A", "B", ...], ... },
  *   "types": { "<type-name>": { "typeName": "<type-name>", "fields": { "<key>": <fieldType>, ... } }, ... },
+ *   (a type picked by a key such as `type:` also has "discriminator": "type", "variants": { "<value>": { "<key>": <fieldType>, ... } })
  *   "modules": { "<module-id>": { "<bucket>": { "<key>": <fieldType>, ... }, ... }, ... }
  * }
  * ```
@@ -51,7 +52,7 @@ object SchemaExport {
         // can resolve it later - see SchemaExportAction.
         for ((name, type) in namedTypes) {
             if (type is ConfigFieldType.Nested) {
-                interner.internNested(name, ConfigFieldTypeJson.fieldsToJson(type.fields, project, interner))
+                ConfigFieldTypeJson.internNested(name, type, project, interner)
             }
         }
 

@@ -19,7 +19,7 @@ import com.intellij.openapi.project.Project
 object NamedTypeRegistry {
 
     fun resolve(project: Project, name: String): ConfigFieldType? {
-        BuiltInAdapters.byTypeName(name)?.let { return it }
+        BuiltInAdapters.byTypeName(project, name)?.let { return it }
         UserAdapterRegistry.byTypeName(project, name)?.let { return it }
         ConfigPsiUtil.findNamedCASerializable(project, name)?.let { return it }
         ConfigPsiUtil.findNamedConfigClass(project, name)?.let { return it }
@@ -28,7 +28,7 @@ object NamedTypeRegistry {
 
     fun allNames(project: Project): List<String> {
         val names = LinkedHashSet<String>()
-        names += BuiltInAdapters.allTypeNames()
+        names += BuiltInAdapters.allTypeNames(project)
         names += UserAdapterRegistry.allTypeNames(project)
         names += ConfigPsiUtil.allCASerializableTypeNames(project)
         names += ConfigPsiUtil.allConfigClassTypeNames(project)

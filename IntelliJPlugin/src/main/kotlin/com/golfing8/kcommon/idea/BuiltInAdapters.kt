@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.idea
 
+import com.intellij.openapi.project.Project
 import com.golfing8.kcommon.idea.ConfigFieldType.EnumLike
 import com.golfing8.kcommon.idea.ConfigFieldType.ListOf
 import com.golfing8.kcommon.idea.ConfigFieldType.MapOf
@@ -19,45 +20,91 @@ import com.golfing8.kcommon.idea.ConfigFieldType.Unknown
  * TimeLength, Duration, World, colors, Interval, MoveLength, Component, ...) are also omitted -
  * they fall through to [ConfigFieldType.Unknown] by default, which is the correct answer for them.
  *
- * Two adapters are deliberately left unmodeled despite being structured (Particle, MenuBuilder):
- * their shape varies per-subtype in ways this table doesn't track, and guessing wrong would cause
- * false "unknown key" warnings on legitimate fields - leniency wins here.
+ * Two adapters are deliberately left unmodeled on Minecraft despite being structured (Particle,
+ * MenuBuilder): their shape varies per-subtype in ways this table doesn't track, and guessing wrong
+ * would cause false "unknown key" warnings on legitimate fields - leniency wins here.
+ *
+ * The Bukkit and Hytale builds ship several classes under the same name with different shapes
+ * (Message, MenuBuilder, Drop), so lookups go through the project's [KCommonPlatform]: the shared
+ * table plus that platform's own. A type missing from the active table falls through to structural
+ * detection (Hytale's Drop, for one, is a plain CASerializable).
  */
 object BuiltInAdapters {
 
-    fun forType(qualifiedName: String): ConfigFieldType? = table[qualifiedName]?.invoke()
+    fun forType(project: Project, qualifiedName: String): ConfigFieldType? = forType(PlatformDetector.platform(project), qualifiedName)
+
+    fun forType(platform: KCommonPlatform, qualifiedName: String): ConfigFieldType? =
+        (shared[qualifiedName] ?: tableFor(platform)[qualifiedName])?.invoke()
 
     /** Looked up by [ConfigFieldType.Nested.typeName] rather than FQN - for `#$Type` tag resolution, where a user writes the type's simple display name, not its Java FQN. */
-    fun byTypeName(name: String): ConfigFieldType? = byName[name]
+    fun byTypeName(project: Project, name: String): ConfigFieldType? = byName.getValue(PlatformDetector.platform(project))[name]
 
-    fun allTypeNames(): List<String> = byName.keys.toList()
+    fun allTypeNames(project: Project): List<String> = byName.getValue(PlatformDetector.platform(project)).keys.toList()
 
-    private val byName: Map<String, ConfigFieldType> by lazy {
-        val map = LinkedHashMap<String, ConfigFieldType>()
-        for (factory in table.values) {
-            val type = factory()
-            if (type is Nested) map.putIfAbsent(type.typeName, type)
+    private fun tableFor(platform: KCommonPlatform) = if (platform == KCommonPlatform.HYTALE) hytale else minecraft
+
+    private val byName: Map<KCommonPlatform, Map<String, ConfigFieldType>> by lazy {
+        KCommonPlatform.entries.associateWith { platform ->
+            val map = LinkedHashMap<String, ConfigFieldType>()
+            for (factory in shared.values + tableFor(platform).values) {
+                val type = factory()
+                if (type is Nested) map.putIfAbsent(type.typeName, type)
+            }
+            map
         }
-        map
     }
 
-    private val table: Map<String, () -> ConfigFieldType> = mapOf(
+    /** Types whose adapter lives in Common, identical on both platforms. */
+    private val shared: Map<String, () -> ConfigFieldType> = mapOf(
         "com.golfing8.kcommon.struct.region.Region" to { regionType() },
-        "com.golfing8.kcommon.struct.item.ItemStackBuilder" to { itemStackBuilderType() },
         "com.golfing8.kcommon.struct.blocks.WeightedCollection" to { MapOf(Unknown) },
+        "java.time.ZonedDateTime" to { zonedDateTimeType() },
+    )
+
+    /** Hytale types, stored in config as their codec writes them (see HytaleCodecs/HytaleConfigAdapters). */
+    private val hytale: Map<String, () -> ConfigFieldType> = mapOf(
+        "com.golfing8.kcommon.config.lang.Message" to { Nested("Message", mapOf("message" to ListOf(Unknown))) },
+        "com.golfing8.kcommon.menu.MenuBuilder" to { HytaleMenuShapes.menu },
+        "com.hypixel.hytale.math.vector.Location" to {
+            Nested("Location", mapOf("World" to Unknown, "Position" to vector("Vector3d", 3), "Rotation" to rotationType()))
+        },
+        "com.hypixel.hytale.math.vector.Rotation3f" to { rotationType() },
+        "com.hypixel.hytale.math.shape.Box" to { Nested("Box", mapOf("Min" to vector("Vector3d", 3), "Max" to vector("Vector3d", 3))) },
+        "com.hypixel.hytale.server.core.inventory.ItemStack" to { hytaleItemStackType() },
+        "org.joml.Vector2d" to { vector("Vector2d", 2) },
+        "org.joml.Vector2f" to { vector("Vector2f", 2) },
+        "org.joml.Vector2i" to { vector("Vector2i", 2) },
+        "org.joml.Vector3d" to { vector("Vector3d", 3) },
+        "org.joml.Vector3f" to { vector("Vector3f", 3) },
+        "org.joml.Vector3i" to { vector("Vector3i", 3) },
+        "org.joml.Vector3L" to { vector("Vector3L", 3) },
+    )
+
+    private fun vector(name: String, size: Int) = Nested(name, listOf("X", "Y", "Z").take(size).associateWith { Unknown })
+
+    private fun rotationType() = Nested("Rotation3f", mapOf("Pitch" to Unknown, "Yaw" to Unknown, "Roll" to Unknown))
+
+    /** ItemStack.CODEC's keys. A plain item id string is also accepted (BetterItemCodec), which a Nested type never flags. */
+    private fun hytaleItemStackType() = Nested(
+        "ItemStack",
+        mapOf(
+            "Id" to Unknown, "Quantity" to Unknown, "Durability" to Unknown, "MaxDurability" to Unknown,
+            "QualityOverride" to Unknown, "Metadata" to MapOf(Unknown), "OverrideDroppedItemAnimation" to Unknown,
+        )
+    )
+
+    private val minecraft: Map<String, () -> ConfigFieldType> = mapOf(
+        "com.golfing8.kcommon.struct.item.ItemStackBuilder" to { itemStackBuilderType() },
         "org.bukkit.Location" to { locationType() },
         "org.bukkit.util.BlockVector" to { Nested("BlockVector", xyzFields()) },
         "org.bukkit.util.Vector" to { Nested("Vector", xyzFields()) },
-        "java.time.ZonedDateTime" to { zonedDateTimeType() },
         "com.golfing8.kcommon.config.lang.Message" to { messageType() },
         "com.golfing8.kcommon.struct.SoundWrapper" to { soundWrapperType() },
         "com.golfing8.kcommon.struct.title.Title" to { titleType() },
         "com.golfing8.kcommon.struct.filter.ItemFilter" to { itemFilterType() },
-        "com.golfing8.kcommon.struct.filter.StringFilter" to { stringFilterType() },
         "org.bukkit.potion.PotionEffectType" to { EnumLike(EnumSource.StaticFieldsOfOwnType("org.bukkit.potion.PotionEffectType")) },
         "com.golfing8.kcommon.nms.struct.PotionData" to { potionDataType() },
         "org.bukkit.potion.PotionEffect" to { potionEffectType() },
-        "com.golfing8.kcommon.struct.time.Schedule" to { ListOf(Unknown) },
         "com.golfing8.kcommon.nms.struct.EntityData" to { entityDataType() },
         "com.golfing8.kcommon.nms.struct.EntityAttributeModifier" to { entityAttributeModifierType() },
         "com.golfing8.kcommon.struct.drop.Drop" to { dropType() },

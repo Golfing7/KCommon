@@ -10,8 +10,27 @@ sealed class ConfigFieldType {
     /** A fixed set of valid string values - see [EnumSource] for where they come from. */
     data class EnumLike(val source: EnumSource) : ConfigFieldType()
 
-    /** A YAML mapping with a fixed, known set of keys. [typeName] is shown to the user as where the keys come from. */
-    data class Nested(val typeName: String, val fields: Map<String, ConfigFieldType>) : ConfigFieldType()
+    /**
+     * A YAML mapping with a fixed, known set of keys. [typeName] is shown to the user as where the keys come from.
+     *
+     * When [discriminator] is set, the mapping's own value under that key (such as `type: Label`)
+     * picks which entry of [variants] holds its keys; [fields] is used when the value is missing or
+     * unknown. Hytale menu elements and `@CASerializable.Options(typeResolverEnum = ...)` types are shaped like this.
+     */
+    data class Nested(
+        val typeName: String,
+        val fields: Map<String, ConfigFieldType>,
+        val discriminator: String? = null,
+        val variants: Map<String, Map<String, ConfigFieldType>> = emptyMap(),
+    ) : ConfigFieldType() {
+        fun fieldsFor(variant: String?): Map<String, ConfigFieldType> {
+            if (variant == null || variants.isEmpty()) return fields
+            return variants.entries.firstOrNull { it.key.equals(variant.trim(), ignoreCase = true) }?.value ?: fields
+        }
+
+        /** Shallow on purpose: a menu element nests copies of itself ten levels deep, so the generated hashCode would walk all of them. */
+        override fun hashCode(): Int = typeName.hashCode() * 31 + fields.keys.hashCode()
+    }
 
     /** List/Set/Collection<T>: a YAML sequence whose items should each match `inner`. */
     data class ListOf(val inner: ConfigFieldType) : ConfigFieldType()
@@ -38,6 +57,18 @@ sealed class SchemaResolution {
     object Indeterminate : SchemaResolution()
 }
 
+/**
+ * Reads the value a mapping holds under a key, for picking a [ConfigFieldType.Nested] variant.
+ * The index is the position in the key path whose mapping is asked about.
+ */
+fun interface VariantLookup {
+    fun valueAt(index: Int, key: String): String?
+
+    companion object {
+        val NONE = VariantLookup { _, _ -> null }
+    }
+}
+
 /** The known keys available at some container (the config root, or a Nested field's own fields), plus a display name. */
 data class FieldContainer(val typeName: String, val fields: Map<String, ConfigFieldType>)
 
@@ -52,13 +83,14 @@ class ConfigSchema(val moduleId: String, rootFieldsProvider: () -> Map<String, C
      * missing keys. Returns null when the container isn't confidently known (e.g. free-form Map
      * keys, or an unresolved/indeterminate path).
      */
-    fun fieldsAt(containerPath: List<String>): FieldContainer? {
+    fun fieldsAt(containerPath: List<String>, variants: VariantLookup = VariantLookup.NONE): FieldContainer? {
         if (containerPath.isEmpty()) {
             return FieldContainer("module '$moduleId' config", rootFields)
         }
-        val resolution = resolve(containerPath)
-        val nested = (resolution as? SchemaResolution.Resolved)?.type as? ConfigFieldType.Nested ?: return null
-        return FieldContainer(nested.typeName, nested.fields)
+        val resolution = resolve(containerPath, variants)
+        val type = (resolution as? SchemaResolution.Resolved)?.type
+        val nested = (type as? ConfigFieldType.ListOf)?.inner as? ConfigFieldType.Nested ?: type as? ConfigFieldType.Nested ?: return null
+        return FieldContainer(nested.typeName, nested.fieldsFor(nested.discriminator?.let { variants.valueAt(containerPath.lastIndex, it) }))
     }
 
     /**
@@ -66,14 +98,14 @@ class ConfigSchema(val moduleId: String, rootFieldsProvider: () -> Map<String, C
      * say anything about"), for suggesting enum-like map keys. Null when the container isn't a
      * MapOf with a known key type.
      */
-    fun mapKeyTypeAt(containerPath: List<String>): ConfigFieldType.EnumLike? {
+    fun mapKeyTypeAt(containerPath: List<String>, variants: VariantLookup = VariantLookup.NONE): ConfigFieldType.EnumLike? {
         if (containerPath.isEmpty()) return null
-        val resolution = resolve(containerPath)
+        val resolution = resolve(containerPath, variants)
         val mapOf = (resolution as? SchemaResolution.Resolved)?.type as? ConfigFieldType.MapOf ?: return null
         return mapOf.keyType as? ConfigFieldType.EnumLike
     }
 
-    fun resolve(path: List<String>): SchemaResolution {
+    fun resolve(path: List<String>, variants: VariantLookup = VariantLookup.NONE): SchemaResolution {
         if (path.isEmpty()) return SchemaResolution.Indeterminate
 
         var knownFields: Map<String, ConfigFieldType>? = rootFields
@@ -98,12 +130,12 @@ class ConfigSchema(val moduleId: String, rootFieldsProvider: () -> Map<String, C
             knownFields = null
             freeFormInner = null
             when (val type = currentType) {
-                is ConfigFieldType.Nested -> knownFields = type.fields
+                is ConfigFieldType.Nested -> knownFields = type.fieldsFor(type.discriminator?.let { variants.valueAt(idx, it) })
                 is ConfigFieldType.MapOf -> freeFormInner = type.inner
                 is ConfigFieldType.ListOf -> {
                     val inner = type.inner
                     if (inner is ConfigFieldType.Nested) {
-                        knownFields = inner.fields
+                        knownFields = inner.fieldsFor(inner.discriminator?.let { variants.valueAt(idx, it) })
                     }
                     // else: can't say anything about what's inside a list of scalars/unknowns - stays indeterminate.
                 }

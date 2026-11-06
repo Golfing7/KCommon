@@ -16,6 +16,9 @@
         pair's type can be pinned with `#$Type`, both with their own smart completion.
         Also completes KCommon's `$symbol(args...){content}` string macros when typing
         `$` inside a YAML string value.
+        Works with both the Bukkit and the Hytale builds of KCommon, picked from the game library on
+        the classpath (with a per-project override in Settings | Tools | KCommon), and understands
+        Hytale's YAML menus, which the KCommon Menu Preview tool window draws as you edit them.
     </description>
 
     <depends>com.intellij.modules.platform</depends>
@@ -36,6 +39,10 @@
             bundle="messages.KCommonHintsBundle"
             nameKey="hints.kcommon.type.name"
             descriptionKey="hints.kcommon.type.description"/>
+        <projectConfigurable parentId="tools" id="kcommon.settings" displayName="KCommon"
+                             instance="com.golfing8.kcommon.idea.KCommonSettingsConfigurable"/>
+        <toolWindow id="KCommon Menu Preview" anchor="right" icon="AllIcons.Actions.Preview"
+                    factoryClass="com.golfing8.kcommon.idea.preview.MenuPreviewToolWindowFactory"/>
     </extensions>
 
     <actions>

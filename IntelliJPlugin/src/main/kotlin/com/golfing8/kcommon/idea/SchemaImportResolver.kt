@@ -43,7 +43,8 @@ class SchemaImportResolver(private val rawEnums: Map<String, JsonValue>, private
                 resolveField(raw)
             } else {
                 val typeName = (raw["typeName"] as? JsonValue.JsonString)?.value ?: ref
-                ConfigFieldType.Nested(typeName, resolveFields(raw["fields"]))
+                val variants = (raw["variants"] as? JsonValue.JsonObject)?.entries.orEmpty().mapValues { resolveFields(it.value) }
+                ConfigFieldType.Nested(typeName, resolveFields(raw["fields"]), (raw["discriminator"] as? JsonValue.JsonString)?.value, variants)
             }
             resolvedTypes[ref] = result
             return result

@@ -19,6 +19,8 @@ object KCConstants {
     const val OPTIONAL = "java.util.Optional"
     const val MENU_CONTAINER = "com.golfing8.kcommon.menu.MenuContainer"
     const val MENU_CONTAINER_INFO = "com.golfing8.kcommon.menu.MenuContainerInfo"
+    const val MENU_BUILDER = "com.golfing8.kcommon.menu.MenuBuilder"
+    const val KSECTION = "com.golfing8.kcommon.config.KSection"
     const val STRING_MACROS = "com.golfing8.kcommon.util.string.StringMacros"
 
     /** Bucket name used for the module's main config.yml (i.e. @Conf.config() left unset). */

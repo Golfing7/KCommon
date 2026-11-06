@@ -59,13 +59,10 @@ class KCommonYamlCompletionContributor : CompletionContributor() {
                         val enclosingResolution = ConfigSchemaResolver.resolveKey(enclosingKeyValue, originalFile).resolution
                         val enclosingType = (enclosingResolution as? SchemaResolution.Resolved)?.type
                         if (enclosingType is ConfigFieldType.Nested) {
-                            val existingValue = enclosingKeyValue.value
-                            val existingKeys = if (existingValue is YAMLMapping) {
-                                existingValue.keyValues.map { it.keyText.lowercase() }.toSet()
-                            } else {
-                                emptySet()
-                            }
-                            suggestFields(enclosingType.typeName, enclosingType.fields, existingKeys, result)
+                            val existingValue = enclosingKeyValue.value as? YAMLMapping
+                            val existingKeys = existingValue?.keyValues?.map { it.keyText.lowercase() }?.toSet().orEmpty()
+                            val fields = ConfigSchemaResolver.fieldsOf(enclosingType, existingValue)
+                            suggestFields(enclosingType.typeName, fields, existingKeys, result)
                             return
                         }
                         if (enclosingType is ConfigFieldType.MapOf) {
