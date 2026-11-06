@@ -41,6 +41,11 @@
             descriptionKey="hints.kcommon.type.description"/>
         <projectConfigurable parentId="tools" id="kcommon.settings" displayName="KCommon"
                              instance="com.golfing8.kcommon.idea.KCommonSettingsConfigurable"/>
+        <psi.referenceContributor language="JAVA" implementation="com.golfing8.kcommon.idea.MenuKeyReferenceContributor"/>
+        <localInspection language="JAVA" shortName="KCommonHytaleMenuBinding" groupName="KCommon"
+                         displayName="Hytale menu call names a key its YAML doesn't have"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.golfing8.kcommon.idea.HytaleMenuBindingInspection"/>
         <toolWindow id="KCommon Menu Preview" anchor="right" icon="AllIcons.Actions.Preview"
                     factoryClass="com.golfing8.kcommon.idea.preview.MenuPreviewToolWindowFactory"/>
     </extensions>

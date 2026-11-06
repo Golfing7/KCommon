@@ -1,0 +1,9 @@
+<html>
+<body>
+Reports calls on a Hytale <code>MenuBuilder</code> or <code>MenuRow</code> that would throw when the menu is built:
+a key its YAML doesn't have (<code>bindTo</code>, <code>show</code>, <code>text</code>, <code>set</code>, <code>visible</code>,
+<code>disabled</code>, <code>specialPlaceholders</code>, <code>addRow</code>), <code>text()</code> on an element type without text,
+<code>set()</code> of a property the element type doesn't have, and <code>addRow</code> into an element that can't hold rows or from a missing template.
+<p>The builder is traced back to the <code>getOrLoad("path", MenuBuilder.class)</code> call that loaded it.</p>
+</body>
+</html>

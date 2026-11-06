@@ -11,6 +11,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.jetbrains.yaml.psi.YAMLKeyValue
+import org.jetbrains.yaml.psi.impl.YAMLHashImpl
 
 /**
  * Shows the resolved KCommon type after any config key whose type this plugin could positively
@@ -23,6 +24,8 @@ class KCommonTypeHintsProvider : InlayHintsProvider {
     private object Collector : SharedBypassCollector {
         override fun collectFromElement(element: PsiElement, sink: InlayTreeSink) {
             if (element !is YAMLKeyValue) return
+            // Every key of a one-line `{...}` mapping would pile its hint onto the same line end; the outer key's hint is enough.
+            if (element.parent is YAMLHashImpl) return
 
             val resolution = ConfigSchemaResolver.resolveKey(element).resolution
             val type = (resolution as? SchemaResolution.Resolved)?.type ?: return
@@ -53,6 +56,11 @@ class KCommonTypeHintsProvider : InlayHintsProvider {
             is ConfigFieldType.Nested -> type.typeName
             is ConfigFieldType.ListOf -> describeType(type.inner)?.let { "list<$it>" } ?: "list"
             is ConfigFieldType.MapOf -> describeType(type.inner)?.let { "map<$it>" } ?: "map"
+            is ConfigFieldType.Formatted -> when (type.format) {
+                ScalarFormat.COLOR -> "color"
+                ScalarFormat.REF -> type.uiType ?: "ref"
+                else -> null
+            }
             ConfigFieldType.Unknown -> null
         }
     }

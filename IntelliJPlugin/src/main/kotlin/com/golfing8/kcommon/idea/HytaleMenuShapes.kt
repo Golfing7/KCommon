@@ -1,15 +1,23 @@
 package com.golfing8.kcommon.idea
 
 import com.golfing8.kcommon.idea.ConfigFieldType.EnumLike
+import com.golfing8.kcommon.idea.ConfigFieldType.Formatted
 import com.golfing8.kcommon.idea.ConfigFieldType.MapOf
 import com.golfing8.kcommon.idea.ConfigFieldType.Nested
 import com.golfing8.kcommon.idea.ConfigFieldType.Unknown
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootModificationTracker
+import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 
 /**
- * The config shape of a Hytale `MenuBuilder`, mirroring `MenuBuilder(Map, String)` and the
- * `MenuSchema` whitelist in the Hytale module. Keep the element table in step with `MenuSchema`:
- * the client disconnects players over markup it doesn't know, so the runtime rejects anything not
- * listed there, and this plugin should flag the same keys.
+ * The config shape of a Hytale `MenuBuilder`. The element whitelist comes from `kcommon/menu-schema.json`,
+ * which the Hytale module writes from its own `MenuSchema` (a test there keeps it current): the copy
+ * in the project's KCommon when there is one, otherwise the copy bundled with this plugin. The
+ * menu's own options (title, width, ...) mirror `MenuBuilder(Map, String)`.
  *
  * Elements are a [Nested] type discriminated by `type:` (defaulting to Group), and nest through
  * `children`. The schema model is eager, so nesting stops after [MAX_DEPTH] levels; anything deeper
@@ -18,109 +26,114 @@ import com.golfing8.kcommon.idea.ConfigFieldType.Unknown
 object HytaleMenuShapes {
     const val MENU_TYPE_NAME = "HytaleMenu"
     private const val MAX_DEPTH = 10
+    private const val SCHEMA_PATH = "kcommon/menu-schema.json"
 
-    private val bool = EnumLike(EnumSource.FixedValues(listOf("true", "false")))
-    private val alignment = enumOf("Start", "Center", "End")
-    private val layoutMode = enumOf(
-        "Full", "Left", "Center", "Right", "Top", "Middle", "Bottom", "LeftScrolling", "RightScrolling",
-        "TopScrolling", "BottomScrolling", "CenterMiddle", "MiddleCenter", "LeftCenterWrap", "LeftWrap"
-    )
+    /** The whitelist as read from the JSON, with property names in markup form (`LayoutMode`). */
+    class Schema(
+        val containers: Set<String>,
+        val textTypes: Set<String>,
+        /** Element type -> markup property name -> its config type. */
+        val elements: Map<String, Map<String, ConfigFieldType>>,
+    ) {
+        val menu: Nested by lazy { buildMenu(this) }
 
-    private val anchor = tuple("Anchor", "Width", "Height", "Top", "Bottom", "Left", "Right", "Full", "Horizontal", "Vertical", "MinWidth", "MaxWidth")
-    private val padding = tuple("Padding", "Top", "Bottom", "Left", "Right", "Full", "Horizontal", "Vertical")
-    private val patch = tuple("PatchStyle", "TexturePath", "Border", "HorizontalBorder", "VerticalBorder", "Color")
-    /** A `.ui` reference written as a map, `{ref: '@SecondaryButtonStyle', sounds: '@ButtonSounds'}`; the plain `'@Name'` form is a scalar. */
-    private val ref = tuple("UiReference", "Ref", "Sounds")
-    private val labelStyle = Nested(
-        "LabelStyle",
-        props(
-            "FontName" to Unknown, "FontSize" to Unknown, "HorizontalAlignment" to alignment, "VerticalAlignment" to alignment,
-            "LetterSpacing" to Unknown, "MinShrinkTextToFitFontSize" to Unknown, "OutlineColor" to Unknown, "RenderBold" to bool,
-            "RenderItalics" to bool, "RenderUnderlined" to bool, "RenderUppercase" to bool, "ShrinkTextToFit" to bool,
-            "TextColor" to Unknown, "Wrap" to bool, "WrapMaxLines" to Unknown,
-        )
-    )
-
-    private val common = props(
-        "Anchor" to anchor, "Padding" to padding, "Background" to patch, "FlexWeight" to Unknown, "Visible" to bool,
-        "HitTestVisible" to bool, "TooltipText" to Unknown, "Overscroll" to bool, "MaskTexturePath" to Unknown,
-        "KeepScrollPosition" to bool, "AutoScrollDown" to bool,
-    )
-
-    /** Each element type's own properties, on top of [common]. */
-    private val elementTypes: Map<String, Map<String, ConfigFieldType>> = linkedMapOf(
-        "Group" to props("LayoutMode" to layoutMode, "ScrollbarStyle" to ref),
-        "Label" to props("Style" to labelStyle),
-        "Title" to props("Style" to labelStyle),
-        "StyledText" to props("LayoutMode" to layoutMode, "FontSize" to Unknown, "Bold" to bool),
-        "TextButton" to props("Style" to ref, "Disabled" to bool),
-        "Button" to props("Style" to ref, "Disabled" to bool, "LayoutMode" to layoutMode),
-        "ItemIcon" to props("ItemId" to Unknown, "ShowItemTooltip" to bool),
-        "ItemSlot" to props(
-            "ItemId" to Unknown, "Quantity" to Unknown, "ShowQuantity" to bool, "ShowQualityBackground" to bool, "ShowDurabilityBar" to bool
-        ),
-        "AssetImage" to props("AssetPath" to Unknown, "FallbackTexturePath" to Unknown),
-        "ProgressBar" to props(
-            "Value" to Unknown, "Bar" to patch, "BarTexturePath" to Unknown,
-            "Alignment" to enumOf("Vertical", "Horizontal"), "Direction" to enumOf("Start", "End")
-        ),
-        "TextField" to props(
-            "PlaceholderText" to Unknown, "Style" to ref, "PlaceholderStyle" to ref, "MaxLength" to Unknown,
-            "AutoFocus" to bool, "IsReadOnly" to bool
-        ),
-    )
-
-    val CONTAINERS = setOf("Group", "Button", "AssetImage")
-    val TEXT_TYPES = setOf("Label", "TextButton", "Title", "StyledText")
-    val ELEMENT_TYPES: Set<String> get() = elementTypes.keys
-
-    /** `elements`/`templates`/`children`: a map of element key to element. */
-    private val elementMap: MapOf by lazy {
-        var level = MapOf(Unknown)
-        repeat(MAX_DEPTH) { level = MapOf(element(level)) }
-        level
+        /** The config keys (`layout-mode`) an element type takes, besides `type`, `special`, `text` and `children`. */
+        fun propertyKeys(type: String): Set<String>? = elements[type]?.keys?.mapTo(LinkedHashSet()) { ConfigPsiUtil.camelToKebab(it) }
     }
 
-    val menu: Nested by lazy {
-        Nested(
+    private val bundled: Schema by lazy {
+        parse(HytaleMenuShapes::class.java.getResourceAsStream("/$SCHEMA_PATH")!!.use { it.readBytes().toString(Charsets.UTF_8) })
+    }
+
+    /** The menu shape for [project] (the bundled schema when it's null or has no KCommon copy of its own). */
+    fun menu(project: Project?): Nested = schema(project).menu
+
+    fun schema(project: Project?): Schema {
+        if (project == null || project.isDefault) return bundled
+        return CachedValuesManager.getManager(project).getCachedValue(project) {
+            val file = FilenameIndex.getVirtualFilesByName("menu-schema.json", GlobalSearchScope.allScope(project))
+                .firstOrNull { it.path.endsWith(SCHEMA_PATH) }
+            val schema = file?.let { runCatching { parse(String(it.contentsToByteArray(), Charsets.UTF_8)) }.getOrNull() } ?: bundled
+            CachedValueProvider.Result.create(
+                schema,
+                *listOfNotNull(ProjectRootModificationTracker.getInstance(project), VirtualFileManager.VFS_STRUCTURE_MODIFICATIONS, file).toTypedArray()
+            )
+        }
+    }
+
+    internal fun parse(json: String): Schema {
+        val root = MiniJson.parse(json) as JsonValue.JsonObject
+        fun strings(key: String) = (root[key] as? JsonValue.JsonArray)?.items?.mapNotNull { (it as? JsonValue.JsonString)?.value }?.toSet().orEmpty()
+        val elements = LinkedHashMap<String, Map<String, ConfigFieldType>>()
+        for ((type, props) in (root["elements"] as JsonValue.JsonObject).entries) {
+            elements[type] = properties(props as JsonValue.JsonObject)
+        }
+        return Schema(strings("containers"), strings("textTypes"), elements)
+    }
+
+    private fun properties(obj: JsonValue.JsonObject): Map<String, ConfigFieldType> =
+        obj.entries.mapValuesTo(LinkedHashMap()) { (name, value) -> property(name, value as JsonValue.JsonObject) }
+
+    private fun property(name: String, obj: JsonValue.JsonObject): ConfigFieldType {
+        val uiType = (obj["uiType"] as? JsonValue.JsonString)?.value
+        val keys = (obj["keys"] as? JsonValue.JsonObject)?.let(::properties).orEmpty().mapKeys { ConfigPsiUtil.camelToKebab(it.key) }
+        return when ((obj["kind"] as? JsonValue.JsonString)?.value) {
+            "BOOL" -> bool
+            "INTEGER" -> Formatted(ScalarFormat.INTEGER)
+            "DECIMAL" -> Formatted(ScalarFormat.DECIMAL)
+            "COLOR" -> Formatted(ScalarFormat.COLOR)
+            "ENUM" -> EnumLike(EnumSource.FixedValues((obj["values"] as? JsonValue.JsonArray)?.items?.mapNotNull { (it as? JsonValue.JsonString)?.value }.orEmpty()))
+            // A tuple may also be a reference to a .ui value of its type.
+            "TUPLE" -> Nested(uiType ?: name, keys, scalar = Formatted(ScalarFormat.REF, uiType))
+            "PATCH" -> Nested(uiType ?: "PatchStyle", keys, scalar = Formatted(ScalarFormat.PATCH, uiType))
+            // A reference, or `{ref: '@Style', sounds: '@Sounds'}`.
+            "REF" -> Nested(
+                uiType ?: "UiReference",
+                mapOf("ref" to Formatted(ScalarFormat.REF, uiType), "sounds" to Formatted(ScalarFormat.REF)),
+                scalar = Formatted(ScalarFormat.REF, uiType)
+            )
+            else -> if (name == "ItemId") EnumLike(EnumSource.HytaleItemIds) else Unknown
+        }
+    }
+
+    private val bool = EnumLike(EnumSource.FixedValues(listOf("true", "false")))
+
+    private fun buildMenu(schema: Schema): Nested {
+        var level = MapOf(Unknown)
+        repeat(MAX_DEPTH) { level = MapOf(element(schema, level)) }
+        val group = schema.elements["Group"].orEmpty().mapKeys { ConfigPsiUtil.camelToKebab(it.key) }
+        return Nested(
             MENU_TYPE_NAME,
             linkedMapOf(
                 "title" to Unknown,
-                "width" to Unknown,
-                "height" to Unknown,
+                "width" to Formatted(ScalarFormat.INTEGER),
+                "height" to Formatted(ScalarFormat.INTEGER),
                 "overlay" to bool,
                 "frame" to enumOf("decorated", "none"),
                 "lifetime" to enumOf("cant-close", "can-dismiss", "can-dismiss-or-close-through-interaction"),
-                "elements-per-page" to Unknown,
+                "elements-per-page" to Formatted(ScalarFormat.INTEGER),
                 // The content Group's own properties; its elements go under `elements`.
-                "content" to Nested("Group", common + elementTypes.getValue("Group")),
-                "elements" to elementMap,
-                "templates" to elementMap,
+                "content" to Nested("Group", group),
+                "elements" to level,
+                "templates" to level,
             )
         )
     }
 
-    private fun element(children: MapOf): Nested {
-        val typeField = EnumLike(EnumSource.FixedValues(elementTypes.keys.toList()))
+    private fun element(schema: Schema, children: MapOf): Nested {
+        val typeField = EnumLike(EnumSource.FixedValues(schema.elements.keys.toList()))
         val variants = LinkedHashMap<String, Map<String, ConfigFieldType>>()
-        for ((type, own) in elementTypes) {
+        for ((type, own) in schema.elements) {
             val fields = LinkedHashMap<String, ConfigFieldType>()
             fields["type"] = typeField
             fields["special"] = bool
-            if (type in TEXT_TYPES) fields["text"] = Unknown
-            if (type in CONTAINERS) fields["children"] = children
-            fields += common
-            fields += own
+            if (type in schema.textTypes) fields["text"] = Unknown
+            if (type in schema.containers) fields["children"] = children
+            for ((name, propertyType) in own) fields[ConfigPsiUtil.camelToKebab(name)] = propertyType
             variants[type] = fields
         }
-        return Nested("MenuElement", variants.getValue("Group"), "type", variants)
+        return Nested("MenuElement", variants["Group"] ?: variants.values.first(), "type", variants)
     }
-
-    /** Markup names are PascalCase; the config writes them in kebab case (`LayoutMode` -> `layout-mode`). */
-    private fun props(vararg entries: Pair<String, ConfigFieldType>): Map<String, ConfigFieldType> =
-        entries.associate { (name, type) -> ConfigPsiUtil.camelToKebab(name) to type }
-
-    private fun tuple(name: String, vararg keys: String) = Nested(name, props(*keys.map { it to Unknown }.toTypedArray()))
 
     private fun enumOf(vararg values: String) = EnumLike(EnumSource.FixedValues(values.toList()))
 }

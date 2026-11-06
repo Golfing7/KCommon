@@ -19,8 +19,21 @@ object HytaleMenuHtml {
     /**
      * @param showSpecial draws `special` elements, which in game only appear once Java binds or shows them.
      * @param rows container key -> template keys Java adds to it with `addRow`; each gets [sampleRows] copies.
+     * @param sampleRows copies of each row; null uses the menu's `elements-per-page`, or 3.
+     * @param samples placeholder -> sample value, filled into text (`{NAME}`).
+     * @param highlight the element path (see [Element.path]) to outline, such as `elements/footer/children/close`.
+     * @param zoom a fixed zoom, or null to shrink the frame to fit the window.
+     * @param navigateScript JavaScript run with `path` set when an element is clicked.
      */
-    data class Options(val showSpecial: Boolean = true, val rows: Map<String, List<String>> = emptyMap(), val sampleRows: Int = 3)
+    data class Options(
+        val showSpecial: Boolean = true,
+        val rows: Map<String, List<String>> = emptyMap(),
+        val sampleRows: Int? = null,
+        val samples: Map<String, String> = emptyMap(),
+        val highlight: String? = null,
+        val zoom: Double? = null,
+        val navigateScript: String? = null,
+    )
 
     private val TITLE_STYLE = mapOf(
         "FontSize" to 15, "VerticalAlignment" to "Center", "RenderUppercase" to true, "TextColor" to "#b4c8c9",
@@ -38,6 +51,8 @@ object HytaleMenuHtml {
         val text: String?,
         val props: Map<String, Any?>,
         val children: List<Element>,
+        /** Where it is in the menu's YAML, `/`-separated (`templates/item/children/name`); null for the frame KCommon adds. */
+        val path: String? = null,
     )
 
     fun render(menu: Map<String, Any?>, assets: MenuAssets?, options: Options = Options()): String =
@@ -45,7 +60,9 @@ object HytaleMenuHtml {
 
     private class Renderer(private val menu: Map<String, Any?>, private val assets: MenuAssets?, private val options: Options) {
         private val out = StringBuilder()
-        private val templates: Map<String, Element> = asMap(menu["templates"]).mapNotNull { (key, raw) -> parse(key, raw)?.let { key to it } }.toMap()
+        private val templates: Map<String, Element> =
+            asMap(menu["templates"]).mapNotNull { (key, raw) -> parse(key, raw, "templates/$key")?.let { key to it } }.toMap()
+        private val sampleRows = options.sampleRows ?: int(menu["elements-per-page"])?.takeIf { it > 0 } ?: 3
         private val placed = HashSet<String>()
 
         fun page(): String {
@@ -63,7 +80,7 @@ object HytaleMenuHtml {
                 contentProps["Background"] = mapOf("TexturePath" to "Common/ContainerPatch.png", "Border" to 23)
             }
             merge(contentProps, props(asMap(menu["content"])))
-            val content = Element("content", "Group", false, null, contentProps, children(menu["elements"]))
+            val content = Element("content", "Group", false, null, contentProps, children(menu["elements"], "elements"), "content")
 
             val root = if (!decorated) content else Element(
                 "frame", "Group", false, null, mapOf("Anchor" to mapOf("Width" to width, "Height" to height)),
@@ -101,12 +118,19 @@ object HytaleMenuHtml {
                 }
                 out.append("</div>")
             }
-            if (decorated) {
+            out.append("<script>")
+            if (options.zoom != null) {
+                out.append("document.querySelector('.desktop>.el').style.zoom=").append(options.zoom).append(';')
+            } else if (decorated) {
                 // Shrink a frame wider or taller than the tool window to fit, rather than clipping it.
-                out.append("<script>(function(){function fit(){var s=Math.min(1,(innerWidth-48)/")
+                out.append("(function(){function fit(){var s=Math.min(1,(innerWidth-48)/")
                     .append(width).append(",(innerHeight-48)/").append(height + 24)
-                    .append(");document.querySelector('.desktop>.el').style.zoom=Math.max(s,0.25);}addEventListener('resize',fit);fit();})();</script>")
+                    .append(");document.querySelector('.desktop>.el').style.zoom=Math.max(s,0.25);}addEventListener('resize',fit);fit();})();")
             }
+            out.append(SCRIPT)
+            options.navigateScript?.let { out.append("window.kcNavigate=function(path){").append(it).append("};") }
+            options.highlight?.let { out.append("kcHighlight(").append(jsString(it)).append(");") }
+            out.append("</script>")
             if (assets == null) {
                 out.append("<div class=\"note\">No Hytale assets found, so textures and .ui styles are approximated. ")
                     .append("Point Settings | Tools | KCommon at your Hytale Assets.zip.</div>")
@@ -136,7 +160,9 @@ object HytaleMenuHtml {
             style.append(layout?.let(::layoutCss) ?: "display:flex;")
 
             out.append("<div class=\"el t-").append(escape(element.type)).append(if (element.special) " special" else "").append(if (!known) " unknown" else "")
-                .append("\" title=\"").append(escape("${element.key} (${element.type})")).append("\" style=\"").append(escape(style.toString())).append("\">")
+                .append("\" title=\"").append(escape("${element.key} (${element.type})")).append("\" style=\"").append(escape(style.toString())).append('"')
+            element.path?.let { out.append(" data-path=\"").append(escape(it)).append('"') }
+            out.append('>')
 
             var background = element.props["Background"]
             var labelStyle: Map<String, Any?>? = null
@@ -172,7 +198,7 @@ object HytaleMenuHtml {
             for (templateKey in options.rows[element.key].orEmpty()) {
                 val template = templates[templateKey] ?: continue
                 placed += templateKey
-                repeat(options.sampleRows) { element(template, childLayout) }
+                repeat(sampleRows) { element(template, childLayout) }
             }
             out.append("</div>")
         }
@@ -194,14 +220,15 @@ object HytaleMenuHtml {
             color(style["OutlineColor"])?.let { css.append("text-shadow:0 0 1px $it,0 0 1px $it;") }
             val base = color(style["TextColor"]) ?: "#ffffff"
             out.append("<div class=\"label\" style=\"").append(css).append("\"><span>")
-            out.append(TextFormat.toHtml(text, base))
+            val filled = options.samples.entries.fold(text) { current, (key, value) -> current.replace("{$key}", value) }
+            out.append(TextFormat.toHtml(filled, base))
             out.append("</span></div>")
         }
 
         private fun item(element: Element) {
             val id = element.props["ItemId"]?.toString()
             if (element.type == "ItemSlot") out.append("<div class=\"fill slot\"></div>")
-            val icon = id?.let { assets?.image("Icons/ItemsGenerated/$it.png") }
+            val icon = id?.let { assets?.itemIcon(it) }
             if (icon != null) {
                 out.append("<div class=\"fill image\" style=\"background-image:url('").append(icon).append("')\"></div>")
             } else {
@@ -270,14 +297,14 @@ object HytaleMenuHtml {
             return assets?.reference(ref.trim())
         }
 
-        private fun parse(key: String, raw: Any?, defaultType: String = "Group"): Element? {
+        private fun parse(key: String, raw: Any?, path: String, defaultType: String = "Group"): Element? {
             val section = asMap(raw).ifEmpty { return null }
             val type = section["type"]?.toString() ?: defaultType
             val rest = section.filterKeys { it != "type" && it != "special" && it != "text" && it != "children" }
-            return Element(key, type, bool(section["special"]) == true, section["text"]?.let(::joinLines), props(rest), children(section["children"]))
+            return Element(key, type, bool(section["special"]) == true, section["text"]?.let(::joinLines), props(rest), children(section["children"], "$path/children"), path)
         }
 
-        private fun children(raw: Any?): List<Element> = asMap(raw).mapNotNull { (key, value) -> parse(key, value) }
+        private fun children(raw: Any?, path: String): List<Element> = asMap(raw).mapNotNull { (key, value) -> parse(key, value, "$path/$key") }
     }
 
     // --- layout ---
@@ -456,6 +483,24 @@ object HytaleMenuHtml {
         }
     }
 
+    /** `kcHighlight(path)` outlines the element at path (or its nearest ancestor shown); a click calls `kcNavigate(path)` when the IDE set one. */
+    internal const val SCRIPT = "window.kcHighlight=function(p){document.querySelectorAll('.kc-hl').forEach(function(e){e.classList.remove('kc-hl')});" +
+        "while(p){var m=document.querySelectorAll('[data-path=\"'+p+'\"]');if(m.length){m.forEach(function(e){e.classList.add('kc-hl')});" +
+        "m[0].scrollIntoView({block:'nearest',inline:'nearest'});return;}var i=p.lastIndexOf('/');p=i<0?'':p.substring(0,i);}};" +
+        "document.addEventListener('click',function(e){var t=e.target.closest('[data-path]');if(t&&window.kcNavigate){e.preventDefault();window.kcNavigate(t.getAttribute('data-path'));}});"
+
+    /** A JavaScript string literal. */
+    internal fun jsString(text: String): String = buildString {
+        append('\'')
+        for (c in text) when (c) {
+            '\'', '\\' -> append('\\').append(c)
+            '\n' -> append("\\n")
+            '<' -> append("\\u003c")
+            else -> append(c)
+        }
+        append('\'')
+    }
+
     private const val CSS = """
 :root{--secondary:'Lexend','Nunito Sans','Segoe UI',sans-serif;}
 html,body{margin:0;background:#141a24;color:#fff;font-family:'Nunito Sans','Segoe UI',Roboto,sans-serif;}
@@ -473,8 +518,11 @@ html,body{margin:0;background:#141a24;color:#fff;font-family:'Nunito Sans','Sego
 .quantity{position:absolute!important;right:3px;bottom:1px;font-size:13px;font-weight:700;text-shadow:0 1px 2px #000;}
 .bar{position:absolute;}
 .t-ItemIcon,.t-ItemSlot{min-width:32px;min-height:32px;}
-.special{outline:1px dashed rgba(255,190,80,.8);outline-offset:-1px;}
-.unknown{outline:1px dashed #e05555;}
+.special::before,.kc-hl::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:5;box-sizing:border-box;}
+.special::before{border:1px dashed rgba(255,190,80,.85);}
+.kc-hl::after{border:2px solid #4da3ff;box-shadow:0 0 6px rgba(77,163,255,.6);}
+[data-path]{cursor:pointer;}
+.unknown{box-shadow:inset 0 0 0 1px #e05555;}
 .error{color:#ff7070;font-size:12px;padding:4px;}
 .templates{padding:16px 24px;border-top:1px solid #2b3542;}
 .template{display:flex;flex-direction:column;margin:4px 0 12px;background:rgba(0,0,0,.2);}

@@ -13,6 +13,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import org.jetbrains.yaml.psi.YAMLKeyValue
 import org.jetbrains.yaml.psi.YAMLMapping
+import org.jetbrains.yaml.psi.YAMLScalar
+import com.golfing8.kcommon.idea.preview.HytaleUiAssets
 
 /**
  * Two kinds of suggestions, both only firing when the module and field type can be confidently
@@ -58,6 +60,10 @@ class KCommonYamlCompletionContributor : CompletionContributor() {
                         // suggest its keys, regardless of how the value currently parses.
                         val enclosingResolution = ConfigSchemaResolver.resolveKey(enclosingKeyValue, originalFile).resolution
                         val enclosingType = (enclosingResolution as? SchemaResolution.Resolved)?.type
+                        val scalarValue = enclosingKeyValue.value as? YAMLScalar
+                        if (scalarValue != null && PsiTreeUtil.isAncestor(scalarValue, position, false) && suggestReferences(enclosingType, scalarValue, parameters, result)) {
+                            return
+                        }
                         if (enclosingType is ConfigFieldType.Nested) {
                             val existingValue = enclosingKeyValue.value as? YAMLMapping
                             val existingKeys = existingValue?.keyValues?.map { it.keyText.lowercase() }?.toSet().orEmpty()
@@ -106,6 +112,48 @@ class KCommonYamlCompletionContributor : CompletionContributor() {
         for (name in EnumSource.resolve(type.source, project)) {
             result.addElement(LookupElementBuilder.create(name))
         }
+    }
+
+    /**
+     * `.ui` references for a Hytale menu value that takes one: `@Name`s of Common.ui (only those of
+     * the expected `.ui` type when it's known), the vanilla documents, and after `Doc.ui@` that
+     * document's names. Returns false when the value doesn't take a reference here.
+     */
+    private fun suggestReferences(type: ConfigFieldType?, scalar: YAMLScalar, parameters: CompletionParameters, result: CompletionResultSet): Boolean {
+        val format = when (type) {
+            is ConfigFieldType.Formatted -> type
+            is ConfigFieldType.Nested -> type.scalar
+            else -> null
+        } ?: return false
+        if (format.format != ScalarFormat.REF && format.format != ScalarFormat.PATCH) return false
+        val assets = HytaleUiAssets.current() ?: return false
+
+        val text = parameters.position.containingFile.text
+        val start = scalar.textRange.startOffset
+        val quoted = text.getOrNull(start) == '\'' || text.getOrNull(start) == '"'
+        val typed = text.substring((start + if (quoted) 1 else 0).coerceAtMost(parameters.offset), parameters.offset)
+        if (format.format == ScalarFormat.PATCH && !typed.startsWith("@") && !typed.contains(".ui")) return false
+
+        val scoped = result.withPrefixMatcher(typed)
+        fun offer(value: String, typeText: String?) {
+            scoped.addElement(LookupElementBuilder.create(value).withTypeText(typeText, true).withInsertHandler { context, _ ->
+                // '@' can't start a plain YAML scalar, so an unquoted reference gets quotes.
+                if (!quoted) context.document.replaceString(context.startOffset, context.tailOffset, "'$value'")
+            })
+        }
+        val at = typed.indexOf(".ui@")
+        if (at >= 0) {
+            val document = typed.substring(0, at + 3)
+            for ((name, uiType) in assets.referenceNames(document)) offer("$document@$name", uiType)
+            return true
+        }
+        for ((name, uiType) in assets.referenceNames()) {
+            if (format.uiType != null && uiType != null && uiType != format.uiType) continue
+            if (assets.reference("@$name") == null) continue // element templates can't be referenced as values
+            offer("@$name", uiType)
+        }
+        for (document in assets.documents()) offer("$document@", "document")
+        return true
     }
 
     private fun suggestKeysForMapping(mapping: YAMLMapping, fallbackFile: PsiFile, project: Project, result: CompletionResultSet) {

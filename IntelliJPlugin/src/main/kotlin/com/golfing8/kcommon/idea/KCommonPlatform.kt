@@ -1,14 +1,18 @@
 package com.golfing8.kcommon.idea
 
 import com.golfing8.kcommon.idea.preview.HytaleUiAssets
+import com.golfing8.kcommon.idea.preview.MinecraftAssets
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.BoundConfigurable
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootModificationTracker
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValueProvider
@@ -23,9 +27,10 @@ import com.intellij.ui.dsl.builder.panel
 enum class KCommonPlatform { MINECRAFT, HYTALE }
 
 /**
- * Decides a project's [KCommonPlatform] from the game library on its classpath: Bukkit means
- * Minecraft, the Hytale server means Hytale. A project with both (such as KCommon itself) or with
- * neither (a lone YAML file) uses the per-project override from Settings | Tools | KCommon, and
+ * Decides which [KCommonPlatform] a file belongs to from the game library on its module's
+ * classpath: Bukkit means Minecraft, the Hytale server means Hytale. A module with both or neither
+ * falls back to the whole project's libraries, and when those don't decide either (such as KCommon
+ * itself, or a lone YAML file) to the per-project override from Settings | Tools | KCommon, and
  * Minecraft when none is set.
  */
 object PlatformDetector {
@@ -44,6 +49,15 @@ object PlatformDetector {
         )
     }
 
+    fun detect(module: Module): Detected = CachedValuesManager.getManager(module.project).getCachedValue(module) {
+        val facade = JavaPsiFacade.getInstance(module.project)
+        val scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module)
+        CachedValueProvider.Result.create(
+            Detected(facade.findClass(MINECRAFT_MARKER, scope) != null, facade.findClass(HYTALE_MARKER, scope) != null),
+            ProjectRootModificationTracker.getInstance(module.project)
+        )
+    }
+
     fun override(project: Project): KCommonPlatform? =
         PropertiesComponent.getInstance(project).getValue(OVERRIDE_KEY)?.let { name -> KCommonPlatform.entries.firstOrNull { it.name == name } }
 
@@ -55,13 +69,23 @@ object PlatformDetector {
         DaemonCodeAnalyzer.getInstance(project).restart()
     }
 
-    fun platform(project: Project): KCommonPlatform {
-        override(project)?.let { return it }
-        val detected = detect(project)
-        return if (detected.hytale && !detected.minecraft) KCommonPlatform.HYTALE else KCommonPlatform.MINECRAFT
+    /** The platform of the module [context] is in; see the class doc for the fallbacks. */
+    fun platform(context: PsiElement): KCommonPlatform {
+        val module = ModuleUtilCore.findModuleForPsiElement(context.containingFile?.originalFile ?: context)
+        if (module != null) decide(detect(module))?.let { return it }
+        return platform(context.project)
     }
 
-    fun isHytale(project: Project): Boolean = platform(project) == KCommonPlatform.HYTALE
+    /** The platform for the project as a whole, for anything not tied to one module. */
+    fun platform(project: Project): KCommonPlatform = decide(detect(project)) ?: override(project) ?: KCommonPlatform.MINECRAFT
+
+    fun isHytale(context: PsiElement): Boolean = platform(context) == KCommonPlatform.HYTALE
+
+    private fun decide(detected: Detected): KCommonPlatform? = when {
+        detected.hytale && !detected.minecraft -> KCommonPlatform.HYTALE
+        detected.minecraft && !detected.hytale -> KCommonPlatform.MINECRAFT
+        else -> null
+    }
 }
 
 /** Settings | Tools | KCommon: the platform override and where the Hytale assets live for menu previews. */
@@ -77,6 +101,7 @@ class KCommonSettingsConfigurable(private val project: Project) : BoundConfigura
 
     private var choice: Choice? = Choice.entries.first { it.platform == PlatformDetector.override(project) }
     private var assetsPath: String = HytaleUiAssets.configuredPath().orEmpty()
+    private var minecraftJar: String = MinecraftAssets.configuredPath().orEmpty()
 
     override fun createPanel() = panel {
         row("Platform:") {
@@ -96,12 +121,24 @@ class KCommonSettingsConfigurable(private val project: Project) : BoundConfigura
             comment("Assets.zip from the Hytale install, or an unpacked HytaleAssets folder. The menu preview reads textures and Common.ui styles from it. " +
                 "Left empty, the standard launcher install is used: ${HytaleUiAssets.defaultPath() ?: "not found"}.")
         }
+        row("Minecraft client jar:") {
+            textFieldWithBrowseButton(
+                "Minecraft Client Jar",
+                project,
+                FileChooserDescriptorFactory.createSingleFileDescriptor("jar")
+            ).bindText(::minecraftJar).columns(COLUMNS_LARGE)
+        }
+        row {
+            comment("Item textures for previewing Bukkit menus. Left empty, the newest version in the launcher's versions folder is used: " +
+                "${MinecraftAssets.defaultPath() ?: "not found"}.")
+        }
     }
 
     override fun apply() {
         super.apply()
         PlatformDetector.setOverride(project, choice?.platform)
         HytaleUiAssets.setConfiguredPath(assetsPath.trim().ifEmpty { null })
+        MinecraftAssets.setConfiguredPath(minecraftJar.trim().ifEmpty { null })
     }
 
     private fun detectedText(): String {
@@ -109,10 +146,11 @@ class KCommonSettingsConfigurable(private val project: Project) : BoundConfigura
         if (DumbService.isDumb(project)) return "Libraries are still being indexed."
         val detected = PlatformDetector.detect(project)
         return when {
-            detected.hytale && detected.minecraft -> "Both Bukkit and the Hytale server are on the classpath; detection picks Minecraft, so choose the platform here."
-            detected.hytale -> "Detected: Hytale."
-            detected.minecraft -> "Detected: Minecraft (Bukkit)."
-            else -> "Neither Bukkit nor the Hytale server is on the classpath; detection picks Minecraft."
+            detected.hytale && detected.minecraft ->
+                "Both Bukkit and the Hytale server are on the classpath. Each module with only one of them still uses that one; this choice covers the rest."
+            detected.hytale -> "Detected: Hytale. This choice only applies where a module's libraries don't decide."
+            detected.minecraft -> "Detected: Minecraft (Bukkit). This choice only applies where a module's libraries don't decide."
+            else -> "Neither Bukkit nor the Hytale server is on the classpath, so this choice decides (Minecraft when left to detection)."
         }
     }
 }

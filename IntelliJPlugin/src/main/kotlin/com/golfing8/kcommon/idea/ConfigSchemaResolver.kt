@@ -89,7 +89,7 @@ object ConfigSchemaResolver {
         FileTagParser.typeTag(keyValue)?.let { typeName ->
             // No module context to report here: a `#$Type` override never yields UnknownKey (the
             // only resolution the annotator attaches a module id to), so resolving one would be wasted work.
-            val type = NamedTypeRegistry.resolve(keyValue.project, typeName)
+            val type = NamedTypeRegistry.resolve(keyValue, typeName)
             return KeyResolution(null, if (type != null) SchemaResolution.Resolved(type) else SchemaResolution.Indeterminate)
         }
 
@@ -103,7 +103,7 @@ object ConfigSchemaResolver {
         val owner = mapping.parent as? YAMLKeyValue
         if (owner != null) {
             FileTagParser.typeTag(owner)?.let { typeName ->
-                return when (val type = NamedTypeRegistry.resolve(owner.project, typeName)) {
+                return when (val type = NamedTypeRegistry.resolve(owner, typeName)) {
                     is ConfigFieldType.Nested -> ContainerResolution(FieldContainer(type.typeName, fieldsOf(type, mapping)), null)
                     is ConfigFieldType.MapOf -> ContainerResolution(null, type.keyType as? ConfigFieldType.EnumLike)
                     else -> ContainerResolution.EMPTY
@@ -190,12 +190,12 @@ object ConfigSchemaResolver {
             val moduleInfo = moduleClass.getAnnotation(KCConstants.MODULE_INFO)
             if (moduleInfo != null) {
                 val configSources = ConfigPsiUtil.extractConfigSources(moduleInfo)
-                return ConfigSchema(moduleId) { buildFieldsFromPsi(project, moduleClass, configSources, bucket) }
+                return ConfigSchema(moduleId, bucket) { buildFieldsFromPsi(project, moduleClass, configSources, bucket) }
             }
         }
 
         val externalFields = ExternalSchemaRegistry.getInstance(project).fieldsFor(moduleId, bucket) ?: return null
-        return ConfigSchema(moduleId) { externalFields }
+        return ConfigSchema(moduleId, bucket) { externalFields }
     }
 
     /**
@@ -217,6 +217,10 @@ object ConfigSchemaResolver {
             for ((key, type) in ConfigPsiUtil.collectConfigClassFields(sourceClass, bucket, project, includeChildren = false)) {
                 fields.putIfAbsent(key, type)
             }
+        }
+        if (bucket.equals(KCConstants.LANG_BUCKET, ignoreCase = true)) {
+            val message = BuiltInAdapters.forType(moduleClass, KCConstants.MESSAGE) ?: ConfigFieldType.Unknown
+            for (key in ConfigPsiUtil.langKeys(moduleClass)) mergeField(fields, key, message)
         }
         // @MenuContainerInfo entries aren't tied to a specific module (see MenuContainerRegistry's
         // doc comment) - merge them in for any module whose config bucket they target.

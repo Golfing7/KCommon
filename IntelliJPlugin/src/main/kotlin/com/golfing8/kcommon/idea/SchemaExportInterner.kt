@@ -49,12 +49,14 @@ class SchemaExportInterner(private val project: Project) {
         fieldsJson: JsonValue.JsonObject,
         discriminator: String? = null,
         variantsJson: JsonValue.JsonObject? = null,
+        scalarJson: JsonValue.JsonObject? = null,
     ): String {
         val record = jsonObjectOf("typeName" to JsonValue.JsonString(typeName), "fields" to fieldsJson)
         if (discriminator != null && variantsJson != null) {
             record["discriminator"] = JsonValue.JsonString(discriminator)
             record["variants"] = variantsJson
         }
+        scalarJson?.let { record["scalar"] = it }
         val signature = record.render()
         val existing = aliasesByTypeName.getOrPut(typeName) { mutableListOf() }
         existing.firstOrNull { it.second == signature }?.let { return it.first }

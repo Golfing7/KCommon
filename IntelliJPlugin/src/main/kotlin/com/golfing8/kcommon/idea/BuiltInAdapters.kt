@@ -1,6 +1,7 @@
 package com.golfing8.kcommon.idea
 
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.golfing8.kcommon.idea.ConfigFieldType.EnumLike
 import com.golfing8.kcommon.idea.ConfigFieldType.ListOf
 import com.golfing8.kcommon.idea.ConfigFieldType.MapOf
@@ -31,40 +32,40 @@ import com.golfing8.kcommon.idea.ConfigFieldType.Unknown
  */
 object BuiltInAdapters {
 
-    fun forType(project: Project, qualifiedName: String): ConfigFieldType? = forType(PlatformDetector.platform(project), qualifiedName)
+    /** The shape of [qualifiedName] on the platform [context] belongs to. */
+    fun forType(context: PsiElement, qualifiedName: String): ConfigFieldType? =
+        forType(PlatformDetector.platform(context), qualifiedName, context.project)
 
-    fun forType(platform: KCommonPlatform, qualifiedName: String): ConfigFieldType? =
-        (shared[qualifiedName] ?: tableFor(platform)[qualifiedName])?.invoke()
+    fun forType(platform: KCommonPlatform, qualifiedName: String, project: Project?): ConfigFieldType? =
+        (shared[qualifiedName] ?: tableFor(platform)[qualifiedName])?.invoke(project)
 
     /** Looked up by [ConfigFieldType.Nested.typeName] rather than FQN - for `#$Type` tag resolution, where a user writes the type's simple display name, not its Java FQN. */
-    fun byTypeName(project: Project, name: String): ConfigFieldType? = byName.getValue(PlatformDetector.platform(project))[name]
+    fun byTypeName(context: PsiElement, name: String): ConfigFieldType? = byName(context)[name]
 
-    fun allTypeNames(project: Project): List<String> = byName.getValue(PlatformDetector.platform(project)).keys.toList()
+    fun allTypeNames(context: PsiElement): List<String> = byName(context).keys.toList()
 
     private fun tableFor(platform: KCommonPlatform) = if (platform == KCommonPlatform.HYTALE) hytale else minecraft
 
-    private val byName: Map<KCommonPlatform, Map<String, ConfigFieldType>> by lazy {
-        KCommonPlatform.entries.associateWith { platform ->
-            val map = LinkedHashMap<String, ConfigFieldType>()
-            for (factory in shared.values + tableFor(platform).values) {
-                val type = factory()
-                if (type is Nested) map.putIfAbsent(type.typeName, type)
-            }
-            map
+    private fun byName(context: PsiElement): Map<String, ConfigFieldType> {
+        val map = LinkedHashMap<String, ConfigFieldType>()
+        for (factory in shared.values + tableFor(PlatformDetector.platform(context)).values) {
+            val type = factory(context.project)
+            if (type is Nested) map.putIfAbsent(type.typeName, type)
         }
+        return map
     }
 
     /** Types whose adapter lives in Common, identical on both platforms. */
-    private val shared: Map<String, () -> ConfigFieldType> = mapOf(
+    private val shared: Map<String, (Project?) -> ConfigFieldType> = mapOf(
         "com.golfing8.kcommon.struct.region.Region" to { regionType() },
         "com.golfing8.kcommon.struct.blocks.WeightedCollection" to { MapOf(Unknown) },
         "java.time.ZonedDateTime" to { zonedDateTimeType() },
     )
 
     /** Hytale types, stored in config as their codec writes them (see HytaleCodecs/HytaleConfigAdapters). */
-    private val hytale: Map<String, () -> ConfigFieldType> = mapOf(
+    private val hytale: Map<String, (Project?) -> ConfigFieldType> = mapOf(
         "com.golfing8.kcommon.config.lang.Message" to { Nested("Message", mapOf("message" to ListOf(Unknown))) },
-        "com.golfing8.kcommon.menu.MenuBuilder" to { HytaleMenuShapes.menu },
+        "com.golfing8.kcommon.menu.MenuBuilder" to { HytaleMenuShapes.menu(it) },
         "com.hypixel.hytale.math.vector.Location" to {
             Nested("Location", mapOf("World" to Unknown, "Position" to vector("Vector3d", 3), "Rotation" to rotationType()))
         },
@@ -88,12 +89,12 @@ object BuiltInAdapters {
     private fun hytaleItemStackType() = Nested(
         "ItemStack",
         mapOf(
-            "Id" to Unknown, "Quantity" to Unknown, "Durability" to Unknown, "MaxDurability" to Unknown,
+            "Id" to EnumLike(EnumSource.HytaleItemIds), "Quantity" to Unknown, "Durability" to Unknown, "MaxDurability" to Unknown,
             "QualityOverride" to Unknown, "Metadata" to MapOf(Unknown), "OverrideDroppedItemAnimation" to Unknown,
         )
     )
 
-    private val minecraft: Map<String, () -> ConfigFieldType> = mapOf(
+    private val minecraft: Map<String, (Project?) -> ConfigFieldType> = mapOf(
         "com.golfing8.kcommon.struct.item.ItemStackBuilder" to { itemStackBuilderType() },
         "org.bukkit.Location" to { locationType() },
         "org.bukkit.util.BlockVector" to { Nested("BlockVector", xyzFields()) },

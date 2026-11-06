@@ -55,6 +55,7 @@ object ConfigPsiUtil {
      */
     fun collectBuckets(moduleClass: PsiClass, configSources: List<PsiClass>): Set<String> {
         val buckets = linkedSetOf(KCConstants.MAIN_CONFIG_BUCKET)
+        if (langKeys(moduleClass).isNotEmpty()) buckets += KCConstants.LANG_BUCKET
         collectBucketNames(moduleClass, includeChildren = true, buckets)
         for (source in configSources) {
             collectBucketNames(source, includeChildren = false, buckets)
@@ -142,8 +143,33 @@ object ConfigPsiUtil {
         }, false)
     }
 
-    fun extractConfigSources(annotation: PsiAnnotation): List<PsiClass> {
-        val value = annotation.findAttributeValue("configSources") ?: return emptyList()
+    fun extractConfigSources(annotation: PsiAnnotation): List<PsiClass> = classArray(annotation, "configSources")
+
+    /**
+     * The lang.yml keys of a module, as `LangConfigContainer` adds them: each constant of a
+     * `langSources` enum (`SOME_MESSAGE` -> `some-message`, `$` nests), and each `@LangConf` field
+     * of the module class (`noPermissionMessage` -> `no-permission`, under its `path`).
+     */
+    fun langKeys(moduleClass: PsiClass): List<List<String>> {
+        val keys = ArrayList<List<String>>()
+        moduleClass.getAnnotation(KCConstants.MODULE_INFO)?.let { info ->
+            for (source in classArray(info, "langSources")) {
+                for (constant in source.fields.filterIsInstance<PsiEnumConstant>()) {
+                    keys += constant.name.lowercase().replace('_', '-').split('$')
+                }
+            }
+        }
+        for (field in moduleClass.allFields) {
+            val conf = field.getAnnotation(KCConstants.LANG_CONF) ?: continue
+            val name = listOf("Message", "Msg").firstOrNull { field.name.endsWith(it) }?.let { field.name.removeSuffix(it) } ?: field.name
+            val path = stringLiteralValue(conf.findAttributeValue("path")).orEmpty()
+            keys += (if (path.isEmpty()) camelToKebab(name) else "$path.${camelToKebab(name)}").split('.')
+        }
+        return keys
+    }
+
+    private fun classArray(annotation: PsiAnnotation, attribute: String): List<PsiClass> {
+        val value = annotation.findAttributeValue(attribute) ?: return emptyList()
         val values = if (value is PsiArrayInitializerMemberValue) value.initializers.toList() else listOf(value)
         return values.mapNotNull { v ->
             (v as? PsiClassObjectAccessExpression)?.operand?.type?.let { PsiTypesUtil.getPsiClass(it) }
@@ -194,7 +220,7 @@ object ConfigPsiUtil {
                 if (!isConfEligible(field)) continue
                 val conf = field.getAnnotation(KCConstants.CONF)
                 if (bucket != null && !confBucket(conf).equals(bucket, ignoreCase = true)) continue
-                fields.putIfAbsent(yamlKeyFor(field, conf), classifyType(field.type, project))
+                fields.putIfAbsent(yamlKeyFor(field, conf), classifyType(field.type, field))
             }
             current = nextConfigClassSuperclass(current)
         }
@@ -254,7 +280,7 @@ object ConfigPsiUtil {
                 for (field in psiClass.fields) {
                     if (!shouldSerialize(field)) continue
                     val conf = field.getAnnotation(KCConstants.CONF)
-                    result[yamlKeyFor(field, conf)] = classifyType(field.type, project)
+                    result[yamlKeyFor(field, conf)] = classifyType(field.type, field)
                 }
                 CachedValueProvider.Result.create(
                     result as Map<String, ConfigFieldType>,
@@ -290,7 +316,9 @@ object ConfigPsiUtil {
         return sb.toString()
     }
 
-    fun classifyType(type: PsiType, project: Project): ConfigFieldType {
+    /** [context] is the element the type was declared on, which decides the platform (and so the built-in shapes) used. */
+    fun classifyType(type: PsiType, context: PsiElement): ConfigFieldType {
+        val project = context.project
         val psiClass = PsiTypesUtil.getPsiClass(type)
 
         if (type is PsiClassType && psiClass != null) {
@@ -299,33 +327,33 @@ object ConfigPsiUtil {
             // Optional<T> is transparent to the YAML shape - it's whatever T is.
             if (qualifiedName == KCConstants.OPTIONAL) {
                 val inner = type.parameters.getOrNull(0)
-                return inner?.let { classifyType(it, project) } ?: ConfigFieldType.Unknown
+                return inner?.let { classifyType(it, context) } ?: ConfigFieldType.Unknown
             }
 
             // Known-by-FQN types take priority: KCommon's own baked-in adapters, then anything a
             // consuming project has declared via @ConfigAdapterInfo.
             if (qualifiedName != null) {
-                BuiltInAdapters.forType(project, qualifiedName)?.let { return it }
+                BuiltInAdapters.forType(context, qualifiedName)?.let { return it }
                 UserAdapterRegistry.forType(project, qualifiedName)?.let { return it }
             }
 
             if (qualifiedName == KCConstants.RANGE_MAP || InheritanceUtil.isInheritor(psiClass, KCConstants.RANGE_MAP)) {
                 val valueParam = type.parameters.getOrNull(0)
-                val inner = valueParam?.let { classifyType(it, project) } ?: ConfigFieldType.Unknown
+                val inner = valueParam?.let { classifyType(it, context) } ?: ConfigFieldType.Unknown
                 return ConfigFieldType.MapOf(inner)
             }
 
             if (qualifiedName == "java.util.Map" || InheritanceUtil.isInheritor(psiClass, "java.util.Map")) {
                 val keyParam = type.parameters.getOrNull(0)
                 val valueParam = type.parameters.getOrNull(1)
-                val keyType = keyParam?.let { classifyType(it, project) } ?: ConfigFieldType.Unknown
-                val inner = valueParam?.let { classifyType(it, project) } ?: ConfigFieldType.Unknown
+                val keyType = keyParam?.let { classifyType(it, context) } ?: ConfigFieldType.Unknown
+                val inner = valueParam?.let { classifyType(it, context) } ?: ConfigFieldType.Unknown
                 return ConfigFieldType.MapOf(inner, keyType)
             }
 
             if (isCollectionType(qualifiedName, psiClass)) {
                 val param = type.parameters.getOrNull(0)
-                val inner = param?.let { classifyType(it, project) } ?: ConfigFieldType.Unknown
+                val inner = param?.let { classifyType(it, context) } ?: ConfigFieldType.Unknown
                 return ConfigFieldType.ListOf(inner)
             }
 
@@ -341,7 +369,7 @@ object ConfigPsiUtil {
                 return caSerializableType(psiClass)
             }
 
-            if (PlatformDetector.isHytale(project)) {
+            if (PlatformDetector.isHytale(context)) {
                 codecType(psiClass)?.let { return it }
             }
         }

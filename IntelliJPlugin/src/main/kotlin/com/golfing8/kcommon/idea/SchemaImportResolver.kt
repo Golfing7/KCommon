@@ -44,7 +44,10 @@ class SchemaImportResolver(private val rawEnums: Map<String, JsonValue>, private
             } else {
                 val typeName = (raw["typeName"] as? JsonValue.JsonString)?.value ?: ref
                 val variants = (raw["variants"] as? JsonValue.JsonObject)?.entries.orEmpty().mapValues { resolveFields(it.value) }
-                ConfigFieldType.Nested(typeName, resolveFields(raw["fields"]), (raw["discriminator"] as? JsonValue.JsonString)?.value, variants)
+                ConfigFieldType.Nested(
+                    typeName, resolveFields(raw["fields"]), (raw["discriminator"] as? JsonValue.JsonString)?.value, variants,
+                    resolveField(raw["scalar"]) as? ConfigFieldType.Formatted
+                )
             }
             resolvedTypes[ref] = result
             return result
@@ -75,6 +78,11 @@ class SchemaImportResolver(private val rawEnums: Map<String, JsonValue>, private
             "nested" -> { // legacy: fields inlined directly, pre-dating SchemaExportInterner
                 val typeName = (obj["typeName"] as? JsonValue.JsonString)?.value ?: "object"
                 ConfigFieldType.Nested(typeName, resolveFields(obj["fields"]))
+            }
+            "format" -> {
+                val format = ScalarFormat.entries.firstOrNull { it.name == (obj["format"] as? JsonValue.JsonString)?.value }
+                    ?: return ConfigFieldType.Unknown
+                ConfigFieldType.Formatted(format, (obj["uiType"] as? JsonValue.JsonString)?.value)
             }
             "list" -> ConfigFieldType.ListOf(resolveField(obj["inner"]))
             "map" -> ConfigFieldType.MapOf(

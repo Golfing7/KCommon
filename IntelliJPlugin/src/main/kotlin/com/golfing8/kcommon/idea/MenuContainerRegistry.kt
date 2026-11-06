@@ -97,14 +97,8 @@ object MenuContainerRegistry {
         val facade = JavaPsiFacade.getInstance(project)
         val section = facade.findClass(KCConstants.KSECTION, scope) ?: return
         val getOrLoad = section.findMethodsByName("getOrLoad", false).firstOrNull {
-            it.parameterList.parametersCount == 2 && it.parameterList.parameters[1].type.canonicalText.startsWith("java.lang.Class")
+            it.parameterList.parametersCount == 2 && (it.parameterList.parameters[1].type as? com.intellij.psi.PsiClassType)?.className == "Class"
         } ?: return
-        val leaf = if (PlatformDetector.isHytale(project)) {
-            HytaleMenuShapes.menu
-        } else {
-            ConfigFieldType.Nested("MenuBuilder", MenuBuilderShapes.menuBuilderFields(MenuContainerKind.NORMAL))
-        }
-
         for (reference in MethodReferencesSearch.search(getOrLoad, scope, true)) {
             val call = PsiTreeUtil.getParentOfType(reference.element, PsiMethodCallExpression::class.java) ?: continue
             val args = call.argumentList.expressions
@@ -115,11 +109,16 @@ object MenuContainerRegistry {
             val segments = path.split('.').map(String::trim).filter(String::isNotEmpty)
             if (segments.isEmpty()) continue
             val bucket = bucketOf(project, call.methodExpression.qualifierExpression) ?: ANY_BUCKET
+            val leaf = if (PlatformDetector.isHytale(call)) {
+                HytaleMenuShapes.menu(project)
+            } else {
+                ConfigFieldType.Nested("MenuBuilder", MenuBuilderShapes.menuBuilderFields(MenuContainerKind.NORMAL))
+            }
             into.getOrPut(bucket) { mutableListOf() }.add(segments to leaf)
         }
     }
 
-    private fun bucketOf(project: Project, qualifier: PsiExpression?): String? {
+    internal fun bucketOf(project: Project, qualifier: PsiExpression?): String? {
         val call = qualifier as? PsiMethodCallExpression ?: return null
         return when (call.methodExpression.referenceName) {
             "getMainConfig" -> KCConstants.MAIN_CONFIG_BUCKET

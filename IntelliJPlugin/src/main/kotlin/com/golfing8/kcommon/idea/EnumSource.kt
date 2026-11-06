@@ -20,6 +20,9 @@ sealed class EnumSource {
     data class FixedValues(val values: List<String>) : EnumSource()
     data class Union(val sources: List<EnumSource>) : EnumSource()
 
+    /** Hytale item ids, read from the Hytale assets the menu preview uses (empty without them). */
+    object HytaleItemIds : EnumSource()
+
     companion object {
         fun resolve(source: EnumSource, project: Project): List<String> = when (source) {
             is JavaEnum -> {
@@ -46,6 +49,7 @@ sealed class EnumSource {
             }
             is FixedValues -> source.values
             is Union -> source.sources.flatMap { resolve(it, project) }
+            HytaleItemIds -> com.golfing8.kcommon.idea.preview.HytaleUiAssets.current()?.itemIds().orEmpty()
         }
     }
 }

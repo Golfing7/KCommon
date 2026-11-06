@@ -65,7 +65,7 @@ class KCommonTagCompletionContributor : CompletionContributor() {
                     }
 
                     TYPE_TAG_PREFIX.find(afterHash)?.let { match ->
-                        offerResults(result, match.groupValues[1], NamedTypeRegistry.allNames(project))
+                        offerResults(result, match.groupValues[1], NamedTypeRegistry.allNames(file))
                         return
                     }
                 }

@@ -1,6 +1,6 @@
 package com.golfing8.kcommon.idea
 
-import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 
 /**
  * Resolves a bare type name - as written in a `#$Type <name>` tag (see [FileTagParser]) - to a
@@ -18,17 +18,20 @@ import com.intellij.openapi.project.Project
  */
 object NamedTypeRegistry {
 
-    fun resolve(project: Project, name: String): ConfigFieldType? {
-        BuiltInAdapters.byTypeName(project, name)?.let { return it }
+    /** [context] is where the name is used; it decides the platform. */
+    fun resolve(context: PsiElement, name: String): ConfigFieldType? {
+        val project = context.project
+        BuiltInAdapters.byTypeName(context, name)?.let { return it }
         UserAdapterRegistry.byTypeName(project, name)?.let { return it }
         ConfigPsiUtil.findNamedCASerializable(project, name)?.let { return it }
         ConfigPsiUtil.findNamedConfigClass(project, name)?.let { return it }
         return ExternalSchemaRegistry.getInstance(project).namedType(name)
     }
 
-    fun allNames(project: Project): List<String> {
+    fun allNames(context: PsiElement): List<String> {
+        val project = context.project
         val names = LinkedHashSet<String>()
-        names += BuiltInAdapters.allTypeNames(project)
+        names += BuiltInAdapters.allTypeNames(context)
         names += UserAdapterRegistry.allTypeNames(project)
         names += ConfigPsiUtil.allCASerializableTypeNames(project)
         names += ConfigPsiUtil.allConfigClassTypeNames(project)

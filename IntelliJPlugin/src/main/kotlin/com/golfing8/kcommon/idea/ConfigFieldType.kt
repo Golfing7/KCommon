@@ -22,6 +22,8 @@ sealed class ConfigFieldType {
         val fields: Map<String, ConfigFieldType>,
         val discriminator: String? = null,
         val variants: Map<String, Map<String, ConfigFieldType>> = emptyMap(),
+        /** A scalar this mapping also accepts in place of its keys (a Hytale tuple written as `'@Ref'`), or null when a scalar isn't checked. */
+        val scalar: Formatted? = null,
     ) : ConfigFieldType() {
         fun fieldsFor(variant: String?): Map<String, ConfigFieldType> {
             if (variant == null || variants.isEmpty()) return fields
@@ -38,8 +40,53 @@ sealed class ConfigFieldType {
     /** Map<K, T>: a YAML mapping with values matching `inner`. Keys match `keyType` (usually Unknown/free-form, but EnumLike for e.g. Map<XEnchantment, Integer>). */
     data class MapOf(val inner: ConfigFieldType, val keyType: ConfigFieldType = Unknown) : ConfigFieldType()
 
+    /** A scalar whose text must follow [format]; [uiType] names the `.ui` type a reference should point at (`TextButtonStyle`). */
+    data class Formatted(val format: ScalarFormat, val uiType: String? = null) : ConfigFieldType()
+
     /** Anything we don't have a specific model for (String, primitives, TimeLength, etc.) - never validated. */
     object Unknown : ConfigFieldType()
+}
+
+/** The scalar formats Hytale menus check when they load (see MenuMarkup in the Hytale module). */
+enum class ScalarFormat {
+    INTEGER, DECIMAL, COLOR,
+    /** A color, a `.png` texture path, or a `.ui` reference. */
+    PATCH,
+    /** Only a `.ui` reference, such as `@DefaultTextButtonStyle` or `Pages/Foo.ui@Bar`. */
+    REF;
+
+    /** Why [text] doesn't fit this format, or null when it does (or holds a placeholder, which is checked once filled in). */
+    fun problem(text: String): String? {
+        val value = text.trim()
+        if (value.contains('{')) return null
+        val isRef = REFERENCE.matches(value)
+        return when (this) {
+            INTEGER -> when {
+                isRef -> "can't be a reference to a .ui value"
+                !Regex("-?\\d+").matches(value) -> "must be a whole number"
+                else -> null
+            }
+            DECIMAL -> when {
+                isRef -> "can't be a reference to a .ui value"
+                !Regex("-?\\d+(\\.\\d+)?").matches(value) -> "must be a number"
+                else -> null
+            }
+            COLOR -> when {
+                isRef -> "can't be a reference to a .ui value"
+                !COLOR_VALUE.matches(value) -> "must be a color such as '#ffffff' or '#000000(0.5)'"
+                else -> null
+            }
+            PATCH -> if (isRef || COLOR_VALUE.matches(value) || value.endsWith(".png")) null
+                else "must be a color such as '#ffffff', a .png texture path, or a .ui reference"
+            REF -> if (isRef) null else "must be a reference to a .ui value, such as '@DefaultTextButtonStyle'"
+        }
+    }
+
+    companion object {
+        /** Mirrors MenuSchema's REF pattern. */
+        val REFERENCE = Regex("(?:([A-Za-z0-9_/]+\\.ui))?@([A-Za-z][A-Za-z0-9]*)")
+        private val COLOR_VALUE = Regex("#[0-9a-fA-F]{6}(\\(\\s*(0(\\.\\d+)?|1(\\.0+)?)\\s*\\))?")
+    }
 }
 
 /** Result of walking a YAML key path against a resolved module's config schema. */
@@ -75,7 +122,7 @@ data class FieldContainer(val typeName: String, val fields: Map<String, ConfigFi
 /**
  * The resolved field structure for one config file (e.g. `<module>/config.yml`) belonging to one module.
  */
-class ConfigSchema(val moduleId: String, rootFieldsProvider: () -> Map<String, ConfigFieldType>) {
+class ConfigSchema(val moduleId: String, val bucket: String? = null, rootFieldsProvider: () -> Map<String, ConfigFieldType>) {
     private val rootFields: Map<String, ConfigFieldType> by lazy(rootFieldsProvider)
 
     /**
@@ -117,8 +164,9 @@ class ConfigSchema(val moduleId: String, rootFieldsProvider: () -> Map<String, C
 
             currentType = when {
                 knownFields != null -> {
+                    // Only the first unknown key is flagged; everything under it is just indeterminate.
                     val match = knownFields.entries.firstOrNull { it.key.equals(segment, ignoreCase = true) }
-                        ?: return SchemaResolution.UnknownKey(parentConfident = true)
+                        ?: return if (isLast) SchemaResolution.UnknownKey(parentConfident = true) else SchemaResolution.Indeterminate
                     match.value
                 }
                 freeFormInner != null -> freeFormInner

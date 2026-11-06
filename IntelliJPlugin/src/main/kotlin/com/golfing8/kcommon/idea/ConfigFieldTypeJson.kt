@@ -28,6 +28,7 @@ object ConfigFieldTypeJson {
             "inner" to toJson(type.inner, project, interner),
             "keyType" to toJson(type.keyType, project, interner)
         )
+        is ConfigFieldType.Formatted -> formatted(type)
         ConfigFieldType.Unknown -> jsonObjectOf("kind" to JsonValue.JsonString("unknown"))
     }
 
@@ -36,7 +37,13 @@ object ConfigFieldTypeJson {
         val variantsJson = if (type.variants.isEmpty()) null else JsonValue.JsonObject().also { obj ->
             for ((variant, fields) in type.variants) obj[variant] = fieldsToJson(fields, project, interner)
         }
-        return interner.internNested(alias, fieldsToJson(type.fields, project, interner), type.discriminator, variantsJson)
+        return interner.internNested(alias, fieldsToJson(type.fields, project, interner), type.discriminator, variantsJson, type.scalar?.let(::formatted))
+    }
+
+    private fun formatted(type: ConfigFieldType.Formatted): JsonValue.JsonObject {
+        val obj = jsonObjectOf("kind" to JsonValue.JsonString("format"), "format" to JsonValue.JsonString(type.format.name))
+        type.uiType?.let { obj["uiType"] = JsonValue.JsonString(it) }
+        return obj
     }
 
     fun fieldsToJson(fields: Map<String, ConfigFieldType>, project: Project, interner: SchemaExportInterner): JsonValue.JsonObject {

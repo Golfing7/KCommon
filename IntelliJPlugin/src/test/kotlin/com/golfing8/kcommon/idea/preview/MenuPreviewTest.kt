@@ -79,4 +79,37 @@ class MenuPreviewTest {
         assertEquals("rgba(0,0,0,0.45)", HytaleMenuHtml.color("#000000(0.45)"))
         assertEquals("LayoutMode", HytaleMenuHtml.pascal("layout-mode"))
     }
+
+    @Test
+    fun `ui documents know the type each name was written as`() {
+        val doc = UiDocument.parse("@A = TextButtonStyle(Default: ()); @B = @A; @C = (X: 1); @T = Label { };")
+        assertEquals("TextButtonStyle", doc.typeOf("B"))
+        assertNull(doc.typeOf("C"))
+        assertTrue(doc.has("T") && doc["T"] == null)
+    }
+
+    @Test
+    fun `samples fill placeholders and paths reach the page`() {
+        val html = HytaleMenuHtml.render(menu, null, HytaleMenuHtml.Options(rows = mapOf("items" to listOf("item")), samples = mapOf("NAME" to "Iron Sword"), highlight = "elements/close"))
+        assertTrue("Iron Sword" in html)
+        assertTrue("data-path=\"templates/item/children/name\"" in html)
+        assertTrue("kcHighlight('elements/close')" in html)
+        assertEquals(mapOf("NAME" to "Iron Sword", "COST" to "5"), MenuRowRegistry.samples("a: 1\n  #@Sample NAME = Iron Sword\n#@Sample COST=5\n"))
+    }
+
+    @Test
+    fun `bukkit menus place filler, other and special slots`() {
+        val bukkit = mapOf(
+            "title" to "&aVault", "type" to "HOPPER", "use-filler-item" to "true",
+            "other-slots" to mapOf("info" to mapOf("slot" to "0", "type" to "PAPER", "name" to "&eInfo", "lore" to listOf("&7Line"))),
+            "special-slots" to mapOf("claim" to mapOf("slot" to mapOf("x" to "3", "y" to "1"), "item" to mapOf("type" to "CHEST", "amount" to "2"))),
+        )
+        val html = BukkitMenuHtml.render(bukkit, MinecraftAssets.ItemTextures { "data:x" }, HytaleMenuHtml.Options())
+        assertEquals(5, Regex("class=\"slot").findAll(html).count())
+        assertTrue("data-path=\"other-slots/info\"" in html && "data-path=\"special-slots/claim\"" in html)
+        assertEquals(3, Regex("data-path=\"filler-item\"").findAll(html).count())
+        assertTrue(">2<" in html && "Vault" in html)
+        val hidden = BukkitMenuHtml.render(bukkit, null, HytaleMenuHtml.Options(showSpecial = false))
+        assertFalse("special-slots/claim" in hidden)
+    }
 }

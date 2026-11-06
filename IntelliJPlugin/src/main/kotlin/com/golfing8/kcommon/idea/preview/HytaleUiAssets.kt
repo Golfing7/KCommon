@@ -17,7 +17,24 @@ interface MenuAssets {
     /** The resolved value of a `.ui` reference such as `@DefaultTextButtonStyle` or `Pages/Foo.ui@Bar`. */
     fun reference(ref: String): Any?
 
+    /** Whether a reference points at something, so a typo can be flagged. */
+    fun referenceStatus(ref: String): RefStatus = RefStatus.OK
+
+    /** The names a document (`Common.ui` when null) defines, with the `.ui` type each was written as, where known. */
+    fun referenceNames(document: String? = null): Map<String, String?> = emptyMap()
+
+    /** The vanilla `.ui` documents a reference can name, such as `Pages/BarterPage.ui`. */
+    fun documents(): List<String> = emptyList()
+
+    /** Every item id, sorted. */
+    fun itemIds(): List<String> = emptyList()
+
+    /** An item's icon as a `data:` URI. */
+    fun itemIcon(id: String): String? = null
+
     data class Texture(val uri: String, val scale: Int)
+
+    enum class RefStatus { OK, NO_DOCUMENT, NO_VALUE }
 }
 
 /**
@@ -30,11 +47,16 @@ object HytaleUiAssets {
     private const val PATH_KEY = "kcommon.hytale.assets"
     private const val UI_ROOT = "Common/UI/Custom/"
     private const val INSTALL = "Hytale/install/release/package/game/latest/Assets.zip"
+    private const val ITEMS = "Server/Item/Items/"
+    /** The first `Icon`/`Parent` in an item file is its own; later ones belong to nested interactions. */
+    private val ICON = Regex("\"Icon\"\\s*:\\s*\"([^\"]+)\"")
+    private val PARENT = Regex("\"Parent\"\\s*:\\s*\"([^\"]+)\"")
 
     @Volatile
     private var open: Source? = null
 
-    fun configuredPath(): String? = PropertiesComponent.getInstance().getValue(PATH_KEY)
+    fun configuredPath(): String? =
+        if (com.intellij.openapi.application.ApplicationManager.getApplication() == null) null else PropertiesComponent.getInstance().getValue(PATH_KEY)
 
     fun setConfiguredPath(path: String?) {
         PropertiesComponent.getInstance().setValue(PATH_KEY, path)
@@ -101,6 +123,59 @@ object HytaleUiAssets {
             if (at < 0) return null
             val document = ref.substring(0, at).ifEmpty { "Common.ui" }
             return document(document)?.get(ref.substring(at + 1))
+        }
+
+        override fun referenceStatus(ref: String): MenuAssets.RefStatus {
+            val at = ref.lastIndexOf('@')
+            val document = document(ref.substring(0, at.coerceAtLeast(0)).ifEmpty { "Common.ui" }) ?: return MenuAssets.RefStatus.NO_DOCUMENT
+            return if (document.has(ref.substring(at + 1))) MenuAssets.RefStatus.OK else MenuAssets.RefStatus.NO_VALUE
+        }
+
+        override fun referenceNames(document: String?): Map<String, String?> {
+            val doc = document(document ?: "Common.ui") ?: return emptyMap()
+            return doc.names.associateWith { doc.typeOf(it) }
+        }
+
+        override fun documents(): List<String> = documentList
+
+        private val documentList: List<String> by lazy {
+            entries(UI_ROOT).filter { it.endsWith(".ui") && it.count { c -> c == '/' } > UI_ROOT.count { c -> c == '/' } }
+                .map { it.removePrefix(UI_ROOT) }.sorted()
+        }
+
+        /** Item id -> its definition's top-level `Icon` and `Parent`, from `Server/Item/Items/**/<id>.json`. */
+        private val items: Map<String, Pair<String?, String?>> by lazy {
+            val result = HashMap<String, Pair<String?, String?>>()
+            for (path in entries(ITEMS)) {
+                if (!path.endsWith(".json")) continue
+                val text = bytes(path)?.toString(Charsets.UTF_8) ?: continue
+                result[path.substringAfterLast('/').removeSuffix(".json")] =
+                    ICON.find(text)?.groupValues?.get(1) to PARENT.find(text)?.groupValues?.get(1)
+            }
+            result
+        }
+
+        private val sortedIds: List<String> by lazy { items.keys.sorted() }
+
+        override fun itemIds(): List<String> = sortedIds
+
+        override fun itemIcon(id: String): String? {
+            var current: String? = id
+            var depth = 0
+            while (current != null && depth++ < 8) {
+                val (icon, parent) = items[current] ?: break
+                if (icon != null) return image(icon)
+                current = parent
+            }
+            return image("Icons/ItemsGenerated/$id.png")
+        }
+
+        /** Every file path under [prefix]. */
+        private fun entries(prefix: String): List<String> {
+            if (zip != null) return zip.entries().asSequence().map { it.name }.filter { it.startsWith(prefix) && !it.endsWith("/") }.toList()
+            val root = File(file, prefix)
+            if (!root.isDirectory) return emptyList()
+            return root.walkTopDown().filter { it.isFile }.map { prefix + it.relativeTo(root).invariantSeparatorsPath }.toList()
         }
 
         private fun document(path: String): UiDocument? {

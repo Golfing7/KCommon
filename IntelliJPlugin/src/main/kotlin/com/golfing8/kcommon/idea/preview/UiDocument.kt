@@ -29,6 +29,18 @@ class UiDocument private constructor(
         }
     }
 
+    /** Every name defined here, including element templates (whose value is null). */
+    val names: Set<String> get() = definitions.keys
+
+    fun has(name: String): Boolean = name in definitions
+
+    /** The `.ui` type a definition was written as (`@Foo = TextButtonStyle(...)` is a TextButtonStyle), following references; null when unknown. */
+    fun typeOf(name: String, depth: Int = 0): String? = when (val value = definitions[name]) {
+        is Tuple -> value.type
+        is Ref -> if (depth > 8) null else if (value.alias == null) typeOf(value.name, depth + 1) else aliases[value.alias]?.let(load)?.typeOf(value.name, depth + 1)
+        else -> null
+    }
+
     private fun resolve(value: Any?): Any? = when (value) {
         is Ref -> if (value.alias == null) get(value.name) else aliases[value.alias]?.let(load)?.get(value.name)
         is Tuple -> {
@@ -43,7 +55,7 @@ class UiDocument private constructor(
     }
 
     private data class Ref(val alias: String?, val name: String)
-    private class Tuple(val entries: List<Pair<String?, Any?>>)
+    private class Tuple(val entries: List<Pair<String?, Any?>>, val type: String? = null)
 
     companion object {
         fun parse(text: String, load: (String) -> UiDocument? = { null }): UiDocument {
@@ -85,7 +97,7 @@ class UiDocument private constructor(
             return when {
                 c == '"' -> string()
                 c == '#' -> color()
-                c == '(' -> tuple()
+                c == '(' -> tuple(null)
                 c == '@' -> { i++; Ref(null, ident()) }
                 c == '$' -> {
                     i++
@@ -98,7 +110,7 @@ class UiDocument private constructor(
                     val name = ident()
                     skipSpace()
                     when (peek()) {
-                        '(' -> tuple()
+                        '(' -> tuple(name)
                         '{' -> { skipBlock(); null }
                         else -> name
                     }
@@ -107,12 +119,12 @@ class UiDocument private constructor(
             }
         }
 
-        private fun tuple(): Tuple {
+        private fun tuple(type: String?): Tuple {
             expect('(')
             val entries = ArrayList<Pair<String?, Any?>>()
             while (true) {
                 skipSpace()
-                if (peek() == ')') { i++; return Tuple(entries) }
+                if (peek() == ')') { i++; return Tuple(entries, type) }
                 if (text.startsWith("...", i)) {
                     i += 3
                     entries += null to value()
