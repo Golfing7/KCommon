@@ -48,6 +48,13 @@ tasks.processResources {
     }
 }
 
+// `./gradlew runLocalIde -PlocalIde=/path/to/idea` runs the sandbox on an installed IDE, to check newer platforms.
+providers.gradleProperty("localIde").orNull?.let { ide ->
+    intellijPlatformTesting.runIde.register("runLocalIde") {
+        localPath = file(ide)
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }

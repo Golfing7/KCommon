@@ -1,0 +1,2 @@
+<!-- Loaded when JCEF is a separate plugin (2026.1+), so the menu preview's classes can see it. Nothing else to register. -->
+<idea-plugin/>

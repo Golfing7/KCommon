@@ -69,10 +69,19 @@ class MenuPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
 
 private class MenuPreviewPanel(private val project: Project) : Disposable {
     val component = JPanel(BorderLayout())
-    private val status = JBLabel("Put the caret in a menu")
+    private val status = JBLabel("Open a YAML file with a menu")
     private val showSpecial = JBCheckBox("Special elements", true)
     private val zoom = ComboBox(arrayOf("Fit", "100%", "75%", "50%"))
-    private val browser: JBCefBrowser? = if (JBCefApp.isSupported()) JBCefBrowser() else null
+    /** Every menu in the current file; picking one moves the caret to it. */
+    private val menuPicker = ComboBox<String>()
+    private var updatingPicker = false
+    @Volatile
+    private var menusInFile: Map<String, SmartPsiElementPointer<YAMLKeyValue>> = emptyMap()
+    /** The menu last shown, by its key path, so it stays up while the caret is elsewhere in the file. */
+    @Volatile
+    private var shownName: String? = null
+    // A JCEF that's missing or unsupported leaves a message instead of the browser.
+    private val browser: JBCefBrowser? = runCatching { if (JBCefApp.isSupported()) JBCefBrowser() else null }.getOrNull()
     private val navigate: JBCefJSQuery? = browser?.let { JBCefJSQuery.create(it as JBCefBrowserBase) }
     private val alarm = Alarm(Alarm.ThreadToUse.SWING_THREAD, this)
     /** The YAML text last drawn, so caret moves inside the same menu only move the highlight. */
@@ -89,6 +98,7 @@ private class MenuPreviewPanel(private val project: Project) : Disposable {
         val controls = JPanel(FlowLayout(FlowLayout.LEFT, JBUI.scale(6), 0))
         controls.add(showSpecial)
         controls.add(zoom)
+        controls.add(menuPicker)
         toolbar.add(controls, BorderLayout.WEST)
         toolbar.add(status, BorderLayout.CENTER)
         component.add(toolbar, BorderLayout.NORTH)
@@ -111,6 +121,14 @@ private class MenuPreviewPanel(private val project: Project) : Disposable {
 
         showSpecial.addActionListener { shown = null; schedule() }
         zoom.addActionListener { shown = null; schedule() }
+        menuPicker.addActionListener {
+            if (updatingPicker) return@addActionListener
+            val pointer = menusInFile[menuPicker.selectedItem as? String ?: return@addActionListener] ?: return@addActionListener
+            val (file, offset) = ReadAction.compute<Pair<com.intellij.openapi.vfs.VirtualFile, Int>?, RuntimeException> {
+                pointer.element?.let { target -> target.containingFile?.virtualFile?.let { it to target.textOffset } }
+            } ?: return@addActionListener
+            PsiNavigationSupport.getInstance().createNavigatable(project, file, offset).navigate(false)
+        }
         val multicaster = EditorFactory.getInstance().eventMulticaster
         multicaster.addCaretListener(object : CaretListener {
             override fun caretPositionChanged(event: CaretEvent) {
@@ -154,28 +172,40 @@ private class MenuPreviewPanel(private val project: Project) : Disposable {
             .submit(AppExecutorUtil.getAppExecutorService())
     }
 
-    private class Preview(val name: String, val source: String, val menu: SmartPsiElementPointer<YAMLKeyValue>, val caretPath: String?, val html: () -> String)
+    private class Preview(
+        val name: String,
+        val source: String,
+        val menu: SmartPsiElementPointer<YAMLKeyValue>,
+        val caretPath: String?,
+        val menus: Map<String, SmartPsiElementPointer<YAMLKeyValue>>,
+        val html: () -> String,
+    )
 
-    /** Null when the caret isn't in a menu, which leaves the last preview up. */
+    /**
+     * The menu the caret is in; with the caret outside every menu, the one shown last (if it's in
+     * this file) or the file's first. Null when the file has no menus, which leaves the last preview up.
+     */
     private fun compute(document: Document, offset: Int, base: HytaleMenuHtml.Options): Preview? {
         val file = PsiDocumentManager.getInstance(project).getPsiFile(document) as? YAMLFile ?: return null
-        val at = file.findElementAt(offset) ?: file.findElementAt(offset - 1) ?: return null
+        val menus = menusIn(file)
+        if (menus.isEmpty()) return null
+        val at = file.findElementAt(offset) ?: file.findElementAt(offset - 1)
         val caretKey = PsiTreeUtil.getParentOfType(at, YAMLKeyValue::class.java, false)
         var keyValue = caretKey
-        var kind: Kind? = null
-        while (keyValue != null) {
-            kind = kind(keyValue)
-            if (kind != null) break
+        while (keyValue != null && menus.values.none { it === keyValue }) {
             keyValue = PsiTreeUtil.getParentOfType(keyValue, YAMLKeyValue::class.java, true)
         }
-        val menu = keyValue?.value as? YAMLMapping ?: return null
+        if (keyValue == null) keyValue = shownName?.let(menus::get) ?: menus.values.first()
+        val name = menus.entries.first { it.value === keyValue }.key
+        val kind = kind(keyValue)
+        val menu = keyValue.value as? YAMLMapping ?: return null
         @Suppress("UNCHECKED_CAST")
         val config = plain(menu) as Map<String, Any?>
         val caretPath = caretKey?.let { pathWithin(keyValue, it) }
         val options = base.copy(rows = MenuRowRegistry.rows(project), samples = MenuRowRegistry.samples(project) + MenuRowRegistry.samples(file.text), highlight = caretPath)
         val source = menu.text + options.showSpecial + options.zoom + kind + options.samples
-        val pointer = SmartPointerManager.createPointer(keyValue)
-        return Preview(keyValue.keyText, source, pointer, caretPath) {
+        val pointers = SmartPointerManager.getInstance(project)
+        return Preview(name, source, pointers.createSmartPsiElementPointer(keyValue), caretPath, menus.mapValues { pointers.createSmartPsiElementPointer(it.value) }) {
             when (kind) {
                 Kind.BUKKIT -> BukkitMenuHtml.render(config, MinecraftAssets.current(), options)
                 else -> HytaleMenuHtml.render(config, HytaleUiAssets.current(), options)
@@ -185,8 +215,20 @@ private class MenuPreviewPanel(private val project: Project) : Disposable {
 
     private fun show(preview: Preview?) {
         if (preview == null || browser == null) return
-        status.text = "Menu: ${preview.name}"
+        status.text = ""
         shownMenu = preview.menu
+        shownName = preview.name
+        menusInFile = preview.menus
+        updatingPicker = true
+        try {
+            val names = preview.menus.keys.toList()
+            if ((0 until menuPicker.itemCount).map { menuPicker.getItemAt(it) } != names) {
+                menuPicker.model = javax.swing.DefaultComboBoxModel(names.toTypedArray())
+            }
+            menuPicker.selectedItem = preview.name
+        } finally {
+            updatingPicker = false
+        }
         if (preview.source == shown) {
             // Same menu, so only the caret moved.
             browser.cefBrowser.executeJavaScript("window.kcHighlight&&kcHighlight(${HytaleMenuHtml.jsString(preview.caretPath.orEmpty())})", "", 0)
@@ -203,13 +245,15 @@ private class MenuPreviewPanel(private val project: Project) : Disposable {
 
     /** Moves the caret to the YAML of the element clicked in the preview. */
     private fun navigateTo(path: String) {
-        val menu = shownMenu?.element ?: return
-        var target: YAMLKeyValue = menu
-        for (segment in path.split('/')) {
-            target = (target.value as? YAMLMapping)?.getKeyValueByKey(segment) ?: break
-        }
-        val file = target.containingFile?.virtualFile ?: return
-        PsiNavigationSupport.getInstance().createNavigatable(project, file, target.textOffset).navigate(true)
+        val (file, offset) = ReadAction.compute<Pair<com.intellij.openapi.vfs.VirtualFile, Int>?, RuntimeException> {
+            val menu = shownMenu?.element ?: return@compute null
+            var target: YAMLKeyValue = menu
+            for (segment in path.split('/')) {
+                target = (target.value as? YAMLMapping)?.getKeyValueByKey(segment) ?: break
+            }
+            target.containingFile?.virtualFile?.let { it to target.textOffset }
+        } ?: return
+        PsiNavigationSupport.getInstance().createNavigatable(project, file, offset).navigate(true)
     }
 
     override fun dispose() = Unit
@@ -230,6 +274,20 @@ private class MenuPreviewPanel(private val project: Project) : Disposable {
             if (type?.typeName == "MenuBuilder") return Kind.BUKKIT
             if (listOf("special-slots", "other-slots", "filler-item").any { mapping.getKeyValueByKey(it)?.value is YAMLMapping }) return Kind.BUKKIT
             return null
+        }
+
+        /** Every menu in [file] by its key path (`crates.preview-menu`), not looking inside a menu for more. */
+        fun menusIn(file: YAMLFile): Map<String, YAMLKeyValue> {
+            val result = LinkedHashMap<String, YAMLKeyValue>()
+            fun walk(mapping: YAMLMapping?, prefix: String) {
+                for (kv in mapping?.keyValues.orEmpty()) {
+                    val value = kv.value as? YAMLMapping ?: continue
+                    val path = prefix + kv.keyText
+                    if (kind(kv) != null) result[path] = kv else walk(value, "$path.")
+                }
+            }
+            for (document in file.documents) walk(document.topLevelValue as? YAMLMapping, "")
+            return result
         }
 
         /** [inner]'s key path below [menu], `/`-separated (`elements/footer/children/close`). */

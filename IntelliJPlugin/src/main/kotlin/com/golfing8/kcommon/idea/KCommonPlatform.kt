@@ -108,7 +108,11 @@ class KCommonSettingsConfigurable(private val project: Project) : BoundConfigura
             comboBox(Choice.entries).bindItem(::choice)
         }
         row {
-            comment(detectedText())
+            // Detection reads indexes, which can't happen on the UI thread, so the text fills in once it's known.
+            val label = comment("Checking libraries...").component
+            com.intellij.openapi.application.ReadAction.nonBlocking<String> { detectedText() }
+                .finishOnUiThread(com.intellij.openapi.application.ModalityState.any()) { label.text = it }
+                .submit(com.intellij.util.concurrency.AppExecutorUtil.getAppExecutorService())
         }
         row("Hytale assets:") {
             textFieldWithBrowseButton(
