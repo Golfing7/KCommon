@@ -1,5 +1,6 @@
 package com.golfing8.kcommon.config.lang;
 
+import com.golfing8.kcommon.nms.access.NMSAccess;
 import com.golfing8.kcommon.struct.SoundWrapper;
 import com.golfing8.kcommon.struct.placeholder.PlaceholderContainer;
 import com.golfing8.kcommon.struct.title.Title;
@@ -209,6 +210,9 @@ public interface MessageContainer {
             } else {
                 Component component = MS.toComponent(getMessage().getMessages(), container);
                 for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+                        return;
+
                     MS.audience(player).sendMessage(component);
                 }
                 MS.audience(Bukkit.getConsoleSender()).sendMessage(component);
@@ -216,6 +220,9 @@ public interface MessageContainer {
         }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+                return;
+
             if (getMessage().getTitle() != null) {
                 MS.sendTitle(player, getMessage().getTitle(), container);
             }
@@ -239,6 +246,9 @@ public interface MessageContainer {
      * @param placeholders the placeholders.
      */
     default void send(CommandSender sender, Object... placeholders) {
+        if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+            return;
+
         PlaceholderContainer container = PlaceholderContainer.compileTrusted(placeholders);
         if (getMessage().getMessages() != null && !getMessage().getMessages().isEmpty()) {
             if (getMessage().isPaged()) {
@@ -275,6 +285,9 @@ public interface MessageContainer {
             if (getMessage().isPaged()) {
                 // Paged messages are tracked individually, this hack is necessary.
                 for (CommandSender sender : receivers) {
+                    if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+                        return;
+
                     toPagedMessage(container).displayTo(sender, 1, placeholders);
                 }
             } else {
@@ -285,6 +298,9 @@ public interface MessageContainer {
         for (CommandSender sender : receivers) {
             if (!(sender instanceof Player))
                 continue;
+
+            if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
+                return;
 
             if (getMessage().getTitle() != null) {
                 MS.sendTitle((Player) sender, getMessage().getTitle(), container);
