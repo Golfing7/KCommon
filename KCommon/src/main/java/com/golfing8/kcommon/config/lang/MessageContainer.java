@@ -211,7 +211,7 @@ public interface MessageContainer {
                 Component component = MS.toComponent(getMessage().getMessages(), container);
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
-                        return;
+                        continue;
 
                     MS.audience(player).sendMessage(component);
                 }
@@ -221,7 +221,7 @@ public interface MessageContainer {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
-                return;
+                continue;
 
             if (getMessage().getTitle() != null) {
                 MS.sendTitle(player, getMessage().getTitle(), container);
@@ -286,7 +286,7 @@ public interface MessageContainer {
                 // Paged messages are tracked individually, this hack is necessary.
                 for (CommandSender sender : receivers) {
                     if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
-                        return;
+                        continue;
 
                     toPagedMessage(container).displayTo(sender, 1, placeholders);
                 }
@@ -300,7 +300,7 @@ public interface MessageContainer {
                 continue;
 
             if (sender.getName().equals(NMSAccess.ITEM_CAPTURE_NAME))
-                return;
+                continue;
 
             if (getMessage().getTitle() != null) {
                 MS.sendTitle((Player) sender, getMessage().getTitle(), container);
